@@ -1,0 +1,6 @@
+{
+  "name": "จุดที่ Business กับ Engineering มาเจอกัน — Interactive Guide & AI",
+  "description": "คู่มือกลางข้ามสายงาน Business ↔ Engineering พร้อมระบบถาม AI, Interactive Quiz และ Gamification",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
