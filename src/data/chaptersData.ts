@@ -3,6 +3,7 @@ import { chapters1_5 } from './chapters/chapters1_5';
 import { chapters6_10 } from './chapters/chapters6_10';
 import { chapters11_15 } from './chapters/chapters11_15';
 import { CHAPTER_ILLUSTRATIONS } from './chapterIllustrations';
+import { FRICTION_PLAYBOOKS } from './frictionPlaybooks';
 
 export const CHAPTERS: Chapter[] = [
   ...chapters1_5,
@@ -10,8 +11,10 @@ export const CHAPTERS: Chapter[] = [
   ...chapters11_15
 ].map(chapter => {
   const illustration = CHAPTER_ILLUSTRATIONS[chapter.id];
+  const frictionPlaybook = FRICTION_PLAYBOOKS[chapter.id];
   return {
     ...chapter,
-    illustrations: illustration ? [illustration] : []
+    illustrations: illustration ? [illustration] : [],
+    frictionPlaybook: frictionPlaybook || undefined
   };
 });

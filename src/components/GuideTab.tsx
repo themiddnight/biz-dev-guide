@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Chapter, AudienceMode } from '../types';
+import { Chapter, AudienceMode, ExperienceLevel } from '../types';
+import { ROLE_MINDSETS } from '../data/roleMindsets';
+import { FRICTION_PLAYBOOKS } from '../data/frictionPlaybooks';
 import { ChapterDiagram } from './ChapterDiagram';
+import { RoleMindsetCard } from './RoleMindsetCard';
+import { FrictionPlaybookCard } from './FrictionPlaybookCard';
 import { 
   Search, 
   Bookmark, 
@@ -30,12 +34,23 @@ import {
   MessageSquare,
   Check,
   Share2,
-  SlidersHorizontal
+  SlidersHorizontal,
+  Briefcase,
+  Code2,
+  Users,
+  Handshake,
+  Sprout,
+  Scale,
+  Flame,
+  Zap
 } from 'lucide-react';
 
 interface GuideTabProps {
   chapters: Chapter[];
   audienceMode: AudienceMode;
+  experienceLevel?: ExperienceLevel;
+  onExperienceLevelChange?: (lvl: ExperienceLevel) => void;
+  onAudienceChange?: (mode: AudienceMode) => void;
   plainModeEnabled: boolean;
   bookmarks: string[];
   readChapters?: string[];
@@ -43,11 +58,15 @@ interface GuideTabProps {
   onToggleReadChapter?: (chapterId: string) => void;
   onAskAIWithPrompt: (prompt: string) => void;
   onStartQuiz: () => void;
+  onEarnXp?: (amount: number, reason: string) => void;
 }
 
 export const GuideTab: React.FC<GuideTabProps> = ({
   chapters,
   audienceMode,
+  experienceLevel = 'beginner',
+  onExperienceLevelChange,
+  onAudienceChange,
   plainModeEnabled,
   bookmarks,
   readChapters = [],
@@ -55,6 +74,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   onToggleReadChapter,
   onAskAIWithPrompt,
   onStartQuiz,
+  onEarnXp,
 }) => {
   const [activeChapterId, setActiveChapterId] = useState<string>('s1');
   const [searchQuery, setSearchQuery] = useState('');
@@ -63,18 +83,42 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   const [checkedChecklist, setCheckedChecklist] = useState<Record<string, boolean>>({});
   const [c4Level, setC4Level] = useState<number>(1);
   const [expandedFaqId, setExpandedFaqId] = useState<number | null>(1);
+  const [mindsetSubTab, setMindsetSubTab] = useState<'business' | 'engineer'>('business');
+  const [dilemmaAnswers, setDilemmaAnswers] = useState<Record<string, string>>({});
 
   // Accordion section states for the active chapter
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
-    primer: true,
-    jargon: true,
+    mindset: true,
+    friction: true,
+    primer: experienceLevel === 'beginner',
+    jargon: experienceLevel === 'beginner',
     dialogue: true,
     diagram: true,
+    examples: true,
     coreConcepts: true,
     workflow: false,
-    pitfalls: false,
+    pitfalls: experienceLevel === 'experienced',
     checklist: false,
   });
+
+  // Automatically adapt default visible sections when user toggles Experience Level
+  useEffect(() => {
+    if (experienceLevel === 'experienced') {
+      setOpenSections(prev => ({
+        ...prev,
+        friction: true,
+        dialogue: true,
+        pitfalls: true,
+      }));
+    } else {
+      setOpenSections(prev => ({
+        ...prev,
+        mindset: true,
+        primer: true,
+        jargon: true,
+      }));
+    }
+  }, [experienceLevel]);
 
   // Find active chapter object
   const activeChapter = chapters.find(c => c.id === activeChapterId) || chapters[0];
@@ -101,10 +145,13 @@ export const GuideTab: React.FC<GuideTabProps> = ({
 
   const expandAllSections = () => {
     setOpenSections({
+      mindset: true,
+      friction: true,
       primer: true,
       jargon: true,
       dialogue: true,
       diagram: true,
+      examples: true,
       coreConcepts: true,
       workflow: true,
       pitfalls: true,
@@ -118,6 +165,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
       jargon: false,
       dialogue: false,
       diagram: false,
+      examples: false,
       coreConcepts: false,
       workflow: false,
       pitfalls: false,
@@ -154,26 +202,26 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   return (
     <div className="space-y-6 pb-20">
       {/* Top Welcome & Quick Jump Banner */}
-      <div className="bg-gradient-to-br from-indigo-500/10 via-purple-500/5 to-transparent dark:from-indigo-950/40 dark:via-zinc-900 border border-indigo-100 dark:border-indigo-900/50 rounded-3xl p-5 sm:p-7">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
-          <div className="space-y-2 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-600/10 text-indigo-700 dark:text-indigo-300 text-xs font-semibold">
-              <Sparkles className="w-3.5 h-3.5" />
+      <div className="bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xs">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div className="space-y-1.5 max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-neutral-100 dark:bg-[#1f1f1f] text-neutral-800 dark:text-[#d4d4d4] text-[11px] sm:text-xs font-semibold border border-neutral-200 dark:border-[#333333]">
+              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
               <span>โหมดอ่านทีละบท พร้อมสารบัญกระโดดข้ามได้ตลอดเวลา</span>
             </div>
-            <h2 className="text-xl sm:text-2xl font-extrabold text-zinc-900 dark:text-zinc-50 tracking-tight">
+            <h2 className="text-lg sm:text-2xl font-extrabold text-neutral-900 dark:text-[#fafafa] tracking-tight">
               คู่มือสองโลก Business ↔ Engineering (15 บทฉบับเริ่มจาก 0)
             </h2>
-            <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed">
+            <p className="text-xs sm:text-sm text-neutral-500 dark:text-[#8e8e8e] leading-relaxed font-normal">
               ครอบคลุมปฐมบทสำหรับมือใหม่ ศัพท์เทคนิคแปลเป็นภาษาคน ตัวอย่างบทสนทนาจริงในที่ทำงาน แผนภาพจำลองระบบ และทางออกของข้อขัดแย้ง
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+          <div className="flex flex-wrap items-center gap-2 shrink-0">
             {/* Open Table of Contents Button */}
             <button
               onClick={() => setIsIndexOpen(true)}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-semibold shadow-sm transition-all cursor-pointer"
+              className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:hover:bg-neutral-200 dark:text-[#0a0a0a] text-xs sm:text-sm font-semibold shadow-xs transition-all cursor-pointer"
             >
               <List className="w-4 h-4" />
               <span>สารบัญทั้ง 15 บท (Index)</span>
@@ -181,7 +229,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
 
             <button
               onClick={onStartQuiz}
-              className="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-200 text-xs sm:text-sm font-medium hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-all cursor-pointer"
+              className="inline-flex items-center gap-2 px-3 sm:px-3.5 py-2 sm:py-2.5 rounded-xl bg-neutral-100 dark:bg-[#1a1a1a] border border-neutral-200 dark:border-[#262626] text-neutral-700 dark:text-[#d4d4d4] text-xs sm:text-sm font-medium hover:bg-neutral-200/70 dark:hover:bg-[#222222] transition-all cursor-pointer"
             >
               <GraduationCap className="w-4 h-4 text-amber-500" />
               <span>ทำควิซสะสม XP</span>
@@ -190,14 +238,14 @@ export const GuideTab: React.FC<GuideTabProps> = ({
         </div>
 
         {/* Global Progress Bar */}
-        <div className="mt-5 pt-4 border-t border-indigo-100/80 dark:border-indigo-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-2 text-zinc-600 dark:text-zinc-300 font-medium">
-            <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+        <div className="mt-4 pt-3.5 border-t border-neutral-100 dark:border-[#262626] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs font-mono">
+          <div className="flex items-center gap-2 text-neutral-600 dark:text-[#a3a3a3] font-medium text-[11px] sm:text-xs">
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
             <span>ความคืบหน้าการอ่าน: อ่านจบแล้ว {readChapters.length} จาก {chapters.length} บท ({percentCompleted}%)</span>
           </div>
-          <div className="w-full sm:w-64 h-2 rounded-full bg-zinc-200 dark:bg-zinc-800 overflow-hidden">
+          <div className="w-full sm:w-64 h-1.5 sm:h-2 rounded-full bg-neutral-100 dark:bg-[#262626] overflow-hidden">
             <div 
-              className="h-full bg-gradient-to-r from-indigo-500 to-emerald-500 rounded-full transition-all duration-500"
+              className="h-full bg-neutral-900 dark:bg-white rounded-full transition-all duration-500"
               style={{ width: `${percentCompleted}%` }}
             />
           </div>
@@ -205,30 +253,30 @@ export const GuideTab: React.FC<GuideTabProps> = ({
       </div>
 
       {/* Main Layout: Desktop Sidebar Index + Chapter Reader Card */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-start">
         
         {/* Left Column: Persistent Sticky Index on Desktop (Hidden on smaller screens, accessed via drawer/modal) */}
         <div className="hidden lg:block lg:col-span-4 sticky top-20 space-y-4">
-          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-4 shadow-sm space-y-4 max-h-[calc(100vh-6rem)] overflow-hidden flex flex-col">
-            <div className="flex items-center justify-between pb-2 border-b border-zinc-100 dark:border-zinc-800">
+          <div className="bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] rounded-2xl sm:rounded-3xl p-3.5 shadow-2xs space-y-3.5 max-h-[calc(100vh-6rem)] overflow-hidden flex flex-col">
+            <div className="flex items-center justify-between pb-2 border-b border-neutral-100 dark:border-[#262626]">
               <div className="flex items-center gap-2">
-                <List className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">สารบัญบทเรียน (15 บท)</h3>
+                <List className="w-4 h-4 text-neutral-900 dark:text-white" />
+                <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">สารบัญบทเรียน (15 บท)</h3>
               </div>
-              <span className="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400">
+              <span className="text-[11px] font-semibold text-neutral-500 dark:text-[#8e8e8e] font-mono">
                 บทที่ {activeIndex + 1}/{chapters.length}
               </span>
             </div>
 
             {/* Quick Search in Index */}
             <div className="relative">
-              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
+              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-[#737373]" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="ค้นหาบท หรือ คำศัพท์..."
-                className="w-full pl-8 pr-3 py-1.5 bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                className="w-full pl-8 pr-3 py-1.5 bg-neutral-50 dark:bg-[#1a1a1a] border border-neutral-200 dark:border-[#262626] rounded-xl text-xs text-neutral-900 dark:text-[#fafafa] placeholder-neutral-400 dark:placeholder-[#555555] focus:outline-none focus:ring-1 focus:ring-neutral-400 dark:focus:ring-neutral-600"
               />
             </div>
 
@@ -249,8 +297,8 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                   onClick={() => setSelectedRole(role.id)}
                   className={`px-2.5 py-1 rounded-lg font-medium whitespace-nowrap transition-all cursor-pointer ${
                     selectedRole === role.id
-                      ? 'bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-bold'
-                      : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-200'
+                      ? 'bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] font-bold shadow-xs'
+                      : 'bg-neutral-100 dark:bg-[#1f1f1f] text-neutral-600 dark:text-[#a3a3a3] hover:bg-neutral-200 dark:hover:bg-[#262626]'
                   }`}
                 >
                   {role.label}
@@ -271,35 +319,43 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                     onClick={() => handleSelectChapter(chapter.id)}
                     className={`w-full text-left p-2.5 rounded-xl border transition-all cursor-pointer flex items-start gap-2.5 ${
                       isActive
-                        ? 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-400 dark:border-indigo-600 shadow-xs'
-                        : 'bg-zinc-50/50 dark:bg-zinc-850/50 border-transparent hover:border-zinc-200 dark:hover:border-zinc-700 hover:bg-zinc-100/80 dark:hover:bg-zinc-800'
+                        ? 'bg-neutral-100 dark:bg-[#1f1f1f] border-neutral-300 dark:border-[#3a3a3a] shadow-xs'
+                        : 'bg-neutral-50/50 dark:bg-[#141414]/60 border-neutral-200/60 dark:border-[#262626] hover:border-neutral-300 dark:hover:border-[#333333] hover:bg-neutral-100/70 dark:hover:bg-[#1a1a1a]'
                     }`}
                   >
-                    <div className={`w-6 h-6 rounded-lg text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 ${
+                    <div className={`w-6 h-6 rounded-lg text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 font-mono ${
                       isActive
-                        ? 'bg-indigo-600 text-white'
+                        ? 'bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] shadow-xs'
                         : isRead
-                        ? 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400'
-                        : 'bg-zinc-200 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300'
+                        ? 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 font-semibold border border-emerald-300/60 dark:border-emerald-800/60'
+                        : 'bg-neutral-200 dark:bg-[#262626] text-neutral-700 dark:text-[#a3a3a3] border border-neutral-300/60 dark:border-[#333333]'
                     }`}>
                       {isRead && !isActive ? <Check className="w-3.5 h-3.5" /> : chapter.num}
                     </div>
 
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-1">
-                        <span className={`text-xs font-semibold truncate ${
-                          isActive ? 'text-indigo-950 dark:text-indigo-200 font-bold' : 'text-zinc-800 dark:text-zinc-200'
+                        <span className={`text-xs truncate ${
+                          isActive 
+                            ? 'text-neutral-900 dark:text-white font-bold' 
+                            : 'text-neutral-800 dark:text-[#c4c4c4] font-medium'
                         }`}>
                           {chapter.title}
                         </span>
                         {isBookmarked && (
-                          <BookmarkCheck className="w-3 h-3 text-amber-500 shrink-0" />
+                          <BookmarkCheck className="w-3.5 h-3.5 text-amber-500 shrink-0" />
                         )}
                       </div>
-                      <div className="flex items-center gap-1.5 mt-0.5 text-[10px] text-zinc-400">
-                        <span className="uppercase font-mono">{chapter.roleTag}</span>
+                      <div className="flex items-center gap-1.5 mt-0.5 text-[10px] text-neutral-500 dark:text-[#737373] font-mono">
+                        <span className="uppercase font-semibold">{chapter.roleTag}</span>
                         <span>•</span>
                         <span>{chapter.readTime}</span>
+                        {isRead && (
+                          <>
+                            <span>•</span>
+                            <span className="text-emerald-600 dark:text-emerald-400 font-semibold">อ่านแล้ว</span>
+                          </>
+                        )}
                       </div>
                     </div>
                   </button>
@@ -310,9 +366,9 @@ export const GuideTab: React.FC<GuideTabProps> = ({
         </div>
 
         {/* Right Column: Active Chapter Reader Card ("บทละหน้า") */}
-        <div className="lg:col-span-8 space-y-6">
+        <div className="lg:col-span-8 space-y-4 sm:space-y-6">
           {/* Chapter Top Navigation Bar */}
-          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-3.5 sm:p-4 shadow-sm flex items-center justify-between gap-3">
+          <div className="bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-2xs flex items-center justify-between gap-3">
             <div className="flex items-center gap-2 min-w-0">
               {/* Prev Chapter Button */}
               <button
@@ -320,8 +376,8 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                 onClick={() => prevChapter && handleSelectChapter(prevChapter.id)}
                 className={`p-2 rounded-xl border flex items-center gap-1 text-xs font-semibold transition-all ${
                   prevChapter
-                    ? 'border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 cursor-pointer'
-                    : 'border-zinc-100 dark:border-zinc-850 text-zinc-300 dark:text-zinc-600 cursor-not-allowed'
+                    ? 'border-neutral-200 dark:border-[#262626] hover:bg-neutral-100 dark:hover:bg-[#1f1f1f] text-neutral-700 dark:text-[#d4d4d4] cursor-pointer'
+                    : 'border-neutral-100 dark:border-[#1c1c1c] text-neutral-300 dark:text-[#444444] cursor-not-allowed'
                 }`}
                 title={prevChapter ? `บทก่อนหน้า: ${prevChapter.title}` : 'นี่คือบทแรก'}
               >
@@ -332,7 +388,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
               {/* Mobile Table of Contents Toggle */}
               <button
                 onClick={() => setIsIndexOpen(true)}
-                className="lg:hidden px-3 py-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 text-zinc-700 dark:text-zinc-300 text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
+                className="lg:hidden px-3 py-2 rounded-xl bg-neutral-100 dark:bg-[#1f1f1f] hover:bg-neutral-200 text-neutral-700 dark:text-[#d4d4d4] text-xs font-semibold flex items-center gap-1.5 cursor-pointer font-mono"
               >
                 <List className="w-3.5 h-3.5" />
                 <span>สารบัญ ({activeChapter.num}/15)</span>
@@ -340,10 +396,10 @@ export const GuideTab: React.FC<GuideTabProps> = ({
 
               {/* Current Chapter Indicator on Desktop */}
               <div className="hidden lg:flex items-center gap-2 pl-2">
-                <span className="px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 text-xs font-bold border border-indigo-200/60 dark:border-indigo-800/60">
+                <span className="px-2.5 py-1 rounded-lg bg-neutral-100 dark:bg-[#1f1f1f] text-neutral-800 dark:text-[#d4d4d4] text-xs font-bold border border-neutral-200 dark:border-[#333333] font-mono">
                   บทที่ {activeChapter.num} จาก {chapters.length}
                 </span>
-                <span className="text-xs text-zinc-500 dark:text-zinc-400 font-medium truncate max-w-[200px]">
+                <span className="text-xs text-neutral-600 dark:text-[#8e8e8e] font-medium truncate max-w-[200px]">
                   {activeChapter.title}
                 </span>
               </div>
@@ -357,12 +413,12 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                   onClick={() => onToggleReadChapter(activeChapter.id)}
                   className={`px-3 py-2 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
                     isCurrentRead
-                      ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300'
-                      : 'bg-zinc-50 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100'
+                      ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300'
+                      : 'bg-neutral-50 dark:bg-[#1a1a1a] border-neutral-200 dark:border-[#262626] text-neutral-700 dark:text-[#d4d4d4] hover:bg-neutral-100 dark:hover:bg-[#222222]'
                   }`}
                   title="ทำเครื่องหมายว่าอ่านและเข้าใจบทนี้แล้ว (+30 XP)"
                 >
-                  <CheckCircle2 className={`w-3.5 h-3.5 ${isCurrentRead ? 'text-emerald-600 dark:text-emerald-400' : 'text-zinc-400'}`} />
+                  <CheckCircle2 className={`w-3.5 h-3.5 ${isCurrentRead ? 'text-emerald-600 dark:text-emerald-400' : 'text-neutral-400'}`} />
                   <span className="hidden md:inline">{isCurrentRead ? 'อ่านแล้ว' : 'ทำเครื่องหมายว่าอ่านแล้ว'}</span>
                 </button>
               )}
@@ -373,7 +429,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                 className={`p-2 rounded-xl border transition-all cursor-pointer ${
                   isCurrentBookmarked
                     ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-300 dark:border-amber-700 text-amber-600 dark:text-amber-400'
-                    : 'bg-zinc-50 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-400 hover:text-zinc-600'
+                    : 'bg-neutral-50 dark:bg-[#1a1a1a] border-neutral-200 dark:border-[#262626] text-neutral-500 hover:text-neutral-800 dark:hover:text-[#fafafa]'
                 }`}
                 title={isCurrentBookmarked ? 'ลบบุ๊กมาร์ก' : 'บันทึกบทนี้ (+15 XP)'}
               >
@@ -386,8 +442,8 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                 onClick={() => nextChapter && handleSelectChapter(nextChapter.id)}
                 className={`p-2 rounded-xl border flex items-center gap-1 text-xs font-semibold transition-all ${
                   nextChapter
-                    ? 'border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 cursor-pointer'
-                    : 'border-zinc-100 dark:border-zinc-850 text-zinc-300 dark:text-zinc-600 cursor-not-allowed'
+                    ? 'border-neutral-200 dark:border-[#262626] bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] hover:opacity-90 cursor-pointer shadow-xs'
+                    : 'border-neutral-100 dark:border-[#1c1c1c] text-neutral-300 dark:text-[#444444] cursor-not-allowed'
                 }`}
                 title={nextChapter ? `บทถัดไป: ${nextChapter.title}` : 'นี่คือบทสุดท้าย'}
               >
@@ -398,52 +454,52 @@ export const GuideTab: React.FC<GuideTabProps> = ({
           </div>
 
           {/* Chapter Main Content Reader Card */}
-          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-5 sm:p-8 shadow-sm space-y-7">
+          <div className="bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-7 shadow-2xs space-y-5 sm:space-y-6">
             
             {/* Chapter Header */}
-            <div className="space-y-3 pb-5 border-b border-zinc-100 dark:border-zinc-800">
+            <div className="space-y-3 pb-4 sm:pb-5 border-b border-neutral-100 dark:border-[#262626]">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="w-8 h-8 rounded-xl bg-indigo-600 text-white font-black text-sm flex items-center justify-center shrink-0">
+                <span className="w-8 h-8 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] font-black text-sm flex items-center justify-center shrink-0 shadow-xs font-mono">
                   {activeChapter.num}
                 </span>
-                <span className="px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 text-xs font-semibold uppercase tracking-wider">
+                <span className="px-2.5 py-0.5 rounded-full bg-neutral-100 dark:bg-[#1f1f1f] border border-neutral-200 dark:border-[#333333] text-neutral-800 dark:text-[#d4d4d4] text-[11px] sm:text-xs font-semibold uppercase tracking-wider font-mono">
                   {activeChapter.roleTag}
                 </span>
-                <span className="flex items-center gap-1 text-xs text-zinc-400">
+                <span className="flex items-center gap-1 text-[11px] sm:text-xs text-neutral-500 dark:text-[#737373] font-medium font-mono">
                   <Clock className="w-3.5 h-3.5" />
                   {activeChapter.readTime}
                 </span>
                 {isCurrentRead && (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 text-xs font-semibold">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 border border-emerald-300/50 dark:border-emerald-800/50 text-emerald-800 dark:text-emerald-300 text-[11px] sm:text-xs font-semibold font-mono">
                     <Check className="w-3 h-3" />
                     ผ่านแล้ว
                   </span>
                 )}
               </div>
 
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-zinc-50 tracking-tight leading-tight">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-neutral-900 dark:text-[#fafafa] tracking-tight leading-tight">
                 {activeChapter.title}
               </h1>
-              <p className="text-sm sm:text-base text-zinc-500 dark:text-zinc-400 leading-relaxed font-normal">
+              <p className="text-xs sm:text-sm text-neutral-500 dark:text-[#8e8e8e] leading-relaxed font-normal">
                 {activeChapter.subtitle}
               </p>
 
               {/* Expand/Collapse All Accordion Control */}
-              <div className="flex items-center justify-between pt-2">
-                <div className="text-xs text-zinc-400">
+              <div className="flex items-center justify-between pt-1 text-xs">
+                <div className="text-neutral-500 dark:text-[#737373] font-normal">
                   คลิกที่หัวข้อเพื่อเปิด/ปิดเนื้อหาย่อย หรือดูทีละส่วน
                 </div>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={expandAllSections}
-                    className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline font-semibold cursor-pointer"
+                    className="text-neutral-800 dark:text-[#d4d4d4] hover:underline font-semibold cursor-pointer"
                   >
                     ขยายทั้งหมด
                   </button>
-                  <span className="text-zinc-300 dark:text-zinc-700">|</span>
+                  <span className="text-neutral-300 dark:text-[#333333]">|</span>
                   <button
                     onClick={collapseAllSections}
-                    className="text-xs text-zinc-500 hover:underline font-semibold cursor-pointer"
+                    className="text-neutral-500 dark:text-[#737373] hover:underline font-semibold cursor-pointer"
                   >
                     ย่อทั้งหมด
                   </button>
@@ -451,15 +507,106 @@ export const GuideTab: React.FC<GuideTabProps> = ({
               </div>
             </div>
 
+            {/* ADAPTIVE LENS CONTROLLER BANNER */}
+            <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-2 sm:space-y-2.5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="text-xs font-bold text-neutral-800 dark:text-[#e5e5e5] flex items-center gap-1.5 font-mono">
+                    <SlidersHorizontal className="w-3.5 h-3.5 text-neutral-600 dark:text-[#a3a3a3]" />
+                    <span>Active Lens:</span>
+                  </span>
+                  <span className="text-[11px] sm:text-xs font-semibold px-2 py-0.5 rounded-md bg-neutral-200 dark:bg-[#262626] text-neutral-800 dark:text-[#d4d4d4]">
+                    {audienceMode === 'business' ? '💼 Business' : audienceMode === 'engineer' ? '💻 Engineer' : '👥 The Bridge (ทั้งสองฝั่ง)'}
+                  </span>
+                  <span className="text-[11px] sm:text-xs font-semibold px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300">
+                    {experienceLevel === 'beginner' ? '🌱 Beginner' : '⚡ Experienced'}
+                  </span>
+                </div>
+
+                {/* Quick Switch Buttons */}
+                <div className="flex items-center gap-1.5 self-start sm:self-auto">
+                  <button
+                    onClick={() => onExperienceLevelChange && onExperienceLevelChange('beginner')}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer transition-all ${
+                      experienceLevel === 'beginner'
+                        ? 'bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] shadow-xs font-bold'
+                        : 'bg-white dark:bg-[#1f1f1f] text-neutral-600 dark:text-[#a3a3a3] border border-neutral-200 dark:border-[#333333] hover:bg-neutral-100 dark:hover:bg-[#262626]'
+                    }`}
+                  >
+                    🌱 ปูพื้นฐาน Mindset
+                  </button>
+                  <button
+                    onClick={() => onExperienceLevelChange && onExperienceLevelChange('experienced')}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer transition-all ${
+                      experienceLevel === 'experienced'
+                        ? 'bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] shadow-xs font-bold'
+                        : 'bg-white dark:bg-[#1f1f1f] text-neutral-600 dark:text-[#a3a3a3] border border-neutral-200 dark:border-[#333333] hover:bg-neutral-100 dark:hover:bg-[#262626]'
+                    }`}
+                  >
+                    ⚡ คัมภีร์รับมือ Friction
+                  </button>
+                </div>
+              </div>
+
+              <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e] leading-relaxed">
+                {experienceLevel === 'beginner'
+                  ? '💡 โหมด Beginner: เน้นปูพื้นฐานวิธีคิด (Mindset) ของบทบาทที่เลือก สิ่งที่เขาแคร์ และคำแนะนำเชื่อมความสัมพันธ์'
+                  : '⚡ โหมด Experienced: เน้นกลยุทธ์รับมือข้อขัดแย้ง (Friction Playbook) ตาราง Trade-off ในการต่อรอง และสคริปต์พูดจริงในห้องประชุม'}
+              </p>
+            </div>
+
+            {/* ADAPTIVE SECTION RENDERING: Beginner vs Experienced ordering */}
+            {experienceLevel === 'experienced' ? (
+              <>
+                {/* 1. Friction & Negotiation Playbook (Prioritized in Experienced mode) */}
+                <FrictionPlaybookCard
+                  playbook={activeChapter.frictionPlaybook}
+                  chapterTitle={activeChapter.title}
+                  audienceMode={audienceMode}
+                  isOpen={openSections.friction}
+                  onToggle={() => toggleSection('friction')}
+                  onEarnXp={onEarnXp}
+                />
+
+                {/* 2. Role Mindset & Empathy Guide */}
+                <RoleMindsetCard
+                  audienceMode={audienceMode}
+                  onSelectRole={onAudienceChange}
+                  isOpen={openSections.mindset}
+                  onToggle={() => toggleSection('mindset')}
+                />
+              </>
+            ) : (
+              <>
+                {/* 1. Role Mindset & Empathy Guide (Prioritized in Beginner mode) */}
+                <RoleMindsetCard
+                  audienceMode={audienceMode}
+                  onSelectRole={onAudienceChange}
+                  isOpen={openSections.mindset}
+                  onToggle={() => toggleSection('mindset')}
+                />
+
+                {/* 2. Friction & Negotiation Playbook */}
+                <FrictionPlaybookCard
+                  playbook={activeChapter.frictionPlaybook}
+                  chapterTitle={activeChapter.title}
+                  audienceMode={audienceMode}
+                  isOpen={openSections.friction}
+                  onToggle={() => toggleSection('friction')}
+                  onEarnXp={onEarnXp}
+                />
+              </>
+            )}
+
             {/* Quick Perspective & Metaphor Box */}
             <div className="space-y-3">
               {/* Plain Language Metaphor (เปรียบแบบบ้านๆ) */}
-              <div className="p-4 rounded-2xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-800/60 space-y-1.5">
-                <div className="flex items-center gap-2 text-xs font-bold text-emerald-800 dark:text-emerald-300">
-                  <Sparkles className="w-4 h-4 text-emerald-600" />
+              <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-1.5">
+                <div className="flex items-center gap-2 text-xs font-bold text-neutral-900 dark:text-[#fafafa]">
+                  <Sparkles className="w-4 h-4 text-amber-500" />
                   <span>เปรียบแบบบ้านๆ (Real-World Analogy)</span>
                 </div>
-                <p className="text-xs sm:text-sm text-zinc-700 dark:text-zinc-200 leading-relaxed">
+                <p className="text-xs sm:text-sm text-neutral-700 dark:text-[#c4c4c4] leading-relaxed font-normal">
                   {activeChapter.plainAnalogy}
                 </p>
               </div>
@@ -467,24 +614,24 @@ export const GuideTab: React.FC<GuideTabProps> = ({
               {/* Audience Perspectives (Business & Engineer Notes) */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {(audienceMode === 'business' || audienceMode === 'both') && (
-                  <div className="p-4 rounded-2xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-800/60 space-y-1.5">
+                  <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-1.5">
                     <div className="flex items-center gap-2 text-xs font-bold text-amber-800 dark:text-amber-300">
-                      <Info className="w-4 h-4 text-amber-600" />
+                      <Info className="w-4 h-4 text-amber-500" />
                       <span>มุมมองฝั่ง Business</span>
                     </div>
-                    <p className="text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed">
+                    <p className="text-xs text-neutral-600 dark:text-[#a3a3a3] leading-relaxed font-normal">
                       {activeChapter.businessNote}
                     </p>
                   </div>
                 )}
 
                 {(audienceMode === 'engineer' || audienceMode === 'both') && (
-                  <div className="p-4 rounded-2xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200/80 dark:border-blue-800/60 space-y-1.5">
+                  <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-1.5">
                     <div className="flex items-center gap-2 text-xs font-bold text-blue-800 dark:text-blue-300">
-                      <CheckCircle2 className="w-4 h-4 text-blue-600" />
+                      <CheckCircle2 className="w-4 h-4 text-blue-500" />
                       <span>มุมมองฝั่ง Engineer</span>
                     </div>
-                    <p className="text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed">
+                    <p className="text-xs text-neutral-600 dark:text-[#a3a3a3] leading-relaxed font-normal">
                       {activeChapter.engineerNote}
                     </p>
                   </div>
@@ -494,55 +641,55 @@ export const GuideTab: React.FC<GuideTabProps> = ({
 
             {/* SECTION 1: ปฐมบทสำหรับมือใหม่ (Beginner Primer) */}
             {activeChapter.beginnerPrimer && (
-              <div className="border border-indigo-200/80 dark:border-indigo-900/60 rounded-2xl overflow-hidden bg-white dark:bg-zinc-900 shadow-2xs">
+              <div className="border border-neutral-200 dark:border-[#262626] rounded-2xl overflow-hidden bg-white dark:bg-[#141414] shadow-2xs">
                 <button
                   onClick={() => toggleSection('primer')}
-                  className="w-full p-4 sm:p-5 flex items-center justify-between bg-indigo-50/50 dark:bg-indigo-950/30 text-left cursor-pointer select-none"
+                  className="w-full p-3.5 sm:p-4.5 flex items-center justify-between bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f] text-left cursor-pointer select-none transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-7 h-7 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold text-xs">
+                    <div className="w-7 h-7 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
                       🌟
                     </div>
                     <div>
-                      <h3 className="text-sm sm:text-base font-bold text-indigo-950 dark:text-indigo-200">
+                      <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
                         ปฐมบทสำหรับมือใหม่ (ปูพื้นฐานจาก 0)
                       </h3>
-                      <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                      <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e]">
                         อธิบายเรื่องนี้แบบไม่ใช้ศัพท์ยาก เข้าใจได้แม้ไม่เคยเขียนโค้ด
                       </p>
                     </div>
                   </div>
-                  {openSections.primer ? <ChevronUp className="w-5 h-5 text-indigo-500" /> : <ChevronDown className="w-5 h-5 text-zinc-400" />}
+                  {openSections.primer ? <ChevronUp className="w-4 h-4 text-neutral-600 dark:text-[#a3a3a3]" /> : <ChevronDown className="w-4 h-4 text-neutral-400 dark:text-[#737373]" />}
                 </button>
 
                 {openSections.primer && (
-                  <div className="p-4 sm:p-6 space-y-4 border-t border-indigo-100 dark:border-indigo-900/50 bg-white dark:bg-zinc-900 text-xs sm:text-sm">
-                    <div className="space-y-1.5">
-                      <div className="font-bold text-indigo-700 dark:text-indigo-400 flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 inline-block"></span>
+                  <div className="p-4 sm:p-5 space-y-3.5 border-t border-neutral-100 dark:border-[#262626] bg-white dark:bg-[#141414] text-xs sm:text-sm">
+                    <div className="space-y-1">
+                      <div className="font-bold text-neutral-900 dark:text-[#e5e5e5] flex items-center gap-1.5 text-xs">
+                        <span className="w-1.5 h-1.5 rounded-full bg-neutral-900 dark:bg-white inline-block"></span>
                         <span>สิ่งนี้คืออะไร? (What is it?)</span>
                       </div>
-                      <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed pl-3">
+                      <p className="text-neutral-600 dark:text-[#a3a3a3] leading-relaxed pl-3 font-normal text-xs sm:text-sm">
                         {activeChapter.beginnerPrimer.whatIsIt}
                       </p>
                     </div>
 
-                    <div className="space-y-1.5">
-                      <div className="font-bold text-indigo-700 dark:text-indigo-400 flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 inline-block"></span>
+                    <div className="space-y-1">
+                      <div className="font-bold text-neutral-900 dark:text-[#e5e5e5] flex items-center gap-1.5 text-xs">
+                        <span className="w-1.5 h-1.5 rounded-full bg-neutral-900 dark:bg-white inline-block"></span>
                         <span>ทำไมถึงสำคัญมาก? ถ้าไม่มีจะเกิดอะไรขึ้น? (Why it matters?)</span>
                       </div>
-                      <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed pl-3">
+                      <p className="text-neutral-600 dark:text-[#a3a3a3] leading-relaxed pl-3 font-normal text-xs sm:text-sm">
                         {activeChapter.beginnerPrimer.whyItMatters}
                       </p>
                     </div>
 
-                    <div className="p-3.5 rounded-xl bg-indigo-50/40 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/40 space-y-1.5">
-                      <div className="font-bold text-indigo-900 dark:text-indigo-300 flex items-center gap-1.5">
+                    <div className="p-3 sm:p-3.5 rounded-xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-1">
+                      <div className="font-bold text-neutral-900 dark:text-[#fafafa] flex items-center gap-1.5 text-xs">
                         <Lightbulb className="w-4 h-4 text-amber-500" />
                         <span>สถานการณ์จริงในชีวิตประจำวัน (Real-World Analogy Scenario)</span>
                       </div>
-                      <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed">
+                      <p className="text-neutral-600 dark:text-[#a3a3a3] leading-relaxed font-normal text-xs">
                         {activeChapter.beginnerPrimer.realWorldScenario}
                       </p>
                     </div>
@@ -553,48 +700,57 @@ export const GuideTab: React.FC<GuideTabProps> = ({
 
             {/* SECTION 2: พจนานุกรมศัพท์จำเป็น (Jargon Buster) */}
             {activeChapter.jargonList && activeChapter.jargonList.length > 0 && (
-              <div className="border border-zinc-200 dark:border-zinc-800 rounded-2xl overflow-hidden bg-white dark:bg-zinc-900 shadow-2xs">
+              <div className="border border-neutral-200 dark:border-[#262626] rounded-2xl overflow-hidden bg-white dark:bg-[#141414] shadow-2xs">
                 <button
                   onClick={() => toggleSection('jargon')}
-                  className="w-full p-4 sm:p-5 flex items-center justify-between bg-zinc-50/70 dark:bg-zinc-850/50 text-left cursor-pointer select-none"
+                  className="w-full p-3.5 sm:p-4.5 flex items-center justify-between text-left cursor-pointer select-none transition-colors bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f]"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-7 h-7 rounded-xl bg-purple-600 text-white flex items-center justify-center font-bold text-xs">
+                    <div className="w-7 h-7 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
                       📖
                     </div>
                     <div>
-                      <h3 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-zinc-100">
-                        พจนานุกรมคำศัพท์จำเป็น (Jargon Buster)
-                      </h3>
-                      <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                        ศัพท์เทคนิคประจำบท แปลเป็นภาษาคนแบบเห็นภาพชัดเจน ({activeChapter.jargonList.length} คำ)
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
+                          พจนานุกรมคำศัพท์จำเป็น (Jargon Buster)
+                        </h3>
+                        <span className="px-2 py-0.5 rounded-full bg-neutral-200 dark:bg-[#262626] text-neutral-800 dark:text-[#d4d4d4] text-[10px] sm:text-[11px] font-semibold font-mono">
+                          {activeChapter.jargonList.length} คำ
+                        </span>
+                      </div>
+                      <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e] mt-0.5">
+                        ศัพท์เทคนิคประจำบท แปลเป็นภาษาคนแบบเห็นภาพชัดเจน
                       </p>
                     </div>
                   </div>
-                  {openSections.jargon ? <ChevronUp className="w-5 h-5 text-purple-500" /> : <ChevronDown className="w-5 h-5 text-zinc-400" />}
+                  {openSections.jargon ? (
+                    <ChevronUp className="w-4 h-4 text-neutral-600 dark:text-[#a3a3a3]" />
+                  ) : (
+                    <ChevronDown className="w-4 h-4 text-neutral-400 dark:text-[#737373]" />
+                  )}
                 </button>
 
                 {openSections.jargon && (
-                  <div className="p-4 sm:p-6 grid grid-cols-1 gap-3.5 border-t border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+                  <div className="p-3.5 sm:p-5 grid grid-cols-1 gap-3 border-t border-neutral-100 dark:border-[#262626] bg-white dark:bg-[#141414]">
                     {activeChapter.jargonList.map((item, jIdx) => (
                       <div 
                         key={jIdx}
-                        className="p-4 rounded-xl bg-zinc-50/70 dark:bg-zinc-800/40 border border-zinc-200/80 dark:border-zinc-700/80 space-y-2 text-xs sm:text-sm"
+                        className="p-3.5 rounded-xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-2 text-xs sm:text-sm"
                       >
                         <div className="flex items-center justify-between gap-2">
-                          <span className="font-bold text-indigo-700 dark:text-indigo-400 text-sm sm:text-base">
+                          <span className="font-bold text-neutral-900 dark:text-white text-xs sm:text-sm font-mono">
                             {item.term}
                           </span>
-                          <span className="px-2 py-0.5 rounded-md bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 text-[11px] font-semibold">
-                            ศัพท์เทคนิค
+                          <span className="px-2 py-0.5 rounded-md bg-neutral-200/80 dark:bg-[#262626] border border-neutral-300/60 dark:border-[#333333] text-neutral-700 dark:text-[#d4d4d4] text-[10px] font-semibold font-mono">
+                            Technical Term
                           </span>
                         </div>
-                        <div className="text-zinc-500 dark:text-zinc-400 text-xs">
-                          <span className="font-semibold text-zinc-600 dark:text-zinc-300">นิยามทางการ: </span>
+                        <div className="text-neutral-500 dark:text-[#8e8e8e] text-xs font-normal leading-relaxed">
+                          <span className="font-bold text-neutral-700 dark:text-[#c4c4c4]">นิยามทางการ: </span>
                           <span>{item.formalDefinition}</span>
                         </div>
-                        <div className="p-2.5 rounded-lg bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-200/70 dark:border-emerald-800/60 text-emerald-900 dark:text-emerald-200 text-xs leading-relaxed">
-                          <span className="font-bold">🗣️ แปลภาษาคน: </span>
+                        <div className="p-2.5 rounded-lg bg-neutral-100 dark:bg-[#1f1f1f] border border-neutral-200 dark:border-[#333333] text-neutral-800 dark:text-[#e5e5e5] text-xs leading-relaxed">
+                          <span className="font-bold text-neutral-900 dark:text-white">🗣️ แปลภาษาคน: </span>
                           <span>{item.humanTranslation}</span>
                         </div>
                       </div>
@@ -606,65 +762,65 @@ export const GuideTab: React.FC<GuideTabProps> = ({
 
             {/* SECTION 3: ตัวอย่างบทสนทนาจริงในที่ทำงาน (Workplace Dialogue) */}
             {activeChapter.dialogueExample && (
-              <div className="border border-zinc-200 dark:border-zinc-800 rounded-2xl overflow-hidden bg-white dark:bg-zinc-900 shadow-2xs">
+              <div className="border border-neutral-200 dark:border-[#262626] rounded-2xl overflow-hidden bg-white dark:bg-[#141414] shadow-2xs">
                 <button
                   onClick={() => toggleSection('dialogue')}
-                  className="w-full p-4 sm:p-5 flex items-center justify-between bg-zinc-50/70 dark:bg-zinc-850/50 text-left cursor-pointer select-none"
+                  className="w-full p-3.5 sm:p-4.5 flex items-center justify-between bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f] text-left cursor-pointer select-none transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-7 h-7 rounded-xl bg-amber-500 text-white flex items-center justify-center font-bold text-xs">
+                    <div className="w-7 h-7 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
                       💬
                     </div>
                     <div>
-                      <h3 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-zinc-100">
+                      <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
                         บทสนทนาจริงในที่ทำงาน (วิธีพูดที่พัง vs วิธีพูดที่ปัง)
                       </h3>
-                      <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                      <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e]">
                         เปรียบเทียบประโยคพูดคุยในห้องประชุม พร้อมบทเรียนการสื่อสาร
                       </p>
                     </div>
                   </div>
-                  {openSections.dialogue ? <ChevronUp className="w-5 h-5 text-amber-500" /> : <ChevronDown className="w-5 h-5 text-zinc-400" />}
+                  {openSections.dialogue ? <ChevronUp className="w-4 h-4 text-neutral-600 dark:text-[#a3a3a3]" /> : <ChevronDown className="w-4 h-4 text-neutral-400 dark:text-[#737373]" />}
                 </button>
 
                 {openSections.dialogue && (
-                  <div className="p-4 sm:p-6 space-y-4 border-t border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900">
-                    <div className="p-3 rounded-xl bg-zinc-100 dark:bg-zinc-800/80 text-xs text-zinc-600 dark:text-zinc-300 font-medium">
-                      <span className="font-bold text-zinc-800 dark:text-zinc-100">บริบทสถานการณ์: </span>
+                  <div className="p-3.5 sm:p-5 space-y-3.5 border-t border-neutral-100 dark:border-[#262626] bg-white dark:bg-[#141414]">
+                    <div className="p-3 rounded-xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] text-xs text-neutral-600 dark:text-[#a3a3a3] font-normal">
+                      <span className="font-bold text-neutral-900 dark:text-[#fafafa]">บริบทสถานการณ์: </span>
                       {activeChapter.dialogueExample.context}
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                       {/* Wrong Way */}
-                      <div className="p-4 rounded-2xl bg-rose-50/60 dark:bg-rose-950/20 border border-rose-200/80 dark:border-rose-900/50 space-y-2.5 text-xs sm:text-sm">
-                        <div className="flex items-center gap-1.5 font-bold text-rose-800 dark:text-rose-300">
-                          <ShieldAlert className="w-4 h-4 text-rose-600" />
+                      <div className="p-3.5 rounded-xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200/70 dark:border-rose-900/40 space-y-2 text-xs sm:text-sm">
+                        <div className="flex items-center gap-1.5 font-bold text-rose-900 dark:text-rose-300 text-xs">
+                          <ShieldAlert className="w-4 h-4 text-rose-500" />
                           <span>❌ วิธีพูดที่สร้างปัญหา (Wrong Way)</span>
                         </div>
-                        <div className="p-3 rounded-xl bg-white/80 dark:bg-zinc-900/80 border border-rose-100 dark:border-rose-950 text-rose-950 dark:text-rose-100 italic">
+                        <div className="p-2.5 rounded-lg bg-white/90 dark:bg-[#181818] border border-rose-100 dark:border-rose-950/80 text-rose-950 dark:text-rose-200 italic font-medium text-xs">
                           {activeChapter.dialogueExample.wrongWay.speaker}
                         </div>
-                        <p className="text-zinc-600 dark:text-zinc-400 text-xs">
+                        <p className="text-neutral-700 dark:text-[#a3a3a3] text-xs leading-relaxed font-normal">
                           {activeChapter.dialogueExample.wrongWay.text}
                         </p>
-                        <div className="text-[11px] text-rose-700 dark:text-rose-400 font-semibold pt-1">
+                        <div className="text-[11px] text-rose-800 dark:text-rose-300 font-semibold pt-0.5">
                           ⚠️ ผลเสีย: {activeChapter.dialogueExample.wrongWay.issue}
                         </div>
                       </div>
 
                       {/* Right Way */}
-                      <div className="p-4 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-200/80 dark:border-emerald-900/50 space-y-2.5 text-xs sm:text-sm">
-                        <div className="flex items-center gap-1.5 font-bold text-emerald-800 dark:text-emerald-300">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                      <div className="p-3.5 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/70 dark:border-emerald-900/40 space-y-2 text-xs sm:text-sm">
+                        <div className="flex items-center gap-1.5 font-bold text-emerald-900 dark:text-emerald-300 text-xs">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                           <span>✅ วิธีพูดที่ถูกต้องและได้ผล (Right Way)</span>
                         </div>
-                        <div className="p-3 rounded-xl bg-white/80 dark:bg-zinc-900/80 border border-emerald-100 dark:border-emerald-950 text-emerald-950 dark:text-emerald-100 italic">
+                        <div className="p-2.5 rounded-lg bg-white/90 dark:bg-[#181818] border border-emerald-100 dark:border-emerald-950/80 text-emerald-950 dark:text-emerald-200 italic font-medium text-xs">
                           {activeChapter.dialogueExample.rightWay.speaker}
                         </div>
-                        <p className="text-zinc-600 dark:text-zinc-400 text-xs">
+                        <p className="text-neutral-700 dark:text-[#a3a3a3] text-xs leading-relaxed font-normal">
                           {activeChapter.dialogueExample.rightWay.text}
                         </p>
-                        <div className="text-[11px] text-emerald-700 dark:text-emerald-400 font-semibold pt-1">
+                        <div className="text-[11px] text-emerald-800 dark:text-emerald-300 font-semibold pt-0.5">
                           💡 ผลลัพธ์: {activeChapter.dialogueExample.rightWay.benefit}
                         </div>
                       </div>
@@ -675,73 +831,74 @@ export const GuideTab: React.FC<GuideTabProps> = ({
             )}
 
             {/* SECTION 4: อินโฟกราฟิก & แผนภาพจำลองกระบวนการ (Visual Diagram) */}
-            <div className="border border-zinc-200 dark:border-zinc-800 rounded-2xl overflow-hidden bg-white dark:bg-zinc-900 shadow-2xs">
+            <div className="border border-neutral-200 dark:border-[#262626] rounded-2xl overflow-hidden bg-white dark:bg-[#141414] shadow-2xs">
               <button
                 onClick={() => toggleSection('diagram')}
-                className="w-full p-4 sm:p-5 flex items-center justify-between bg-zinc-50/70 dark:bg-zinc-850/50 text-left cursor-pointer select-none"
+                className="w-full p-3.5 sm:p-4.5 flex items-center justify-between bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f] text-left cursor-pointer select-none transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-7 h-7 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-xs">
+                  <div className="w-7 h-7 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
                     🗺️
                   </div>
                   <div>
-                    <h3 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-zinc-100">
+                    <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
                       {activeChapter.diagramTitle || `แผนภาพโครงสร้างและกระบวนการบทที่ ${activeChapter.num}`}
                     </h3>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                    <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e]">
                       {activeChapter.diagramDescription || 'แผนภาพจำลองสถาปัตยกรรมและกระบวนการทำงานร่วมกัน'}
                     </p>
                   </div>
                 </div>
-                {openSections.diagram ? <ChevronUp className="w-5 h-5 text-blue-500" /> : <ChevronDown className="w-5 h-5 text-zinc-400" />}
+                {openSections.diagram ? <ChevronUp className="w-4 h-4 text-neutral-600 dark:text-[#a3a3a3]" /> : <ChevronDown className="w-4 h-4 text-neutral-400 dark:text-[#737373]" />}
               </button>
 
               {openSections.diagram && (
-                <div className="p-4 sm:p-6 border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50/30 dark:bg-zinc-900/60 space-y-5">
+                <div className="p-3.5 sm:p-5 border-t border-neutral-100 dark:border-[#262626] bg-neutral-50/50 dark:bg-[#111111] space-y-4">
                   {/* Structured Visual Illustration & Metaphor Schema */}
                   {activeChapter.illustrations && activeChapter.illustrations.length > 0 && (
-                    <div className="space-y-4">
+                    <div className="space-y-3.5">
                       {activeChapter.illustrations.map((ill) => (
                         <div 
                           key={ill.id}
-                          className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-zinc-850 border border-zinc-200 dark:border-zinc-700 shadow-2xs space-y-3.5"
+                          className="p-3.5 sm:p-5 rounded-2xl bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] shadow-2xs space-y-3"
                         >
                           <div className="flex items-center justify-between flex-wrap gap-2">
                             <div className="flex items-center gap-2.5">
-                              <span className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 font-bold text-xs">
-                                🎨 Visual Architecture
+                              <span className="px-2.5 py-0.5 rounded-lg bg-neutral-100 dark:bg-[#1f1f1f] border border-neutral-200 dark:border-[#333333] text-neutral-800 dark:text-[#d4d4d4] font-semibold text-[11px] flex items-center gap-1.5 font-mono">
+                                <span>🎨</span>
+                                <span>Visual Architecture</span>
                               </span>
                               <div>
-                                <h4 className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-zinc-100">
+                                <h4 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
                                   {ill.title}
                                 </h4>
-                                <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
+                                <p className="text-[11px] text-neutral-500 dark:text-[#8e8e8e]">
                                   {ill.subtitle}
                                 </p>
                               </div>
                             </div>
-                            <span className="px-2 py-0.5 rounded-md bg-purple-50 dark:bg-purple-950/50 border border-purple-200 dark:border-purple-800/60 text-purple-700 dark:text-purple-300 text-[10px] font-mono">
+                            <span className="px-2 py-0.5 rounded-md bg-neutral-100 dark:bg-[#1f1f1f] border border-neutral-200 dark:border-[#333333] text-neutral-700 dark:text-[#d4d4d4] text-[10px] font-mono font-semibold">
                               Type: {ill.svgType}
                             </span>
                           </div>
 
                           {/* Visual Analogy Metaphor */}
-                          <div className="p-3.5 rounded-xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 text-xs space-y-1">
-                            <div className="font-bold text-amber-900 dark:text-amber-300 flex items-center gap-1.5">
-                              <Lightbulb className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                          <div className="p-3 rounded-xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] text-xs space-y-1">
+                            <div className="font-bold text-neutral-900 dark:text-[#fafafa] flex items-center gap-1.5">
+                              <Lightbulb className="w-4 h-4 text-amber-500 shrink-0" />
                               <span>ภาพเปรียบเทียบในชีวิตจริง (Mental Model Metaphor)</span>
                             </div>
-                            <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed text-[11px] sm:text-xs">
+                            <p className="text-neutral-600 dark:text-[#a3a3a3] leading-relaxed text-[11px] sm:text-xs font-normal">
                               {ill.visualMetaphor}
                             </p>
                           </div>
 
                           {/* Structured SVG Visual Blueprint Scene */}
-                          <div className="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-900/80 border border-zinc-200 dark:border-zinc-800 text-[11px] space-y-1">
-                            <span className="font-mono text-[10px] text-zinc-400 uppercase tracking-wider block">
+                          <div className="p-3 rounded-xl bg-neutral-100/70 dark:bg-[#0a0a0a] border border-neutral-200 dark:border-[#262626] text-[11px] space-y-1">
+                            <span className="font-mono text-[10px] text-neutral-800 dark:text-[#d4d4d4] uppercase tracking-wider block font-bold">
                               📐 โครงสร้างแผนผังเชิงนามธรรม (Visual Blueprint Scene):
                             </span>
-                            <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                            <p className="text-neutral-600 dark:text-[#8e8e8e] leading-relaxed font-normal">
                               {ill.svgDescription}
                             </p>
                           </div>
@@ -749,17 +906,17 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                           {/* Visual Elements Matrix */}
                           {ill.elements && ill.elements.length > 0 && (
                             <div className="space-y-1.5 pt-1">
-                              <span className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 block">
+                              <span className="text-[11px] font-bold text-neutral-800 dark:text-[#e5e5e5] block font-mono">
                                 องค์ประกอบสำคัญในแผนภาพ ({ill.elements.length} ส่วน):
                               </span>
                               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 text-xs">
                                 {ill.elements.map((elem, eIdx) => (
                                   <div 
                                     key={eIdx}
-                                    className="p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/70 space-y-1"
+                                    className="p-2.5 rounded-xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-1"
                                   >
                                     <div className="flex items-center justify-between">
-                                      <span className="font-bold text-[11px] text-zinc-900 dark:text-zinc-100 truncate">
+                                      <span className="font-bold text-[11px] text-neutral-900 dark:text-[#fafafa] truncate">
                                         {elem.label}
                                       </span>
                                       <span 
@@ -767,10 +924,10 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                                         style={{ backgroundColor: elem.color }}
                                       />
                                     </div>
-                                    <div className="text-[10px] text-indigo-600 dark:text-indigo-400 font-semibold">
+                                    <div className="text-[10px] text-neutral-700 dark:text-[#d4d4d4] font-semibold font-mono">
                                       {elem.role}
                                     </div>
-                                    <div className="text-[10px] text-zinc-500 dark:text-zinc-400 leading-normal">
+                                    <div className="text-[10px] text-neutral-500 dark:text-[#8e8e8e] leading-normal font-normal">
                                       {elem.detail}
                                     </div>
                                   </div>
@@ -780,8 +937,8 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                           )}
 
                           {/* Key Takeaway */}
-                          <div className="pt-1 text-[11px] text-emerald-700 dark:text-emerald-300 flex items-center gap-1.5 font-medium">
-                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                          <div className="pt-1 text-[11px] text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5 font-medium">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                             <span><b>สาระสำคัญ:</b> {ill.takeaway}</span>
                           </div>
                         </div>
@@ -794,10 +951,10 @@ export const GuideTab: React.FC<GuideTabProps> = ({
 
                   {/* Interactive C4 Model Zoom for Chapter 5 */}
                   {activeChapter.id === 's5' && (
-                    <div className="mt-4 p-5 rounded-2xl bg-white dark:bg-zinc-800/70 border border-zinc-200 dark:border-zinc-700 space-y-3">
+                    <div className="mt-4 p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] space-y-3">
                       <div className="flex items-center justify-between flex-wrap gap-2">
-                        <h4 className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-                          <Layers className="w-4 h-4 text-indigo-500" />
+                        <h4 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa] flex items-center gap-2">
+                          <Layers className="w-4 h-4 text-neutral-600 dark:text-[#a3a3a3]" />
                           <span>Interactive C4 Model Explorer (คลิกซูมเข้าดูทีละระดับ)</span>
                         </h4>
                         <div className="flex items-center gap-1">
@@ -805,10 +962,10 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                             <button
                               key={lvl}
                               onClick={() => setC4Level(lvl)}
-                              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer font-mono ${
                                 c4Level === lvl
-                                  ? 'bg-indigo-600 text-white shadow-xs'
-                                  : 'bg-zinc-100 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300'
+                                  ? 'bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] shadow-xs'
+                                  : 'bg-neutral-100 dark:bg-[#1f1f1f] text-neutral-600 dark:text-[#a3a3a3] hover:bg-neutral-200 dark:hover:bg-[#262626]'
                               }`}
                             >
                               L{lvl}
@@ -817,35 +974,35 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                         </div>
                       </div>
 
-                      <div className="p-3.5 bg-zinc-50 dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 text-xs sm:text-sm space-y-1">
+                      <div className="p-3.5 bg-neutral-50 dark:bg-[#181818] rounded-xl border border-neutral-200 dark:border-[#262626] text-xs sm:text-sm space-y-1">
                         {c4Level === 1 && (
                           <div>
-                            <span className="font-bold text-indigo-600 dark:text-indigo-400">Level 1: System Context</span>
-                            <p className="text-zinc-600 dark:text-zinc-300 mt-1">
+                            <span className="font-bold text-neutral-900 dark:text-[#fafafa] font-mono">Level 1: System Context</span>
+                            <p className="text-neutral-600 dark:text-[#a3a3a3] mt-1 leading-relaxed text-xs">
                               ซูมออกสุด เห็นระบบเป็นกล่องเดียวตรงกลาง ล้อมรอบด้วย Actor (ลูกค้า, ร้านค้า, ไรเดอร์) และระบบภายนอก (Payment Gateway, Map API) — <b>เหมาะที่สุดสำหรับ Business Stakeholders และผู้บริหาร</b>
                             </p>
                           </div>
                         )}
                         {c4Level === 2 && (
                           <div>
-                            <span className="font-bold text-indigo-600 dark:text-indigo-400">Level 2: Container Diagram</span>
-                            <p className="text-zinc-600 dark:text-zinc-300 mt-1">
+                            <span className="font-bold text-neutral-900 dark:text-[#fafafa] font-mono">Level 2: Container Diagram</span>
+                            <p className="text-neutral-600 dark:text-[#a3a3a3] mt-1 leading-relaxed text-xs">
                               ซูมเข้ามา 1 ชั้น เห็นหน่วยที่ Deploy แยกกันได้ เช่น Single Page App, Mobile App, Backend API, Database — <b>เหมาะสำหรับ Tech Lead &amp; Software Architects</b>
                             </p>
                           </div>
                         )}
                         {c4Level === 3 && (
                           <div>
-                            <span className="font-bold text-indigo-600 dark:text-indigo-400">Level 3: Component Diagram</span>
-                            <p className="text-zinc-600 dark:text-zinc-300 mt-1">
+                            <span className="font-bold text-neutral-900 dark:text-[#fafafa] font-mono">Level 3: Component Diagram</span>
+                            <p className="text-neutral-600 dark:text-[#a3a3a3] mt-1 leading-relaxed text-xs">
                               ซูมเข้าไปในหนึ่ง Container (เช่น Backend API) แสดงโมดูลย่อย เช่น OrderComponent, PaymentController, NotificationService — <b>เหมาะสำหรับทีม Developer ที่ Implement</b>
                             </p>
                           </div>
                         )}
                         {c4Level === 4 && (
                           <div>
-                            <span className="font-bold text-indigo-600 dark:text-indigo-400">Level 4: Code Diagram (UML Class)</span>
-                            <p className="text-zinc-600 dark:text-zinc-300 mt-1">
+                            <span className="font-bold text-neutral-900 dark:text-[#fafafa] font-mono">Level 4: Code Diagram (UML Class)</span>
+                            <p className="text-neutral-600 dark:text-[#a3a3a3] mt-1 leading-relaxed text-xs">
                               ซูมระดับ Class / Functions ในโค้ดจริง — <i>คำแนะนำ:</i> มักไม่ต้องวาดมือเพราะโค้ดเปลี่ยนเร็ว ให้ IDE สร้างอัตโนมัติ
                             </p>
                           </div>
@@ -856,8 +1013,8 @@ export const GuideTab: React.FC<GuideTabProps> = ({
 
                   {/* Interactive Friction Scenarios for Chapter 11 */}
                   {activeChapter.id === 's11' && (
-                    <div className="mt-4 space-y-2.5">
-                      <h4 className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                    <div className="mt-4 space-y-2">
+                      <h4 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa] flex items-center gap-2">
                         <AlertCircle className="w-4 h-4 text-amber-500" />
                         <span>คลิกเพื่อดูทางออกของ 4 ข้อขัดแย้งยอดนิยมตลอดกาล:</span>
                       </h4>
@@ -890,24 +1047,24 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                       ].map((item) => (
                         <div 
                           key={item.id}
-                          className="p-3.5 bg-white dark:bg-zinc-800/60 rounded-xl border border-zinc-200 dark:border-zinc-700 space-y-2"
+                          className="p-3.5 bg-white dark:bg-[#141414] rounded-xl border border-neutral-200 dark:border-[#262626] space-y-2"
                         >
                           <div 
                             onClick={() => setExpandedFaqId(expandedFaqId === item.id ? null : item.id)}
-                            className="font-bold text-xs sm:text-sm text-zinc-900 dark:text-zinc-100 flex items-center justify-between cursor-pointer select-none"
+                            className="font-bold text-xs sm:text-sm text-neutral-900 dark:text-[#fafafa] flex items-center justify-between cursor-pointer select-none"
                           >
                             <span>{item.q}</span>
-                            <span className="text-zinc-400">{expandedFaqId === item.id ? '−' : '+'}</span>
+                            <span className="text-neutral-400 dark:text-[#737373] font-mono text-base">{expandedFaqId === item.id ? '−' : '+'}</span>
                           </div>
                           {expandedFaqId === item.id && (
-                            <div className="pt-2 border-t border-zinc-100 dark:border-zinc-700 text-xs space-y-2">
+                            <div className="pt-2 border-t border-neutral-100 dark:border-[#262626] text-xs space-y-2">
                               <div>
-                                <span className="font-semibold text-zinc-500">สาเหตุที่แท้จริง: </span>
-                                <span className="text-zinc-700 dark:text-zinc-300">{item.root}</span>
+                                <span className="font-bold text-neutral-700 dark:text-[#c4c4c4]">สาเหตุที่แท้จริง: </span>
+                                <span className="text-neutral-600 dark:text-[#a3a3a3]">{item.root}</span>
                               </div>
-                              <div className="p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800">
-                                <span className="font-bold text-emerald-800 dark:text-emerald-300">ประโยคทางออกในห้องประชุม: </span>
-                                <span className="text-emerald-900 dark:text-emerald-200">{item.script}</span>
+                              <div className="p-2.5 rounded-lg bg-neutral-100 dark:bg-[#1f1f1f] border border-neutral-200 dark:border-[#333333]">
+                                <span className="font-bold text-neutral-900 dark:text-white">ประโยคทางออกในห้องประชุม: </span>
+                                <span className="text-neutral-700 dark:text-[#d4d4d4]">{item.script}</span>
                               </div>
                             </div>
                           )}
@@ -919,45 +1076,124 @@ export const GuideTab: React.FC<GuideTabProps> = ({
               )}
             </div>
 
-            {/* SECTION 5: ความรู้เชิงลึก & แนวคิดหลัก (Core Concepts) */}
-            {activeChapter.coreConcepts && activeChapter.coreConcepts.length > 0 && (
-              <div className="border border-zinc-200 dark:border-zinc-800 rounded-2xl overflow-hidden bg-white dark:bg-zinc-900 shadow-2xs">
+            {/* SECTION 4.5: กรณีศึกษาจริงจากบริษัทเทค (Real-World Case Studies) */}
+            {activeChapter.realWorldExamples && activeChapter.realWorldExamples.length > 0 && (
+              <div className="border border-neutral-200 dark:border-[#262626] rounded-2xl overflow-hidden bg-white dark:bg-[#141414] shadow-2xs">
                 <button
-                  onClick={() => toggleSection('coreConcepts')}
-                  className="w-full p-4 sm:p-5 flex items-center justify-between bg-zinc-50/70 dark:bg-zinc-850/50 text-left cursor-pointer select-none"
+                  onClick={() => toggleSection('examples')}
+                  className="w-full p-3.5 sm:p-4.5 flex items-center justify-between bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f] text-left cursor-pointer select-none transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-7 h-7 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold text-xs">
+                    <div className="w-7 h-7 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
+                      🏢
+                    </div>
+                    <div>
+                      <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
+                        กรณีศึกษาจริงในอุตสาหกรรม (Real-World Case Studies)
+                      </h3>
+                      <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e]">
+                        บทเรียนจริงจากบริษัทเทคและสตาร์ทอัพ ({activeChapter.realWorldExamples.length} เรื่องราว)
+                      </p>
+                    </div>
+                  </div>
+                  {openSections.examples ? <ChevronUp className="w-4 h-4 text-neutral-600 dark:text-[#a3a3a3]" /> : <ChevronDown className="w-4 h-4 text-neutral-400 dark:text-[#737373]" />}
+                </button>
+
+                {openSections.examples && (
+                  <div className="p-3.5 sm:p-5 space-y-3.5 border-t border-neutral-100 dark:border-[#262626] bg-white dark:bg-[#141414]">
+                    {activeChapter.realWorldExamples.map((ex, eIdx) => (
+                      <div
+                        key={eIdx}
+                        className="p-3.5 sm:p-5 rounded-2xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-3"
+                      >
+                        <div className="flex items-center justify-between flex-wrap gap-2">
+                          <div className="font-bold text-xs sm:text-sm text-neutral-900 dark:text-[#fafafa] flex items-center gap-2">
+                            <span className="px-2 py-0.5 rounded-md bg-neutral-200 dark:bg-[#262626] text-neutral-800 dark:text-[#d4d4d4] text-[10px] font-mono font-bold">
+                              {ex.companyOrIndustry}
+                            </span>
+                            <span>{ex.title}</span>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs sm:text-sm">
+                          <div className="p-3 rounded-xl bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] space-y-1">
+                            <span className="font-bold text-neutral-800 dark:text-[#e5e5e5] text-xs flex items-center gap-1.5">
+                              📌 บริบทและโจทย์เริ่มต้น:
+                            </span>
+                            <p className="text-neutral-600 dark:text-[#a3a3a3] leading-relaxed text-xs">
+                              {ex.situation}
+                            </p>
+                          </div>
+
+                          <div className="p-3 rounded-xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200/70 dark:border-rose-900/40 space-y-1">
+                            <span className="font-bold text-rose-900 dark:text-rose-300 text-xs flex items-center gap-1.5">
+                              ⚠️ สิ่งที่เกิดขึ้น / จุดสะดุด:
+                            </span>
+                            <p className="text-rose-950 dark:text-rose-200 leading-relaxed text-xs">
+                              {ex.whatHappened}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="p-3.5 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/70 dark:border-emerald-900/40 space-y-1 text-xs sm:text-sm">
+                          <span className="font-bold text-emerald-900 dark:text-emerald-300 text-xs flex items-center gap-1.5">
+                            ✅ วิธีแก้ปัญหาและการประสานงาน:
+                          </span>
+                          <p className="text-neutral-800 dark:text-[#d4d4d4] leading-relaxed text-xs font-normal">
+                            {ex.resolution}
+                          </p>
+                        </div>
+
+                        <div className="p-2.5 rounded-xl bg-neutral-100 dark:bg-[#1f1f1f] border border-neutral-200 dark:border-[#333333] text-xs text-neutral-800 dark:text-[#d4d4d4] flex items-center gap-2 font-medium">
+                          <Lightbulb className="w-4 h-4 text-amber-500 shrink-0" />
+                          <span><b>บทเรียนสำคัญ:</b> {ex.keyLesson}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* SECTION 5: ความรู้เชิงลึก & แนวคิดหลัก (Core Concepts) */}
+            {activeChapter.coreConcepts && activeChapter.coreConcepts.length > 0 && (
+              <div className="border border-neutral-200 dark:border-[#262626] rounded-2xl overflow-hidden bg-white dark:bg-[#141414] shadow-2xs">
+                <button
+                  onClick={() => toggleSection('coreConcepts')}
+                  className="w-full p-3.5 sm:p-4.5 flex items-center justify-between bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f] text-left cursor-pointer select-none transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-7 h-7 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
                       💡
                     </div>
                     <div>
-                      <h3 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-zinc-100">
+                      <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
                         ความรู้เชิงลึกและหลักการสำคัญ (Core Deep-Dive Concepts)
                       </h3>
-                      <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                      <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e]">
                         แนวคิดและทฤษฎีสำคัญที่ใช้ในการทำงานจริง ({activeChapter.coreConcepts.length} หัวข้อ)
                       </p>
                     </div>
                   </div>
-                  {openSections.coreConcepts ? <ChevronUp className="w-5 h-5 text-indigo-500" /> : <ChevronDown className="w-5 h-5 text-zinc-400" />}
+                  {openSections.coreConcepts ? <ChevronUp className="w-4 h-4 text-neutral-600 dark:text-[#a3a3a3]" /> : <ChevronDown className="w-4 h-4 text-neutral-400 dark:text-[#737373]" />}
                 </button>
 
                 {openSections.coreConcepts && (
-                  <div className="p-4 sm:p-6 space-y-4 border-t border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+                  <div className="p-3.5 sm:p-5 space-y-3.5 border-t border-neutral-100 dark:border-[#262626] bg-white dark:bg-[#141414]">
                     {activeChapter.coreConcepts.map((concept, cIdx) => (
                       <div 
                         key={cIdx}
-                        className="p-4 sm:p-5 rounded-2xl bg-zinc-50/60 dark:bg-zinc-800/40 border border-zinc-200/80 dark:border-zinc-700/80 space-y-2.5"
+                        className="p-3.5 sm:p-4 rounded-xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-2"
                       >
-                        <div className="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-                          <span className="w-2 h-2 rounded-full bg-indigo-500 inline-block"></span>
+                        <div className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa] flex items-center gap-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-neutral-900 dark:bg-white inline-block"></span>
                           <span>{concept.heading}</span>
                         </div>
-                        <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed pl-4">
+                        <p className="text-xs sm:text-sm text-neutral-600 dark:text-[#a3a3a3] leading-relaxed pl-3 font-normal">
                           {concept.detail}
                         </p>
                         {concept.bulletPoints && concept.bulletPoints.length > 0 && (
-                          <ul className="pt-2 pl-8 space-y-2 list-disc text-xs sm:text-sm text-zinc-600 dark:text-zinc-300">
+                          <ul className="pt-1 pl-7 space-y-1.5 list-disc text-xs sm:text-sm text-neutral-600 dark:text-[#a3a3a3] font-normal">
                             {concept.bulletPoints.map((bp, bpIdx) => (
                               <li key={bpIdx} className="leading-relaxed">{bp}</li>
                             ))}
@@ -972,41 +1208,41 @@ export const GuideTab: React.FC<GuideTabProps> = ({
 
             {/* SECTION 6: ขั้นตอนการทำงานจริง (Real-World Workflow) */}
             {activeChapter.realWorldWorkflow && activeChapter.realWorldWorkflow.length > 0 && (
-              <div className="border border-zinc-200 dark:border-zinc-800 rounded-2xl overflow-hidden bg-white dark:bg-zinc-900 shadow-2xs">
+              <div className="border border-neutral-200 dark:border-[#262626] rounded-2xl overflow-hidden bg-white dark:bg-[#141414] shadow-2xs">
                 <button
                   onClick={() => toggleSection('workflow')}
-                  className="w-full p-4 sm:p-5 flex items-center justify-between bg-zinc-50/70 dark:bg-zinc-850/50 text-left cursor-pointer select-none"
+                  className="w-full p-3.5 sm:p-4.5 flex items-center justify-between bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f] text-left cursor-pointer select-none transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-7 h-7 rounded-xl bg-purple-600 text-white flex items-center justify-center font-bold text-xs">
+                    <div className="w-7 h-7 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
                       🔄
                     </div>
                     <div>
-                      <h3 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-zinc-100">
+                      <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
                         ขั้นตอนการทำงานจริงในองค์กร (Real-World Workflow)
                       </h3>
-                      <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                      <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e]">
                         ลำดับขั้นตอนส่งต่องานจริงระหว่างฝ่าย ({activeChapter.realWorldWorkflow.length} ขั้นตอน)
                       </p>
                     </div>
                   </div>
-                  {openSections.workflow ? <ChevronUp className="w-5 h-5 text-purple-500" /> : <ChevronDown className="w-5 h-5 text-zinc-400" />}
+                  {openSections.workflow ? <ChevronUp className="w-4 h-4 text-neutral-600 dark:text-[#a3a3a3]" /> : <ChevronDown className="w-4 h-4 text-neutral-400 dark:text-[#737373]" />}
                 </button>
 
                 {openSections.workflow && (
-                  <div className="p-4 sm:p-6 grid grid-cols-1 sm:grid-cols-2 gap-3 border-t border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+                  <div className="p-3.5 sm:p-5 grid grid-cols-1 sm:grid-cols-2 gap-3 border-t border-neutral-100 dark:border-[#262626] bg-white dark:bg-[#141414]">
                     {activeChapter.realWorldWorkflow.map((wf, wIdx) => (
                       <div 
                         key={wIdx}
-                        className="p-3.5 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200/80 dark:border-zinc-700/80 space-y-1.5 text-xs"
+                        className="p-3.5 rounded-xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-1.5 text-xs"
                       >
                         <div className="flex items-center justify-between gap-1">
-                          <span className="font-bold text-zinc-900 dark:text-zinc-100 text-sm">{wf.step}</span>
-                          <span className="px-2 py-0.5 rounded-md bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 font-semibold text-[11px]">
+                          <span className="font-bold text-neutral-900 dark:text-[#fafafa] text-xs sm:text-sm">{wf.step}</span>
+                          <span className="px-2 py-0.5 rounded-md bg-neutral-200 dark:bg-[#262626] text-neutral-800 dark:text-[#d4d4d4] font-semibold text-[10px] sm:text-[11px] font-mono">
                             {wf.role}
                           </span>
                         </div>
-                        <p className="text-zinc-600 dark:text-zinc-300 leading-relaxed">
+                        <p className="text-neutral-600 dark:text-[#a3a3a3] leading-relaxed font-normal">
                           {wf.description}
                         </p>
                       </div>
@@ -1018,40 +1254,40 @@ export const GuideTab: React.FC<GuideTabProps> = ({
 
             {/* SECTION 7: กับดักที่เจอบ่อยและทางออก (Common Pitfalls & Solutions) */}
             {activeChapter.commonPitfalls && activeChapter.commonPitfalls.length > 0 && (
-              <div className="border border-zinc-200 dark:border-zinc-800 rounded-2xl overflow-hidden bg-white dark:bg-zinc-900 shadow-2xs">
+              <div className="border border-neutral-200 dark:border-[#262626] rounded-2xl overflow-hidden bg-white dark:bg-[#141414] shadow-2xs">
                 <button
                   onClick={() => toggleSection('pitfalls')}
-                  className="w-full p-4 sm:p-5 flex items-center justify-between bg-zinc-50/70 dark:bg-zinc-850/50 text-left cursor-pointer select-none"
+                  className="w-full p-3.5 sm:p-4.5 flex items-center justify-between bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f] text-left cursor-pointer select-none transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-7 h-7 rounded-xl bg-rose-500 text-white flex items-center justify-center font-bold text-xs">
+                    <div className="w-7 h-7 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
                       ⚠️
                     </div>
                     <div>
-                      <h3 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-zinc-100">
+                      <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
                         กับดักที่เจอบ่อยและทางออกที่แนะนำ (Pitfalls &amp; Solutions)
                       </h3>
-                      <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                      <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e]">
                         สิ่งที่มักทำให้โปรเจกต์ล่าช้าหรือล้มเหลว พร้อมวิธีป้องกัน
                       </p>
                     </div>
                   </div>
-                  {openSections.pitfalls ? <ChevronUp className="w-5 h-5 text-rose-500" /> : <ChevronDown className="w-5 h-5 text-zinc-400" />}
+                  {openSections.pitfalls ? <ChevronUp className="w-4 h-4 text-neutral-600 dark:text-[#a3a3a3]" /> : <ChevronDown className="w-4 h-4 text-neutral-400 dark:text-[#737373]" />}
                 </button>
 
                 {openSections.pitfalls && (
-                  <div className="p-4 sm:p-6 space-y-3 border-t border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+                  <div className="p-3.5 sm:p-5 space-y-3 border-t border-neutral-100 dark:border-[#262626] bg-white dark:bg-[#141414]">
                     {activeChapter.commonPitfalls.map((cp, cpIdx) => (
                       <div 
                         key={cpIdx}
                         className="p-3.5 rounded-xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200/70 dark:border-rose-900/40 space-y-1.5 text-xs sm:text-sm"
                       >
-                        <div className="flex items-center gap-1.5 font-bold text-rose-800 dark:text-rose-300">
-                          <ShieldAlert className="w-4 h-4 text-rose-600 shrink-0" />
+                        <div className="flex items-center gap-1.5 font-bold text-rose-900 dark:text-rose-300 text-xs">
+                          <ShieldAlert className="w-4 h-4 text-rose-500 shrink-0" />
                           <span>กับดัก: {cp.pitfall}</span>
                         </div>
-                        <div className="pl-5 text-zinc-700 dark:text-zinc-300 leading-relaxed text-xs">
-                          <span className="font-bold text-emerald-700 dark:text-emerald-400">💡 ทางออกที่แนะนำ: </span>
+                        <div className="pl-5 text-neutral-700 dark:text-[#c4c4c4] leading-relaxed text-xs">
+                          <span className="font-bold text-emerald-800 dark:text-emerald-400">💡 ทางออกที่แนะนำ: </span>
                           <span>{cp.solution}</span>
                         </div>
                       </div>
@@ -1063,29 +1299,29 @@ export const GuideTab: React.FC<GuideTabProps> = ({
 
             {/* SECTION 8: Pre-flight Checklist */}
             {activeChapter.checklist && activeChapter.checklist.length > 0 && (
-              <div className="border border-zinc-200 dark:border-zinc-800 rounded-2xl overflow-hidden bg-white dark:bg-zinc-900 shadow-2xs">
+              <div className="border border-neutral-200 dark:border-[#262626] rounded-2xl overflow-hidden bg-white dark:bg-[#141414] shadow-2xs">
                 <button
                   onClick={() => toggleSection('checklist')}
-                  className="w-full p-4 sm:p-5 flex items-center justify-between bg-zinc-50/70 dark:bg-zinc-850/50 text-left cursor-pointer select-none"
+                  className="w-full p-3.5 sm:p-4.5 flex items-center justify-between bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f] text-left cursor-pointer select-none transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-7 h-7 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-xs">
+                    <div className="w-7 h-7 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
                       ✅
                     </div>
                     <div>
-                      <h3 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-zinc-100">
+                      <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
                         Pre-flight Checklist ก่อนเข้าประชุมหรือส่งต่องาน
                       </h3>
-                      <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                      <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e]">
                         เช็กลิสต์ตรวจความพร้อม ป้องกันการตกหล่นก่อนส่งต่องาน ({activeChapter.checklist.length} ข้อ)
                       </p>
                     </div>
                   </div>
-                  {openSections.checklist ? <ChevronUp className="w-5 h-5 text-emerald-500" /> : <ChevronDown className="w-5 h-5 text-zinc-400" />}
+                  {openSections.checklist ? <ChevronUp className="w-4 h-4 text-neutral-600 dark:text-[#a3a3a3]" /> : <ChevronDown className="w-4 h-4 text-neutral-400 dark:text-[#737373]" />}
                 </button>
 
                 {openSections.checklist && (
-                  <div className="p-4 sm:p-6 border-t border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 space-y-2 text-xs">
+                  <div className="p-3.5 sm:p-5 border-t border-neutral-100 dark:border-[#262626] bg-white dark:bg-[#141414] space-y-1.5 text-xs">
                     {activeChapter.checklist.map((item, idx) => {
                       const itemKey = `${activeChapter.id}_cl_${idx}`;
                       const isChecked = !!checkedChecklist[itemKey];
@@ -1095,16 +1331,16 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                           onClick={() => toggleChecklistItem(itemKey)}
                           className={`flex items-start gap-2.5 p-2.5 rounded-xl cursor-pointer transition-colors ${
                             isChecked
-                              ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-300 line-through opacity-85'
-                              : 'hover:bg-zinc-50 dark:hover:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300'
+                              ? 'bg-neutral-100 dark:bg-[#1f1f1f] text-neutral-400 dark:text-[#666666] line-through opacity-80'
+                              : 'hover:bg-neutral-50 dark:hover:bg-[#181818] text-neutral-700 dark:text-[#d4d4d4]'
                           }`}
                         >
                           {isChecked ? (
                             <CheckSquare className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
                           ) : (
-                            <Square className="w-4 h-4 text-zinc-400 shrink-0 mt-0.5" />
+                            <Square className="w-4 h-4 text-neutral-400 dark:text-[#737373] shrink-0 mt-0.5" />
                           )}
-                          <span className="leading-relaxed">{item}</span>
+                          <span className="leading-relaxed font-normal">{item}</span>
                         </div>
                       );
                     })}
@@ -1114,13 +1350,13 @@ export const GuideTab: React.FC<GuideTabProps> = ({
             )}
 
             {/* Chapter Footer Actions */}
-            <div className="pt-6 border-t border-zinc-100 dark:border-zinc-800 space-y-4">
+            <div className="pt-5 border-t border-neutral-100 dark:border-[#262626] space-y-3.5">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <button
                   onClick={() => onAskAIWithPrompt(`ช่วยอธิบายบทที่ ${activeChapter.num} "${activeChapter.title}" ให้ฟังอย่างละเอียด พร้อมยกตัวอย่างเคสจริงในบริษัทเทคให้เห็นภาพ`)}
-                  className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-xs sm:text-sm font-semibold border border-indigo-200 dark:border-indigo-800 transition-colors cursor-pointer"
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-neutral-100 dark:bg-[#1f1f1f] text-neutral-900 dark:text-[#fafafa] hover:bg-neutral-200 dark:hover:bg-[#262626] text-xs sm:text-sm font-semibold border border-neutral-200 dark:border-[#333333] transition-colors cursor-pointer"
                 >
-                  <Bot className="w-4 h-4 text-indigo-600" />
+                  <Bot className="w-4 h-4 text-neutral-700 dark:text-[#a3a3a3]" />
                   <span>ถาม AI Bridge Assistant เจาะลึกบทนี้</span>
                 </button>
 
@@ -1132,7 +1368,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                         handleSelectChapter(nextChapter.id);
                       }
                     }}
-                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold shadow-sm transition-all cursor-pointer"
+                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer font-mono"
                   >
                     <CheckCircle2 className="w-4 h-4" />
                     <span>อ่านจบแล้ว! ไปบทถัดไป (+30 XP)</span>
@@ -1141,17 +1377,17 @@ export const GuideTab: React.FC<GuideTabProps> = ({
               </div>
 
               {/* Bottom Pagination Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                 {prevChapter ? (
                   <button
                     onClick={() => handleSelectChapter(prevChapter.id)}
-                    className="p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 hover:border-indigo-300 dark:hover:border-indigo-700 text-left transition-all cursor-pointer bg-zinc-50/50 dark:bg-zinc-850/40 group"
+                    className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-neutral-200 dark:border-[#262626] hover:border-neutral-400 dark:hover:border-[#404040] text-left transition-all cursor-pointer bg-neutral-50/70 dark:bg-[#181818] group"
                   >
-                    <div className="flex items-center gap-1 text-[11px] text-zinc-400 group-hover:text-indigo-600 transition-colors">
+                    <div className="flex items-center gap-1 text-[11px] text-neutral-500 dark:text-[#737373] group-hover:text-neutral-900 dark:group-hover:text-white transition-colors font-mono">
                       <ArrowLeft className="w-3.5 h-3.5" />
                       <span>บทก่อนหน้า</span>
                     </div>
-                    <div className="font-bold text-xs sm:text-sm text-zinc-800 dark:text-zinc-200 mt-1 truncate">
+                    <div className="font-bold text-xs sm:text-sm text-neutral-900 dark:text-[#fafafa] mt-1 truncate">
                       บทที่ {prevChapter.num}: {prevChapter.title}
                     </div>
                   </button>
@@ -1160,13 +1396,13 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                 {nextChapter && (
                   <button
                     onClick={() => handleSelectChapter(nextChapter.id)}
-                    className="p-4 rounded-2xl border border-indigo-200 dark:border-indigo-800/80 hover:border-indigo-400 dark:hover:border-indigo-600 text-right transition-all cursor-pointer bg-indigo-50/30 dark:bg-indigo-950/20 group"
+                    className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-neutral-200 dark:border-[#262626] hover:border-neutral-400 dark:hover:border-[#404040] text-right transition-all cursor-pointer bg-neutral-50/70 dark:bg-[#181818] group"
                   >
-                    <div className="flex items-center justify-end gap-1 text-[11px] text-indigo-500 font-semibold">
+                    <div className="flex items-center justify-end gap-1 text-[11px] text-neutral-900 dark:text-white font-semibold font-mono">
                       <span>บทถัดไป</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </div>
-                    <div className="font-bold text-xs sm:text-sm text-zinc-800 dark:text-zinc-200 mt-1 truncate">
+                    <div className="font-bold text-xs sm:text-sm text-neutral-900 dark:text-[#fafafa] mt-1 truncate">
                       บทที่ {nextChapter.num}: {nextChapter.title}
                     </div>
                   </button>
@@ -1180,38 +1416,38 @@ export const GuideTab: React.FC<GuideTabProps> = ({
 
       {/* Slide-over Drawer / Modal for Table of Contents (Index) on all screens */}
       {isIndexOpen && (
-        <div className="fixed inset-0 z-50 flex justify-end bg-black/50 backdrop-blur-xs transition-opacity animate-fadeIn">
-          <div className="w-full max-w-md bg-white dark:bg-zinc-900 h-full shadow-2xl flex flex-col overflow-hidden border-l border-zinc-200 dark:border-zinc-800 animate-slideLeft">
+        <div className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-xs transition-opacity animate-fadeIn">
+          <div className="w-full max-w-md bg-white dark:bg-[#141414] h-full shadow-2xl flex flex-col overflow-hidden border-l border-neutral-200 dark:border-[#262626] animate-slideLeft">
             
             {/* Drawer Header */}
-            <div className="p-4 sm:p-5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
+            <div className="p-4 sm:p-5 border-b border-neutral-200 dark:border-[#262626] flex items-center justify-between">
               <div>
-                <h3 className="font-bold text-base text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-                  <List className="w-4 h-4 text-indigo-600" />
+                <h3 className="font-bold text-base text-neutral-900 dark:text-[#fafafa] flex items-center gap-2">
+                  <List className="w-4 h-4 text-neutral-600 dark:text-[#a3a3a3]" />
                   <span>สารบัญทั้ง 15 บท</span>
                 </h3>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                <p className="text-xs text-neutral-500 dark:text-[#8e8e8e] mt-0.5 font-mono">
                   อ่านแล้ว {readChapters.length}/{chapters.length} บท • เลือกเพื่อกระโดดข้ามทันที
                 </p>
               </div>
               <button
                 onClick={() => setIsIndexOpen(false)}
-                className="p-2 rounded-xl text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
+                className="p-2 rounded-xl text-neutral-400 hover:text-neutral-700 dark:hover:text-[#fafafa] hover:bg-neutral-100 dark:hover:bg-[#1f1f1f] cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Drawer Search & Filter */}
-            <div className="p-4 border-b border-zinc-100 dark:border-zinc-850 space-y-3 bg-zinc-50/50 dark:bg-zinc-850/30">
+            <div className="p-4 border-b border-neutral-100 dark:border-[#262626] space-y-3 bg-neutral-50 dark:bg-[#181818]">
               <div className="relative">
-                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
+                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-[#737373]" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="ค้นหาชื่อบท, คำศัพท์ เช่น C4, DoR, API..."
-                  className="w-full pl-9 pr-3 py-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                  className="w-full pl-9 pr-3 py-2 bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#333333] rounded-xl text-xs text-neutral-900 dark:text-[#fafafa] placeholder-neutral-400 dark:placeholder-[#666666] focus:outline-none focus:ring-1 focus:ring-neutral-400 dark:focus:ring-[#666666]"
                 />
               </div>
 
@@ -1229,10 +1465,10 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                   <button
                     key={role.id}
                     onClick={() => setSelectedRole(role.id)}
-                    className={`px-3 py-1 rounded-lg font-medium whitespace-nowrap transition-all cursor-pointer ${
+                    className={`px-3 py-1 rounded-lg font-medium whitespace-nowrap transition-all cursor-pointer font-mono text-[11px] ${
                       selectedRole === role.id
-                        ? 'bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-bold'
-                        : 'bg-zinc-200/80 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-300'
+                        ? 'bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] font-bold'
+                        : 'bg-neutral-200/80 dark:bg-[#262626] text-neutral-700 dark:text-[#a3a3a3] hover:bg-neutral-300 dark:hover:bg-[#333333]'
                     }`}
                   >
                     {role.label}
@@ -1242,7 +1478,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
             </div>
 
             {/* Chapter Items List */}
-            <div className="p-4 overflow-y-auto flex-1 space-y-2 divide-y divide-zinc-100 dark:divide-zinc-800/60">
+            <div className="p-3.5 overflow-y-auto flex-1 space-y-1.5 divide-y divide-neutral-100 dark:divide-[#262626]">
               {filteredChapters.map((chapter) => {
                 const isActive = chapter.id === activeChapterId;
                 const isRead = readChapters.includes(chapter.id);
@@ -1252,26 +1488,26 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                   <div
                     key={chapter.id}
                     onClick={() => handleSelectChapter(chapter.id)}
-                    className={`pt-2.5 first:pt-0 p-3 rounded-2xl transition-all cursor-pointer flex items-start gap-3 ${
+                    className={`pt-2 first:pt-0 p-3 rounded-xl transition-all cursor-pointer flex items-start gap-3 ${
                       isActive
-                        ? 'bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-300 dark:border-indigo-700'
-                        : 'hover:bg-zinc-50 dark:hover:bg-zinc-800/60'
+                        ? 'bg-neutral-100 dark:bg-[#1f1f1f] border border-neutral-300 dark:border-[#404040]'
+                        : 'hover:bg-neutral-50 dark:hover:bg-[#181818]'
                     }`}
                   >
-                    <div className={`w-8 h-8 rounded-xl text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 ${
+                    <div className={`w-7 h-7 rounded-lg text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 font-mono ${
                       isActive
-                        ? 'bg-indigo-600 text-white'
+                        ? 'bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a]'
                         : isRead
-                        ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400'
-                        : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400'
+                        ? 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300'
+                        : 'bg-neutral-100 dark:bg-[#262626] text-neutral-700 dark:text-[#a3a3a3]'
                     }`}>
-                      {isRead && !isActive ? <Check className="w-4 h-4" /> : chapter.num}
+                      {isRead && !isActive ? <Check className="w-3.5 h-3.5" /> : chapter.num}
                     </div>
 
                     <div className="min-w-0 flex-1 space-y-0.5">
                       <div className="flex items-center justify-between gap-1">
                         <span className={`text-xs sm:text-sm font-bold truncate ${
-                          isActive ? 'text-indigo-900 dark:text-indigo-200' : 'text-zinc-800 dark:text-zinc-200'
+                          isActive ? 'text-neutral-900 dark:text-white' : 'text-neutral-800 dark:text-[#d4d4d4]'
                         }`}>
                           {chapter.title}
                         </span>
@@ -1279,16 +1515,16 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                           <BookmarkCheck className="w-3.5 h-3.5 text-amber-500 shrink-0" />
                         )}
                       </div>
-                      <p className="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-1">
+                      <p className="text-[11px] text-neutral-500 dark:text-[#8e8e8e] line-clamp-1 font-normal">
                         {chapter.subtitle}
                       </p>
-                      <div className="flex items-center gap-2 pt-1 text-[11px] text-zinc-400">
-                        <span className="px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 font-mono uppercase text-[10px]">
+                      <div className="flex items-center gap-2 pt-1 text-[10px] text-neutral-500 dark:text-[#737373] font-normal font-mono">
+                        <span className="px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-[#262626] uppercase text-neutral-700 dark:text-[#a3a3a3]">
                           {chapter.roleTag}
                         </span>
                         <span>{chapter.readTime}</span>
                         {isRead && (
-                          <span className="text-emerald-600 dark:text-emerald-400 font-semibold">• อ่านแล้ว</span>
+                          <span className="text-emerald-700 dark:text-emerald-400 font-semibold">• อ่านแล้ว</span>
                         )}
                       </div>
                     </div>
@@ -1298,11 +1534,11 @@ export const GuideTab: React.FC<GuideTabProps> = ({
             </div>
 
             {/* Drawer Footer */}
-            <div className="p-4 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-850 flex items-center justify-between text-xs">
-              <span className="text-zinc-500">สะสม XP จากการอ่านและการทำควิซ</span>
+            <div className="p-4 border-t border-neutral-200 dark:border-[#262626] bg-neutral-50 dark:bg-[#181818] flex items-center justify-between text-xs">
+              <span className="text-neutral-500 dark:text-[#8e8e8e] font-mono text-[11px]">สะสม XP จากการอ่านและการทำควิซ</span>
               <button
                 onClick={() => setIsIndexOpen(false)}
-                className="px-4 py-2 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-semibold rounded-xl cursor-pointer"
+                className="px-4 py-2 bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] font-semibold rounded-xl cursor-pointer"
               >
                 ปิดสารบัญ
               </button>

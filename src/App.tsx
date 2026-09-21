@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { AudienceMode, TabType, UserStats, Badge } from './types';
+import { AudienceMode, ExperienceLevel, TabType, UserStats, Badge } from './types';
 import { CHAPTERS } from './data/chaptersData';
 import { QUIZ_QUESTIONS } from './data/quizQuestions';
 import { INITIAL_BADGES, LEVEL_TIERS } from './data/badgesData';
@@ -13,9 +13,48 @@ import { Sparkles, Trophy, Zap, X } from 'lucide-react';
 export default function App() {
   const [activeTab, setActiveTab] = useState<TabType>('guide');
   const [audienceMode, setAudienceMode] = useState<AudienceMode>('both');
+  const [experienceLevel, setExperienceLevel] = useState<ExperienceLevel>(() => {
+    const saved = localStorage.getItem('be_guide_exp_level') as ExperienceLevel | null;
+    return saved || 'beginner';
+  });
   const [plainModeEnabled, setPlainModeEnabled] = useState(false);
   const [aiPromptPrefill, setAiPromptPrefill] = useState('');
   const [toastMessage, setToastMessage] = useState<{ title: string; subtitle: string } | null>(null);
+
+  // Theme state: light | dark | system (defaults to dark for Variation 4)
+  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>(() => {
+    const saved = localStorage.getItem('be_guide_theme') as 'light' | 'dark' | 'system' | null;
+    return saved || 'dark';
+  });
+
+  // Apply theme class to document.documentElement
+  useEffect(() => {
+    const root = document.documentElement;
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+    const applyTheme = () => {
+      const isDark = theme === 'dark' || (theme === 'system' && mediaQuery.matches);
+      if (isDark) {
+        root.classList.add('dark');
+        root.style.colorScheme = 'dark';
+      } else {
+        root.classList.remove('dark');
+        root.style.colorScheme = 'light';
+      }
+    };
+
+    applyTheme();
+    localStorage.setItem('be_guide_theme', theme);
+
+    const handleChange = () => {
+      if (theme === 'system') {
+        applyTheme();
+      }
+    };
+
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, [theme]);
 
   const [badges, setBadges] = useState<Badge[]>(() => {
     const saved = localStorage.getItem('be_guide_badges');
@@ -87,6 +126,17 @@ export default function App() {
     setAudienceMode(mode);
     if (mode !== 'both') {
       unlockBadge('view_switcher');
+    }
+  };
+
+  // Experience level toggle handler
+  const handleExperienceLevelChange = (level: ExperienceLevel) => {
+    setExperienceLevel(level);
+    localStorage.setItem('be_guide_exp_level', level);
+    if (level === 'experienced') {
+      addXp(15, 'เปิดโหมด Experienced: ศึกษาคัมภีร์รับมือ Friction');
+    } else {
+      addXp(10, 'เปิดโหมด Beginner: ปูพื้นฐาน Mindset');
     }
   };
 
@@ -174,24 +224,25 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans antialiased transition-colors">
+    <div className="min-h-screen bg-[#fafafa] dark:bg-[#0a0a0a] text-neutral-900 dark:text-[#e5e5e5] font-sans antialiased transition-colors duration-200">
       {/* Toast Alert for XP / Badges */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-2xl shadow-xl border border-zinc-700 dark:border-zinc-300 animate-slideUp">
-          <div className="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center font-bold shrink-0">
-            <Zap className="w-4 h-4 fill-white" />
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 bg-neutral-950 dark:bg-[#141414] text-white rounded-[4px] shadow-2xl border border-neutral-800 dark:border-[#262626] animate-slideUp font-mono">
+          <div className="w-7 h-7 rounded-[3px] bg-white text-neutral-950 flex items-center justify-center font-bold shrink-0 text-xs">
+            <Zap className="w-3.5 h-3.5 fill-current" />
           </div>
           <div className="pr-2">
-            <div className="font-bold text-xs sm:text-sm text-amber-400 dark:text-amber-600">
+            <div className="font-bold text-xs sm:text-sm text-white">
               {toastMessage.title}
             </div>
-            <div className="text-[11px] text-zinc-300 dark:text-zinc-600">
+            <div className="text-[11px] text-neutral-400 font-normal">
               {toastMessage.subtitle}
             </div>
           </div>
           <button 
             onClick={() => setToastMessage(null)}
-            className="text-zinc-400 hover:text-white dark:hover:text-zinc-900 cursor-pointer"
+            className="text-neutral-500 hover:text-white cursor-pointer p-1"
+            aria-label="Close notification"
           >
             <X className="w-3.5 h-3.5" />
           </button>
@@ -204,16 +255,23 @@ export default function App() {
         setActiveTab={setActiveTab}
         audienceMode={audienceMode}
         setAudienceMode={handleAudienceChange}
+        experienceLevel={experienceLevel}
+        setExperienceLevel={handleExperienceLevelChange}
         userStats={userStats}
         togglePlainMode={handleTogglePlainMode}
+        theme={theme}
+        setTheme={setTheme}
       />
 
       {/* Main Content Area */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8">
+      <main className="max-w-[1600px] mx-auto px-3 sm:px-6 lg:px-8 pt-6 sm:pt-8">
         {activeTab === 'guide' && (
           <GuideTab
             chapters={CHAPTERS}
             audienceMode={audienceMode}
+            experienceLevel={experienceLevel}
+            onExperienceLevelChange={handleExperienceLevelChange}
+            onAudienceChange={handleAudienceChange}
             plainModeEnabled={plainModeEnabled}
             bookmarks={userStats.bookmarks}
             readChapters={userStats.readChapters}
@@ -221,6 +279,7 @@ export default function App() {
             onToggleReadChapter={handleToggleReadChapter}
             onAskAIWithPrompt={handleAskAIWithPrompt}
             onStartQuiz={() => setActiveTab('quiz')}
+            onEarnXp={(amount, reason) => addXp(amount, reason)}
           />
         )}
 
@@ -250,12 +309,12 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-zinc-200 dark:border-zinc-800/80 mt-16 py-8 text-center text-xs text-zinc-500 dark:text-zinc-400">
+      <footer className="border-t border-slate-200 dark:border-slate-800/80 mt-16 py-8 text-center text-xs text-slate-500 dark:text-slate-400">
         <div className="max-w-7xl mx-auto px-4 space-y-2">
-          <p className="font-medium text-zinc-700 dark:text-zinc-300">
+          <p className="font-semibold text-slate-700 dark:text-slate-300">
             จุดที่ business กับ engineering มาเจอกัน — Interactive Knowledge &amp; Collaboration Platform
           </p>
-          <p>
+          <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
             ออกแบบเพื่อลดช่องว่างความเข้าใจผิดระหว่าง Business และ Engineering พร้อมเครื่องมือ AI และระบบ Interactive Gamification
           </p>
         </div>

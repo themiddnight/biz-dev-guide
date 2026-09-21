@@ -1,5 +1,7 @@
 export type AudienceMode = 'business' | 'engineer' | 'both';
 
+export type ExperienceLevel = 'beginner' | 'experienced';
+
 export type TabType = 'guide' | 'ai' | 'quiz' | 'gamification' | 'simulator';
 
 export interface ChapterConcept {
@@ -61,6 +63,53 @@ export interface ChapterIllustration {
   takeaway: string;
 }
 
+export interface NegotiationDilemmaOption {
+  id: string;
+  text: string;
+  isOptimal: boolean;
+  result: string;
+  tip: string;
+}
+
+export interface NegotiationDilemma {
+  scenario: string;
+  counterpartQuote: string;
+  options: NegotiationDilemmaOption[];
+}
+
+export interface FrictionTradeOff {
+  ifYouNeed: string;
+  youMustSacrifice: string;
+  howToNegotiate: string;
+}
+
+export interface GoldenScript {
+  situation: string;
+  businessScript?: string;
+  engineerScript?: string;
+}
+
+export interface FrictionPlaybook {
+  chapterId: string;
+  battlegroundTitle: string;
+  businessFrustration: string;
+  engineerFrustration: string;
+  underlyingRootCause: string;
+  tradeOffMatrix: FrictionTradeOff[];
+  goldenScripts: GoldenScript[];
+  dilemma?: NegotiationDilemma;
+}
+
+export interface RoleMindsetGuide {
+  role: 'business' | 'engineer';
+  title: string;
+  whatTheyCareAboutMost: string[];
+  whatKeepsThemUpAtNight: string[];
+  howTheyMeasureSuccess: string;
+  unspokenThoughts: string;
+  bridgeAdvice: string;
+}
+
 export interface Chapter {
   id: string;
   num: number;
@@ -84,6 +133,7 @@ export interface Chapter {
   checklist?: string[];
   commonPitfalls?: ChapterPitfall[];
   illustrations?: ChapterIllustration[];
+  frictionPlaybook?: FrictionPlaybook;
 }
 
 export interface QuizQuestion {

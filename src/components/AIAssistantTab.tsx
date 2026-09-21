@@ -114,33 +114,33 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 pb-16">
+    <div className="max-w-4xl mx-auto space-y-5 sm:space-y-6 pb-16">
       {/* Header Info */}
-      <div className="bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-transparent p-6 rounded-3xl border border-indigo-100 dark:border-indigo-900/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="bg-white dark:bg-[#141414] p-5 sm:p-6 rounded-2xl sm:rounded-3xl border border-neutral-200 dark:border-[#262626] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-2xs">
         <div className="space-y-1">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-indigo-600/10 text-indigo-600 dark:text-indigo-300 text-xs font-semibold">
-            <Sparkles className="w-3 h-3" />
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-neutral-100 dark:bg-[#1f1f1f] text-neutral-800 dark:text-[#d4d4d4] text-[11px] sm:text-xs font-semibold border border-neutral-200 dark:border-[#333333]">
+            <Sparkles className="w-3 h-3 text-amber-500" />
             <span>AI Bridge Assistant Powered by Gemini</span>
           </div>
-          <h2 className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-100">
+          <h2 className="text-lg sm:text-2xl font-bold text-neutral-900 dark:text-[#fafafa]">
             ถาม AI เพิ่มเติม &amp; ปรึกษาสถานการณ์จริง
           </h2>
-          <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400">
+          <p className="text-xs sm:text-sm text-neutral-500 dark:text-[#8e8e8e]">
             ไขข้อสงสัย เจรจาหาทางออกตรงจุด และแปลคำศัพท์ข้ามสายงานได้ทันที
           </p>
         </div>
 
         {/* Perspective selector */}
-        <div className="flex items-center gap-1 bg-white dark:bg-zinc-800 p-1 rounded-xl border border-zinc-200 dark:border-zinc-700 shrink-0">
-          <span className="text-[11px] font-semibold text-zinc-400 px-2">มุมมอง:</span>
+        <div className="flex items-center gap-1 bg-neutral-100 dark:bg-[#1a1a1a] p-1 rounded-xl border border-neutral-200 dark:border-[#262626] shrink-0 shadow-2xs">
+          <span className="text-[11px] font-semibold text-neutral-500 dark:text-[#737373] px-2 font-mono">มุมมอง:</span>
           {(['both', 'business', 'engineer'] as const).map((r) => (
             <button
               key={r}
               onClick={() => setRolePerspective(r)}
               className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer ${
                 rolePerspective === r
-                  ? 'bg-indigo-600 text-white shadow-xs'
-                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
+                  ? 'bg-white dark:bg-[#262626] text-neutral-900 dark:text-white shadow-2xs font-bold'
+                  : 'text-neutral-500 dark:text-[#737373] hover:text-neutral-900 dark:hover:text-white'
               }`}
             >
               {r === 'both' ? 'ทั้งคู่' : r === 'business' ? 'Business' : 'Engineer'}
@@ -151,7 +151,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
 
       {/* Quick Prompt Chips */}
       <div className="space-y-2">
-        <div className="flex items-center gap-1.5 text-xs font-semibold text-zinc-500 dark:text-zinc-400">
+        <div className="flex items-center gap-1.5 text-xs font-semibold text-neutral-500 dark:text-[#8e8e8e]">
           <Lightbulb className="w-3.5 h-3.5 text-amber-500" />
           <span>คำถามยอดฮิตที่เลือกถามได้ทันที:</span>
         </div>
@@ -160,7 +160,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
             <button
               key={idx}
               onClick={() => handleSend(prompt)}
-              className="text-xs px-3 py-1.5 rounded-xl bg-white dark:bg-zinc-800/80 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 hover:border-indigo-300 transition-all text-left cursor-pointer"
+              className="text-xs px-3 py-1.5 rounded-xl bg-white dark:bg-[#141414] hover:bg-neutral-50 dark:hover:bg-[#1c1c1c] text-neutral-700 dark:text-[#c4c4c4] border border-neutral-200 dark:border-[#262626] hover:border-neutral-400 dark:hover:border-[#404040] transition-all text-left cursor-pointer shadow-2xs"
             >
               {prompt}
             </button>
@@ -169,7 +169,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
       </div>
 
       {/* Chat Conversation Thread */}
-      <div className="bg-white dark:bg-zinc-900/90 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-4 sm:p-6 min-h-[420px] max-h-[600px] overflow-y-auto space-y-4">
+      <div className="bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] rounded-2xl sm:rounded-3xl p-4 sm:p-6 min-h-[420px] max-h-[600px] overflow-y-auto space-y-4 shadow-2xs">
         {messages.map((msg) => {
           const isAi = msg.role === 'assistant';
           return (
@@ -179,7 +179,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
             >
               <div
                 className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-white ${
-                  isAi ? 'bg-indigo-600' : 'bg-zinc-700 dark:bg-zinc-600'
+                  isAi ? 'bg-neutral-900 dark:bg-white dark:text-[#0a0a0a]' : 'bg-neutral-700 dark:bg-[#333333]'
                 }`}
               >
                 {isAi ? <Bot className="w-4 h-4" /> : <User className="w-4 h-4" />}
@@ -188,8 +188,8 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
               <div
                 className={`max-w-[85%] sm:max-w-[75%] rounded-2xl p-4 text-xs sm:text-sm leading-relaxed space-y-2 ${
                   isAi
-                    ? 'bg-zinc-50 dark:bg-zinc-800/70 border border-zinc-200/80 dark:border-zinc-700/80 text-zinc-800 dark:text-zinc-100'
-                    : 'bg-indigo-600 text-white'
+                    ? 'bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] text-neutral-800 dark:text-[#e5e5e5]'
+                    : 'bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] shadow-xs'
                 }`}
               >
                 {isAi ? (
@@ -197,15 +197,15 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
                     <Markdown
                       remarkPlugins={[remarkGfm]}
                       components={{
-                        h1: ({ children }) => <h1 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-zinc-50 mt-3 mb-1.5 border-b border-zinc-200 dark:border-zinc-700 pb-1">{children}</h1>,
-                        h2: ({ children }) => <h2 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-zinc-100 mt-2.5 mb-1">{children}</h2>,
-                        h3: ({ children }) => <h3 className="text-xs sm:text-sm font-bold text-indigo-600 dark:text-indigo-400 mt-2 mb-0.5">{children}</h3>,
-                        p: ({ children }) => <p className="mb-2 last:mb-0 leading-relaxed text-zinc-800 dark:text-zinc-200">{children}</p>,
-                        ul: ({ children }) => <ul className="list-disc pl-5 mb-2 space-y-1 text-zinc-800 dark:text-zinc-200">{children}</ul>,
-                        ol: ({ children }) => <ol className="list-decimal pl-5 mb-2 space-y-1 text-zinc-800 dark:text-zinc-200">{children}</ol>,
+                        h1: ({ children }) => <h1 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-[#fafafa] mt-3 mb-1.5 border-b border-neutral-200 dark:border-[#262626] pb-1">{children}</h1>,
+                        h2: ({ children }) => <h2 className="text-sm sm:text-base font-bold text-neutral-900 dark:text-[#fafafa] mt-2.5 mb-1">{children}</h2>,
+                        h3: ({ children }) => <h3 className="text-xs sm:text-sm font-bold text-neutral-800 dark:text-[#d4d4d4] mt-2 mb-0.5">{children}</h3>,
+                        p: ({ children }) => <p className="mb-2 last:mb-0 leading-relaxed text-neutral-700 dark:text-[#d4d4d4]">{children}</p>,
+                        ul: ({ children }) => <ul className="list-disc pl-5 mb-2 space-y-1 text-neutral-700 dark:text-[#d4d4d4]">{children}</ul>,
+                        ol: ({ children }) => <ol className="list-decimal pl-5 mb-2 space-y-1 text-neutral-700 dark:text-[#d4d4d4]">{children}</ol>,
                         li: ({ children }) => <li className="leading-relaxed">{children}</li>,
                         blockquote: ({ children }) => (
-                          <blockquote className="border-l-4 border-indigo-500 pl-3 italic text-zinc-600 dark:text-zinc-300 my-2 bg-indigo-50/50 dark:bg-indigo-950/30 py-1.5 rounded-r-lg">
+                          <blockquote className="border-l-4 border-neutral-400 dark:border-[#555555] pl-3 italic text-neutral-700 dark:text-[#c4c4c4] my-2 bg-neutral-100/60 dark:bg-[#202020] py-1.5 rounded-r-lg">
                             {children}
                           </blockquote>
                         ),
@@ -213,25 +213,25 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
                           const isInline = !String(children).includes('\n') && !className;
                           if (isInline) {
                             return (
-                              <code className="px-1.5 py-0.5 rounded bg-zinc-200/80 dark:bg-zinc-700 text-indigo-700 dark:text-indigo-300 font-mono text-[11px] sm:text-xs" {...props}>
+                              <code className="px-1.5 py-0.5 rounded bg-neutral-200 dark:bg-[#262626] text-neutral-900 dark:text-[#e5e5e5] font-mono text-[11px] sm:text-xs" {...props}>
                                 {children}
                               </code>
                             );
                           }
                           return (
-                            <div className="my-2.5 rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-700 bg-zinc-900 text-zinc-100 p-3 font-mono text-xs overflow-x-auto">
+                            <div className="my-2.5 rounded-xl overflow-hidden border border-neutral-200 dark:border-[#262626] bg-[#0a0a0a] text-neutral-100 p-3 font-mono text-xs overflow-x-auto">
                               <code {...props}>{children}</code>
                             </div>
                           );
                         },
                         table: ({ children }) => (
-                          <div className="my-2.5 overflow-x-auto rounded-xl border border-zinc-200 dark:border-zinc-700">
+                          <div className="my-2.5 overflow-x-auto rounded-xl border border-neutral-200 dark:border-[#262626]">
                             <table className="w-full text-left border-collapse text-xs">{children}</table>
                           </div>
                         ),
-                        th: ({ children }) => <th className="bg-zinc-100 dark:bg-zinc-800/90 p-2.5 font-bold border-b border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100">{children}</th>,
-                        td: ({ children }) => <td className="p-2.5 border-b border-zinc-100 dark:border-zinc-800/80 text-zinc-700 dark:text-zinc-300">{children}</td>,
-                        strong: ({ children }) => <strong className="font-bold text-zinc-900 dark:text-zinc-100">{children}</strong>,
+                        th: ({ children }) => <th className="bg-neutral-100 dark:bg-[#222222] p-2.5 font-bold border-b border-neutral-200 dark:border-[#262626] text-neutral-900 dark:text-[#fafafa]">{children}</th>,
+                        td: ({ children }) => <td className="p-2.5 border-b border-neutral-100 dark:border-[#262626] text-neutral-700 dark:text-[#c4c4c4]">{children}</td>,
+                        strong: ({ children }) => <strong className="font-bold text-neutral-900 dark:text-[#fafafa]">{children}</strong>,
                       }}
                     >
                       {msg.content}
@@ -244,10 +244,10 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
                 )}
 
                 {isAi && (
-                  <div className="flex items-center justify-between pt-2 border-t border-zinc-200/60 dark:border-zinc-700/60 text-[11px] text-zinc-400">
+                  <div className="flex items-center justify-between pt-2 border-t border-neutral-200/60 dark:border-[#262626] text-[11px] text-neutral-500 dark:text-[#8e8e8e] font-mono">
                     <span className="flex items-center gap-1">
                       {msg.source === 'gemini' ? (
-                        <span className="text-indigo-500 font-semibold">● Gemini Model</span>
+                        <span className="text-amber-600 dark:text-amber-400 font-semibold">● Gemini Model</span>
                       ) : (
                         <span>● Expert Assistant</span>
                       )}
@@ -255,12 +255,12 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
                     </span>
                     <button
                       onClick={() => copyToClipboard(msg.content, msg.id)}
-                      className="hover:text-zinc-600 dark:hover:text-zinc-200 flex items-center gap-1 cursor-pointer"
+                      className="hover:text-neutral-900 dark:hover:text-white flex items-center gap-1 cursor-pointer transition-colors"
                     >
                       {copiedId === msg.id ? (
                         <>
-                          <Check className="w-3 h-3 text-emerald-500" />
-                          <span className="text-emerald-500 font-medium">คัดลอกแล้ว</span>
+                          <Check className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                          <span className="text-emerald-600 dark:text-emerald-400 font-semibold">คัดลอกแล้ว</span>
                         </>
                       ) : (
                         <>
@@ -278,11 +278,11 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
 
         {isLoading && (
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center text-white shrink-0">
+            <div className="w-8 h-8 rounded-xl bg-neutral-900 dark:bg-white dark:text-[#0a0a0a] flex items-center justify-center text-white shrink-0">
               <Bot className="w-4 h-4" />
             </div>
-            <div className="p-3 rounded-2xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs text-zinc-500 flex items-center gap-2">
-              <Loader2 className="w-4 h-4 animate-spin text-indigo-500" />
+            <div className="p-3 rounded-2xl bg-neutral-100 dark:bg-[#1a1a1a] border border-neutral-200 dark:border-[#262626] text-xs text-neutral-600 dark:text-[#a3a3a3] flex items-center gap-2">
+              <Loader2 className="w-4 h-4 animate-spin text-neutral-500" />
               <span>กำลังวิเคราะห์และเรียบเรียงคำตอบ...</span>
             </div>
           </div>
@@ -303,12 +303,12 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
           onChange={(e) => setInputQuestion(e.target.value)}
           placeholder="พิมพ์คำถามของคุณ เช่น 'ทำไม Dev ถึงบ่นเรื่อง Flaky test?' หรือ 'วิธีเขียน User story ที่ดี'..."
           disabled={isLoading}
-          className="w-full pl-5 pr-28 py-3.5 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-2xl text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 shadow-sm"
+          className="w-full pl-4 sm:pl-5 pr-28 py-3.5 bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] rounded-xl sm:rounded-2xl text-xs sm:text-sm text-neutral-900 dark:text-[#fafafa] placeholder-neutral-400 dark:placeholder-[#555555] focus:outline-none focus:ring-1 focus:ring-neutral-400 dark:focus:ring-neutral-600 shadow-2xs"
         />
         <button
           type="submit"
           disabled={!inputQuestion.trim() || isLoading}
-          className="absolute right-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer disabled:cursor-not-allowed"
+          className="absolute right-2 px-3.5 py-2 bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:hover:bg-neutral-200 dark:text-[#0a0a0a] disabled:opacity-40 rounded-lg sm:rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer disabled:cursor-not-allowed"
         >
           {isLoading ? (
             <Loader2 className="w-4 h-4 animate-spin" />
