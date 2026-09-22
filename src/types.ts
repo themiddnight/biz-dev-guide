@@ -17,6 +17,40 @@ export type RichText = string;
  */
 export type FigureKey = never;
 
+export interface TableColumn {
+  key: string;
+  label: string;
+  widthHint?: 'narrow' | 'wide';
+}
+
+export interface TableRow {
+  cells: Record<string, RichText>;
+}
+
+export type ContentBlock =
+  | {
+      kind: 'table';
+      id: string;
+      title?: string;
+      intro?: RichText;
+      columns: TableColumn[];
+      rows: TableRow[];
+      footnote?: RichText;
+      mobile?: 'stack' | 'scroll';
+      collapsed?: boolean;
+    }
+  | { kind: 'note'; id: string; tone: 'info' | 'warn' | 'ok'; title?: string; body: RichText }
+  | { kind: 'figure'; id: string; figureKey: FigureKey; title?: string; caption?: RichText }
+  | { kind: 'cards'; id: string; title?: string; intro?: RichText; cards: { term: string; def: RichText }[] }
+  | { kind: 'details'; id: string; summary: string; body: ContentBlock[] }
+  | { kind: 'sources'; id: string; title?: string; items: { label: string; url?: string }[]; caveat?: RichText };
+
+export interface ChapterContentSection {
+  heading?: string;
+  placement?: 'reference' | 'diagram';
+  blocks: ContentBlock[];
+}
+
 export type TabType = 'guide' | 'ai' | 'quiz' | 'gamification' | 'simulator';
 
 export interface ChapterConcept {
@@ -149,6 +183,7 @@ export interface Chapter {
   commonPitfalls?: ChapterPitfall[];
   illustrations?: ChapterIllustration[];
   frictionPlaybook?: FrictionPlaybook;
+  contentSections?: ChapterContentSection[];
 }
 
 export interface QuizQuestion {

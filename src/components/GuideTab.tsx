@@ -5,6 +5,7 @@ import { FRICTION_PLAYBOOKS } from '../data/frictionPlaybooks';
 import { ChapterDiagram } from './ChapterDiagram';
 import { RoleMindsetCard } from './RoleMindsetCard';
 import { FrictionPlaybookCard } from './FrictionPlaybookCard';
+import { ContentBlocks } from './content/ContentBlocks';
 import { 
   Search, 
   Bookmark, 
@@ -96,6 +97,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
     diagram: true,
     examples: true,
     coreConcepts: true,
+    reference: true,
     workflow: false,
     pitfalls: experienceLevel === 'experienced',
     checklist: false,
@@ -125,6 +127,9 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   const activeIndex = chapters.findIndex(c => c.id === activeChapterId);
   const prevChapter = activeIndex > 0 ? chapters[activeIndex - 1] : null;
   const nextChapter = activeIndex < chapters.length - 1 ? chapters[activeIndex + 1] : null;
+
+  const referenceSections = (activeChapter.contentSections ?? []).filter(section => section.placement !== 'diagram');
+  const referenceBlockCount = referenceSections.reduce((sum, section) => sum + section.blocks.length, 0);
 
   const isCurrentBookmarked = bookmarks.includes(activeChapter.id);
   const isCurrentRead = readChapters.includes(activeChapter.id);
@@ -949,6 +954,15 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                   {/* Interactive Chapter Diagram Simulator */}
                   <ChapterDiagram chapterId={activeChapter.id} />
 
+                  {/* Restored static-guide blocks placed inside the diagram section */}
+                  {activeChapter.contentSections && (
+                    <ContentBlocks
+                      sections={activeChapter.contentSections}
+                      placement="diagram"
+                      onNavigateChapter={handleSelectChapter}
+                    />
+                  )}
+
                   {/* Interactive C4 Model Zoom for Chapter 5 */}
                   {activeChapter.id === 's5' && (
                     <div className="mt-4 p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] space-y-3">
@@ -1201,6 +1215,42 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                         )}
                       </div>
                     ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* SECTION 5.5: เนื้อหาอ้างอิง (Reference) — restored tables/cards/sources from the static guide */}
+            {referenceSections.length > 0 && (
+              <div className="border border-neutral-200 dark:border-[#262626] rounded-2xl overflow-hidden bg-white dark:bg-[#141414] shadow-2xs">
+                <button
+                  onClick={() => toggleSection('reference')}
+                  aria-expanded={!!openSections.reference}
+                  className="w-full p-3.5 sm:p-4.5 flex items-center justify-between bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f] text-left cursor-pointer select-none transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-7 h-7 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
+                      📚
+                    </div>
+                    <div>
+                      <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
+                        เนื้อหาอ้างอิง (Reference)
+                      </h3>
+                      <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e]">
+                        ตาราง การ์ด และแหล่งอ้างอิงประกอบบทนี้ ({referenceBlockCount} รายการ)
+                      </p>
+                    </div>
+                  </div>
+                  {openSections.reference ? <ChevronUp className="w-4 h-4 text-neutral-600 dark:text-[#a3a3a3]" /> : <ChevronDown className="w-4 h-4 text-neutral-400 dark:text-[#737373]" />}
+                </button>
+
+                {openSections.reference && (
+                  <div className="p-3.5 sm:p-5 border-t border-neutral-100 dark:border-[#262626] bg-white dark:bg-[#141414]">
+                    <ContentBlocks
+                      sections={referenceSections}
+                      placement="reference"
+                      onNavigateChapter={handleSelectChapter}
+                    />
                   </div>
                 )}
               </div>
