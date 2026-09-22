@@ -1,7 +1,7 @@
 # Spec: Hero-figure briefs for chapters s1–s15
 
 - Date: 2026-09-22
-- Status: **Draft for owner approval**
+- Status: **Approved** — the owner accepted all six recommendations in §6 (2026-09-22). The s9 `keyTakeaway` rewrite (Q5) is already applied; the other decisions land with their rollout wave.
 - Parent spec: [`2026-09-22-visual-first-pilot-ch3.md`](./2026-09-22-visual-first-pilot-ch3.md) (pilot, hero slot, rollout rules). Its §1 non-goals, §2.2–§2.4 porting/responsive/a11y rules, §3 hero slot, §4 (inline placement deferred) and §11 rollout order apply to every brief below unless a brief says otherwise.
 - UI copy is **Thai-first**; English appears only in parentheses after the Thai. Every string in `code` inside a panel table is the literal copy to ship.
 - Rule change since the pilot: the owner relaxed "≤ 6 text strings per panel". Text count is not capped, but **every string must fit its box at `fontSize` ≥ 10** in the smallest rendered size of its layout mode.
@@ -260,7 +260,7 @@ Panel tables use: **Label** (HTML above the panel), **SVG content** (literal str
 ### s9 — Tech Debt และ Refactor (Technical Debt)
 
 - **Point (as briefed):** debt charges interest on every later change: the same small request touches more and more code. This follows the chapter title and subtitle ("…คิดดอกเบี้ยทบต้นเป็นงานที่ช้าลงทุก Sprint"), **not** the current `keyTakeaway`, which restates s3 (Q5).
-- **Proposed `keyTakeaway`** (for owner approval): `หนี้ทางเทคนิคคิดดอกเบี้ยทุกครั้งที่แก้โค้ด กันเวลาจ่ายหนี้ทุก Sprint ก่อนงานจะช้าลงเรื่อยๆ`
+- **`keyTakeaway`** (approved, applied): `หนี้ทางเทคนิคคิดดอกเบี้ยทุกครั้งที่แก้โค้ด กันเวลาจ่ายหนี้ทุก Sprint ก่อนงานจะช้าลงเรื่อยๆ`
 - **Artefact and why:** a pull request's "files changed" list for the same tiny request, "add refund reason สินค้าชำรุด". With debt the reason list is copy-pasted in 6 places and one is missed, causing a bug. After refactoring it is one file. A developer's real view makes "interest" concrete.
 - **Component / key:** `RefundDebtDiff` / `'refund-debt-diff'`. 2 panels, `viewBox 0 0 300 240`, shell `columns: 2` (stacked below 640px).
 
@@ -442,16 +442,16 @@ Each batch: one PR, one `visualFirst.test.ts` guard update, copyBudgets pass for
 | Thai strings overflow at `fontSize` 10 | §2.4 width rule and 6.5-unit budget; verify with `getComputedTextLength()`; shorten copy, never shrink font |
 | Before/after stacked on mobile makes the hero tall (2 × ≈ 250px) | `viewBox` heights ≤ 300; s4 uses tabs; acceptance still checks only that the top of panel 1 is visible (pilot §9.3) |
 | Heroes restate widgets (s4, s7, s12, s14) | briefs keep definitions and frameworks in widgets; s14 widget removal is Q6 |
-| s9 figure contradicts the current s9 `keyTakeaway` | Q5 must be answered before s9 ships; otherwise brief s9 around cost-of-late-fix and accept duplication with s3 |
+| s9 figure contradicts the current s9 `keyTakeaway` | Resolved: Q5 accepted and applied; otherwise brief s9 around cost-of-late-fix and accept duplication with s3 |
 | Legacy figures moved inline still have sub-10 text | redraw text sizes as part of the move; do not move a figure without it |
 | s5 option choice delays wave 1 | option B needs no mechanism to ship the hero itself; the inline mechanism can land in the same wave independently |
 | Fictional numbers read as claims (50,000 users, 70/20/10, 99.9%) | all taken from the chapter's own copy (scenario, keyTakeaway, widget) or clearly illustrative; no cost numbers anywhere |
 
 ---
 
-## 6. Open questions for the owner
+## 6. Owner decisions (all recommendations accepted, 2026-09-22)
 
-| # | Chapter | Question | Recommendation |
+| # | Chapter | Question | Recommendation (**accepted**) |
 |---|---|---|---|
 | Q1 | all | Reuse the online-shop "ขอคืนเงิน" feature as the single domain for every hero? | Yes (§2.2) |
 | Q2 | s5 | Hero option B (new `RefundC4Impact`, carries the key takeaway) or option A (existing swimlane/sequence pair, per pilot §11)? | B |
