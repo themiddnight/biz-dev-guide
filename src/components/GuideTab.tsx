@@ -183,6 +183,13 @@ export const GuideTab: React.FC<GuideTabProps> = ({
     setOtherSideView(defaultOtherSideView);
   }, [role]);
 
+  // Hero seat: the reader's own seat unless flipped; resets on chapter or role change, not persisted (spec P3.3).
+  const [seatFlipped, setSeatFlipped] = useState(false);
+  useEffect(() => {
+    setSeatFlipped(false);
+  }, [activeChapter.id, role]);
+  const seat = role ? (seatFlipped ? otherRole(role) : role) : 'biz';
+
   // Each chapter (and each level) opens at its Core (spec §1.4, D3).
   useEffect(() => {
     setOpenState(deriveOpenState(layout, activeChapter.id));
@@ -609,7 +616,14 @@ export const GuideTab: React.FC<GuideTabProps> = ({
           {/* Chapter Main Content Reader Card */}
           <div id={CHAPTER_START_ID} className="bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-7 shadow-2xs space-y-5 sm:space-y-6">
             
-            <ChapterHero chapter={activeChapter} experienceLevel={chapterLevel} isRead={isCurrentRead} />
+            <ChapterHero
+              chapter={activeChapter}
+              experienceLevel={chapterLevel}
+              isRead={isCurrentRead}
+              role={role}
+              seat={seat}
+              onFlipSeat={() => setSeatFlipped((f) => !f)}
+            />
 
             {/* ADAPTIVE LENS CONTROLLER BANNER */}
             <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-2 sm:space-y-2.5">

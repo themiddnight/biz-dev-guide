@@ -2,14 +2,18 @@ import React from 'react';
 import { Clock, Check, Sparkles } from 'lucide-react';
 import type { Chapter, ExperienceLevel } from '../../types';
 import { HeroFigure } from './HeroFigure';
+import type { Role } from '../../data/rolePerspective';
 
 interface ChapterHeroProps {
   chapter: Chapter;
   experienceLevel: ExperienceLevel;
   isRead: boolean;
+  role?: Role | null;
+  seat?: Role;
+  onFlipSeat?: () => void;
 }
 
-export const ChapterHero: React.FC<ChapterHeroProps> = ({ chapter, experienceLevel, isRead }) => {
+export const ChapterHero: React.FC<ChapterHeroProps> = ({ chapter, experienceLevel, isRead, role = null, seat = 'biz', onFlipSeat = () => {} }) => {
   const analogyHeading = (
     <div className="flex items-center gap-2 text-xs font-bold text-neutral-900 dark:text-[#fafafa]">
       <Sparkles className="w-4 h-4 text-amber-500" />
@@ -57,7 +61,9 @@ export const ChapterHero: React.FC<ChapterHeroProps> = ({ chapter, experienceLev
         <p className="text-xs sm:text-sm text-neutral-500 dark:text-[#8e8e8e] leading-relaxed font-normal">
           {chapter.subtitle}
         </p>
-        {chapter.heroFigure && <HeroFigure figure={chapter.heroFigure} analogy={chapter.plainAnalogy} />}
+        {chapter.heroFigure && (
+          <HeroFigure figure={chapter.heroFigure} analogy={chapter.plainAnalogy} role={role} seat={seat} onFlipSeat={onFlipSeat} />
+        )}
         <p className="text-sm text-neutral-800 dark:text-[#d4d4d4] leading-relaxed" data-key-takeaway>
           <span className="font-semibold">สรุปบทนี้:</span> {chapter.keyTakeaway}
         </p>

@@ -56,6 +56,8 @@ export interface ChapterHeroFigure {
   figureKey: FigureKey;
   /** One line, plain text (no RichText/links). Must make sense without the chapter body. */
   caption: string;
+  /** The refund moment narrated from each seat (role-perspective spec P3.2). One line, ≤ 100 chars. */
+  seats: Record<Role, string>;
 }
 
 export interface TableColumn {

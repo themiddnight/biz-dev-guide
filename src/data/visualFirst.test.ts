@@ -35,6 +35,12 @@ describe('visual-first heroes', () => {
     expect(CHAPTERS.filter((c) => c.heroFigure).map((c) => c.id)).toEqual(Object.keys(HERO_FIGURES));
   });
 
+  it.each(Object.keys(HERO_FIGURES))('narrates the %s hero figure from both seats', (id) => {
+    const seats = chapter(id).heroFigure?.seats;
+    expect(seats?.biz?.trim()).toBeTruthy();
+    expect(seats?.eng?.trim()).toBeTruthy();
+  });
+
   it.each(Object.keys(HERO_FIGURES))('keeps $ amounts out of %s', (id) => {
     expect(JSON.stringify(chapter(id))).not.toMatch(MONEY);
   });

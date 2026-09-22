@@ -33,6 +33,21 @@ describe('copy budgets', () => {
         if (ch.heroFigure.caption.includes('\n')) v.push(`${at('heroFigure.caption')}: contains a newline`);
         bannedOpener(v, at('heroFigure.caption'), ch.heroFigure.caption);
         over(v, at('plainAnalogy (hero)'), ch.plainAnalogy, 80);
+        // Seat lines (role-perspective spec P3.2): one line each, distinct, not a caption repeat.
+        const { seats, caption } = ch.heroFigure;
+        for (const side of ['biz', 'eng'] as const) {
+          const where = at(`heroFigure.seats.${side}`);
+          const line = seats?.[side];
+          if (!line) {
+            v.push(`${where}: missing`);
+            continue;
+          }
+          over(v, where, line, 100);
+          if (line.includes('\n')) v.push(`${where}: contains a newline`);
+          bannedOpener(v, where, line);
+          if (line === caption) v.push(`${where}: repeats the caption`);
+        }
+        if (seats && seats.biz === seats.eng) v.push(`${at('heroFigure.seats')}: biz equals eng`);
       }
       over(v, at('keyTakeaway'), ch.keyTakeaway, 100);
       over(v, at('businessNote'), ch.businessNote, 100);
