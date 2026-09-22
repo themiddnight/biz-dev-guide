@@ -302,7 +302,7 @@ The previous-chapter card stays sequential. The AI button (`:1592-1598`) does no
   - `setLevelChosen(true)`
   - **No XP** (I-17, I-22)
   - It does not route through `handleExperienceLevelChange`, which early-returns when choosing the already-default `'beginner'` and would then never write the key.
-- `handleExperienceLevelChange` also calls `setLevelChosen(true)`. A reader who toggles the level from the header or the lens banner before answering the card has made the choice, so the card must disappear.
+- `handleExperienceLevelChange` always calls `writeStorage('be_guide_exp_level', level)` and `setLevelChosen(true)` before its early return, even when the level equals the current one. The early return only skips the state change and the XP (D12). A reader who selects a level from the header or the lens banner before answering the card has made the choice, so the card disappears permanently.
 - GuideTab receives `showFirstVisit={!levelChosen}` and `onChooseInitialLevel`.
 
 ### 4.2 Content (Thai-first)
@@ -506,6 +506,7 @@ UI is verified in the browser preview against §9 (light and dark, 375px and des
 | D9 | Outline clicks use `replaceState`, chapter changes use `pushState` | Back walks chapters, not scroll positions |
 | D10 | **Owner decision:** `CHAPTER_CORE_OVERRIDES` promotes s11 `faq` and s15 `glossary` to the front of Core for both levels (§1.1) | They are those chapters' main content, and s11 is the experienced track's first stop |
 | D11 | **Owner decision:** track completion awards no XP or badge | XP stays on the learning actions already in place |
+| D12 | **Owner decision:** selecting a level (header, lens banner or first-visit card) always persists `be_guide_exp_level` and dismisses the first-visit card permanently, even if it equals the current level. The early return in `handleExperienceLevelChange` only skips XP. | Otherwise re-selecting the default `beginner` hides the card only until reload, which contradicts AC 18 |
 
 ## 11. Risks
 

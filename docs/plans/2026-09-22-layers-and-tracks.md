@@ -1656,7 +1656,23 @@ export function writeStorage(key: string, value: string): void {
   };
 ```
 
-Make `setLevelChosen(true);` the first statement of `handleExperienceLevelChange`, before its early return. Pass the new props to `<GuideTab>`:
+Rewrite `handleExperienceLevelChange` (spec §10 D12). Selecting a level always persists the key and dismisses the card, even when it equals the current level. The early return only skips the state change and the XP:
+
+```tsx
+  const handleExperienceLevelChange = (level: ExperienceLevel) => {
+    writeStorage('be_guide_exp_level', level);
+    setLevelChosen(true);
+    if (level === experienceLevel) return;
+    setExperienceLevel(level);
+    if (level === 'experienced') {
+      addXp(15, 'เปิดโหมด Experienced: ศึกษาคัมภีร์รับมือ Friction');
+    } else {
+      addXp(10, 'เปิดโหมด Beginner: ปูพื้นฐาน Mindset');
+    }
+  };
+```
+
+Keep the two `addXp` lines exactly as they are in the current file (copy them, do not retype). Pass the new props to `<GuideTab>`:
 
 ```tsx
             showFirstVisit={!levelChosen}
@@ -1736,7 +1752,7 @@ Use `TRACK_CHAPTER_NUMS` for the display so it matches the spec copy exactly. `r
 - [ ] **Step 6: Browser verification** (fresh profile each time; read XP with `JSON.parse(localStorage.be_guide_stats||'{}').xp`):
   1. AC 16, at 375px. `[data-first-visit]` is present and the welcome banner is absent. The beginner option shows `เส้นทาง: บท 1 → 2 → 3 → 4 → 6 → 7 → 11 → 14 · ≈ 92 นาที`. Record the XP, then click `[data-first-visit-option="experienced"]`. Then `localStorage.be_guide_exp_level === 'experienced'`, the XP is unchanged, the chapter title is ch.11's, and the drawer is open showing `[data-track-panel="experienced"]`. At desktop width the same choice opens ch.11 with the drawer closed.
   2. AC 17. Click `[data-first-visit-skip]`: the key is `beginner`, the chapter stays ch.1, and the XP is unchanged. After a reload, `[data-first-visit]` is absent.
-  3. AC 18. With the card showing, click the lens banner's `⚡ ทำงานข้ามทีมมาแล้ว`. The card disappears and XP is awarded as before (button behaviour unchanged). After a reload the card stays gone (the key was written). Then clear storage and click the already-active `🌱 ใหม่กับเรื่องนี้`: the card disappears for this page session. Because of the unchanged early return, it reappears after a reload. Report this in the task summary (see Self-review, open ambiguity).
+  3. AC 18 (D12). With the card showing, click the lens banner's `⚡ ทำงานข้ามทีมมาแล้ว`. The card disappears, `be_guide_exp_level === 'experienced'`, XP is awarded as before, and after a reload the card stays gone. Then clear storage, reload, and click the already-active `🌱 ใหม่กับเรื่องนี้`. The card disappears, `be_guide_exp_level === 'beginner'`, XP is unchanged, and after a reload the card stays gone.
   4. AC 19 is verified in Task 11 (it needs the hash loader).
 
 - [ ] **Step 7: Commit**
@@ -2109,4 +2125,5 @@ Spec sections:
 5. The requested-section scroll targets `sec-friction`, the wrapper whose top is the playbook card's top, not `friction-playbook-card`. The same-chapter playbook path still scrolls to `friction-playbook-card`.
 6. The outline gets the ids `sec-<key>`, and `TrackFooter.tsx` exports two components (`TrackNextCard`, `TrackEndCard`) because the next card and the read button live in different footer rows.
 
-**Open ambiguity to confirm with the owner:** AC 18 says toggling the level "hides the card permanently". But `handleExperienceLevelChange` early-returns without writing the key when the chosen level equals the current one (spec §4.1 keeps that behaviour). Clicking the already-active `🌱` button therefore hides the card only until reload. Task 10 records this and does not change button behaviour. The fix, if wanted, is to write the key before the early return.
+**Owner decision applied (spec §10 D12):** Selecting a level from the header, the lens banner or the first-visit card always writes `be_guide_exp_level` and dismisses the card permanently, even when the level is unchanged. The early return in `handleExperienceLevelChange` now only skips the state change and the XP (Task 10, Step 2).
+
