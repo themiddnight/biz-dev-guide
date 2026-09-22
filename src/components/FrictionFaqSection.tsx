@@ -227,10 +227,7 @@ export const FrictionFaqSection: React.FC<FrictionFaqSectionProps> = ({
         <section key={group.key} className="space-y-2.5">
           <div>
             <h4 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">{group.title}</h4>
-            <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e] flex flex-wrap gap-x-3 gap-y-0.5">
-              <span><span className="font-semibold">Biz:</span> {group.subtitle.business}</span>
-              <span><span className="font-semibold">Eng:</span> {group.subtitle.engineer}</span>
-            </p>
+            <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e]">{group.subtitle}</p>
           </div>
           {FRICTION_FAQS.filter(faq => faq.group === group.key).map(renderItem)}
         </section>

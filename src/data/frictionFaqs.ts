@@ -19,34 +19,27 @@ export interface FrictionFaq {
 export interface FaqGroup {
   key: FrictionFaq['group'];
   title: string;
-  /** Static `.grp-sub` text differs by audience lens; both lenses' subtitles are shown together. */
-  subtitle: Record<'business' | 'engineer', string>;
+  subtitle: string;
 }
 
 export const FAQ_QUICK_JUMP_TITLE = 'คำถามในบทนี้ (12 ข้อ) — คลิกเพื่อข้ามไป';
 
 /** Static `.aud-callout` text for each audience lens; both are shown together. */
 export const FAQ_AUDIENCE_CALLOUTS: Record<'business' | 'engineer', { who: string; body: string }> = {
-  business: { who: 'สำหรับคุณที่มาจากฝั่ง business', body: 'คำถามของคุณถูกจัดขึ้นก่อน แต่อยากให้เลื่อนอ่านกลุ่มล่างด้วย — นั่นคือสิ่งที่ทีม dev ของคุณกำลังคิดอยู่แต่อาจไม่เคยพูดออกมาตรงๆ' },
-  engineer: { who: 'สำหรับคุณที่มาจากฝั่ง engineer', body: 'คำถามของคุณถูกจัดขึ้นก่อน แต่อยากให้เลื่อนอ่านกลุ่มล่างด้วย — นั่นคือสิ่งที่ฝั่ง business กำลังคิดเกี่ยวกับพฤติกรรมของคุณอยู่' },
+  business: { who: 'ถ้าคุณมาจากฝั่ง Business', body: 'อ่านกลุ่มคำถามของสาย Engineering ด้วย นั่นคือสิ่งที่ทีม Dev คิดอยู่แต่อาจไม่เคยพูดตรงๆ' },
+  engineer: { who: 'ถ้าคุณมาจากฝั่ง Engineering', body: 'อ่านกลุ่มคำถามของสาย Business ด้วย นั่นคือสิ่งที่ฝั่ง Business คิดเกี่ยวกับวิธีทำงานของคุณ' },
 };
 
 export const FAQ_GROUPS: FaqGroup[] = [
   {
     key: 'engineering-asks',
     title: 'คำถามที่คนสาย engineering มักถาม',
-    subtitle: {
-      engineer: 'เรียงขึ้นก่อนเพราะคุณเลือกมุมมองฝั่ง engineer',
-      business: 'นี่คือสิ่งที่ทีม dev ของคุณอาจกำลังคิดอยู่',
-    },
+    subtitle: 'สิ่งที่ทีม Dev อาจกำลังคิดอยู่',
   },
   {
     key: 'business-asks',
     title: 'คำถามที่คนสาย business มักถาม',
-    subtitle: {
-      engineer: 'นี่คือสิ่งที่ฝั่ง business กำลังคิดเกี่ยวกับพฤติกรรมของคุณอยู่',
-      business: 'เรียงขึ้นก่อนเพราะคุณเลือกมุมมองฝั่ง business',
-    },
+    subtitle: 'สิ่งที่ฝั่ง Business อาจกำลังคิดอยู่',
   },
 ];
 
