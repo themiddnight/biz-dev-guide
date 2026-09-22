@@ -570,7 +570,7 @@ export function defaultQuizRound(role: Role | null): QuizRound; // role ?? 'basi
 |---|---|---|---|
 | `be_guide_role` | 1 | `biz` \| `eng` | absent = no role |
 | `be_guide_level_mode` | 1 | `auto` \| `beginner` \| `experienced` | read only while a role is set |
-| `be_guide_chapter_levels` | 1 | JSON object | cleared on role change |
+| `be_guide_chapter_levels` | 1 | JSON object | legacy; migrated to be_guide_chapter_levels_by_role |
 | `be_guide_exp_level` | — | unchanged | base level; used when role is null |
 
 Other-side view, seat and quiz round are session state only.
@@ -582,7 +582,7 @@ Other-side view, seat and quiz round are session state only.
 | D1 | Role is primary; level becomes a derived default with explicit overrides (per chapter, then global). | The owner's recommendation. It matches the design rule: role changes the order of each chapter. |
 | D2 | No role = today's behaviour exactly, including XP on level switch. | This keeps legacy profiles and "skip" stable, and each phase ships without a migration. |
 | D3 | Shared chapters default to **beginner** under a role. | Role says nothing about collaboration experience, and beginner is the site-wide default. The alternative, reusing `be_guide_exp_level`, would add hidden state that the header cannot show. The per-chapter switch is one tap. |
-| D4 | Changing role clears per-chapter overrides but keeps `levelMode`. | Overrides were relative to the old role's defaults. `levelMode` is shown in the header, so keeping it is not surprising. |
+| D4 | Changing role clears per-chapter overrides but keeps `levelMode`. | Overrides were relative to the old role's defaults. `levelMode` is shown in the header, so keeping it is not surprising. Superseded by 2026-09-23-role-ux-fixes.md Phase 3. |
 | D5 | No XP for choosing a role, a level mode or a chapter override. | This is the same policy as bookmarks. Settings are not learning actions, and toggling must not be farmable. |
 | D6 | `otherSide` is a new SectionKey in Core for both levels. | It is the only role-dependent content, so it must be seen without expanding anything. Chapter-signature overrides still lead. |
 | D7 | `businessNote`/`engineerNote` move from the hero into the other-side box footer. They are not deleted. | Advice to the reader belongs next to the other side's view that motivates it. This also removes a hero repeat flagged by the concise-copy spec. |

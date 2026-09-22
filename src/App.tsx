@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ExperienceLevel, TabType, UserStats, Badge } from './types';
 import { readStorage, writeStorage, removeStorage } from './lib/storage';
-import { parseRole, parseLevelMode, parseChapterLevels, planRoleChoice } from './lib/rolePrefs';
+import { parseRole, parseLevelMode, planRoleChoice, loadChapterLevelsByRole, chapterLevelsFor, withChapterLevel } from './lib/rolePrefs';
 import type { LevelInputs, LevelMode, Role } from './data/rolePerspective';
 import { CHAPTERS } from './data/chaptersData';
 import { formatChapterHash } from './lib/chapterRoute';
@@ -52,18 +52,22 @@ export default function App() {
   // Role perspective (spec P1.2). No role = today's behaviour (D2). None of these pay XP (D5).
   const [role, setRole] = useState<Role | null>(() => parseRole(readStorage('be_guide_role')));
   const [levelMode, setLevelMode] = useState<LevelMode>(() => parseLevelMode(readStorage('be_guide_level_mode')));
-  const [chapterLevels, setChapterLevels] = useState<Record<string, ExperienceLevel>>(() =>
-    parseChapterLevels(readStorage('be_guide_chapter_levels'), CHAPTERS.map(c => c.id))
-  );
+  // Per-chapter overrides are stored per role and swap with it (role UX fixes Phase 3, supersedes D4).
+  // The legacy flat key is migrated once and removed.
+  const [levelsInit] = useState(() => loadChapterLevelsByRole(
+    readStorage('be_guide_chapter_levels_by_role'), readStorage('be_guide_chapter_levels'),
+    parseRole(readStorage('be_guide_role')), CHAPTERS.map(c => c.id),
+  ));
+  const [chapterLevelsByRole, setChapterLevelsByRole] = useState(levelsInit.byRole);
+  useEffect(() => {
+    if (!levelsInit.migrated) return;
+    writeStorage('be_guide_chapter_levels_by_role', JSON.stringify(levelsInit.byRole));
+    removeStorage('be_guide_chapter_levels');
+  }, [levelsInit]);
+  const chapterLevels = chapterLevelsFor(chapterLevelsByRole, role);
   const levelInputs: LevelInputs = { role, baseLevel: experienceLevel, levelMode, chapterLevels };
 
-  const persistChapterLevels = (next: Record<string, ExperienceLevel>) => {
-    setChapterLevels(next);
-    writeStorage('be_guide_chapter_levels', JSON.stringify(next));
-  };
-
-  // Changing role clears per-chapter overrides but keeps levelMode (D4).
-  // Re-choosing the current role changes nothing, so overrides survive.
+  // Changing role keeps levelMode; the new role's override set applies through chapterLevelsFor.
   const handleChooseRole = (next: Role | null) => {
     const plan = planRoleChoice(role, next, levelChosen);
     // An explicit "no role" is a choice too: without this the first-visit card would reappear.
@@ -72,7 +76,6 @@ export default function App() {
     setRole(next);
     if (next === null) removeStorage('be_guide_role');
     else writeStorage('be_guide_role', next);
-    persistChapterLevels({});
   };
 
   const handleLevelModeChange = (mode: LevelMode) => {
@@ -81,10 +84,10 @@ export default function App() {
   };
 
   const handleChapterLevelChange = (chapterId: string, level: ExperienceLevel | null) => {
-    const next = { ...chapterLevels };
-    if (level === null) delete next[chapterId];
-    else next[chapterId] = level;
-    persistChapterLevels(next);
+    if (role === null) return; // the per-chapter switch is not rendered without a role
+    const next = withChapterLevel(chapterLevelsByRole, role, chapterId, level);
+    setChapterLevelsByRole(next);
+    writeStorage('be_guide_chapter_levels_by_role', JSON.stringify(next));
   };
 
   const [aiPromptPrefill, setAiPromptPrefill] = useState('');
