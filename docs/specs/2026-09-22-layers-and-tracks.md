@@ -364,7 +364,8 @@ Section presence in that chapter is **not** checked here. It is checked at apply
 - **replaceSection:** `replaceState` to `#/ch/{num}` or `#/ch/{num}/{key}`. Outline clicks do not add history entries.
 - **popstate:** parse `location.hash`.
   - Valid → set `activeChapterId`, set `requestedSection` (new nonce) if a section is present, and call `opts.onChapterRoute()`. App passes `() => setActiveTab('guide')`.
-  - `null` → keep the state and `replaceState` the canonical hash.
+  - Bare hash (`''` or `'#'`) → the untouched initial entry: show the default chapter (ch.1), clear `requestedSection`, and call `opts.onChapterRoute()`. Needed so Back from the first navigation returns to ch.1 (AC 22).
+  - Any other `null` (invalid hash) → keep the state and `replaceState` the canonical hash.
   - This handler never pushes.
   - Browser back/forward therefore walks chapter visits. Manual hash edits also arrive as `popstate`.
 - **Tabs:** tabs are not routes (out of scope). When `activeTab !== 'guide'`, App calls `history.replaceState(null, '', location.pathname + location.search)`. When the guide tab becomes active again **after another tab**, it `replaceState`s `#/ch/{num}`. The hook never writes a hash on initial load without one, and never writes one before the first navigation. A plain visit keeps a bare URL, so a later visit is not mistaken for a deep link.
