@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
 import { CHAPTERS } from './chaptersData';
-import { CHAPTER_ILLUSTRATIONS } from './chapterIllustrations';
 import { FIGURES } from '../components/figures';
 
 const chapter = (id: string) => CHAPTERS.find((c) => c.id === id)!;
@@ -36,22 +35,7 @@ describe('visual-first heroes', () => {
     expect(CHAPTERS.filter((c) => c.heroFigure).map((c) => c.id)).toEqual(Object.keys(HERO_FIGURES));
   });
 
-  it.each(Object.keys(HERO_FIGURES))('drops the %s text illustration cards', (id) => {
-    expect(chapter(id).illustrations).toEqual([]);
-  });
-
   it.each(Object.keys(HERO_FIGURES))('keeps $ amounts out of %s', (id) => {
     expect(JSON.stringify(chapter(id))).not.toMatch(MONEY);
-  });
-
-  it('keeps $ amounts out of the illustration cards', () => {
-    expect(JSON.stringify(CHAPTER_ILLUSTRATIONS)).not.toMatch(MONEY);
-  });
-
-  it('carries no svgType or svgDescription author notes', () => {
-    for (const ill of Object.values(CHAPTER_ILLUSTRATIONS)) {
-      expect(ill).not.toHaveProperty('svgType');
-      expect(ill).not.toHaveProperty('svgDescription');
-    }
   });
 });

@@ -143,22 +143,6 @@ export interface ChapterPitfall {
   solution: string; // ทางออกที่แก้ได้จริง
 }
 
-export interface SvgVisualElement {
-  label: string;
-  role: string;
-  color: string;
-  detail: string;
-}
-
-export interface ChapterIllustration {
-  id: string;
-  title: string;
-  subtitle: string;
-  visualMetaphor: string; // อธิบายเปรียบเทียบภาพให้เข้าใจทันที
-  elements: SvgVisualElement[];
-  takeaway: string;
-}
-
 export interface NegotiationDilemmaOption {
   id: string;
   text: string;
@@ -229,7 +213,6 @@ export interface Chapter {
   realWorldWorkflow?: { step: string; role: string; description: string }[];
   checklist?: string[];
   commonPitfalls?: ChapterPitfall[];
-  illustrations?: ChapterIllustration[];
   heroFigure?: ChapterHeroFigure;
   frictionPlaybook?: FrictionPlaybook;
   contentSections?: ChapterContentSection[];

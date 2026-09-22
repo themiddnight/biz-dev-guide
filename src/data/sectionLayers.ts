@@ -89,13 +89,12 @@ export function getInlineSectionsAt(chapter: Chapter, key: SectionKey, conceptIn
 }
 
 /**
- * Whether the Diagram section has anything to show: an illustration card, a widget,
- * the glossary map, or content placed in it. Chapters whose hero replaced all of these
+ * Whether the Diagram section has anything to show: a widget, the glossary map,
+ * or content placed in it. Chapters whose hero replaced all of these
  * (s1 after Q4, s14 after Q6) drop the section.
  */
 export function hasDiagramContent(chapter: Chapter): boolean {
   return (
-    (chapter.illustrations?.length ?? 0) > 0 ||
     DIAGRAM_WIDGET_CHAPTERS.has(chapter.id) ||
     chapter.id === GLOSSARY_MAP_CHAPTER ||
     (chapter.contentSections ?? []).some(section => placementOf(section) === 'diagram')

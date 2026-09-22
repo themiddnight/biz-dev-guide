@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layers, ChevronDown, ChevronUp, CheckCircle2, Lightbulb } from 'lucide-react';
+import { Layers, ChevronDown, ChevronUp } from 'lucide-react';
 import { ChapterDiagram } from '../../ChapterDiagram';
 import { ContentBlocks } from '../../content/ContentBlocks';
 import { DiagramFamilyGrid } from '../../diagrams/DiagramFamilyGrid';
@@ -35,77 +35,6 @@ export const DiagramSection: React.FC<SectionProps> = ({ chapter, isOpen, onTogg
 
       {isOpen && (
         <div className="p-3.5 sm:p-5 border-t border-neutral-100 dark:border-[#262626] bg-neutral-50/50 dark:bg-[#111111] space-y-4">
-          {/* Structured Visual Illustration & Metaphor Schema */}
-          {chapter.illustrations && chapter.illustrations.length > 0 && (
-            <div className="space-y-3.5">
-              {chapter.illustrations.map((ill) => (
-                <div
-                  key={ill.id}
-                  className="p-3.5 sm:p-5 rounded-2xl bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] shadow-2xs space-y-3"
-                >
-                  <div>
-                    <h4 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
-                      {ill.title}
-                    </h4>
-                    <p className="text-[11px] text-neutral-500 dark:text-[#8e8e8e]">
-                      {ill.subtitle}
-                    </p>
-                  </div>
-
-                  {/* Visual Analogy Metaphor */}
-                  <div className="p-3 rounded-xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] text-xs space-y-1">
-                    <div className="font-bold text-neutral-900 dark:text-[#fafafa] flex items-center gap-1.5">
-                      <Lightbulb className="w-4 h-4 text-amber-500 shrink-0" />
-                      <span>ภาพเปรียบเทียบในชีวิตจริง (Mental Model Metaphor)</span>
-                    </div>
-                    <p className="text-neutral-600 dark:text-[#a3a3a3] leading-relaxed text-[11px] sm:text-xs font-normal">
-                      {ill.visualMetaphor}
-                    </p>
-                  </div>
-
-                  {/* Visual Elements Matrix */}
-                  {ill.elements && ill.elements.length > 0 && (
-                    <div className="space-y-1.5 pt-1">
-                      <span className="text-[11px] font-bold text-neutral-800 dark:text-[#e5e5e5] block">
-                        องค์ประกอบสำคัญในแผนภาพ ({ill.elements.length} ส่วน):
-                      </span>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 text-xs">
-                        {ill.elements.map((elem, eIdx) => (
-                          <div
-                            key={eIdx}
-                            className="p-2.5 rounded-xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-1"
-                          >
-                            <div className="flex items-center justify-between">
-                              <span className="font-bold text-[11px] text-neutral-900 dark:text-[#fafafa] truncate">
-                                {elem.label}
-                              </span>
-                              <span
-                                className="w-2.5 h-2.5 rounded-full shrink-0"
-                                style={{ backgroundColor: elem.color }}
-                              />
-                            </div>
-                            <div className="text-[10px] text-neutral-700 dark:text-[#d4d4d4] font-semibold">
-                              {elem.role}
-                            </div>
-                            <div className="text-[10px] text-neutral-500 dark:text-[#8e8e8e] leading-normal font-normal">
-                              {elem.detail}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Key Takeaway */}
-                  <div className="pt-1 text-[11px] text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5 font-medium">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                    <span><b>สาระสำคัญ:</b> {ill.takeaway}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
           {/* s5: diagram families + T1 render above the Kitchen simulator (spec §3.4 order) */}
           {chapter.id === 's5' && (
             <div className="space-y-3">
