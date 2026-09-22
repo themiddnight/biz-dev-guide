@@ -15,13 +15,13 @@ export const FRICTION_PLAYBOOKS: Record<string, FrictionPlaybook> = {
       },
       {
         ifYouNeed: 'ระบบรองรับลูกค้าได้เป็นแสนคนโดยไม่พัง',
-        youMustSacrifice: 'ความเร็วในการส่งมอบฟีเจอร์แรก (ต้องมีเวลาออกแบบสถาปัตยกรรม)',
+        youMustSacrifice: 'ความเร็วในการส่งฟีเจอร์แรก (ต้องมีเวลาออกแบบระบบ)',
         howToNegotiate: '"ถ้าเป้าหมายคือรองรับแคมเปญใหญ่ เราขอเวลา 2 สัปดาห์ทำ Load Test และวางคิวระบบ เพื่อไม่ให้ล่มตอนเปิดตัวจริง"'
       }
     ],
     goldenScripts: [
       {
-        situation: 'เมื่อ Business อยากเพิ่มฟีเจอร์ใหม่ระหว่างที่ Sprint กำลังดำเนินอยู่',
+        situation: 'เมื่อ Business อยากเพิ่มฟีเจอร์ใหม่ระหว่าง Sprint',
         businessScript: '"ลูกค้าเพิ่งบอกว่าฟีเจอร์นี้จำเป็นมาก ถ้าจะใส่เข้า Sprint นี้ เราตัดการ์ดใบไหนออกได้บ้าง วันส่งจะได้ไม่เลื่อนครับ?"',
         engineerScript: '"ฟีเจอร์นี้น่าสนใจครับ แต่ Sprint นี้เต็มแล้ว ถ้าจะดึงเข้ามา เราย้าย X หรือ Y ไป Sprint หน้าดีครับ?"'
       },
@@ -133,7 +133,7 @@ export const FRICTION_PLAYBOOKS: Record<string, FrictionPlaybook> = {
     tradeOffMatrix: [
       {
         ifYouNeed: 'ไม่ให้เวลา Refactor เลย ทำแต่ฟีเจอร์ใหม่',
-        youMustSacrifice: 'ความเร็วในการพัฒนาในอนาคต (Velocity จะตกฮวบ) และความเสถียรของระบบ',
+        youMustSacrifice: 'งานต่อๆ ไปจะช้าลง (Velocity ตกฮวบ) และความเสถียรของระบบ',
         howToNegotiate: '"แบ่งโควตาคงที่ 15–20% ของทุก Sprint ให้ Technical Debt และงานดูแลระบบ แทนการหยุดทั้ง Sprint"'
       }
     ],
@@ -153,7 +153,7 @@ export const FRICTION_PLAYBOOKS: Record<string, FrictionPlaybook> = {
           text: 'ขู่เรื่องระบบล่ม: "ถ้าคุณไม่ให้ทำ แล้วระบบล่มตอน 11.11 ผมไม่รับผิดชอบนะ"',
           isOptimal: false,
           result: 'เกิดบรรยากาศโยนความผิดล่วงหน้า (Defensive Culture) และผู้บริหารมองว่าทีม Engineering ไม่เป็นมืออาชีพ',
-          tip: 'การขู่ไม่ได้ความร่วมมือ ได้แต่ความตื่นตระหนกและความไม่พอใจ'
+          tip: 'ขู่ไปก็ไม่มีใครอยากช่วย มีแต่คนตกใจและไม่พอใจ'
         },
         {
           id: 'opt_compromise_plan',
@@ -198,7 +198,7 @@ export const FRICTION_PLAYBOOKS: Record<string, FrictionPlaybook> = {
       {
         ifYouNeed: 'Deploy วันศุกร์เพื่อเปิดตัวแคมเปญวันเสาร์เช้า',
         youMustSacrifice: 'ต้องมี Rollback อัตโนมัติใน 60 วินาที และ Business ต้องมา Standby ในห้อง Incident ด้วย',
-        howToNegotiate: '"ถ้าแคมเปญจำเป็นต้องปล่อยวันเสาร์จริงๆ เราขอ Deploy ตั้งแต่เช้าวันพฤหัสบดี เพื่อให้มีเวลาสังเกตการณ์ระบบ 24 ชม. ก่อนวันหยุดครับ"'
+        howToNegotiate: '"ถ้าแคมเปญจำเป็นต้องปล่อยวันเสาร์จริงๆ เราขอ Deploy ตั้งแต่เช้าวันพฤหัสบดี จะได้มีเวลาเฝ้าดูระบบ 24 ชม. ก่อนวันหยุดครับ"'
       }
     ],
     goldenScripts: [
@@ -212,7 +212,7 @@ export const FRICTION_PLAYBOOKS: Record<string, FrictionPlaybook> = {
 
   s11: {
     chapterId: 's11',
-    battlegroundTitle: 'ห้องเจรจาต่อรอง: สามเหลี่ยมบริหารโครงการ (The Iron Triangle)',
+    battlegroundTitle: 'ห้องเจรจา: สามเหลี่ยม Scope-เวลา-งบ (The Iron Triangle)',
     businessFrustration: 'แค่อยากได้ครบตามสเปก ในเวลาเดิม งบเดิม ทำไมทีมบอกว่าทำไม่ได้',
     engineerFrustration: 'คำสั่งมักมาแบบ "เอาทุกอย่าง เสร็จเมื่อวาน และห้ามมีบั๊ก" ซึ่งเป็นไปไม่ได้จริง',
     underlyingRootCause: 'ไม่ยอมรับ Iron Triangle: ถ้าล็อกทั้ง Scope, Time และ Budget ไว้หมด สิ่งที่พังคือ Quality',
@@ -254,7 +254,7 @@ export const FRICTION_PLAYBOOKS: Record<string, FrictionPlaybook> = {
       {
         situation: 'เมื่อระบบล่ม (Production Incident)',
         businessScript: '"ตอนนี้โฟกัสกู้ระบบก่อนครับ ส่วนสาเหตุ ค่อยมาทำ Postmortem ด้วยกัน ดูว่าจะกันไม่ให้เกิดซ้ำได้ยังไง"',
-        engineerScript: '"ระบบกลับมาแล้วครับ ตอนนี้กำลังรวบรวม Timeline และ Root Cause โดยไม่หาคนผิด บ่ายนี้จะเสนอ 3 มาตรการป้องกันเชิงระบบให้ผู้บริหารพิจารณาครับ"'
+        engineerScript: '"ระบบกลับมาแล้วครับ ตอนนี้กำลังรวบรวม Timeline และ Root Cause โดยไม่หาคนผิด บ่ายนี้จะเสนอ 3 วิธีกันไม่ให้เกิดซ้ำ ให้ผู้บริหารดูครับ"'
       }
     ]
   }

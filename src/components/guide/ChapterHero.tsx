@@ -59,7 +59,7 @@ export const ChapterHero: React.FC<ChapterHeroProps> = ({ chapter, experienceLev
         </p>
         {chapter.heroFigure && <HeroFigure figure={chapter.heroFigure} analogy={chapter.plainAnalogy} />}
         <p className="text-sm text-neutral-800 dark:text-[#d4d4d4] leading-relaxed" data-key-takeaway>
-          <span className="font-semibold">สาระสำคัญของบทนี้:</span> {chapter.keyTakeaway}
+          <span className="font-semibold">สรุปบทนี้:</span> {chapter.keyTakeaway}
         </p>
       </div>
 

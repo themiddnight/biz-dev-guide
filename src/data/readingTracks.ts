@@ -6,8 +6,8 @@ export const TRACK_CHAPTER_NUMS: Record<ExperienceLevel, readonly number[]> = {
 };
 
 export const TRACK_META: Record<ExperienceLevel, { title: string; description: string }> = {
-  beginner: { title: 'เส้นทางมือใหม่', description: 'ปูพื้นจากต้นน้ำถึงการทดสอบ แล้วปิดด้วยความขัดแย้งที่เจอบ่อย' },
-  experienced: { title: 'เส้นทางคนทำงานข้ามทีม', description: 'เริ่มจากความขัดแย้งจริง แล้วลงลึกเรื่องประตูงาน หนี้เทคนิค และยุค AI' },
+  beginner: { title: 'เส้นทางมือใหม่', description: 'ไล่ตั้งแต่ต้นน้ำถึงการทดสอบ แล้วปิดด้วยความขัดแย้งที่เจอบ่อย' },
+  experienced: { title: 'เส้นทางคนทำงานข้ามทีม', description: 'เริ่มจากความขัดแย้งจริง แล้วลงลึกเรื่องด่านตรวจงาน หนี้เทคนิค และยุค AI' },
 };
 
 export type ChapterRef = Pick<Chapter, 'id' | 'num' | 'readTime'>;

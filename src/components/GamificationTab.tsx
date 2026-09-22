@@ -70,7 +70,7 @@ export const GamificationTab: React.FC<GamificationTabProps> = ({
                 </h2>
               </div>
               <p className="text-xs sm:text-sm text-neutral-500 dark:text-[#8e8e8e] mt-0.5">
-                ระดับความเชี่ยวชาญในการเชื่อมโยง Business ↔ Engineering
+                ระดับของคุณในการทำงานข้าม Business ↔ Engineering
               </p>
             </div>
           </div>
@@ -84,7 +84,7 @@ export const GamificationTab: React.FC<GamificationTabProps> = ({
         {/* Level Progression Bar */}
         <div className="space-y-2 pt-1">
           <div className="flex items-center justify-between text-xs text-neutral-500 dark:text-[#8e8e8e]">
-            <span>ความคืบหน้าสู่ระดับถัดไป</span>
+            <span>อีกเท่าไรถึงระดับถัดไป</span>
             {nextTier ? (
               <span>{userStats.xp} / {nextTier.minXp} XP (ขาดอีก {nextTier.minXp - userStats.xp} XP)</span>
             ) : (
@@ -151,10 +151,10 @@ export const GamificationTab: React.FC<GamificationTabProps> = ({
       <div className="space-y-3 sm:space-y-4">
         <div>
           <h3 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-[#fafafa]">
-            เหรียญรางวัลและความสำเร็จ (Badges &amp; Achievements)
+            เหรียญที่สะสมได้ (Badges &amp; Achievements)
           </h3>
           <p className="text-xs text-neutral-500 dark:text-[#8e8e8e]">
-            ปลดล็อกเมื่อคุณมีปฏิสัมพันธ์กับคู่มือ ถาม AI และทำควิซ
+            ปลดล็อกได้จากการอ่านคู่มือ ถาม AI และทำควิซ
           </p>
         </div>
 

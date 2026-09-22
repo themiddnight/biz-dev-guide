@@ -8,7 +8,7 @@ export const FamilyStructureSig: React.FC<FigureProps> = ({ className }) => {
       <svg
         viewBox="0 0 150 62"
         role="img"
-        aria-label="ลายเซ็นของไดอะแกรมหมวดโครงสร้าง: กล่องซ้อนกล่องเชื่อมด้วยเส้น"
+        aria-label="ไอคอนของไดอะแกรมหมวดโครงสร้าง: กล่องซ้อนกล่องเชื่อมด้วยเส้น"
         fontFamily="inherit"
         style={{ width: '100%', height: 'auto', maxWidth: 150, display: 'block', margin: '0 auto' }}
       >

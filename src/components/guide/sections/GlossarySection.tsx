@@ -19,7 +19,7 @@ export const GlossarySection: React.FC<SectionProps> = ({ chapter, isOpen, onTog
           </div>
           <div>
             <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
-              คลังคำศัพท์ (Glossary)
+              รวมคำศัพท์ (Glossary)
             </h3>
             <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e]">
               ค้นหาและกรองศัพท์ทั้งหมด {GLOSSARY.length} คำ ตามหมวด

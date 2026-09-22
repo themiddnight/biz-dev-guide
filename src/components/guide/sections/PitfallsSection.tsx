@@ -17,10 +17,10 @@ export const PitfallsSection: React.FC<SectionProps> = ({ chapter, isOpen, onTog
           </div>
           <div>
             <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
-              กับดักที่เจอบ่อยและทางออกที่แนะนำ (Pitfalls &amp; Solutions)
+              กับดักที่เจอบ่อยและทางแก้ (Pitfalls &amp; Solutions)
             </h3>
             <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e]">
-              สิ่งที่มักทำให้โปรเจกต์ล่าช้าหรือล้มเหลว พร้อมวิธีป้องกัน
+              เรื่องที่มักทำให้โปรเจกต์ช้าหรือพัง พร้อมวิธีกัน
             </p>
           </div>
         </div>
@@ -39,7 +39,7 @@ export const PitfallsSection: React.FC<SectionProps> = ({ chapter, isOpen, onTog
                 <span>กับดัก: {cp.pitfall}</span>
               </div>
               <div className="pl-5 text-neutral-700 dark:text-[#c4c4c4] leading-relaxed text-xs">
-                <span className="font-bold text-emerald-800 dark:text-emerald-400">💡 ทางออกที่แนะนำ: </span>
+                <span className="font-bold text-emerald-800 dark:text-emerald-400">💡 ทางแก้: </span>
                 <span>{cp.solution}</span>
               </div>
             </div>

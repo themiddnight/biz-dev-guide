@@ -16,7 +16,7 @@ export const ConeOfUncertainty: React.FC<FigureProps> = ({ className }) => {
         fontFamily="inherit"
         style={{ width: '100%', height: 'auto', maxWidth: 560, display: 'block', margin: '0 auto' }}
       >
-        <title id={titleId}>แผนภาพกรวยแห่งความไม่แน่นอนของการประเมินเวลา</title>
+        <title id={titleId}>กรวยความไม่แน่นอนของการประเมินเวลา</title>
         <desc id={descId}>ช่วงความคลาดเคลื่อนของการประเมินกว้างมากในช่วงต้นโปรเจกต์ และค่อยๆ แคบลงจนใกล้ค่าจริงเมื่อทีมได้ลงมือทำและเรียนรู้ระบบมากขึ้น</desc>
         <path d="M60 40 C 200 60, 330 96, 520 122 L 520 138 C 330 164, 200 200, 60 220 Z" fill="var(--fig-warn-bg)" stroke="var(--fig-warn-border)" strokeWidth="1.2" />
         <line x1="60" y1="130" x2="530" y2="130" stroke="var(--fig-text-muted)" strokeWidth="1.4" strokeDasharray="5 4" />

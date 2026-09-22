@@ -8,7 +8,7 @@ export const FamilyScreenSig: React.FC<FigureProps> = ({ className }) => {
       <svg
         viewBox="0 0 150 62"
         role="img"
-        aria-label="ลายเซ็นของไดอะแกรมหมวดหน้าจอ: กรอบหน้าจอที่มีแถบหัวและบล็อกเนื้อหา"
+        aria-label="ไอคอนของไดอะแกรมหมวดหน้าจอ: กรอบหน้าจอที่มีแถบหัวและบล็อกเนื้อหา"
         fontFamily="inherit"
         style={{ width: '100%', height: 'auto', maxWidth: 150, display: 'block', margin: '0 auto' }}
       >

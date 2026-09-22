@@ -26,7 +26,7 @@ export const DiagramSection: React.FC<SectionProps> = ({ chapter, isOpen, onTogg
               {chapter.diagramTitle || `แผนภาพโครงสร้างและกระบวนการบทที่ ${chapter.num}`}
             </h3>
             <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e]">
-              {chapter.diagramDescription || 'แผนภาพจำลองสถาปัตยกรรมและกระบวนการทำงานร่วมกัน'}
+              {chapter.diagramDescription || 'ภาพรวมระบบและขั้นตอนการทำงาน'}
             </p>
           </div>
         </div>

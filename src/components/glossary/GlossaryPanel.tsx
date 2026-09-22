@@ -98,7 +98,7 @@ export const GlossaryPanel: React.FC<GlossaryPanelProps> = ({
           value={query}
           onChange={e => setQuery(e.target.value)}
           placeholder="ค้นหาคำศัพท์ เช่น NFR, PjM, canary, ย้อนหลัง..."
-          aria-label="ค้นหาคำศัพท์ในคลังคำศัพท์"
+          aria-label="ค้นหาคำศัพท์"
           className={`${tokens.colors.input} w-full rounded-xl pl-9 pr-9 py-2.5 text-xs sm:text-sm`}
         />
         {query && (

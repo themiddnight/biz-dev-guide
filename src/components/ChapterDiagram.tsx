@@ -70,7 +70,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
       { name: 'Local Branch', role: 'เครื่อง Dev', passText: 'เขียนโค้ดและทดสอบบนเครื่องตัวเอง', risk: 'เห็นแค่มุมของคนเขียนคนเดียว' },
       { name: 'Pull Request', role: 'Code Review', passText: 'เพื่อนร่วมทีมอ่านและตรวจโค้ด', skippedText: 'ไม่มีใครอ่านโค้ดก่อน Merge', risk: 'ถ้ากดอนุมัติโดยไม่อ่าน บั๊กจะหลุด' },
       { name: 'Automated CI', role: 'เทสต์อัตโนมัติ', passText: 'รัน Unit Tests + Security Scan ทุกครั้ง', skippedText: 'ไม่มีเทสต์อัตโนมัติรันเลย', risk: 'จับตรรกะผิดได้เร็วและถูกที่สุด' },
-      { name: 'Staging', role: 'ทดสอบรวมระบบ (QA)', passText: 'ทดสอบบนสภาพแวดล้อมใกล้ของจริง', risk: 'เจอปัญหาการเชื่อมกับระบบภายนอก' },
+      { name: 'Staging', role: 'ทดสอบรวมระบบ (QA)', passText: 'ทดสอบบนระบบที่ใกล้ของจริง', risk: 'เจอปัญหาการเชื่อมกับระบบภายนอก' },
       { name: 'Production', role: 'ผู้ใช้จริง', passText: 'ส่งถึงผู้ใช้จริง', risk: 'บั๊กที่หลุดมาถึงตรงนี้ ลูกค้าเจอก่อนทีม' }
     ];
     // Gates 2 (PR review) and 3 (CI) are the ones "skip mode" bypasses.
@@ -263,7 +263,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
           {/* RICE Scoring Formula */}
           <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-3">
             <span className="text-xs font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider">
-              RICE Scoring (การให้คะแนนอย่างมีโครงสร้าง)
+              RICE Scoring (ให้คะแนนตามสูตร)
             </span>
             <div className="p-3 bg-slate-100 dark:bg-slate-800 rounded-xl text-center text-xs font-bold text-slate-900 dark:text-slate-100">
               Score = (Reach × Impact × Confidence) ÷ Effort
@@ -474,7 +474,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
               <p className="text-[11px] text-slate-500 mt-2">
                 {paymentFailed 
                   ? '⚠️ ผลกระทบ: โค้ดตัดบัตรมี Memory Leak จนโปรแกรมทั้งก้อนดับ ลูกค้าล็อกอินหรือดูสินค้าไม่ได้เลย' 
-                  : '💡 จุดเด่น: พัฒนาง่าย ส่งมอบเร็วในช่วงแรก แต่ส่วนหนึ่งพังอาจลากทั้งระบบลงไปด้วย'}
+                  : '💡 จุดเด่น: สร้างง่าย ส่งของได้เร็วช่วงแรก แต่ส่วนหนึ่งพังอาจลากทั้งระบบลงไปด้วย'}
               </p>
             </div>
           ) : (
@@ -551,7 +551,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
               <p className="text-[11px] text-slate-500">
                 {paymentFailed 
                   ? '✅ บทเรียน: Payment ล่ม แต่ลูกค้ายังล็อกอิน ค้นหา และหยิบใส่ตะกร้าได้ ขั้นจ่ายเงินเท่านั้นที่ต้องรอ ทีมต้องออกแบบไว้ล่วงหน้าว่าช่วงนั้นจะบอกลูกค้าอย่างไร' 
-                  : '💡 การแลกเปลี่ยน: Microservices ซับซ้อนกว่าและต้นทุนดูแลสูงกว่า จึงคุ้มเมื่อระบบและทีมเริ่มใหญ่'}
+                  : '💡 สิ่งที่ต้องแลก: Microservices ซับซ้อนกว่าและต้นทุนดูแลสูงกว่า จึงคุ้มเมื่อระบบและทีมเริ่มใหญ่'}
               </p>
             </div>
           )}
@@ -676,7 +676,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
             </span>
             <div className="flex items-center gap-2">
               <span className="text-xs font-bold text-amber-500">
-                {canaryPercent}% Traffic สู่เวอร์ชันใหม่
+                {canaryPercent}% Traffic ไปเวอร์ชันใหม่
               </span>
               <button
                 onClick={() => setCanaryBug(!canaryBug)}
@@ -713,7 +713,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
               ))}
             </div>
             <span className="text-[11px] text-slate-400">
-              {canaryPercent < 100 ? '🛡️ ถ้าตัวชี้วัดเกินเกณฑ์ ระบบ Rollback อัตโนมัติ (เร็วแค่ไหนขึ้นกับรอบการเฝ้าวัดผล)' : '✅ ปล่อยครบ, ปลอดภัยเพราะทุกขั้นก่อนหน้าผ่านเกณฑ์'}
+              {canaryPercent < 100 ? '🛡️ ถ้าตัวชี้วัดเกินเกณฑ์ ระบบ Rollback อัตโนมัติ (เร็วแค่ไหนขึ้นกับว่าเช็กตัวชี้วัดถี่แค่ไหน)' : '✅ ปล่อยครบ, ปลอดภัยเพราะทุกขั้นก่อนหน้าผ่านเกณฑ์'}
             </span>
           </div>
 
@@ -725,7 +725,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
                     กระทบผู้ใช้แค่ {canaryPercent}% → Error พุ่งเกินเกณฑ์ → Rollback อัตโนมัติ
                   </div>
                   <p className="text-[11px] text-rose-800 dark:text-rose-300/90">
-                    อีก {100 - canaryPercent}% ยังใช้เวอร์ชันเดิมอยู่และไม่เจอบั๊กเลย ยิ่งเริ่มจากกลุ่มเล็ก ความเสียหายยิ่งจำกัด
+                    อีก {100 - canaryPercent}% ยังใช้เวอร์ชันเดิมอยู่และไม่เจอบั๊กเลย ยิ่งเริ่มจากกลุ่มเล็ก ยิ่งเสียหายน้อย
                   </p>
                 </>
               ) : (
@@ -774,7 +774,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
           ))}
         </div>
         <div className="p-3 bg-slate-900 text-slate-100 rounded-xl text-xs space-y-1">
-          <div className="text-rose-400 font-bold">จุดตรวจพบ: {boehmData[boehmPhase].phase} ({boehmData[boehmPhase].cost})</div>
+          <div className="text-rose-400 font-bold">เจอตอน: {boehmData[boehmPhase].phase} ({boehmData[boehmPhase].cost})</div>
           <p className="text-slate-300">{boehmData[boehmPhase].desc}</p>
         </div>
       </div>
@@ -793,7 +793,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
           <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700">
             <b className="text-slate-900 dark:text-slate-100 block mb-1">Tier 1: Customer Support</b>
-            <p className="text-[11px] text-slate-500">ตอบคำถามทั่วไป แก้ปัญหาเบื้องต้นตามคู่มือ หากแก้ไม่ได้ส่งต่อ L2</p>
+            <p className="text-[11px] text-slate-500">ตอบคำถามทั่วไป แก้ปัญหาเบื้องต้นตามคู่มือ ถ้าแก้ไม่ได้ส่งต่อ L2</p>
           </div>
           <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700">
             <b className="text-slate-900 dark:text-slate-100 block mb-1">Tier 2: Tech Support / Ops</b>
@@ -801,7 +801,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
           </div>
           <div className="p-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800">
             <b className="text-indigo-700 dark:text-indigo-300 block mb-1">Tier 3: Engineering Team</b>
-            <p className="text-[11px] text-slate-600 dark:text-slate-400">วิเคราะห์ Code, ออกแบบ Hotfix และนำข้อผิดพลาดเข้า Product Backlog</p>
+            <p className="text-[11px] text-slate-600 dark:text-slate-400">ไล่ดู Code, ออกแบบ Hotfix และใส่บั๊กเข้า Product Backlog</p>
           </div>
         </div>
         {/* Return leg: without it the "loop" is just a one-way escalation */}
@@ -895,7 +895,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
                 className="w-full accent-blue-500 cursor-pointer"
               />
               <span className="text-[10px] text-slate-400 block">
-                {timeVal <= 1 ? 'ไฟลนก้น เร่งด่วนสุดขีด' : timeVal <= 3 ? 'ระยะเวลามาตรฐาน' : 'มีเวลาขัดเกลาและทดสอบ'}
+                {timeVal <= 1 ? 'ไฟลนก้น เร่งด่วนสุดขีด' : timeVal <= 3 ? 'ระยะเวลามาตรฐาน' : 'มีเวลาเก็บงานและทดสอบ'}
               </span>
             </div>
 
@@ -915,7 +915,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
                 className="w-full accent-purple-500 cursor-pointer"
               />
               <span className="text-[10px] text-slate-400 block">
-                {costVal <= 1 ? 'เดฟทำงานคนเดียว' : costVal <= 3 ? 'ทีมขนาดกะทัดรัด' : 'ทีมใหญ่ขึ้น แต่ได้งานเพิ่มไม่มาก'}
+                {costVal <= 1 ? 'Dev ทำงานคนเดียว' : costVal <= 3 ? 'ทีมเล็ก' : 'ทีมใหญ่ขึ้น แต่ได้งานเพิ่มไม่มาก'}
               </span>
             </div>
           </div>
@@ -939,7 +939,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
               <p className="text-[11px] text-slate-400 max-w-md">
                 {isDanger 
                   ? '⚠️ แรงกดดันสูงเกินไป ทางที่ได้ผลคือตัด Scope ที่ไม่จำเป็นหรือขยายเวลา การเติมคนกลางทางมักทำให้ช้าลง (Brooks\'s law) เพราะคนใหม่ต้องเรียนรู้และคนเดิมต้องเสียเวลาสอน' 
-                  : '✅ อยู่ในเกณฑ์ที่ทีมสามารถควบคุมคุณภาพการเขียนโค้ดและทดสอบได้ครบถ้วน'}
+                  : '✅ ทีมยังคุมคุณภาพโค้ดและเทสต์ได้ครบ'}
               </p>
               {costVal >= 4 && (
                 <p className="text-[11px] text-amber-300/90 max-w-md">
@@ -997,7 +997,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
                   Dual-Track Agile: ทีมเดียว สองเส้นงาน
                 </h4>
                 <p className="text-[11px] text-slate-500">
-                  ทีมเดียวกันทำสองงานคู่กัน: Discovery พิสูจน์ไอเดียล่วงหน้า 1-2 สปรินต์ ส่งงานที่ผ่านแล้วให้ Delivery สร้าง
+                  ทีมเดียวกันทำสองงานคู่กัน: Discovery พิสูจน์ไอเดียล่วงหน้า 1-2 Sprint ส่งงานที่ผ่านแล้วให้ Delivery สร้าง
                 </p>
               </div>
             </div>
@@ -1040,7 +1040,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
               <div className="flex items-center justify-between mb-2">
                 <b className="text-pink-700 dark:text-pink-300 font-bold flex items-center gap-1.5">
                   <Compass className="w-4 h-4" />
-                  <span>Track 1: Discovery (ล่วงหน้า สปรินต์ N+1)</span>
+                  <span>Track 1: Discovery (ล่วงหน้า Sprint N+1)</span>
                 </b>
                 <span className="text-[10px] px-2 py-0.5 rounded bg-pink-100 dark:bg-pink-900/50 text-pink-700 dark:text-pink-300">
                   เน้นหาคำตอบ
@@ -1050,7 +1050,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
                 PM + Designer นำ โดยมี Dev ร่วมประเมินความเป็นไปได้: สัมภาษณ์ลูกค้า ทำ Prototype ทดสอบว่า "มีคนต้องการฟีเจอร์นี้จริงไหม"
               </p>
               <div className="p-2 rounded-lg bg-white/80 dark:bg-slate-900/80 text-[10px] text-pink-600 dark:text-pink-300">
-                เอาต์พุต: Validated Backlog + ชัดเจนเรื่อง Acceptance Criteria
+                ผลที่ได้: Validated Backlog + ชัดเจนเรื่อง Acceptance Criteria
               </div>
             </div>
 
@@ -1062,7 +1062,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
               <div className="flex items-center justify-between mb-2">
                 <b className="text-blue-700 dark:text-blue-300 font-bold flex items-center gap-1.5">
                   <FileCode2 className="w-4 h-4" />
-                  <span>Track 2: Delivery (สปรินต์ปัจจุบัน N)</span>
+                  <span>Track 2: Delivery (Sprint ปัจจุบัน N)</span>
                 </b>
                 <span className="text-[10px] px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300">
                   เน้นสร้างของจริง
@@ -1072,14 +1072,14 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
                 ทีมเดียวกัน (Dev + QA เป็นแกน) หยิบงานที่ผ่าน Discovery แล้วมาสร้างโค้ดระดับ Production เขียน Automated Test และ Deploy
               </p>
               <div className="p-2 rounded-lg bg-white/80 dark:bg-slate-900/80 text-[10px] text-blue-600 dark:text-blue-300">
-                เอาต์พุต: ซอฟต์แวร์ที่ใช้งานได้และผ่านการทดสอบ
+                ผลที่ได้: ซอฟต์แวร์ที่ใช้งานได้และผ่านการทดสอบ
               </div>
             </div>
           </div>
 
           <div className="p-3 bg-slate-100 dark:bg-slate-800 rounded-xl text-xs text-slate-600 dark:text-slate-300 flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-            <span><b>กฎทอง:</b> อย่าเริ่มสร้างงานระดับ production ก่อน validate ไอเดียนั้น ถ้ายังไม่แน่ใจ ให้ทดสอบด้วย Prototype ที่ทิ้งได้ถูกๆ ก่อน</span>
+            <span><b>หลักง่ายๆ:</b> อย่าเริ่มสร้างงานระดับ production ก่อน validate ไอเดียนั้น ถ้ายังไม่แน่ใจ ให้ทดสอบด้วย Prototype ที่ทิ้งได้ถูกๆ ก่อน</span>
           </div>
         </div>
       </div>
@@ -1095,7 +1095,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
         <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-3">
           <span className="text-xs font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider flex items-center gap-1.5">
             <Bot className="w-4 h-4" />
-            <span>การเปลี่ยนผ่านของ SDLC ยุค AI (2026+)</span>
+            <span>SDLC ที่เปลี่ยนไปในยุค AI (2026+)</span>
           </span>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
             <div className="p-3 rounded-xl bg-slate-100 dark:bg-slate-800/60">
@@ -1103,8 +1103,8 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
               <span className="text-[11px] text-slate-500">เขียน Boilerplate Code, เขียน Unit Test ตามสเปก, แปลง Figma เป็น HTML</span>
             </div>
             <div className="p-3 rounded-xl bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-800/60">
-              <b className="text-purple-700 dark:text-purple-300 block mb-1">คอขวดใหม่ของมนุษย์:</b>
-              <span className="text-[11px] text-slate-600 dark:text-slate-400">การเขียน Prompt/Spec ให้ไร้ช่องโหว่, การตรวจสอบ Security และ Architecture</span>
+              <b className="text-purple-700 dark:text-purple-300 block mb-1">คอขวดใหม่ที่อยู่ที่คน:</b>
+              <span className="text-[11px] text-slate-600 dark:text-slate-400">เขียน Prompt/Spec ให้ไม่มีช่องโหว่, ตรวจ Security และ Architecture</span>
             </div>
             <div className="p-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800/60">
               <b className="text-indigo-700 dark:text-indigo-300 block mb-1">ทักษะที่แพงที่สุด:</b>

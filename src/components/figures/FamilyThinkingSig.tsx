@@ -8,7 +8,7 @@ export const FamilyThinkingSig: React.FC<FigureProps> = ({ className }) => {
       <svg
         viewBox="0 0 150 62"
         role="img"
-        aria-label="ลายเซ็นของไดอะแกรมหมวดจัดระเบียบความคิด: จุดกลางแตกกิ่งออกไปรอบด้าน"
+        aria-label="ไอคอนของไดอะแกรมหมวดจัดระเบียบความคิด: จุดกลางแตกกิ่งออกไปรอบด้าน"
         fontFamily="inherit"
         style={{ width: '100%', height: 'auto', maxWidth: 150, display: 'block', margin: '0 auto' }}
       >

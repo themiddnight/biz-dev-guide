@@ -16,10 +16,10 @@ export const ExamplesSection: React.FC<SectionProps> = ({ chapter, isOpen, onTog
           </div>
           <div>
             <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
-              กรณีศึกษาจริงในอุตสาหกรรม (Real-World Case Studies)
+              เคสจริงจากบริษัทต่างๆ (Case Studies)
             </h3>
             <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e]">
-              บทเรียนจริงจากบริษัทเทคและสตาร์ทอัพ ({chapter.realWorldExamples.length} เรื่องราว)
+              บทเรียนจริงจากบริษัทเทคและสตาร์ทอัพ ({chapter.realWorldExamples.length} เรื่อง)
             </p>
           </div>
         </div>
@@ -45,7 +45,7 @@ export const ExamplesSection: React.FC<SectionProps> = ({ chapter, isOpen, onTog
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs sm:text-sm">
                 <div className="p-3 rounded-xl bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] space-y-1">
                   <span className="font-bold text-neutral-800 dark:text-[#e5e5e5] text-xs flex items-center gap-1.5">
-                    📌 บริบทและโจทย์เริ่มต้น:
+                    📌 โจทย์ตั้งต้น:
                   </span>
                   <p className="text-neutral-600 dark:text-[#a3a3a3] leading-relaxed text-xs">
                     {ex.situation}
@@ -64,7 +64,7 @@ export const ExamplesSection: React.FC<SectionProps> = ({ chapter, isOpen, onTog
 
               <div className="p-3.5 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/70 dark:border-emerald-900/40 space-y-1 text-xs sm:text-sm">
                 <span className="font-bold text-emerald-900 dark:text-emerald-300 text-xs flex items-center gap-1.5">
-                  ✅ วิธีแก้ปัญหาและการประสานงาน:
+                  ✅ แก้ยังไง:
                 </span>
                 <p className="text-neutral-800 dark:text-[#d4d4d4] leading-relaxed text-xs font-normal">
                   {ex.resolution}

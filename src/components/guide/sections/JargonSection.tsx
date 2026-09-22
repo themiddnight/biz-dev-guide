@@ -20,7 +20,7 @@ export const JargonSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggl
           <div>
             <div className="flex items-center gap-2">
               <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
-                พจนานุกรมคำศัพท์จำเป็น (Jargon Buster)
+                รวมคำศัพท์ที่จำเป็น (Jargon Buster)
               </h3>
               <span className="px-2 py-0.5 rounded-full bg-neutral-200 dark:bg-[#262626] text-neutral-800 dark:text-[#d4d4d4] text-[10px] sm:text-[11px] font-semibold">
                 {chapter.jargonList.length} คำ

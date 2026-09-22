@@ -315,10 +315,10 @@ export const GuideTab: React.FC<GuideTabProps> = ({
               <span>โหมดอ่านทีละบท พร้อมสารบัญกระโดดข้ามได้ตลอดเวลา</span>
             </div>
             <h2 className="text-lg sm:text-2xl font-extrabold text-neutral-900 dark:text-[#fafafa] tracking-tight">
-              คู่มือสองโลก Business ↔ Engineering (15 บทฉบับเริ่มจาก 0)
+              คู่มือสองโลก Business ↔ Engineering (15 บท เริ่มจากศูนย์)
             </h2>
             <p className="text-xs sm:text-sm text-neutral-500 dark:text-[#8e8e8e] leading-relaxed font-normal">
-              ครอบคลุมปฐมบทสำหรับมือใหม่ ศัพท์เทคนิคแปลเป็นภาษาคน ตัวอย่างบทสนทนาจริงในที่ทำงาน แผนภาพจำลองระบบ และทางออกของข้อขัดแย้ง
+              มีตั้งแต่จุดเริ่มต้นสำหรับมือใหม่ ศัพท์เทคนิคแปลเป็นภาษาคน ตัวอย่างบทสนทนาจริงในที่ทำงาน แผนภาพจำลองระบบ และทางออกของข้อขัดแย้ง
             </p>
           </div>
 
@@ -625,7 +625,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
 
               <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e] leading-relaxed">
                 {experienceLevel === 'beginner'
-                  ? '💡 โหมดมือใหม่: เปิด ปฐมบท · ศัพท์จำเป็น · แผนภาพ ไว้ก่อน ส่วนอื่นพับไว้ในชั้น "นำไปใช้" และ "เจาะลึก"'
+                  ? '💡 โหมดมือใหม่: เปิด จุดเริ่มต้น · ศัพท์จำเป็น · แผนภาพ ไว้ก่อน ส่วนอื่นพับไว้ในชั้น "นำไปใช้" และ "เจาะลึก"'
                   : '⚡ โหมดทำงานข้ามทีม: เปิด แนวคิดหลัก · กับดัก · แผนภาพ ไว้ก่อน วิธีรับมือ Friction อยู่ในชั้น "นำไปใช้"'}
               </p>
             </div>
@@ -677,7 +677,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                   className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-neutral-100 dark:bg-[#1f1f1f] text-neutral-900 dark:text-[#fafafa] hover:bg-neutral-200 dark:hover:bg-[#262626] text-xs sm:text-sm font-semibold border border-neutral-200 dark:border-[#333333] transition-colors cursor-pointer"
                 >
                   <Bot className="w-4 h-4 text-neutral-700 dark:text-[#a3a3a3]" />
-                  <span>ถาม AI Bridge Assistant เจาะลึกบทนี้</span>
+                  <span>ถาม AI เพิ่มเรื่องบทนี้</span>
                 </button>
 
                 {onToggleReadChapter && !isCurrentRead && (

@@ -30,9 +30,9 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
       id: 'welcome',
       role: 'assistant',
       content: `สวัสดีครับ! ผมคือ **AI Bridge Specialist** 🤖
-ผมยินดีช่วยคุณคลี่คลายข้อสงสัยและสร้างสะพานเชื่อมระหว่างโลกของ Business และ Engineering
+ผมช่วยตอบข้อสงสัยเรื่องงานระหว่าง Business กับ Engineering ได้
 
-คุณสามารถถามอะไรก็ได้ เช่น:
+คุณถามอะไรก็ได้ เช่น:
 - ขอวิธีอธิบายศัพท์เทคนิคยากๆ ให้ผู้บริหารฟัง
 - ขอเหตุผลให้ Developer เข้าใจความเร่งด่วนของธุรกิจ
 - ปรึกษากรณีความขัดแย้งในที่ประชุม หรือวิธีประเมินงาน
@@ -99,7 +99,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
       const errorMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: `ขออภัย เกิดข้อผิดพลาดในการรับคำตอบ: ${err.message || 'โปรดตรวจสอบการเชื่อมต่อ'}`,
+        content: `ขออภัย รับคำตอบไม่สำเร็จ: ${err.message || 'ลองเช็กการเชื่อมต่อ'}`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
       setMessages((prev) => [...prev, errorMsg]);
@@ -143,7 +143,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
             ถาม AI เพิ่มเติม &amp; ปรึกษาสถานการณ์จริง
           </h2>
           <p className="text-xs sm:text-sm text-neutral-500 dark:text-[#8e8e8e]">
-            ไขข้อสงสัย เจรจาหาทางออกตรงจุด และแปลคำศัพท์ข้ามสายงานได้ทันที
+            ถามข้อสงสัย หาทางออก และแปลศัพท์ข้ามสายงานได้ทันที
           </p>
         </div>
 
@@ -300,7 +300,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
             </div>
             <div className="p-3 rounded-2xl bg-neutral-100 dark:bg-[#1a1a1a] border border-neutral-200 dark:border-[#262626] text-xs text-neutral-600 dark:text-[#a3a3a3] flex items-center gap-2">
               <Loader2 className="w-4 h-4 animate-spin text-neutral-500" />
-              <span>กำลังวิเคราะห์และเรียบเรียงคำตอบ...</span>
+              <span>กำลังคิดคำตอบ...</span>
             </div>
           </div>
         )}

@@ -16,7 +16,7 @@ export const PrimerSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggl
           </div>
           <div>
             <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
-              ปฐมบทสำหรับมือใหม่ (ปูพื้นฐานจาก 0)
+              จุดเริ่มต้นสำหรับมือใหม่ (เริ่มจากศูนย์)
             </h3>
             <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e]">
               อธิบายเรื่องนี้แบบไม่ใช้ศัพท์ยาก เข้าใจได้แม้ไม่เคยเขียนโค้ด
@@ -51,7 +51,7 @@ export const PrimerSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggl
           <div className="p-3 sm:p-3.5 rounded-xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-1">
             <div className="font-bold text-neutral-900 dark:text-[#fafafa] flex items-center gap-1.5 text-xs">
               <Lightbulb className="w-4 h-4 text-amber-500" />
-              <span>สถานการณ์จริงในชีวิตประจำวัน (Real-World Analogy Scenario)</span>
+              <span>เทียบกับเรื่องในชีวิตประจำวัน (Real-World Analogy)</span>
             </div>
             <p className="text-neutral-600 dark:text-[#a3a3a3] leading-relaxed font-normal text-xs">
               {chapter.beginnerPrimer.realWorldScenario}

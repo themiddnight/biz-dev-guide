@@ -8,7 +8,7 @@ export const FamilyProcessSig: React.FC<FigureProps> = ({ className }) => {
       <svg
         viewBox="0 0 150 62"
         role="img"
-        aria-label="ลายเซ็นของไดอะแกรมหมวดกระบวนการ: เลนแนวนอนสามเลนกับกล่องข้ามเลน"
+        aria-label="ไอคอนของไดอะแกรมหมวดกระบวนการ: เลนแนวนอนสามเลนกับกล่องข้ามเลน"
         fontFamily="inherit"
         style={{ width: '100%', height: 'auto', maxWidth: 150, display: 'block', margin: '0 auto' }}
       >

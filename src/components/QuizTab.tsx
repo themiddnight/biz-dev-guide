@@ -91,13 +91,13 @@ export const QuizTab: React.FC<QuizTabProps> = ({
         <div className="space-y-2">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-xs font-semibold border border-emerald-500/20">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>ภารกิจเสร็จสิ้น! บันทึกผลสำเร็จเรียบร้อย</span>
+            <span>ทำครบแล้ว! บันทึกผลแล้ว</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-50">
             ยินดีด้วย! คุณทำแบบทดสอบครบแล้ว
           </h2>
           <p className="text-slate-600 dark:text-slate-400 text-sm">
-            คุณได้พิสูจน์ความเข้าใจในการลดช่องว่างระหว่างฝั่ง Business และ Engineering
+            คุณเข้าใจงานระหว่าง Business กับ Engineering มากขึ้นแล้ว
           </p>
         </div>
 
@@ -243,7 +243,7 @@ export const QuizTab: React.FC<QuizTabProps> = ({
         <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-neutral-50 dark:bg-[#1a1a1a] border border-neutral-200 dark:border-[#262626] space-y-1.5 animate-fadeIn">
           <div className="flex items-center gap-1.5 text-xs font-bold text-neutral-900 dark:text-[#e5e5e5]">
             <HelpCircle className="w-4 h-4 text-indigo-500" />
-            <span>คำอธิบายเฉลยและเหตุผล:</span>
+            <span>เฉลย:</span>
           </div>
           <p className="text-xs sm:text-sm text-neutral-700 dark:text-[#c4c4c4] leading-relaxed font-normal">
             {currentOptions[selectedOptionIndex].explanation}
@@ -258,7 +258,7 @@ export const QuizTab: React.FC<QuizTabProps> = ({
             onClick={handleNext}
             className="inline-flex items-center gap-2 px-6 py-3 rounded-xl sm:rounded-2xl bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:hover:bg-neutral-200 dark:text-[#0a0a0a] text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer"
           >
-            <span>{currentIndex + 1 === questions.length ? 'ดูสรุปผลลัพธ์' : 'คำถามข้อถัดไป'}</span>
+            <span>{currentIndex + 1 === questions.length ? 'ดูผล' : 'คำถามข้อถัดไป'}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>

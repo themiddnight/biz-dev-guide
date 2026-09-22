@@ -19,7 +19,7 @@ export const DialogueSection: React.FC<SectionProps> = ({ chapter, isOpen, onTog
               บทสนทนาจริงในที่ทำงาน (วิธีพูดที่พัง vs วิธีพูดที่ปัง)
             </h3>
             <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e]">
-              เปรียบเทียบประโยคพูดคุยในห้องประชุม พร้อมบทเรียนการสื่อสาร
+              เทียบประโยคที่พูดกันในห้องประชุม แบบไหนได้ผล
             </p>
           </div>
         </div>
@@ -29,7 +29,7 @@ export const DialogueSection: React.FC<SectionProps> = ({ chapter, isOpen, onTog
       {isOpen && (
         <div className="p-3.5 sm:p-5 space-y-3.5 border-t border-neutral-100 dark:border-[#262626] bg-white dark:bg-[#141414]">
           <div className="p-3 rounded-xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] text-xs text-neutral-600 dark:text-[#a3a3a3] font-normal">
-            <span className="font-bold text-neutral-900 dark:text-[#fafafa]">บริบทสถานการณ์: </span>
+            <span className="font-bold text-neutral-900 dark:text-[#fafafa]">สถานการณ์: </span>
             {chapter.dialogueExample.context}
           </div>
 
@@ -55,7 +55,7 @@ export const DialogueSection: React.FC<SectionProps> = ({ chapter, isOpen, onTog
             <div className="p-3.5 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/70 dark:border-emerald-900/40 space-y-2 text-xs sm:text-sm">
               <div className="flex items-center gap-1.5 font-bold text-emerald-900 dark:text-emerald-300 text-xs">
                 <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                <span>✅ วิธีพูดที่ถูกต้องและได้ผล (Right Way)</span>
+                <span>✅ วิธีพูดที่ได้ผล (Right Way)</span>
               </div>
               <div className="p-2.5 rounded-lg bg-white/90 dark:bg-[#181818] border border-emerald-100 dark:border-emerald-950/80 text-emerald-950 dark:text-emerald-200 italic font-medium text-xs">
                 {chapter.dialogueExample.rightWay.speaker}

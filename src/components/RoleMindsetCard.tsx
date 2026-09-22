@@ -52,7 +52,7 @@ export const RoleMindsetCard: React.FC<RoleMindsetCardProps> = ({
               </span>
             </div>
             <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e] mt-0.5 line-clamp-1 sm:line-clamp-none">
-              ทำไมเขาถึงคิดแบบนั้น? สิ่งที่เขาแคร์ สิ่งที่เขากลัว และคำแนะนำในการสร้างสะพานเชื่อม
+              ทำไมเขาถึงคิดแบบนั้น? สิ่งที่เขาแคร์ สิ่งที่เขากลัว และวิธีคุยกับฝั่งนี้
             </p>
           </div>
         </div>
@@ -106,7 +106,7 @@ export const RoleMindsetCard: React.FC<RoleMindsetCardProps> = ({
             </div>
             <div className="flex items-start gap-1.5 max-w-full text-[11px] sm:text-xs leading-relaxed px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/25 font-medium">
               <Trophy className="w-3 h-3 sm:w-3.5 sm:h-3.5 mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400" />
-              <span className="min-w-0 break-words">เกณฑ์ความสำเร็จ: {guide.howTheyMeasureSuccess}</span>
+              <span className="min-w-0 break-words">วัดความสำเร็จจาก: {guide.howTheyMeasureSuccess}</span>
             </div>
           </div>
 
@@ -132,7 +132,7 @@ export const RoleMindsetCard: React.FC<RoleMindsetCardProps> = ({
             <div className="p-3 sm:p-3.5 rounded-xl bg-amber-500/5 dark:bg-amber-950/20 border border-amber-500/20 space-y-2">
               <div className="flex items-center gap-1.5 text-amber-900 dark:text-amber-300 font-bold text-xs">
                 <AlertTriangle className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-                <span>สิ่งที่ทำให้เขากังวลใจ / กลัวใต้ผิวน้ำ</span>
+                <span>สิ่งที่เขากังวลหรือกลัว</span>
               </div>
               <ul className="space-y-1.5 text-neutral-700 dark:text-[#c4c4c4]">
                 {guide.whatKeepsThemUpAtNight.map((item, idx) => (
@@ -160,7 +160,7 @@ export const RoleMindsetCard: React.FC<RoleMindsetCardProps> = ({
           <div className="p-3 sm:p-3.5 rounded-xl bg-emerald-500/5 dark:bg-emerald-950/20 border border-emerald-500/25 space-y-1.5">
             <div className="flex items-center gap-1.5 text-emerald-900 dark:text-emerald-300 font-bold text-xs sm:text-sm">
               <HeartHandshake className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 dark:text-emerald-400" />
-              <span>คำแนะนำในการสร้างสะพานเชื่อม (Bridge Advice)</span>
+              <span>วิธีคุยกับฝั่งนี้ (Bridge Advice)</span>
             </div>
             <p className="text-neutral-800 dark:text-[#d4d4d4] leading-relaxed text-xs sm:text-sm">
               {guide.bridgeAdvice}

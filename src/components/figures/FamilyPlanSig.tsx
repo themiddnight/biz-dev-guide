@@ -8,7 +8,7 @@ export const FamilyPlanSig: React.FC<FigureProps> = ({ className }) => {
       <svg
         viewBox="0 0 150 62"
         role="img"
-        aria-label="ลายเซ็นของไดอะแกรมหมวดแผนและเวลา: แท่งแนวนอนเหลื่อมกันแบบแกนต์ชาร์ต"
+        aria-label="ไอคอนของไดอะแกรมหมวดแผนและเวลา: แท่งแนวนอนเหลื่อมกันแบบแกนต์ชาร์ต"
         fontFamily="inherit"
         style={{ width: '100%', height: 'auto', maxWidth: 150, display: 'block', margin: '0 auto' }}
       >

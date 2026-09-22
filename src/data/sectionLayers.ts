@@ -33,11 +33,11 @@ export const CHAPTER_CORE_OVERRIDES: Readonly<Record<string, readonly SectionKey
 };
 
 export const SECTION_META: Record<SectionKey, { chip: string; minutes: number }> = {
-  primer: { chip: 'ปฐมบท', minutes: 2 },
+  primer: { chip: 'จุดเริ่มต้น', minutes: 2 },
   jargon: { chip: 'ศัพท์จำเป็น', minutes: 2 },
   diagram: { chip: 'แผนภาพ', minutes: 3 },
   dialogue: { chip: 'บทสนทนา', minutes: 2 },
-  examples: { chip: 'กรณีศึกษา', minutes: 3 },
+  examples: { chip: 'ตัวอย่างจริง', minutes: 3 },
   workflow: { chip: 'ขั้นตอนงาน', minutes: 2 },
   checklist: { chip: 'เช็กลิสต์', minutes: 1 },
   faq: { chip: 'คำถามที่เจอบ่อย', minutes: 6 },
@@ -45,13 +45,13 @@ export const SECTION_META: Record<SectionKey, { chip: string; minutes: number }>
   coreConcepts: { chip: 'แนวคิดหลัก', minutes: 3 },
   pitfalls: { chip: 'กับดัก', minutes: 2 },
   reference: { chip: 'อ้างอิง', minutes: 3 },
-  glossary: { chip: 'คลังคำศัพท์', minutes: 5 },
+  glossary: { chip: 'รวมคำศัพท์', minutes: 5 },
   mindset: { chip: 'วิธีคิดแต่ละบทบาท', minutes: 2 },
 };
 
 /** Layer header name (spec §2.3) and short outline label (spec §2.1). */
 export const LAYER_META: Record<Layer, { name: string; short: string }> = {
-  core: { name: 'แก่น (Core)', short: 'แก่น' },
+  core: { name: 'ต้องรู้ (Core)', short: 'ต้องรู้' },
   apply: { name: 'นำไปใช้ (Apply)', short: 'นำไปใช้' },
   deep: { name: 'เจาะลึก (Deep)', short: 'เจาะลึก' },
 };

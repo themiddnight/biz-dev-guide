@@ -138,7 +138,7 @@ export const FrictionFaqSection: React.FC<FrictionFaqSectionProps> = ({
                     key={concept}
                     type="button"
                     onClick={() => onSearchGlossary(concept)}
-                    title={`ค้นหา "${concept}" ในคลังคำศัพท์ (บทที่ 15)`}
+                    title={`ค้นหา "${concept}" ในหน้ารวมคำศัพท์ (บทที่ 15)`}
                     className={`${chipClass} cursor-pointer bg-neutral-100 dark:bg-[#1f1f1f] border-neutral-200 dark:border-[#333333] text-neutral-800 dark:text-[#d4d4d4] hover:bg-neutral-200 dark:hover:bg-[#262626] underline decoration-dotted decoration-neutral-400 dark:decoration-[#525252] underline-offset-2`}
                   >
                     {concept}
@@ -257,7 +257,7 @@ export const FrictionFaqSection: React.FC<FrictionFaqSectionProps> = ({
         </div>
 
         <div className="space-y-1.5">
-          <div className="text-[11px] sm:text-xs font-bold text-neutral-700 dark:text-[#c4c4c4]">แหล่งอ้างอิงสำหรับแนวคิดในบทที่ 11</div>
+          <div className="text-[11px] sm:text-xs font-bold text-neutral-700 dark:text-[#c4c4c4]">ที่มาของแนวคิดในบทที่ 11</div>
           <ul className="pl-5 space-y-1 list-disc text-xs sm:text-sm text-neutral-700 dark:text-[#d4d4d4]">
             {FAQ_SOURCES.map(source => (
               <li key={source.url} className="leading-relaxed">

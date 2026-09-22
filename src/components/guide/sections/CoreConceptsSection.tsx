@@ -18,10 +18,10 @@ export const CoreConceptsSection: React.FC<SectionProps> = ({ chapter, isOpen, o
           </div>
           <div>
             <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
-              ความรู้เชิงลึกและหลักการสำคัญ (Core Deep-Dive Concepts)
+              แนวคิดหลัก (Core Concepts)
             </h3>
             <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e]">
-              แนวคิดและทฤษฎีสำคัญที่ใช้ในการทำงานจริง ({chapter.coreConcepts.length} หัวข้อ)
+              แนวคิดที่ใช้จริงในงาน ({chapter.coreConcepts.length} หัวข้อ)
             </p>
           </div>
         </div>

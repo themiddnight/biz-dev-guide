@@ -103,7 +103,7 @@ export const ProtocolSimulator: React.FC = () => {
 
               <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-blue-200 dark:border-blue-900 text-xs flex items-center justify-between">
                 <div>
-                  <span className="text-slate-500">จำนวนคำขอที่ยิงไปเปลืองทรัพยากร: </span>
+                  <span className="text-slate-500">คำขอที่ยิงไปเปล่าๆ: </span>
                   <b className="text-base text-blue-600 dark:text-blue-400">{pollCount} ครั้ง</b>
                 </div>
                 <span className="text-[11px] text-slate-400">

@@ -17,10 +17,10 @@ export const WorkflowSection: React.FC<SectionProps> = ({ chapter, isOpen, onTog
           </div>
           <div>
             <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
-              ขั้นตอนการทำงานจริงในองค์กร (Real-World Workflow)
+              ขั้นตอนทำงานจริง (Real-World Workflow)
             </h3>
             <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e]">
-              ลำดับขั้นตอนส่งต่องานจริงระหว่างฝ่าย ({chapter.realWorldWorkflow.length} ขั้นตอน)
+              งานส่งต่อกันระหว่างฝ่ายทีละขั้น ({chapter.realWorldWorkflow.length} ขั้น)
             </p>
           </div>
         </div>

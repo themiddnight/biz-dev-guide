@@ -25,7 +25,7 @@ export const ReferenceSection: React.FC<SectionProps> = ({ chapter, isOpen, onTo
                   เนื้อหาอ้างอิง (Reference)
                 </h3>
                 <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e]">
-                  ตาราง การ์ด และแหล่งอ้างอิงประกอบบทนี้ ({referenceBlockCount} รายการ)
+                  ตาราง การ์ด และที่มาของบทนี้ ({referenceBlockCount} รายการ)
                 </p>
               </div>
             </div>

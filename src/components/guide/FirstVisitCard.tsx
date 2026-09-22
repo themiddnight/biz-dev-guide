@@ -3,7 +3,7 @@ import type { Chapter, ExperienceLevel } from '../../types';
 import { TRACK_CHAPTER_NUMS, getTrackMinutes, resolveTrack } from '../../data/readingTracks';
 
 const OPTIONS: { level: ExperienceLevel; label: string; line: string }[] = [
-  { level: 'beginner', label: '🌱 ใหม่กับเรื่องนี้', line: 'ยังไม่คุ้นศัพท์และขั้นตอนระหว่าง Business กับ Engineering เริ่มจากปฐมบท ศัพท์ และแผนภาพ' },
+  { level: 'beginner', label: '🌱 ใหม่กับเรื่องนี้', line: 'ยังไม่คุ้นศัพท์และขั้นตอนระหว่าง Business กับ Engineering เริ่มที่หัวข้อจุดเริ่มต้น ศัพท์ และแผนภาพ' },
   { level: 'experienced', label: '⚡ ทำงานข้ามทีมมาแล้ว', line: 'เคยคุยงานกับอีกฝั่งมาแล้ว อยากได้แนวคิดหลัก กับดัก และวิธีรับมือความขัดแย้ง' },
 ];
 

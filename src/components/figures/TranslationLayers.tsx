@@ -42,8 +42,8 @@ export const TranslationLayers: React.FC<FigureProps> = ({ className }) => {
         fontFamily="inherit"
         style={{ width: '100%', height: 'auto', maxWidth: 360, display: 'block', margin: '0 auto' }}
       >
-        <title id={`${uid}-p1t`}>แผนภาพเส้นทางการแปลความต้องการทางธุรกิจไปสู่โค้ด</title>
-        <desc id={`${uid}-p1d`}>ความต้องการทางธุรกิจไหลลงผ่านสี่บทบาท ได้แก่ Product Manager, Business Analyst, Solution Architect และ Engineer โดยแต่ละบทบาทผลิตเอกสารของตัวเอง และมีจุดที่ความกำกวมรั่วไหลอยู่ระหว่างแต่ละชั้น ส่วน Project Manager ทำงานคู่ขนานตลอดเส้นโดยไม่ตัดสินใจเนื้อหา</desc>
+        <title id={`${uid}-p1t`}>ความต้องการของธุรกิจกลายเป็นโค้ดยังไง</title>
+        <desc id={`${uid}-p1d`}>ความต้องการทางธุรกิจไหลลงผ่านสี่บทบาท ได้แก่ Product Manager, Business Analyst, Solution Architect และ Engineer โดยแต่ละบทบาทผลิตเอกสารของตัวเอง และมีจุดที่ความหมายเพี้ยนได้ระหว่างแต่ละชั้น ส่วน Project Manager ทำงานคู่ขนานตลอดเส้นโดยไม่ตัดสินใจเนื้อหา</desc>
         <defs>
           <marker id={`${uid}-pipe-a`} viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
             <path d="M0,0 L10,5 L0,10 z" fill={muted} />

@@ -14,7 +14,7 @@ export const GateTimeline: React.FC<FigureProps> = ({ className }) => {
         fontFamily="inherit"
         style={{ width: '100%', height: 'auto', maxWidth: 620, display: 'block', margin: '0 auto' }}
       >
-        <title id={`${uid}-f5t`}>แผนภาพเส้นเวลาการส่งมอบพร้อมจุด gate และเส้นต้นทุนการเปลี่ยนแปลง</title>
+        <title id={`${uid}-f5t`}>เส้นเวลาส่งงานกับจุด gate และต้นทุนถ้าเปลี่ยนใจ</title>
         <desc id={`${uid}-f5d`}>เส้นเวลาห้าช่วงคือ elicit ตกลงขอบเขต ออกแบบ สร้าง และขึ้นระบบจริง โดยมีจุด gate คั่นระหว่างช่วง และมีเส้นโค้งแสดงต้นทุนของการเปลี่ยนแปลงที่สูงขึ้นเรื่อยๆ ตามช่วงเวลาที่ผ่านไป</desc>
         <defs>
           <marker id={`${uid}-gate-a`} viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">

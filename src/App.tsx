@@ -161,7 +161,7 @@ export default function App() {
     setBadges((prev) =>
       prev.map((b) => (b.id === badgeId && !b.unlocked ? { ...b, unlocked: true, unlockedAt } : b))
     );
-    claimXp([{ key: xpKey.badge(badgeId), amount: 50 }], `ปลดล็อกเหรียญตรา: ${badge.title}`);
+    claimXp([{ key: xpKey.badge(badgeId), amount: 50 }], `ปลดล็อกเหรียญ: ${badge.title}`);
   };
 
   // Experience level toggle handler
@@ -172,9 +172,9 @@ export default function App() {
     setExperienceLevel(level);
     // First switch into each mode pays once; toggling back and forth pays nothing.
     if (level === 'experienced') {
-      claimXp([{ key: xpKey.mode(level), amount: 15 }], 'เปิดโหมด Experienced: ศึกษาคัมภีร์รับมือ Friction');
+      claimXp([{ key: xpKey.mode(level), amount: 15 }], 'เปิดโหมด Experienced: อ่านคู่มือรับมือ Friction');
     } else {
-      claimXp([{ key: xpKey.mode(level), amount: 10 }], 'เปิดโหมด Beginner: ปูพื้นฐาน Mindset');
+      claimXp([{ key: xpKey.mode(level), amount: 10 }], 'เปิดโหมด Beginner: เริ่มจาก Mindset พื้นฐาน');
     }
   };
 
@@ -210,7 +210,7 @@ export default function App() {
     }
 
     // Re-marking a chapter after unmarking it does not pay again.
-    if (claimXp([{ key: xpKey.read(chapterId), amount: 30 }], 'อ่านและทำความเข้าใจบทนี้สำเร็จ', 'ทำเครื่องหมายว่าอ่านแล้ว +30 XP') === 0) {
+    if (claimXp([{ key: xpKey.read(chapterId), amount: 30 }], 'อ่านบทนี้จบแล้ว', 'ทำเครื่องหมายว่าอ่านแล้ว +30 XP') === 0) {
       showToast('ทำเครื่องหมายว่าอ่านแล้ว', 'บทนี้เคยได้รับ XP ไปแล้ว');
     }
     unlockBadge('first_step');
@@ -363,7 +363,7 @@ export default function App() {
           </p>
           <p>คู่มือกลาง แชร์ต่อได้ — ปรับปรุงเพิ่มเองได้ตามงานที่เจอจริง</p>
           <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-            ออกแบบเพื่อลดช่องว่างความเข้าใจผิดระหว่าง Business และ Engineering พร้อมเครื่องมือ AI และระบบ Interactive Gamification
+            ช่วยให้ Business กับ Engineering เข้าใจกันง่ายขึ้น พร้อมเครื่องมือ AI และระบบ Interactive Gamification
           </p>
         </div>
       </footer>

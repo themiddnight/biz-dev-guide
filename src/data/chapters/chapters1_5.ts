@@ -13,8 +13,8 @@ export const chapters1_5: Chapter[] = [
     keyTakeaway: 'อุดรอยรั่วด้วยการดึง Dev มาฟังปัญหาตั้งแต่ต้น ไม่ใช่เขียนเอกสารเพิ่ม',
     plainAnalogy: 'เหมือนเกมกระซิบ: สั่ง "ต้มยำไม่ใส่ผักชี" ต่อกัน 5 คน ครัวยกแกงจืดมาแทน',
     readTime: '10 นาที',
-    diagramTitle: 'The Leaky Translation Pipeline (8 สถานีส่งมอบความต้องการ)',
-    diagramDescription: 'แสดงการสูญหายของบริบทในแต่ละรอยต่อ ตั้งแต่ Business Concept ➔ PO ➔ UX ➔ BA ➔ SA ➔ Dev ➔ QA ➔ Deployment',
+    diagramTitle: 'The Leaky Translation Pipeline (8 จุดที่งานเปลี่ยนมือ)',
+    diagramDescription: 'บริบทหายไปทีละนิดทุกครั้งที่เปลี่ยนมือ ตั้งแต่ Business Concept ➔ PO ➔ UX ➔ BA ➔ SA ➔ Dev ➔ QA ➔ Deployment',
     beginnerPrimer: {
       whatIsIt: 'Leaky Pipeline คืออาการที่โจทย์ธุรกิจเพี้ยนไปทีละนิดทุกครั้งที่งานเปลี่ยนมือ ตั้งแต่ผู้บริหาร → PM → Designer → SA → Dev เพราะแต่ละคนตีความตามมุมของตัวเอง',
       whyItMatters: 'ความผิดพลาดที่แพงที่สุดไม่ใช่บั๊ก แต่คือการทำของผิดชิ้นออกมาได้เนี้ยบ (Building the wrong thing right) ทีมทุ่มเทเป็นปี แต่เปิดตัวแล้วไม่มีใครใช้',
@@ -23,7 +23,7 @@ export const chapters1_5: Chapter[] = [
     jargonList: [
       {
         term: 'Business Outcome vs Output',
-        formalDefinition: 'Output คือของที่ทีมส่งมอบ ส่วน Outcome คือพฤติกรรมผู้ใช้หรือผลทางธุรกิจที่เปลี่ยนไปเพราะของชิ้นนั้น',
+        formalDefinition: 'Output คือของที่ทีมส่ง ส่วน Outcome คือพฤติกรรมผู้ใช้หรือผลทางธุรกิจที่เปลี่ยนไปเพราะของชิ้นนั้น',
         humanTranslation: 'Output คือ "ทำปุ่มเสร็จแล้ว" ส่วน Outcome คือ "คนกดซื้อเพิ่มขึ้นจริง"',
         meetingExample: '"Sprint นี้เราไม่ได้วัดแค่ Output ว่าฟีเจอร์เสร็จวันไหน แต่วัด Outcome ว่าลูกค้าโทรเข้า Call Center น้อยลงไหม"'
       },
@@ -35,7 +35,7 @@ export const chapters1_5: Chapter[] = [
       },
       {
         term: 'Hand-off',
-        formalDefinition: 'การส่งมอบงานจากฝ่ายหนึ่งให้อีกฝ่ายทำต่อ เป็นขั้นตอนปกติ ไม่ได้ดีหรือแย่ในตัวเอง',
+        formalDefinition: 'การส่งงานจากฝ่ายหนึ่งให้อีกฝ่ายทำต่อ เป็นขั้นตอนปกติ ไม่ได้ดีหรือแย่ในตัวเอง',
         humanTranslation: 'ส่งงานต่อให้อีกฝ่าย เช่น ดีไซเนอร์ส่งไฟล์ Figma ให้ Dev ถ้าส่งแล้วต่างคนต่างไปก็คือโยนงานข้ามรั้ว',
         meetingExample: '"อย่ารอวัน Hand-off ค่อยคุยครับ ชวนทีม Dev มาดู Wireframe ตั้งแต่ต้นสัปดาห์ จะได้ช่วยกันเคาะสเปก"'
       },
@@ -97,7 +97,7 @@ export const chapters1_5: Chapter[] = [
         heading: '2. งานรั่วตรงไหนบ้างตอนเปลี่ยนมือ',
         detail: 'งานเปลี่ยนมือทีไร คนรับก็ตีความใหม่ตามมุมของอาชีพตัวเอง',
         bulletPoints: [
-          'Concept ➔ PM: วิสัยทัศน์กลายเป็นรายการฟีเจอร์ แต่ความต้องการเชิงลึกของตลาดอาจหลุด',
+          'Concept ➔ PM: วิสัยทัศน์กลายเป็นรายการฟีเจอร์ แต่สิ่งที่ตลาดต้องการจริงๆ อาจหลุด',
           'PM ➔ Designer: ฟีเจอร์กลายเป็นหน้าจอ แต่ดีไซเนอร์ไม่รู้ข้อจำกัดทางเทคนิค',
           'Designer ➔ Dev: ได้หน้าจอสวย แต่ไม่บอกว่าเน็ตหลุดหรือข้อความยาวเกินจะแสดงยังไง (Edge Case)',
           'Dev ➔ QA: โค้ดทำตามที่ Dev เข้าใจ อาจไม่ตรงกับที่ Business คาดไว้'
@@ -157,7 +157,7 @@ export const chapters1_5: Chapter[] = [
     plainAnalogy: 'PM เหมือนกัปตันเรือระวางจำกัด: ขนทุกอย่างเรือจม ต้องเลือกว่าเที่ยวนี้ขนอะไร',
     readTime: '11 นาที',
     diagramTitle: 'Prioritization Matrix (MoSCoW & RICE Scoring)',
-    diagramDescription: 'เครื่องมือจำแนกงานตามความจำเป็น (Must/Should/Could/Won\'t) และสมการคำนวณความคุ้มค่า (Reach × Impact × Confidence / Effort)',
+    diagramDescription: 'แบ่งงานตามความจำเป็น (Must/Should/Could/Won\'t) และสูตรคิดความคุ้ม (Reach × Impact × Confidence / Effort)',
     beginnerPrimer: {
       whatIsIt: 'Product Manager (PM) คือคนที่ตัดสินว่าทีมควรสร้างอะไรและสร้างไปเพื่ออะไร โดยชั่งสามด้านพร้อมกัน: ผู้ใช้ต้องการไหม ธุรกิจได้อะไร และเทคโนโลยีทำได้ไหม',
       whyItMatters: 'คน เวลา และเงินมีจำกัด แต่ไอเดียไม่จำกัด ถ้าไม่มีใครคัด ทีม Engineering จะโดนดึงไปทำทุกอย่างพร้อมกัน สุดท้ายไม่มีงานไหนเสร็จ หรือเสร็จแล้วไม่มีใครใช้',
@@ -220,7 +220,7 @@ export const chapters1_5: Chapter[] = [
       },
       rightWay: {
         speaker: 'PM: "ฟีเจอร์นี้น่าสนใจครับ แต่ตอนนี้ทีมทุ่มอยู่กับระบบชำระเงิน ถ้าใส่เพิ่ม เราต้องเลื่อนระบบแจ้งเตือนออกไป หรือเลื่อนวันเปิดตัวอีก 2 สัปดาห์ ทางไหนตอบเป้าธุรกิจรอบนี้มากกว่าครับ?"',
-        text: 'ไม่ปฏิเสธทันที แต่วางให้เห็นว่าได้อะไรเสียอะไร (Trade-off) ให้ผู้บริหารเลือกเองบนข้อเท็จจริง',
+        text: 'ไม่ปฏิเสธทันที แต่วางให้เห็นว่าได้อะไรเสียอะไร (Trade-off) ให้ผู้บริหารเลือกเองจากข้อมูลจริง',
         benefit: 'ทีมไม่โดนงานล้น และส่งงานได้ตามกำหนดโดยไม่เสียคุณภาพ'
       }
     },
@@ -251,7 +251,7 @@ export const chapters1_5: Chapter[] = [
     realWorldWorkflow: [
       { step: 'ขั้นที่ 1: รวบรวมข้อมูล', role: 'PM', description: 'คุยกับลูกค้า ดูข้อมูลพฤติกรรม (Analytics) และรับคำขอจากฝ่ายต่างๆ' },
       { step: 'ขั้นที่ 2: จัดคะแนนและคัดกรอง', role: 'PM + Data', description: 'ให้คะแนนด้วย RICE และจัดกลุ่มด้วย MoSCoW' },
-      { step: 'ขั้นที่ 3: ปรึกษาความเป็นไปได้', role: 'PM + Tech Lead', description: 'เอาฟีเจอร์คะแนนสูงไปคุยกับทีม Engineering ว่ายากแค่ไหน เสี่ยงตรงไหน' },
+      { step: 'ขั้นที่ 3: เช็กกับทีมว่าทำได้ไหม', role: 'PM + Tech Lead', description: 'เอาฟีเจอร์คะแนนสูงไปคุยกับทีม Engineering ว่ายากแค่ไหน เสี่ยงตรงไหน' },
       { step: 'ขั้นที่ 4: สื่อสาร Roadmap', role: 'PM', description: 'บอกทิศทางให้ผู้บริหารและทีมรู้ พร้อมเหตุผลว่าทำไมบางอย่างยังไม่ทำ' }
     ],
     checklist: [
@@ -347,7 +347,7 @@ export const chapters1_5: Chapter[] = [
         title: 'แอปธนาคารอัปเดตแล้วจอขาว',
         companyOrIndustry: 'Mobile Banking & FinTech',
         situation: '(ตัวอย่างสมมติ) ธนาคารแห่งหนึ่งปล่อยแอปเวอร์ชันใหม่ที่มีแอนิเมชันสวยและกราฟิก 3D หรูหรา',
-        whatHappened: 'ดีไซเนอร์ทดสอบบนมือถือเรือธงกับเน็ต 5G แต่ลูกค้า 30% ใช้มือถือราคาประหยัด บางคนอยู่ในรถไฟฟ้าใต้ดินที่เน็ตกระตุก แอปหมุนค้างจนจอขาว โอนเงินไม่ได้ ลูกค้าตื่นตระหนกว่าเงินหาย',
+        whatHappened: 'ดีไซเนอร์ทดสอบบนมือถือเรือธงกับเน็ต 5G แต่ลูกค้า 30% ใช้มือถือราคาประหยัด บางคนอยู่ในรถไฟฟ้าใต้ดินที่เน็ตกระตุก แอปหมุนค้างจนจอขาว โอนเงินไม่ได้ ลูกค้าตกใจว่าเงินหาย',
         resolution: 'ทีมเพิ่ม Offline Fallback, แคชยอดเงินล่าสุดไว้ในเครื่อง, แสดง Skeleton Screen และปุ่ม "ลองใหม่" (Retry) ทันทีที่เน็ตสะดุด',
         keyLesson: 'ออกแบบเผื่อสภาพที่แย่ที่สุด (Worst Case) เสมอ ไม่ใช่ทดสอบแค่ในห้องแอร์บนมือถือรุ่นล่าสุด'
       }
@@ -437,9 +437,9 @@ export const chapters1_5: Chapter[] = [
     businessNote: 'ระบุว่าระบบต้องเร็วแค่ไหน รับคนพร้อมกันเท่าไร และข้อมูลต้องปลอดภัยแค่ไหน ไม่ใช่ระบุแค่ว่าทำอะไรได้',
     engineerNote: 'ช่วย Business ถามถึงกฎธุรกิจและEdge Case ก่อนเริ่มคิดตารางฐานข้อมูล',
     keyTakeaway: 'ระบบล่มวันเปิดตัวมักไม่ใช่เพราะคำนวณผิด แต่เพราะไม่มีใครคุยเรื่อง Non-Functional Requirements ก่อน',
-    plainAnalogy: 'เหมือนสั่งทำรถ: วิ่งได้มีเบรกคือสิ่งที่เห็น ถุงลมกับโครงรถคือสิ่งที่ชี้ชะตา',
+    plainAnalogy: 'เหมือนสั่งทำรถ: วิ่งได้มีเบรกคือสิ่งที่เห็น ถุงลมกับโครงรถคือสิ่งที่ช่วยชีวิต',
     readTime: '12 นาที',
-    diagramTitle: 'The Requirement Iceberg (ภูเขาน้ำแข็งแห่งความต้องการ)',
+    diagramTitle: 'The Requirement Iceberg (ภูเขาน้ำแข็งของ Requirement)',
     diagramDescription: 'เปรียบเทียบ Functional Requirements (10% บนผิวน้ำ) กับ Non-Functional Requirements (90% ใต้น้ำ เช่น Performance, Security, Scalability, Disaster Recovery)',
     beginnerPrimer: {
       whatIsIt: 'Business Analysis (BA) คือการขุดความต้องการที่คลุมเครือ แล้วเขียนเป็นสเปกที่ชัด แบ่งเป็น 2 ส่วน: ระบบทำอะไรได้ (Functional) และทำได้ดีแค่ไหน (Non-Functional)',
@@ -530,13 +530,13 @@ export const chapters1_5: Chapter[] = [
       },
       {
         heading: '3. NFR ยิ่งสูง งบยิ่งพุ่งแบบก้าวกระโดด',
-        detail: 'ระบบที่ใช้งานได้ 99% (ล่มได้ปีละราว 3.6 วัน) กับ 99.999% (ล่มได้ปีละราว 5 นาที) ต่างกันหลายเท่าตัวเรื่องงบ เพราะอย่างหลังต้องมีระบบสำรองข้ามภูมิภาค ตั้ง NFR ให้สมกับมูลค่าทางธุรกิจ'
+        detail: 'ระบบที่ใช้งานได้ 99% (ล่มได้ปีละราว 3.6 วัน) กับ 99.999% (ล่มได้ปีละราว 5 นาที) ต่างกันหลายเท่าตัวเรื่องงบ เพราะอย่างหลังต้องมีระบบสำรองข้ามภูมิภาค ตั้ง NFR ให้คุ้มกับที่ธุรกิจได้'
       }
     ],
     realWorldWorkflow: [
       { step: 'ขั้นที่ 1: สัมภาษณ์และสังเกต', role: 'BA', description: 'เก็บข้อมูลจากผู้เกี่ยวข้อง และเรียนรู้กฎขององค์กร (Business Rules)' },
-      { step: 'ขั้นที่ 2: จำแนกและวัดค่า', role: 'BA + QA Lead', description: 'แยก FR กับ NFR และใส่ตัวเลขเกณฑ์ที่วัดได้จริง' },
-      { step: 'ขั้นที่ 3: ตรวจสอบความสอดคล้อง', role: 'BA + Solution Architect', description: 'ให้สถาปนิกเช็กว่าระบบเดิมรองรับไหม หรือต้องลงทุนเพิ่ม' },
+      { step: 'ขั้นที่ 2: แยกประเภทและใส่ตัวเลข', role: 'BA + QA Lead', description: 'แยก FR กับ NFR และใส่ตัวเลขเกณฑ์ที่วัดได้จริง' },
+      { step: 'ขั้นที่ 3: เช็กว่าเข้ากับระบบเดิมไหม', role: 'BA + Solution Architect', description: 'ให้สถาปนิกเช็กว่าระบบเดิมรองรับไหม หรือต้องลงทุนเพิ่ม' },
       { step: 'ขั้นที่ 4: Sign-off & Baseline', role: 'Business + Dev Lead', description: 'เซ็นรับขอบเขตงานร่วมกัน ใช้เป็นเกณฑ์ตรวจรับระบบ' }
     ],
     checklist: [
@@ -582,7 +582,7 @@ export const chapters1_5: Chapter[] = [
     plainAnalogy: 'เหมือนซูม Google Maps: L1 ทั้งประเทศ, L2 ถนนหลัก, L3 ตึก, L4 สายไฟในบ้าน',
     readTime: '13 นาที',
     diagramTitle: 'Interactive C4 Architecture Model (การซูม 4 ระดับ)',
-    diagramDescription: 'เครื่องมือจำลองการซูมแผนผังระบบ: Level 1 (Context), Level 2 (Containers), Level 3 (Components), และ Level 4 (Code/Classes)',
+    diagramDescription: 'ลองซูมแผนผังระบบ 4 ระดับ: Level 1 (Context), Level 2 (Containers), Level 3 (Components), และ Level 4 (Code/Classes)',
     beginnerPrimer: {
       whatIsIt: 'System Architecture คือการวางโครงว่าซอฟต์แวร์มีส่วนย่อยอะไรบ้าง และแต่ละส่วนคุยกันยังไง ส่วน C4 Model คือวิธีวาดผังนี้ โดยแบ่งเป็น 4 ระดับความละเอียด',
       whyItMatters: 'ถ้าไม่มีแผนที่ ทุกคนนึกภาพระบบกันเอง พอมีปัญหาหรือจะเพิ่มฟีเจอร์ ก็ไม่มีใครรู้ว่าต้องแก้ตรงไหน และแก้จุดหนึ่งอาจทำอีกระบบพังโดยไม่รู้ตัว',
@@ -678,7 +678,7 @@ export const chapters1_5: Chapter[] = [
       { step: 'ขั้นที่ 1: วาด System Context', role: 'Solution Architect + PM', description: 'เขียนผู้ใช้ทั้งหมดและระบบภายนอกที่เกี่ยวข้องลงไวท์บอร์ด' },
       { step: 'ขั้นที่ 2: วางโครง Containers', role: 'SA + Tech Lead', description: 'เลือกเทคโนโลยีหลัก ภาษา และฐานข้อมูลให้เหมาะกับปริมาณงาน' },
       { step: 'ขั้นที่ 3: ออกแบบความปลอดภัย', role: 'Security Architect', description: 'กำหนดจุดเข้ารหัสข้อมูล การยืนยันตัวตน (Authentication) และไฟร์วอลล์' },
-      { step: 'ขั้นที่ 4: เผยแพร่และทบทวน', role: 'ทั้งทีม', description: 'เก็บผังไว้ในคู่มือกลาง และอัปเดตทุกครั้งที่โครงสร้างสำคัญเปลี่ยน' }
+      { step: 'ขั้นที่ 4: แชร์ผังและอัปเดต', role: 'ทั้งทีม', description: 'เก็บผังไว้ในคู่มือกลาง และอัปเดตทุกครั้งที่โครงสร้างสำคัญเปลี่ยน' }
     ],
     checklist: [
       'มีผัง System Context (L1) ที่คนนอกสายงานอ่านเข้าใจใน 2 นาที',
@@ -706,7 +706,7 @@ export const chapters1_5: Chapter[] = [
       {
         pitfall: 'เลือกเทคโนโลยีตามกระแส โดยไม่ดูขนาดและความพร้อมของทีม (Resume-Driven Development)',
         symptom: 'ทีม 3 คนเลือกเทคโนโลยีซับซ้อนระดับโลก พอเกิดเหตุตอนตี 2 ไม่มีใครแก้ได้',
-        solution: 'เลือกเทคโนโลยีที่ทีมถนัดและมีคนใช้แพร่หลาย (Boring Technology) เพื่อแก้ปัญหาลูกค้า ไม่ใช่เพื่อเติมเรซูเม่'
+        solution: 'เลือกเทคโนโลยีที่ทีมถนัดและคนใช้กันเยอะ (Boring Technology) เพื่อแก้ปัญหาลูกค้า ไม่ใช่เพื่อเติมเรซูเม่'
       }
     ]
   }

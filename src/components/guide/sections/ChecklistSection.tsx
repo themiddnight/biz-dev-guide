@@ -20,7 +20,7 @@ export const ChecklistSection: React.FC<SectionProps> = ({ chapter, isOpen, onTo
               Pre-flight Checklist ก่อนเข้าประชุมหรือส่งต่องาน
             </h3>
             <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e]">
-              เช็กลิสต์ตรวจความพร้อม ป้องกันการตกหล่นก่อนส่งต่องาน ({chapter.checklist.length} ข้อ)
+              เช็กให้ครบก่อนส่งต่องาน จะได้ไม่มีอะไรตกหล่น ({chapter.checklist.length} ข้อ)
             </p>
           </div>
         </div>

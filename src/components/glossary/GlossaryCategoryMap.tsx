@@ -20,7 +20,7 @@ export const GlossaryCategoryMap: React.FC<GlossaryCategoryMapProps> = ({ terms,
   return (
     <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] space-y-3">
       <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e]">
-        {GLOSSARY_CATEGORIES.length} หมวด รวม {terms.length} คำ — กดหมวดเพื่อกรองคลังคำศัพท์
+        {GLOSSARY_CATEGORIES.length} หมวด รวม {terms.length} คำ — กดหมวดเพื่อกรองคำศัพท์
       </p>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
         {GLOSSARY_CATEGORIES.map(cat => {

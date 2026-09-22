@@ -39,13 +39,13 @@ export const GLOSSARY_CATEGORIES: { key: GlossaryCategory; label: string; labelT
   { key: 'architecture', label: 'Architecture & diagrams', labelTh: 'สถาปัตยกรรมและไดอะแกรม' },
   { key: 'product', label: 'Product', labelTh: 'ผลิตภัณฑ์' },
   { key: 'pipeline', label: 'Pipeline & process', labelTh: 'ไปป์ไลน์และกระบวนการ' },
-  { key: 'tech-debt', label: 'Tech debt & design trade-offs', labelTh: 'หนี้ทางเทคนิคและการแลกเปลี่ยนเชิงออกแบบ' },
-  { key: 'estimation', label: 'Estimation & uncertainty', labelTh: 'การประมาณการและความไม่แน่นอน' },
+  { key: 'tech-debt', label: 'Tech debt & design trade-offs', labelTh: 'หนี้เทคนิคและ trade-off ตอนออกแบบ' },
+  { key: 'estimation', label: 'Estimation & uncertainty', labelTh: 'การประเมินเวลาและความไม่แน่นอน' },
   { key: 'frameworks', label: 'Frameworks & certifications', labelTh: 'Framework และใบรับรอง' },
-  { key: 'engineering', label: 'Engineering practice', labelTh: 'แนวปฏิบัติงานวิศวกรรม' },
+  { key: 'engineering', label: 'Engineering practice', labelTh: 'วิธีทำงานฝั่ง Engineering' },
   { key: 'qa', label: 'QA & testing', labelTh: 'QA และการทดสอบ' },
   { key: 'devops', label: 'Delivery & DevOps', labelTh: 'การส่งมอบและ DevOps' },
-  { key: 'operations', label: 'Operations, support & product signals', labelTh: 'ปฏิบัติการ ซัพพอร์ต และสัญญาณจากผู้ใช้' },
+  { key: 'operations', label: 'Operations, support & product signals', labelTh: 'ดูแลระบบ ซัพพอร์ต และสัญญาณจากผู้ใช้' },
   { key: 'metrics', label: 'Delivery metrics', labelTh: 'ตัวชี้วัดการส่งมอบ' },
   { key: 'ux', label: 'UX/UI', labelTh: 'UX/UI' },
 ];
@@ -121,7 +121,7 @@ export const GLOSSARY: GlossaryTerm[] = [
   {
     id: 'stakeholder',
     term: 'Stakeholder',
-    definition: 'ใครก็ตามที่มีผลประโยชน์เกี่ยวข้อง',
+    definition: 'ใครก็ตามที่ได้หรือเสียจากงานนี้',
     category: 'requirements',
     relatedChapterIds: ['s4'],
     origin: 'static',
@@ -145,7 +145,7 @@ export const GLOSSARY: GlossaryTerm[] = [
   {
     id: 'change-request',
     term: 'Change request',
-    definition: 'เอกสารขออนุมัติแก้ scope อย่างเป็นทางการ ทำให้ต้นทุนการเปลี่ยนมองเห็นได้',
+    definition: 'เอกสารขออนุมัติแก้ scope อย่างเป็นทางการ ให้เห็นว่าการเปลี่ยนต้องจ่ายเท่าไร',
     category: 'requirements',
     relatedChapterIds: ['s4'],
     origin: 'static',
@@ -178,7 +178,7 @@ export const GLOSSARY: GlossaryTerm[] = [
   {
     id: 'module-function-mapping',
     term: 'Module + function mapping',
-    definition: 'โครงสร้างความสามารถภายในระบบ',
+    definition: 'ข้างในระบบมีส่วนไหน ทำอะไรบ้าง',
     category: 'architecture',
     relatedChapterIds: ['s5'],
     origin: 'static',
@@ -372,7 +372,7 @@ export const GLOSSARY: GlossaryTerm[] = [
   {
     id: 'planning-fallacy',
     term: 'Planning fallacy',
-    definition: 'อคติที่มนุษย์ประเมินเวลางานใหม่ต่ำกว่าความจริงเป็นปกติ เกิดกับทุกฝ่ายไม่ใช่แค่ฝ่ายใดฝ่ายหนึ่ง',
+    definition: 'นิสัยที่คนมักกะเวลางานใหม่ต่ำกว่าจริง เกิดกับทุกฝ่ายไม่ใช่แค่ฝ่ายใดฝ่ายหนึ่ง',
     category: 'estimation',
     relatedChapterIds: ['s11'],
     origin: 'static',
@@ -388,7 +388,7 @@ export const GLOSSARY: GlossaryTerm[] = [
   {
     id: 'edge-case',
     term: 'Edge case',
-    definition: 'กรณีชายขอบที่เกิดไม่บ่อยแต่ต้องมีคำตอบก่อนเขียนโค้ด',
+    definition: 'กรณีแปลกๆ ที่เกิดไม่บ่อยแต่ต้องมีคำตอบก่อนเขียนโค้ด',
     category: 'estimation',
     relatedChapterIds: ['s11'],
     origin: 'static',
@@ -455,7 +455,7 @@ export const GLOSSARY: GlossaryTerm[] = [
   {
     id: 'trunk-based-development',
     term: 'Trunk-based development',
-    definition: 'merge โค้ดกลับ branch หลักบ่อยๆ ชิ้นเล็กๆ เพื่อลดความขัดแย้งตอนรวมโค้ด',
+    definition: 'merge โค้ดกลับ branch หลักบ่อยๆ ชิ้นเล็กๆ จะได้ไม่ชนกันหนักตอนรวมโค้ด',
     category: 'engineering',
     relatedChapterIds: ['s6'],
     origin: 'static',
@@ -504,7 +504,7 @@ export const GLOSSARY: GlossaryTerm[] = [
   {
     id: 'unit-test',
     term: 'Unit test',
-    definition: 'ทดสอบหน่วยโค้ดเล็กที่สุดแบบแยกโดด รันเร็ว',
+    definition: 'ทดสอบโค้ดชิ้นเล็กที่สุดทีละชิ้น รันเร็ว',
     category: 'qa',
     relatedChapterIds: ['s7'],
     origin: 'static',
@@ -537,7 +537,7 @@ export const GLOSSARY: GlossaryTerm[] = [
   {
     id: 'uat',
     term: 'UAT (User Acceptance Testing)',
-    definition: 'การทดสอบโดย user/stakeholder จริงเพื่อยืนยันว่าแก้ปัญหาธุรกิจได้จริง',
+    definition: 'ให้ user/stakeholder จริงลองใช้ ดูว่าแก้ปัญหาธุรกิจได้จริง',
     category: 'qa',
     relatedChapterIds: ['s7'],
     origin: 'static',
@@ -643,7 +643,7 @@ export const GLOSSARY: GlossaryTerm[] = [
   {
     id: 'post-mortem-rca',
     term: 'Post-mortem / RCA (Root Cause Analysis)',
-    definition: 'การทบทวนหา root cause หลัง incident แบบ blameless เพื่อป้องกันไม่ให้เกิดซ้ำ',
+    definition: 'การทบทวนหาต้นเหตุจริงหลัง incident แบบ blameless เพื่อป้องกันไม่ให้เกิดซ้ำ',
     category: 'operations',
     relatedChapterIds: ['s10'],
     aliases: ['Postmortem'],
@@ -652,7 +652,7 @@ export const GLOSSARY: GlossaryTerm[] = [
   {
     id: 'observability',
     term: 'Observability',
-    definition: 'ความสามารถมองเห็นสภาพภายในระบบจากภายนอก ผ่าน logging, monitoring, alerting',
+    definition: 'ดูจากข้างนอกได้ว่าข้างในระบบเป็นยังไง ผ่าน logging, monitoring, alerting',
     category: 'operations',
     relatedChapterIds: ['s10'],
     origin: 'static',
@@ -783,7 +783,7 @@ export const GLOSSARY: GlossaryTerm[] = [
   {
     id: 'design-system',
     term: 'Design system',
-    definition: 'ชุดกลางของ component สี font และ spacing ที่ทุกหน้าจอใช้ร่วมกัน เพื่อความสม่ำเสมอของหน้าตา',
+    definition: 'ชุดกลางของ component สี font และ spacing ที่ทุกหน้าจอใช้ร่วมกัน ทุกหน้าจะได้หน้าตาไปทางเดียวกัน',
     category: 'ux',
     relatedChapterIds: ['s3'],
     origin: 'static',
@@ -869,7 +869,7 @@ export const GLOSSARY: GlossaryTerm[] = [
     id: 'backward-compatibility',
     term: 'Backward Compatibility',
     definition: 'ความสามารถของระบบเวอร์ชันใหม่ที่ยังทำงานร่วมกับระบบ อินพุต หรือแอปเวอร์ชันเก่าได้',
-    plain: 'ความเข้ากันได้ย้อนหลัง: อัปเดตหลังบ้านแล้ว ลูกค้าที่ยังไม่อัปเดตแอปในมือถือก็ยังใช้ได้ตามปกติ',
+    plain: 'อัปเดตหลังบ้านแล้ว ลูกค้าที่ยังไม่อัปเดตแอปในมือถือก็ยังใช้ได้ตามปกติ',
     example: '"เพิ่มฟิลด์ใหม่ใน API ต้องรักษา Backward Compatibility ไว้ ไม่อย่างนั้นแอปเวอร์ชันเก่าที่ลูกค้ายังไม่อัปเดตจะค้าง"',
     category: 'engineering',
     relatedChapterIds: ['s6'],
