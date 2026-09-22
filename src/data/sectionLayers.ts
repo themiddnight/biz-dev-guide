@@ -15,7 +15,7 @@ export const SECTION_KEYS: readonly SectionKey[] = [
 
 export const LAYER_CONFIG: Record<ExperienceLevel, Record<Layer, readonly SectionKey[]>> = {
   beginner: {
-    core: ['primer', 'otherSide', 'coreConcepts', 'jargon', 'diagram'],
+    core: ['primer', 'jargon', 'otherSide', 'coreConcepts', 'diagram'],
     apply: ['dialogue', 'examples', 'workflow', 'checklist', 'pitfalls', 'faq', 'friction'],
     deep: ['reference', 'glossary', 'mindset'],
   },
@@ -161,8 +161,12 @@ const sectionsWhere = (layout: LayerGroup[], pick: (g: LayerGroup) => boolean) =
   return sections;
 };
 
-/** Core sections that start closed for a chapter (visual-first pilot). Layer stays expanded. */
-export const CHAPTER_CORE_COLLAPSED: Readonly<Record<string, readonly SectionKey[]>> = { s3: ['jargon'] };
+/**
+ * Core sections that start closed for a chapter (visual-first pilot). Layer stays expanded.
+ * Empty since the jargon block moved to second in beginner Core (term-definitions spec D4):
+ * s3's title uses `UX/UI`, so the block that resolves it must be open. The mechanism stays.
+ */
+export const CHAPTER_CORE_COLLAPSED: Readonly<Record<string, readonly SectionKey[]>> = {};
 
 export function deriveOpenState(layout: LayerGroup[], chapterId?: string): OpenState {
   const sections = sectionsWhere(layout, g => g.layer === 'core');
