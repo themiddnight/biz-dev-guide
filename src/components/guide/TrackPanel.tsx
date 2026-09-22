@@ -31,7 +31,7 @@ export const TrackPanel: React.FC<TrackPanelProps> = ({ chapters, experienceLeve
         </div>
       </div>
       <ol className="space-y-1">
-        {trackIds.map((id, index) => {
+        {trackIds.map((id) => {
           const chapter = chapters.find(c => c.id === id);
           if (!chapter) return null;
           const isActive = id === activeChapterId;
@@ -47,8 +47,8 @@ export const TrackPanel: React.FC<TrackPanelProps> = ({ chapters, experienceLeve
                   isActive ? 'bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a]' : 'text-neutral-800 dark:text-[#d4d4d4] hover:bg-neutral-100 dark:hover:bg-[#1f1f1f]'
                 }`}
               >
-                <span className="w-5 shrink-0 text-[10px] opacity-70">{index + 1}</span>
-                <span className="flex-1 truncate">บทที่ {chapter.num}: {chapter.title}</span>
+                <span className="w-5 shrink-0 text-[10px] opacity-70" aria-label={`บทที่ ${chapter.num}`}>{chapter.num}</span>
+                <span className="flex-1 truncate" title={chapter.title}>{chapter.title}</span>
                 {isRead && <Check className="w-3.5 h-3.5 shrink-0 text-emerald-500" aria-label="อ่านแล้ว" />}
               </button>
             </li>

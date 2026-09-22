@@ -48,6 +48,11 @@ export const ChapterHero: React.FC<ChapterHeroProps> = ({ chapter, experienceLev
         <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-neutral-900 dark:text-[#fafafa] tracking-tight leading-tight">
           {chapter.title}
         </h1>
+        {chapter.enTerm && (
+          <span className="inline-block px-2 py-0.5 rounded-md bg-neutral-100 dark:bg-[#1f1f1f] border border-neutral-200 dark:border-[#333333] text-neutral-600 dark:text-[#a3a3a3] text-[11px] font-semibold">
+            {chapter.enTerm}
+          </span>
+        )}
         <p className="text-xs sm:text-sm text-neutral-500 dark:text-[#8e8e8e] leading-relaxed font-normal">
           {chapter.subtitle}
         </p>

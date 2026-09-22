@@ -282,6 +282,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
     const matchesSearch = 
       ch.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       ch.subtitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (ch.enTerm?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false) ||
       ch.keyTakeaway.toLowerCase().includes(searchQuery.toLowerCase()) ||
       ch.plainAnalogy.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (ch.jargonList && ch.jargonList.some(j => j.term.toLowerCase().includes(searchQuery.toLowerCase()))) ||

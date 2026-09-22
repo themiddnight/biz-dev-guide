@@ -89,7 +89,7 @@ export interface WorkplaceDialogue {
 
 export interface JargonTerm {
   term: string;
-  formalDefinition: string;
+  formalDefinition?: string; // omitted when it would only restate humanTranslation
   humanTranslation: string; // แปลภาษาคนแบบเห็นภาพ
   meetingExample?: string; // ตัวอย่างการใช้ในห้องประชุมจริง
 }
@@ -179,6 +179,7 @@ export interface Chapter {
   id: string;
   num: number;
   title: string;
+  enTerm?: string; // canonical English name, shown as a tag and matched by search
   subtitle: string;
   roleTag: 'all' | 'pm' | 'ux' | 'ba' | 'sa' | 'eng' | 'qa' | 'devops' | 'support' | 'friction' | 'ai';
   businessNote: string;
