@@ -75,7 +75,7 @@ Hi-fi and Production need not be pixel perfect. Colour, real Thai copy and visib
 - The 4 levels are **4 separate `<svg>` panels**, not one wide SVG, so they can reflow. Each panel has `viewBox="0 0 150 240"`, `role="img"`, `aria-labelledby` pointing to its own `<title>` and `<desc>`, and ids made with `useId()` (one `uid`, suffixed `-t1`, `-d1`, …). Each panel scales with `width: 100%; height: auto`.
 - Labels, cost lines, the scale and the tabs are **HTML**, not SVG text, for Thai shaping, wrapping and screen readers.
 - Colours come only from `var(--fig-*)`. No new tokens. The Production error uses the `--fig-warn*` tokens and a "!" glyph plus text, so colour is never the only cue.
-- SVG text: `fontFamily="inherit"`, `fontSize` ≥ 10 user units, at most 6 text strings per panel. At the smallest 4-up panel width (about 150px) this renders at ≥ 10px.
+- SVG text: `fontFamily="inherit"`, `fontSize` ≥ 10 user units. The number of text strings per panel is not capped, but every string must fit inside its box at `fontSize` ≥ 10 (no overflow past the 150-wide panel). At the smallest 4-up panel width (about 150px) this renders at ≥ 10px.
 - Root: `<div className={`fig-scope @container ${className ?? ''}`}>`.
 - This is the first figure with local state (the selected tab). Add one line to the registry header comment: "Figures may hold view-only UI state (e.g. mobile tabs); content stays static."
 
@@ -336,7 +336,7 @@ With each rollout step, update the pilot guard in `visualFirst.test.ts` and re-r
 
 | Risk | Mitigation |
 |---|---|
-| 4-up panels too small to read on a narrow desktop column | container breakpoint at 640px; ≥ 10-unit text; ≤ 6 strings per panel |
+| 4-up panels too small to read on a narrow desktop column | container breakpoint at 640px; ≥ 10-unit text; every string fits its box at that size |
 | Tab mode makes the figure tall on mobile (about 500px) | panel capped at 260px wide; criterion 3 checks visibility, not full fit |
 | The key takeaway moves below the fold on mobile | it restates the caption; accepted for the pilot, re-check in §8 |
 | Reusing the Refund domain could confuse readers who have not reached ch.5 | the screen stands alone; no ch.5 knowledge is needed |

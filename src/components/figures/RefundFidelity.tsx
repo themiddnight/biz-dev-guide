@@ -115,11 +115,7 @@ const HifiScreen: React.FC = () => (
   </g>
 );
 
-/*
- * Production keeps 6 text strings: title, price, truncated name, error, button and the
- * empty-state note (one <text>, two lines). The reason value and upload label become
- * glyphs so the real-data states can fit the per-panel budget.
- */
+/* Production = Hi-fi plus real-data states: truncated name, upload error, disabled button, empty state. */
 const ProductionScreen: React.FC = () => (
   <g>
     <HifiChrome />
@@ -127,17 +123,17 @@ const ProductionScreen: React.FC = () => (
     <text x="14" y="76" fontSize="10" fill="var(--fig-text)">หูฟังไร้สาย รุ่น Pro Max…</text>
 
     <rect x="8" y="90" width="134" height="22" rx="5" fill="var(--fig-bg)" stroke="var(--fig-border)" />
-    <rect x="14" y="98" width="62" height="6" rx="2" fill="var(--fig-text-2)" />
-    <path d="M126,99 L130,103 L134,99" fill="none" stroke="var(--fig-text-2)" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+    <text x="14" y="105" fontSize="10" fill="var(--fig-text)">ไม่ได้รับสินค้า ▾</text>
 
     <rect x="8" y="120" width="134" height="28" rx="5" fill="var(--fig-bg)" stroke="var(--fig-warn-border)" strokeDasharray="4 3" />
-    {/* image glyph */}
-    <rect x="66" y="126" width="18" height="15" rx="2" fill="none" stroke="var(--fig-text-2)" strokeWidth="1.2" />
-    <path d="M68,139 L73,133 L77,137 L79,135 L82,139" fill="none" stroke="var(--fig-text-2)" strokeWidth="1.2" strokeLinejoin="round" />
+    {/* image glyph beside the label (label ≈ 90 units wide at fontSize 10) */}
+    <rect x="20" y="128" width="14" height="12" rx="2" fill="none" stroke="var(--fig-text-2)" strokeWidth="1.2" />
+    <path d="M21.5,138.5 L25.5,133.5 L28.5,136.5 L30,135 L32.5,138.5" fill="none" stroke="var(--fig-text-2)" strokeWidth="1.1" strokeLinejoin="round" />
+    <text x="40" y="138" fontSize="10" fill="var(--fig-text-2)">แนบรูป (ไม่บังคับ)</text>
 
     <rect x="8" y="154" width="134" height="18" rx="4" fill="var(--fig-warn-bg)" stroke="var(--fig-warn-border)" />
     <circle cx="17" cy="163" r="5" fill="var(--fig-warn)" />
-    {/* "!" glyph as shapes so it does not count against the text budget */}
+    {/* "!" glyph drawn as shapes */}
     <rect x="16.3" y="159.5" width="1.4" height="4.2" rx="0.7" fill="var(--fig-warn-bg)" />
     <circle cx="17" cy="165.6" r="0.8" fill="var(--fig-warn-bg)" />
     <text x="26" y="167" fontSize="10" fill="var(--fig-warn)">อัปโหลดไม่สำเร็จ ลองใหม่</text>
