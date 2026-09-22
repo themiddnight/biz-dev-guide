@@ -320,6 +320,7 @@ export default function App() {
             requestedSection={route.requestedSection}
             onNavigateChapter={route.navigate}
             onReplaceSection={route.replaceSection}
+            onRequestedSectionApplied={route.clearRequestedSection}
             loadedFromHash={route.loadedFromHash}
             resumeCandidate={route.resumeCandidate}
             resumeDismissed={route.resumeDismissed}

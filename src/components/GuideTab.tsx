@@ -66,6 +66,7 @@ interface GuideTabProps {
   requestedSection: RequestedSection | null;
   onNavigateChapter: (chapterId: string, section?: SectionKey) => void;
   onReplaceSection: (section: SectionKey | null) => void;
+  onRequestedSectionApplied: () => void;
 }
 
 export const GuideTab: React.FC<GuideTabProps> = ({
@@ -88,6 +89,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   onStartQuiz,
   onEarnXp,
   onReplaceSection,
+  onRequestedSectionApplied,
   activeChapterId,
   requestedSection,
   onNavigateChapter,
@@ -175,6 +177,8 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   // re-derive effect so that, when both fire in one commit, this update wins.
   useEffect(() => {
     if (!requestedSection) return;
+    // Consume the request so a remount (Quiz -> Guide) never re-opens and re-scrolls to it.
+    onRequestedSectionApplied();
     if (!isSectionPresent(activeChapter, requestedSection.key)) {
       onReplaceSection(null);
       return;

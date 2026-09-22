@@ -24,6 +24,8 @@ export interface ChapterRouteApi {
   navigate: (chapterId: string, section?: SectionKey) => void;
   replaceSection: (section: SectionKey | null) => void;
   dismissResume: () => void;
+  /** Called once a requested section has been applied, so a GuideTab remount never replays it. */
+  clearRequestedSection: () => void;
 }
 
 const DEFAULT_CHAPTER = 's1';
@@ -106,6 +108,7 @@ export function useChapterRoute(chapters: Chapter[], opts: { onChapterRoute: () 
   }, [numOf]);
 
   const dismissResume = useCallback(() => dispatch({ type: 'dismissResume' }), []);
+  const clearRequestedSection = useCallback(() => setRequestedSection(null), []);
 
   return {
     activeChapterId,
@@ -117,5 +120,6 @@ export function useChapterRoute(chapters: Chapter[], opts: { onChapterRoute: () 
     navigate,
     replaceSection,
     dismissResume,
+    clearRequestedSection,
   };
 }
