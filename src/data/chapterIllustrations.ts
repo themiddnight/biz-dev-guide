@@ -109,15 +109,15 @@ export const CHAPTER_ILLUSTRATIONS: Record<string, ChapterIllustration> = {
   s8: {
     id: 'ill-s8',
     title: 'The Canary Release Valve & Traffic Splitter',
-    subtitle: 'วาล์วผันน้ำทราฟฟิก: ปล่อยของใหม่ให้ผู้ใช้ 5% แรก หากผิดพลาดดึงกลับใน 30 วินาที',
+    subtitle: 'วาล์วผันน้ำทราฟฟิก: ปล่อยของใหม่ให้ผู้ใช้ 5% แรก หากตัวชี้วัดเกินเกณฑ์ ระบบสับทราฟฟิกกลับเวอร์ชันเดิมอัตโนมัติ',
     visualMetaphor: 'นกขมิ้นในเหมืองถ่านหิน (Canary in a Coal Mine) ที่คนงานส่งเข้าไปตรวจก๊าซพิษก่อน หากนกปลอดภัย คนงานจึงจะเดินเข้าไปทำงาน',
     svgType: 'pipeline',
-    svgDescription: 'ไดอะแกรมระบบผันน้ำทราฟฟิก: ผู้ใช้ 100% วิ่งมาที่ Load Balancer จากนั้นวาล์วผัน 95% ไปยังระบบเดิมที่เสถียร (Blue) และ 5% ไปยังระบบเวอร์ชันใหม่ (Green Canary) พร้อมเซ็นเซอร์วัด Error Rate',
+    svgDescription: 'ไดอะแกรมระบบผันน้ำทราฟฟิก: ผู้ใช้ 100% วิ่งมาที่ Load Balancer จากนั้นวาล์วผัน 95% ไปยังเวอร์ชันปัจจุบันที่เสถียร (Stable Fleet) และ 5% ไปยังเวอร์ชันใหม่ (Canary Fleet) พร้อมเซ็นเซอร์วัด Error Rate',
     elements: [
       { label: 'Total Traffic (100%)', role: 'กระแสน้ำเข้า', color: '#64748b', detail: 'ผู้ใช้งานทุกคนที่เปิดแอปพร้อมกัน' },
       { label: 'Traffic Balancer Valve', role: 'วาล์วควบคุม', color: '#8b5cf6', detail: 'สามารถปรับสัดส่วน 5% ➔ 20% ➔ 50% ➔ 100% ตามความมั่นใจ' },
       { label: 'Canary Fleet (New)', role: 'นกขมิ้นทดสอบ', color: '#f59e0b', detail: 'เครื่องเซิร์ฟเวอร์เวอร์ชันใหม่ คอยจับตาดู Error Log และ Crash Report' },
-      { label: 'Instant Rollback Button', role: 'เบรกฉุกเฉิน', color: '#ef4444', detail: 'ถ้าพบข้อผิดพลาด วาล์วจะสับทราฟฟิกกลับสู่เวอร์ชันเดิมอัตโนมัติ' }
+      { label: 'Instant Rollback Button', role: 'เบรกฉุกเฉิน', color: '#ef4444', detail: 'ถ้า Error Rate หรือ Latency เกินเกณฑ์ที่ตั้งไว้ วาล์วจะสับทราฟฟิกกลับสู่เวอร์ชันเดิมอัตโนมัติ (เร็วแค่ไหนขึ้นกับรอบการเฝ้าวัดผล)' }
     ],
     takeaway: 'ในโลกวิศวกรรมยุคใหม่ เราไม่หวังพึ่งโชคชะตา แต่เราออกแบบระบบให้ผิดพลาดได้อย่างจำกัดและฟื้นตัวได้ทันที'
   },

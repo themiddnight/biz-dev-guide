@@ -283,7 +283,7 @@ export const chapters11_15: Chapter[] = [
   {
     id: 's13',
     num: 13,
-    title: 'การพัฒนายุด AI (AI-Augmented SDLC: Cursor, Copilot & New Bottlenecks)',
+    title: 'การพัฒนายุค AI (AI-Augmented SDLC: Cursor, Copilot & New Bottlenecks)',
     subtitle: 'เมื่อ AI ช่วยเขียนโค้ดได้ในเสี้ยววินาที คอขวดใหม่ของมนุษย์ย้ายไปอยู่ที่ไหน และจะทำงานร่วมกันอย่างไร',
     roleTag: 'ai',
     businessNote: 'AI ไม่ได้ทำให้เราสามารถสั่งระบบซับซ้อนให้เสร็จได้ใน 1 วันโดยไม่ต้องมีวิศวกร โค้ดที่ AI สร้างขึ้นยังต้องการมนุษย์ที่เข้าใจสถาปัตยกรรมมาตรวจสอบความปลอดภัยและความถูกต้องเสมอ',

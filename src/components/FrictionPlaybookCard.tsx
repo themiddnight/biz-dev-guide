@@ -293,15 +293,14 @@ export const FrictionPlaybookCard: React.FC<FrictionPlaybookCardProps> = ({
                   ถ้าคุณต้องตอบ คุณจะตอบอย่างไร?
                 </div>
                 <div className="space-y-1.5 sm:space-y-2">
-                  {playbook.dilemma.options.map((option) => {
+                  {playbook.dilemma.options.map((option, index) => {
                     const isSelected = selectedOptionId === option.id;
                     const showResult = selectedOptionId !== null;
 
                     return (
-                      <div 
+                      <div
                         key={option.id}
-                        onClick={() => handleSelectDilemma(option.id, option.isOptimal)}
-                        className={`p-2.5 sm:p-3 rounded-lg sm:rounded-xl border text-xs cursor-pointer transition-all ${
+                        className={`p-2.5 sm:p-3 rounded-lg sm:rounded-xl border text-xs transition-all ${
                           isSelected
                             ? option.isOptimal
                               ? 'bg-emerald-500/10 dark:bg-emerald-950/40 border-emerald-500 dark:border-emerald-500 font-medium'
@@ -311,15 +310,20 @@ export const FrictionPlaybookCard: React.FC<FrictionPlaybookCardProps> = ({
                             : 'bg-white dark:bg-[#141414] border-neutral-200 dark:border-[#262626] hover:border-neutral-400 dark:hover:border-[#404040]'
                         }`}
                       >
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex items-start gap-1.5 sm:gap-2">
-                            <span className="font-bold text-neutral-400 dark:text-[#737373] shrink-0 font-mono">
-                              {option.id.toUpperCase()}.
+                        <button
+                          type="button"
+                          onClick={() => handleSelectDilemma(option.id, option.isOptimal)}
+                          aria-pressed={isSelected}
+                          className="w-full flex items-start justify-between gap-2 text-left cursor-pointer rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                        >
+                          <span className="flex items-start gap-1.5 sm:gap-2">
+                            <span className="font-bold text-neutral-400 dark:text-[#737373] shrink-0">
+                              {['ก', 'ข', 'ค', 'ง', 'จ'][index] ?? index + 1}.
                             </span>
                             <span className="text-neutral-900 dark:text-[#e5e5e5] leading-relaxed">
                               {option.text}
                             </span>
-                          </div>
+                          </span>
                           {isSelected && (
                             <span className="shrink-0">
                               {option.isOptimal ? (
@@ -329,7 +333,7 @@ export const FrictionPlaybookCard: React.FC<FrictionPlaybookCardProps> = ({
                               )}
                             </span>
                           )}
-                        </div>
+                        </button>
 
                         {/* Explanation if selected */}
                         {isSelected && (

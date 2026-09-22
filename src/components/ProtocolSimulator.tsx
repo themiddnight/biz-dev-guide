@@ -96,7 +96,7 @@ export const ProtocolSimulator: React.FC = () => {
                     isPolling ? 'bg-rose-500 text-white' : 'bg-blue-600 text-white'
                   }`}
                 >
-                  {isPolling ? 'หยุด Polling' : 'เริ่ม Polling (ถามทุก 1.5 วินาที)'}
+                  {isPolling ? 'หยุด Polling' : 'เริ่ม Polling (จำลองเร็วขึ้น: 1.5 วินาที แทน 5 นาทีจริง)'}
                 </button>
               </div>
 
@@ -110,7 +110,7 @@ export const ProtocolSimulator: React.FC = () => {
                 </span>
               </div>
               <p className="text-[11px] text-slate-500">
-                💡 <b>คำอธิบาย:</b> เหมือนคุณโทรไปหาบริษัทส่งของทุก 5 นาที เปลืองแบตโทรศัพท์และเปลืองเงินทั้งสองฝ่าย
+                💡 <b>คำอธิบาย:</b> เหมือนคุณโทรไปหาบริษัทส่งของทุก 5 นาที เปลืองแบตโทรศัพท์และเปลืองเงินทั้งสองฝ่าย (ตัวจำลองนี้เร่งให้เร็วขึ้น ถามทุก 1.5 วินาที เพื่อให้เห็นภาพทันที)
               </p>
             </div>
           )}

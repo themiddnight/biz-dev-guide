@@ -19,6 +19,18 @@ interface QuizTabProps {
   onAskAIWithPrompt: (prompt: string) => void;
 }
 
+// Shuffle options once per attempt so the correct answer is not tied to a fixed position.
+// Correctness always follows option.isCorrect, never the displayed index.
+const shuffleOptions = (questions: QuizQuestion[]): QuizQuestion['options'][] =>
+  questions.map((q) => {
+    const opts = [...q.options];
+    for (let i = opts.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [opts[i], opts[j]] = [opts[j], opts[i]];
+    }
+    return opts;
+  });
+
 export const QuizTab: React.FC<QuizTabProps> = ({
   questions,
   onCompleteQuiz,
@@ -29,14 +41,16 @@ export const QuizTab: React.FC<QuizTabProps> = ({
   const [score, setScore] = useState(0);
   const [earnedXp, setEarnedXp] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
+  const [shuffledOptions, setShuffledOptions] = useState(() => shuffleOptions(questions));
 
   const currentQ = questions[currentIndex];
+  const currentOptions = shuffledOptions[currentIndex] ?? currentQ.options;
 
   const handleSelectOption = (idx: number) => {
     if (selectedOptionIndex !== null) return; // Already answered
     setSelectedOptionIndex(idx);
 
-    const isCorrect = currentQ.options[idx].isCorrect;
+    const isCorrect = currentOptions[idx].isCorrect;
     if (isCorrect) {
       setScore((prev) => prev + 1);
       setEarnedXp((prev) => prev + currentQ.xp);
@@ -49,7 +63,8 @@ export const QuizTab: React.FC<QuizTabProps> = ({
       setSelectedOptionIndex(null);
     } else {
       setIsFinished(true);
-      onCompleteQuiz(score + (currentQ.options[selectedOptionIndex ?? 0]?.isCorrect ? 1 : 0), earnedXp);
+      // score and earnedXp already include the last answer (updated in handleSelectOption).
+      onCompleteQuiz(score, earnedXp);
     }
   };
 
@@ -59,6 +74,7 @@ export const QuizTab: React.FC<QuizTabProps> = ({
     setScore(0);
     setEarnedXp(0);
     setIsFinished(false);
+    setShuffledOptions(shuffleOptions(questions));
   };
 
   if (isFinished) {
@@ -170,7 +186,7 @@ export const QuizTab: React.FC<QuizTabProps> = ({
 
       {/* Options List */}
       <div className="space-y-2.5 sm:space-y-3">
-        {currentQ.options.map((option, idx) => {
+        {currentOptions.map((option, idx) => {
           const isSelected = selectedOptionIndex === idx;
           let btnStyle = 'border-neutral-200 dark:border-[#262626] bg-white dark:bg-[#141414] text-neutral-800 dark:text-[#e5e5e5] hover:border-neutral-400 dark:hover:border-[#404040]';
 
@@ -186,7 +202,7 @@ export const QuizTab: React.FC<QuizTabProps> = ({
 
           return (
             <button
-              key={idx}
+              key={`${currentQ.id}-${option.text}`}
               onClick={() => handleSelectOption(idx)}
               disabled={isAnswered}
               className={`w-full p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border text-left text-xs sm:text-sm font-medium transition-all flex items-start justify-between gap-3 cursor-pointer disabled:cursor-default ${btnStyle}`}
@@ -226,7 +242,7 @@ export const QuizTab: React.FC<QuizTabProps> = ({
             <span>คำอธิบายเฉลยและเหตุผล:</span>
           </div>
           <p className="text-xs sm:text-sm text-neutral-700 dark:text-[#c4c4c4] leading-relaxed font-normal">
-            {currentQ.options[selectedOptionIndex].explanation}
+            {currentOptions[selectedOptionIndex].explanation}
           </p>
         </div>
       )}

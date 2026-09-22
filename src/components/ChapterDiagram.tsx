@@ -41,7 +41,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
   const [activeStep, setActiveStep] = useState<number>(0);
   const [c4Zoom, setC4Zoom] = useState<1 | 2 | 3 | 4>(1);
   const [pyramidLevel, setPyramidLevel] = useState<'unit' | 'integration' | 'e2e'>('unit');
-  const [canaryPercent, setCanaryPercent] = useState<number>(10);
+  const [canaryPercent, setCanaryPercent] = useState<number>(5);
   const [boehmPhase, setBoehmPhase] = useState<number>(0);
 
   // Chapter 1: Subway Train state
@@ -645,7 +645,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
               ))}
             </div>
             <span className="text-[11px] text-slate-400">
-              {canaryPercent < 100 ? '🛡️ ถ้าเกิด Error ดึงกลับใน 30 วิ (Rollback)' : '✅ ปล่อยเต็ม 100% ปลอดภัย'}
+              {canaryPercent < 100 ? '🛡️ ถ้าตัวชี้วัดเกินเกณฑ์ ระบบ Rollback อัตโนมัติ (เร็วแค่ไหนขึ้นกับรอบการเฝ้าวัดผล)' : '✅ ปล่อยเต็ม 100% ปลอดภัย'}
             </span>
           </div>
         </div>
