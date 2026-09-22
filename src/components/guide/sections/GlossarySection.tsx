@@ -39,6 +39,7 @@ export const GlossarySection: React.FC<SectionProps> = ({ chapter, isOpen, onTog
             onCategoryChange={ctx.setGlossaryCategory}
             query={ctx.glossaryQuery}
             onQueryChange={ctx.setGlossaryQuery}
+            role={ctx.role}
           />
         </div>
       )}

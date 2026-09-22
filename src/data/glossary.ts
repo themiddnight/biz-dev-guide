@@ -1,8 +1,10 @@
 import { RichText } from '../types';
+import type { Role } from './rolePerspective';
 
 /**
- * Glossary restored from the static guide (`#glossary-grid`, static lines 1882–1975, 94 terms,
- * static order kept) plus the 5 former chapter-15 jargon terms (`origin: 'app'`).
+ * 113 terms: the glossary restored from the static guide (`#glossary-grid`, static lines 1882–1975,
+ * 94 terms, static order kept), the 5 former chapter-15 jargon terms, and 14 business & money terms
+ * for engineers (role-perspective spec P4.4). The last two groups have `origin: 'app'`.
  * `category` and `relatedChapterIds` are derived (spec §2.3), not part of the static source.
  * `plain` stays empty for static terms in phase 1 (owner decision Q6).
  */
@@ -19,7 +21,8 @@ export type GlossaryCategory =
   | 'devops'
   | 'operations'
   | 'metrics'
-  | 'ux';
+  | 'ux'
+  | 'business';
 
 export interface GlossaryTerm {
   id: string;
@@ -32,6 +35,8 @@ export interface GlossaryTerm {
   relatedChapterIds: string[];
   aliases?: string[];
   origin: 'static' | 'app';
+  /** Home side of the term; falls back to `CATEGORY_SIDE[category]` (see `termSide`). */
+  side?: Role;
 }
 
 export const GLOSSARY_CATEGORIES: { key: GlossaryCategory; label: string; labelTh: string }[] = [
@@ -48,7 +53,34 @@ export const GLOSSARY_CATEGORIES: { key: GlossaryCategory; label: string; labelT
   { key: 'operations', label: 'Operations, support & product signals', labelTh: 'ดูแลระบบ ซัพพอร์ต และสัญญาณจากผู้ใช้' },
   { key: 'metrics', label: 'Delivery metrics', labelTh: 'ตัวชี้วัดการส่งมอบ' },
   { key: 'ux', label: 'UX/UI', labelTh: 'UX/UI' },
+  { key: 'business', label: 'Business & money', labelTh: 'ธุรกิจและตัวเงิน' },
 ];
+
+/** Default home side per category: product and business terms belong to Business, the rest to Engineering. */
+export const CATEGORY_SIDE: Record<GlossaryCategory, Role> = {
+  requirements: 'eng',
+  architecture: 'eng',
+  product: 'biz',
+  pipeline: 'eng',
+  'tech-debt': 'eng',
+  estimation: 'eng',
+  frameworks: 'eng',
+  engineering: 'eng',
+  qa: 'eng',
+  devops: 'eng',
+  operations: 'eng',
+  metrics: 'eng',
+  ux: 'eng',
+  business: 'biz',
+};
+
+export const termSide = (t: Pick<GlossaryTerm, 'side' | 'category'>): Role => t.side ?? CATEGORY_SIDE[t.category];
+
+/** With a role, the other side's terms come first (stable). Role null keeps the given order. */
+export function sortTermsForRole<T extends Pick<GlossaryTerm, 'side' | 'category'>>(terms: readonly T[], role: Role | null): T[] {
+  if (!role) return [...terms];
+  return [...terms].sort((a, b) => Number(termSide(a) === role) - Number(termSide(b) === role));
+}
 
 export const GLOSSARY: GlossaryTerm[] = [
   // ---- Static guide terms (1–94) ----
@@ -66,6 +98,7 @@ export const GLOSSARY: GlossaryTerm[] = [
     definition: 'เอกสารบรรยาย requirement แบบเล่าเรื่อง',
     category: 'requirements',
     relatedChapterIds: ['s4'],
+    side: 'biz',
     origin: 'static',
   },
   {
@@ -75,6 +108,7 @@ export const GLOSSARY: GlossaryTerm[] = [
     category: 'requirements',
     relatedChapterIds: ['s4'],
     aliases: ['SOW'],
+    side: 'biz',
     origin: 'static',
   },
   {
@@ -108,6 +142,7 @@ export const GLOSSARY: GlossaryTerm[] = [
     definition: 'NFR ที่เจาะจงเวลา/คุณภาพเป็นตัวเลขวัดผลได้',
     category: 'requirements',
     relatedChapterIds: ['s4', 's10'],
+    side: 'biz',
     origin: 'static',
   },
   {
@@ -124,6 +159,7 @@ export const GLOSSARY: GlossaryTerm[] = [
     definition: 'ใครก็ตามที่ได้หรือเสียจากงานนี้',
     category: 'requirements',
     relatedChapterIds: ['s4'],
+    side: 'biz',
     origin: 'static',
   },
   {
@@ -278,6 +314,7 @@ export const GLOSSARY: GlossaryTerm[] = [
     category: 'product',
     relatedChapterIds: ['s2'],
     aliases: ['OKR', 'KPI'],
+    side: 'biz',
     origin: 'static',
   },
   {
@@ -697,6 +734,7 @@ export const GLOSSARY: GlossaryTerm[] = [
     definition: 'สัดส่วนผู้ใช้ที่ยังกลับมาใช้งานต่อเนื่องหลังผ่านไประยะหนึ่ง',
     category: 'operations',
     relatedChapterIds: ['s10'],
+    side: 'biz',
     origin: 'static',
   },
   {
@@ -705,6 +743,7 @@ export const GLOSSARY: GlossaryTerm[] = [
     definition: 'สัดส่วนผู้ใช้ที่เลิกใช้งานไปในช่วงเวลาหนึ่ง',
     category: 'operations',
     relatedChapterIds: ['s10'],
+    side: 'biz',
     origin: 'static',
   },
   {
@@ -713,6 +752,7 @@ export const GLOSSARY: GlossaryTerm[] = [
     definition: 'สัดส่วนผู้ใช้ที่มีสิทธิ์เข้าถึง feature แล้วเลือกใช้จริง',
     category: 'operations',
     relatedChapterIds: ['s10'],
+    side: 'biz',
     origin: 'static',
   },
   {
@@ -874,5 +914,173 @@ export const GLOSSARY: GlossaryTerm[] = [
     category: 'engineering',
     relatedChapterIds: ['s6'],
     origin: 'app',
+  },
+  // ---- Business & money terms for engineers (100–113, spec P4.4) ----
+  {
+    id: 'revenue',
+    term: 'Revenue (รายได้)',
+    definition: 'เงินทั้งหมดที่ได้จากการขายสินค้าหรือบริการในช่วงหนึ่ง ก่อนหักต้นทุนและค่าใช้จ่ายใดๆ',
+    plain: 'ยอดขายสูงไม่ได้แปลว่ามีกำไร ฟีเจอร์ที่ดันยอดขายแต่เพิ่มต้นทุนมากกว่า ทำให้บริษัทจนลง',
+    example: '"เดือนนี้ Revenue ฿2 ล้าน แต่หักต้นทุนกับค่าการตลาดแล้วยังขาดทุนอยู่ครับ"',
+    category: 'business',
+    relatedChapterIds: ['s16'],
+    aliases: ['ยอดขาย', 'Top line'],
+    origin: 'app',
+    side: 'biz',
+  },
+  {
+    id: 'gross-margin',
+    term: 'Gross Margin',
+    definition: '(รายได้ − ต้นทุนขาย) ÷ รายได้ คิดเป็นเปอร์เซ็นต์ บอกว่าขายได้ 100 บาท เหลือเท่าไรหลังหักต้นทุนของสินค้าหรือบริการนั้น',
+    plain: 'ค่า server และค่าธรรมเนียมรับชำระเงินมักนับเป็นต้นทุนขาย โค้ดที่เปลืองทรัพยากรจึงกินกำไรทุกออเดอร์',
+    example: '"ขายแพ็กละ ฿1,000 ต้นทุนขาย ฿300 Gross Margin คือ 70% ครับ"',
+    category: 'business',
+    relatedChapterIds: ['s16'],
+    aliases: ['กำไรขั้นต้น'],
+    origin: 'app',
+    side: 'biz',
+  },
+  {
+    id: 'cac',
+    term: 'CAC (Customer Acquisition Cost)',
+    definition: 'ค่าการตลาดและการขายทั้งหมดในช่วงหนึ่ง หารด้วยจำนวนลูกค้าใหม่ที่ได้ในช่วงเดียวกัน',
+    plain: 'ถ้า CAC สูง ทุกบั๊กที่ทำให้ลูกค้าหลุดคือเงินค่าหาลูกค้าที่เสียไปฟรี',
+    example: '"ไตรมาสนี้ใช้ค่าโฆษณา ฿500,000 ได้ลูกค้าใหม่ 1,000 คน CAC ตกคนละ ฿500 ครับ"',
+    category: 'business',
+    relatedChapterIds: ['s16'],
+    aliases: ['CAC', 'ค่าหาลูกค้า'],
+    origin: 'app',
+    side: 'biz',
+  },
+  {
+    id: 'ltv',
+    term: 'LTV (Customer Lifetime Value)',
+    definition: 'รายได้หรือกำไรขั้นต้นรวมที่คาดว่าลูกค้าหนึ่งคนจะสร้างให้ ตลอดช่วงที่ยังเป็นลูกค้า มักดูคู่กับ CAC',
+    plain: 'บั๊กที่ทำให้ลูกค้าเลิกใช้เร็วขึ้น ทำให้ LTV หด ทั้งที่ค่าหาลูกค้าจ่ายไปแล้ว',
+    example: '"LTV ของเราประมาณ 3 เท่าของ CAC ถ้าลูกค้าเลิกเร็วขึ้นอีกนิด ตัวเลขนี้จะไม่คุ้มแล้วครับ"',
+    category: 'business',
+    relatedChapterIds: ['s16'],
+    aliases: ['LTV', 'CLV', 'Lifetime Value'],
+    origin: 'app',
+    side: 'biz',
+  },
+  {
+    id: 'burn-rate',
+    term: 'Burn Rate',
+    definition: 'เงินสดที่บริษัทใช้ไปต่อเดือน ถ้าหักเงินที่รับเข้ามาแล้วเรียกว่า Net Burn',
+    plain: 'เงินเดือนทีมกับค่า cloud มักเป็นก้อนใหญ่ของ Burn Rate งานที่ช้าไปหนึ่งเดือนจึงมีราคาเป็นเงินจริง',
+    example: '"Net Burn ตอนนี้เดือนละ ฿3 ล้าน ค่าคนกับค่า cloud เกินครึ่งครับ"',
+    category: 'business',
+    relatedChapterIds: ['s16'],
+    aliases: ['Net Burn'],
+    origin: 'app',
+    side: 'biz',
+  },
+  {
+    id: 'runway',
+    term: 'Runway',
+    definition: 'เงินสดที่เหลือ หารด้วย Net Burn ต่อเดือน ได้เป็นจำนวนเดือนที่บริษัทอยู่ได้ ถ้าไม่มีเงินเข้าเพิ่ม',
+    plain: 'ถ้า Runway เหลือ 6 เดือน โปรเจกต์ 9 เดือนอาจไม่ได้ใช้เลย Business จึงถามหาของที่ขายได้เร็ว',
+    example: '"เงินในบัญชี ฿36 ล้าน Burn เดือนละ ฿3 ล้าน Runway เหลือ 12 เดือนครับ"',
+    category: 'business',
+    relatedChapterIds: ['s16'],
+    origin: 'app',
+    side: 'biz',
+  },
+  {
+    id: 'p-and-l',
+    term: 'P&L (Profit and Loss statement)',
+    definition: 'งบกำไรขาดทุน: รายงานรายได้ ต้นทุน และค่าใช้จ่ายในช่วงหนึ่ง จบที่บรรทัดกำไรหรือขาดทุนสุทธิ',
+    plain: 'Business บอกว่าเรื่องนี้ "กระทบ P&L" แปลว่ามันเปลี่ยนตัวเลขกำไรที่ผู้บริหารต้องรายงาน ไม่ใช่แค่เรื่องเทคนิค',
+    example: '"บั๊กคืนเงินซ้ำรอบนี้ต้องลงใน P&L ไตรมาสนี้ เป็นค่าใช้จ่ายที่ไม่ได้วางแผนไว้ครับ"',
+    category: 'business',
+    relatedChapterIds: ['s16'],
+    aliases: ['P&L', 'งบกำไรขาดทุน', 'Income statement'],
+    origin: 'app',
+    side: 'biz',
+  },
+  {
+    id: 'roi',
+    term: 'ROI (Return on Investment)',
+    definition: '(ผลตอบแทนที่ได้ − เงินที่ลงไป) ÷ เงินที่ลงไป คิดเป็นเปอร์เซ็นต์ ใช้เทียบว่างานไหนคุ้มกว่ากัน',
+    plain: 'ขอเวลาแก้หนี้เทคนิค ถ้าบอกได้ว่าลงแรงเท่าไรและได้อะไรคืน เป็นเงินหรือเวลา Business จะอนุมัติง่ายขึ้นมาก',
+    example: '"ลงทุนทำระบบเทสต์อัตโนมัติ ฿200,000 ประหยัดค่าทดสอบมือได้ปีละ ฿500,000 ROI ปีแรก 150% ครับ"',
+    category: 'business',
+    relatedChapterIds: ['s18', 's9'],
+    aliases: ['ROI'],
+    origin: 'app',
+    side: 'biz',
+  },
+  {
+    id: 'opportunity-cost',
+    term: 'Opportunity Cost (ค่าเสียโอกาส)',
+    definition: 'มูลค่าของทางเลือกที่ดีที่สุดที่ต้องสละไป เมื่อเลือกใช้เวลา คน หรือเงินกับอีกทางหนึ่ง',
+    plain: 'ฟีเจอร์เล็กๆ ที่รับเพิ่มสองสัปดาห์ คืองานบนโรดแมปที่ต้องเลื่อนไปสองสัปดาห์',
+    example: '"รับงานลูกค้ารายนี้เพิ่มได้ แต่ Opportunity Cost คือระบบคืนเงินใหม่จะเลื่อนไปอีกหนึ่ง Sprint ครับ"',
+    category: 'business',
+    relatedChapterIds: ['s18'],
+    aliases: ['ค่าเสียโอกาส'],
+    origin: 'app',
+    side: 'biz',
+  },
+  {
+    id: 'fiscal-year-budget-cycle',
+    term: 'Fiscal Year / Budget Cycle',
+    definition: 'Fiscal Year คือรอบบัญชี 12 เดือนที่บริษัทใช้ทำงบ ไม่จำเป็นต้องตรงกับปีปฏิทิน เช่น ปีงบประมาณรัฐไทยเริ่ม 1 ตุลาคม ส่วน Budget Cycle คือรอบวางแผนและอนุมัติงบของปีถัดไป',
+    plain: 'งานที่ต้องใช้เงินซื้อเครื่องมือหรือจ้างคนเพิ่ม ถ้าไม่ได้ขอไว้ตอนทำงบ อาจต้องรอถึงปีหน้า',
+    example: '"ถ้าจะซื้อ license เครื่องมือ monitoring ต้องใส่ในงบรอบนี้ ไม่งั้นต้องรอ Fiscal Year หน้าครับ"',
+    category: 'business',
+    relatedChapterIds: ['s17'],
+    aliases: ['Fiscal Year', 'Budget Cycle', 'ปีงบประมาณ', 'รอบงบประมาณ'],
+    origin: 'app',
+    side: 'biz',
+  },
+  {
+    id: 'sales-pipeline',
+    term: 'Sales Pipeline',
+    definition: 'ดีลทั้งหมดที่ฝ่ายขายกำลังตามอยู่ แยกตามขั้น เช่น เจอลูกค้า เสนอราคา ต่อรอง และปิดดีล',
+    plain: 'ดีลที่ใกล้ปิดมักมีคำสัญญาเรื่องฟีเจอร์หรือวันส่งติดมาด้วย ดู Pipeline แล้วจะรู้ก่อนว่างานไหนกำลังมา',
+    example: '"ดีลร้านเครือใหญ่อยู่ขั้นต่อรองใน Pipeline แล้ว เขาขอ API คืนเงินแบบกลุ่มมาด้วยครับ"',
+    category: 'business',
+    relatedChapterIds: ['s19'],
+    aliases: ['Pipeline'],
+    origin: 'app',
+    side: 'biz',
+  },
+  {
+    id: 'quota',
+    term: 'Quota',
+    definition: 'เป้ายอดขายที่พนักงานขายหรือทีมขายต้องทำให้ได้ในแต่ละรอบ เช่น เดือนหรือไตรมาส มักผูกกับค่าคอมมิชชัน',
+    plain: 'ปลายไตรมาสคือช่วงที่ฝ่ายขายรีบปิดดีลให้ทัน Quota คำขอด่วนจาก Sales จึงชอบมาช่วงนี้',
+    example: '"เหลือสองสัปดาห์ปิดไตรมาส ทีมขายยังขาด Quota อีก ฿4 ล้าน เลยอยากได้ฟีเจอร์นี้ไปปิดดีลครับ"',
+    category: 'business',
+    relatedChapterIds: ['s19'],
+    aliases: ['Sales quota', 'เป้ายอดขาย'],
+    origin: 'app',
+    side: 'biz',
+  },
+  {
+    id: 'service-credit',
+    term: 'Service Credit (SLA penalty)',
+    definition: 'ส่วนลดในบิลรอบถัดไปที่ผู้ให้บริการให้ลูกค้า เมื่อทำไม่ได้ตาม SLA มักคิดเป็นเปอร์เซ็นต์ของค่าบริการเดือนนั้น ตามระดับที่พลาด',
+    plain: 'ระบบล่มเกินที่ SLA กำหนด บริษัทต้องลดค่าบริการให้ลูกค้าจริง uptime จึงเป็นตัวเลขเงิน ไม่ใช่แค่ตัวเลขบนหน้าจอ',
+    example: '"เดือนที่แล้ว uptime ต่ำกว่า 99.9% ต้องให้ Service Credit ลูกค้ารายใหญ่ 10% ของบิล ราว ฿80,000 ครับ"',
+    category: 'business',
+    relatedChapterIds: ['s19'],
+    aliases: ['Service Credit', 'SLA penalty', 'ค่าปรับ SLA'],
+    origin: 'app',
+    side: 'biz',
+  },
+  {
+    id: 'go-to-market',
+    term: 'Go-to-market (GTM)',
+    definition: 'แผนนำสินค้าหรือฟีเจอร์ออกสู่ตลาด ครอบคลุมกลุ่มลูกค้า ราคา ช่องทางขาย การตลาด และวันเปิดตัว',
+    plain: 'วันเปิดตัวในแผน GTM มักผูกกับโฆษณาที่จ่ายเงินจองไว้แล้ว ถ้าระบบไม่พร้อม ค่าโฆษณาก็เสียเปล่า',
+    example: '"แผน GTM จองโฆษณาไว้วันที่ 1 แล้ว ฟีเจอร์ต้องขึ้นก่อนวันนั้นครับ"',
+    category: 'business',
+    relatedChapterIds: ['s17', 's19'],
+    aliases: ['GTM'],
+    origin: 'app',
+    side: 'biz',
   },
 ];

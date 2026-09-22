@@ -1,11 +1,15 @@
 import React, { useMemo, useState } from 'react';
 import { Search, X } from 'lucide-react';
 import { Chapter } from '../../types';
-import { GLOSSARY_CATEGORIES, GlossaryCategory, GlossaryTerm } from '../../data/glossary';
+import { GLOSSARY_CATEGORIES, GlossaryCategory, GlossaryTerm, sortTermsForRole, termSide } from '../../data/glossary';
+import { ROLES, type Role } from '../../data/rolePerspective';
 import { tokens } from '../../styles/tokens';
 import { RichText } from '../content/RichText';
 
 export type GlossaryFilter = GlossaryCategory | 'all';
+
+/** Side chip labels (spec P4.4). */
+const SIDE_LABEL: Record<Role, string> = { biz: 'ศัพท์ฝั่ง Business', eng: 'ศัพท์ฝั่ง Engineering' };
 
 interface GlossaryPanelProps {
   terms: GlossaryTerm[];
@@ -19,6 +23,8 @@ interface GlossaryPanelProps {
   /** Controlled search query, lifted so other chapters can prefill it (s11 FAQ concept chips). */
   query?: string;
   onQueryChange?: (query: string) => void;
+  /** Reader's role: the other side's terms are listed first. Null keeps the source order. */
+  role?: Role | null;
 }
 
 const chipClass = (active: boolean) =>
@@ -40,6 +46,7 @@ export const GlossaryPanel: React.FC<GlossaryPanelProps> = ({
   onCategoryChange,
   query: controlledQuery,
   onQueryChange,
+  role = null,
 }) => {
   const [localQuery, setLocalQuery] = useState('');
   const query = controlledQuery ?? localQuery;
@@ -55,6 +62,16 @@ export const GlossaryPanel: React.FC<GlossaryPanelProps> = ({
     if (category === undefined) setLocalCategory(next);
     onCategoryChange?.(next);
   };
+
+  const [side, setSide] = useState<Role | 'all'>('all');
+
+  const sideCounts = useMemo(() => {
+    const counts: Record<Role, number> = { biz: 0, eng: 0 };
+    for (const term of terms) counts[termSide(term)] += 1;
+    return counts;
+  }, [terms]);
+
+  const orderedTerms = useMemo(() => sortTermsForRole(terms, role), [terms, role]);
 
   const categoryCounts = useMemo(() => {
     const counts = {} as Record<GlossaryCategory, number>;
@@ -72,7 +89,8 @@ export const GlossaryPanel: React.FC<GlossaryPanelProps> = ({
   const needle = query.trim().toLowerCase();
   const results = useMemo(
     () =>
-      terms.filter(term => {
+      orderedTerms.filter(term => {
+        if (side !== 'all' && termSide(term) !== side) return false;
         if (activeCategory !== 'all' && term.category !== activeCategory) return false;
         if (!needle) return true;
         const haystack = [term.term, ...(term.aliases ?? []), plainText(term.definition), term.plain ? plainText(term.plain) : '']
@@ -80,12 +98,13 @@ export const GlossaryPanel: React.FC<GlossaryPanelProps> = ({
           .toLowerCase();
         return haystack.includes(needle);
       }),
-    [terms, activeCategory, needle]
+    [orderedTerms, side, activeCategory, needle]
   );
 
   const clearFilters = () => {
     setQuery('');
     setCategory('all');
+    setSide('all');
   };
 
   return (
@@ -111,6 +130,22 @@ export const GlossaryPanel: React.FC<GlossaryPanelProps> = ({
             <X className="w-3.5 h-3.5" />
           </button>
         )}
+      </div>
+
+      {/* Side chips: filter by the term's home side */}
+      <div className="flex flex-wrap gap-1.5" role="group" aria-label="กรองตามฝั่ง">
+        {ROLES.map(r => (
+          <button
+            key={r}
+            type="button"
+            data-glossary-side={r}
+            aria-pressed={side === r}
+            onClick={() => setSide(side === r ? 'all' : r)}
+            className={chipClass(side === r)}
+          >
+            {SIDE_LABEL[r]} ({sideCounts[r]})
+          </button>
+        ))}
       </div>
 
       {/* Category chips: scroll horizontally on mobile, wrap from sm */}

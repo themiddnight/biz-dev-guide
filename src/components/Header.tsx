@@ -40,6 +40,8 @@ interface HeaderProps {
   levelMode: LevelMode;
   onLevelModeChange: (mode: LevelMode) => void;
   userStats: UserStats;
+  /** Total chapters, shown on the Guide tab. */
+  chapterCount: number;
   theme?: 'light' | 'dark' | 'system';
   setTheme?: (theme: 'light' | 'dark' | 'system') => void;
 }
@@ -54,6 +56,7 @@ export const Header: React.FC<HeaderProps> = ({
   levelMode,
   onLevelModeChange,
   userStats,
+  chapterCount,
   theme = 'system',
   setTheme,
 }) => {
@@ -172,7 +175,7 @@ export const Header: React.FC<HeaderProps> = ({
             }`}
           >
             <BookOpen className="w-3.5 h-3.5" />
-            <span>Guide [15]</span>
+            <span>Guide [{chapterCount}]</span>
           </button>
 
           <button

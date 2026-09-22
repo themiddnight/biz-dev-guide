@@ -342,6 +342,7 @@ export default function App() {
         levelMode={levelMode}
         onLevelModeChange={handleLevelModeChange}
         userStats={userStats}
+        chapterCount={CHAPTERS.length}
         theme={theme}
         setTheme={setTheme}
       />
@@ -396,6 +397,7 @@ export default function App() {
           <GamificationTab
             badges={badges}
             userStats={userStats}
+            chapterCount={CHAPTERS.length}
             onStartQuiz={() => setActiveTab('quiz')}
             onGoToGuide={() => setActiveTab('guide')}
           />

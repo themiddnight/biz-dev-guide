@@ -36,7 +36,7 @@ export const INITIAL_BADGES: Badge[] = [
   {
     id: 'deep_scholar',
     title: 'อ่านจบทุกสายงาน',
-    description: 'อ่านครบทุกส่วนตั้งแต่ PM, BA, SA จนถึง DevOps และ Support',
+    description: 'อ่านครบทุกบท ทั้งฝั่ง Business และ Engineering',
     icon: 'GraduationCap',
     category: 'reading',
     unlocked: false,

@@ -14,7 +14,7 @@ describe('FirstVisitCard', () => {
     expect(html).toContain('💼 ฉันมาจากสาย Business');
     expect(html).toContain('💻 ฉันมาจากสาย Engineering');
     expect(html).toContain('เส้นทาง: บท 1 → 4 → 5 → 6 → 9 → 10 → 11 → 13 · ≈ 98 นาที');
-    expect(html).toContain('เส้นทาง: บท 1 → 2 → 3 → 4 → 12 → 11 → 14 → 9 · ≈ 92 นาที');
+    expect(html).toContain('เส้นทาง: บท 1 → 16 → 2 → 17 → 18 → 4 → 11 → 19 → 9 · ≈ 100 นาที');
     expect(html).toContain('ไม่ระบุสาย:');
     expect(html).toContain('data-first-visit-option="beginner"');
     expect(html).toContain('data-first-visit-option="experienced"');

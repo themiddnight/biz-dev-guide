@@ -20,6 +20,8 @@ import {
 interface GamificationTabProps {
   badges: Badge[];
   userStats: UserStats;
+  /** Total chapters, the denominator of the read counter. */
+  chapterCount: number;
   onStartQuiz: () => void;
   onGoToGuide: () => void;
 }
@@ -27,6 +29,7 @@ interface GamificationTabProps {
 export const GamificationTab: React.FC<GamificationTabProps> = ({
   badges,
   userStats,
+  chapterCount,
   onStartQuiz,
   onGoToGuide,
 }) => {
@@ -108,7 +111,7 @@ export const GamificationTab: React.FC<GamificationTabProps> = ({
             <span>อ่านแล้ว</span>
           </div>
           <div className="text-xl sm:text-2xl font-extrabold text-neutral-900 dark:text-[#fafafa]">
-            {userStats.readChapters.length}/15
+            {userStats.readChapters.length}/{chapterCount}
           </div>
           <span className="text-[11px] text-neutral-400 dark:text-[#666666]">บุ๊กมาร์ก {userStats.bookmarks.length}</span>
         </div>

@@ -348,7 +348,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
               <span>โหมดอ่านทีละบท พร้อมสารบัญกระโดดข้ามได้ตลอดเวลา</span>
             </div>
             <h2 className="text-lg sm:text-2xl font-extrabold text-neutral-900 dark:text-[#fafafa] tracking-tight">
-              คู่มือสองโลก Business ↔ Engineering (15 บท เริ่มจากศูนย์)
+              คู่มือสองโลก Business ↔ Engineering ({chapters.length} บท เริ่มจากศูนย์)
             </h2>
             <p className="text-xs sm:text-sm text-neutral-500 dark:text-[#8e8e8e] leading-relaxed font-normal">
               มีตั้งแต่จุดเริ่มต้นสำหรับมือใหม่ ศัพท์เทคนิคแปลเป็นภาษาคน ตัวอย่างบทสนทนาจริงในที่ทำงาน แผนภาพจำลองระบบ และทางออกของข้อขัดแย้ง
@@ -362,7 +362,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
               className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:hover:bg-neutral-200 dark:text-[#0a0a0a] text-xs sm:text-sm font-semibold shadow-xs transition-all cursor-pointer"
             >
               <List className="w-4 h-4" />
-              <span>สารบัญทั้ง 15 บท (Index)</span>
+              <span>สารบัญทั้ง {chapters.length} บท (Index)</span>
             </button>
 
             <button
@@ -409,7 +409,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
             <div className="flex items-center justify-between pb-2 border-b border-neutral-100 dark:border-[#262626]">
               <div className="flex items-center gap-2">
                 <List className="w-4 h-4 text-neutral-900 dark:text-white" />
-                <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">สารบัญบทเรียน (15 บท)</h3>
+                <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">สารบัญบทเรียน ({chapters.length} บท)</h3>
               </div>
               <span className="text-[11px] font-semibold text-neutral-500 dark:text-[#8e8e8e]">
                 บทที่ {activeIndex + 1}/{chapters.length}
@@ -443,6 +443,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                 { id: 'eng', label: 'Dev' },
                 { id: 'qa', label: 'QA' },
                 { id: 'friction', label: 'ขัดแย้ง' },
+                { id: 'biz', label: 'ธุรกิจ' },
               ].map((role) => (
                 <button
                   key={role.id}
@@ -551,7 +552,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                 className="lg:hidden px-3 py-2 rounded-xl bg-neutral-100 dark:bg-[#1f1f1f] hover:bg-neutral-200 text-neutral-700 dark:text-[#d4d4d4] text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
               >
                 <List className="w-3.5 h-3.5" />
-                <span>สารบัญ ({activeChapter.num}/15)</span>
+                <span>สารบัญ ({activeChapter.num}/{chapters.length})</span>
               </button>
 
               {/* Current Chapter Indicator on Desktop */}
@@ -842,7 +843,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
               <div>
                 <h3 className="font-bold text-base text-neutral-900 dark:text-[#fafafa] flex items-center gap-2">
                   <List className="w-4 h-4 text-neutral-600 dark:text-[#a3a3a3]" />
-                  <span>สารบัญทั้ง 15 บท</span>
+                  <span>สารบัญทั้ง {chapters.length} บท</span>
                 </h3>
                 <p className="text-xs text-neutral-500 dark:text-[#8e8e8e] mt-0.5">
                   อ่านแล้ว {readChapters.length}/{chapters.length} บท • เลือกเพื่อกระโดดข้ามทันที
@@ -883,6 +884,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                   { id: 'eng', label: 'Dev' },
                   { id: 'qa', label: 'QA' },
                   { id: 'friction', label: 'ขัดแย้ง' },
+                  { id: 'biz', label: 'ธุรกิจ' },
                 ].map((role) => (
                   <button
                     key={role.id}
