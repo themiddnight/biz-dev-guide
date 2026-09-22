@@ -33,6 +33,9 @@ const SummaryChevron = () => (
 // Guards against keys missing at runtime (e.g. stale data) even though FIGURES is typed as complete.
 const getFigure = (key: FigureKey): React.FC<FigureProps> | undefined => FIGURES[key];
 
+// Figures drawn ≥600 units wide: keep labels legible on narrow screens by scrolling inside the figure only.
+const WIDE_FIGURES: ReadonlySet<FigureKey> = new Set<FigureKey>(['three-lenses', 'c4-l1-hero']);
+
 interface BlockProps {
   block: ContentBlock;
   onNavigateChapter?: (chapterId: string) => void;
@@ -59,7 +62,15 @@ const Block: React.FC<BlockProps> = ({ block, onNavigateChapter }) => {
       return (
         <figure className="space-y-2">
           {block.title && <div className={blockTitleClass}>{block.title}</div>}
-          <Figure className="w-full h-auto" />
+          {WIDE_FIGURES.has(block.figureKey) ? (
+            <div className="overflow-x-auto">
+              <div className="min-w-[520px]">
+                <Figure className="w-full h-auto" />
+              </div>
+            </div>
+          ) : (
+            <Figure className="w-full h-auto" />
+          )}
           {block.caption && (
             <figcaption className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e] leading-relaxed">
               {rich(block.caption)}

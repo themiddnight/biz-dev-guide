@@ -52,6 +52,126 @@ export const CHAPTER_CONTENT: Record<string, ChapterContentSection[]> = {
     },
   ],
 
+  // Static s5 lines 757–925 (T1 in the Diagram section; 5.2 and 5.3 in Reference)
+  s5: [
+    {
+      placement: 'diagram',
+      blocks: [
+        {
+          kind: 'table',
+          id: 's5-diagram-types',
+          title: 'ตารางอ้างอิง — ไดอะแกรมแต่ละชนิดใช้ตอนไหน อ่านโดยใคร',
+          collapsed: true,
+          columns: [
+            { key: 'type', label: 'ชนิด' },
+            { key: 'family', label: 'หมวด', widthHint: 'narrow' },
+            { key: 'question', label: 'ตอบคำถามอะไร', widthHint: 'wide' },
+            { key: 'reader', label: 'คนอ่านหลัก' },
+          ],
+          rows: [
+            { cells: { type: 'C4 context (L1)', family: 'โครงสร้าง', question: 'ระบบเราไปแตะใครบ้าง', reader: 'ทุกคน รวมคนไม่เทคนิค' } },
+            { cells: { type: 'C4 container (L2)', family: 'โครงสร้าง', question: 'ระบบประกอบด้วยส่วนที่รันแยกกันอะไรบ้าง', reader: 'คนเทคนิค' } },
+            { cells: { type: 'Component / module map', family: 'โครงสร้าง', question: 'ข้างในส่วนหนึ่งมีก้อนย่อยอะไร', reader: 'architect · tech lead' } },
+            { cells: { type: 'ERD', family: 'โครงสร้าง', question: 'ข้อมูลมีตารางอะไร เชื่อมกันด้วยอะไร', reader: 'dev · data analyst' } },
+            { cells: { type: 'Use case', family: 'พฤติกรรม', question: 'ใครทำอะไรกับระบบได้บ้าง', reader: 'BA · QA · business' } },
+            { cells: { type: 'Sequence', family: 'พฤติกรรม', question: 'ใน 1 สถานการณ์ ใครเรียกใครตามลำดับไหน', reader: 'dev · QA' } },
+            { cells: { type: 'State machine', family: 'พฤติกรรม', question: 'สิ่งหนึ่งมีสถานะอะไรได้บ้าง เปลี่ยนเมื่อไหร่', reader: 'dev · BA' } },
+            { cells: { type: 'User flow', family: 'พฤติกรรม', question: 'ผู้ใช้เดินผ่านหน้าจอไหนบ้างกว่าจะถึงเป้าหมาย', reader: 'designer · PM' } },
+            { cells: { type: 'Swimlane / BPMN', family: 'กระบวนการ', question: 'งานส่งต่อระหว่างคน/แผนกยังไง อนุมัติตรงไหน', reader: 'business · ops' } },
+            { cells: { type: 'Customer journey map', family: 'กระบวนการ', question: 'ลูกค้ารู้สึกยังไงในแต่ละช่วงของการใช้บริการ', reader: 'PM · marketing · designer' } },
+            { cells: { type: 'Wireframe / mockup', family: 'หน้าจอ', question: 'หน้าตาและตำแหน่งของสิ่งต่างๆ บนจอ', reader: 'ทุกคน' } },
+            { cells: { type: 'Mind map / affinity', family: 'จัดระเบียบความคิด', question: 'ไอเดียดิบๆ จัดกลุ่มได้ยังไง', reader: 'ทีมตอน workshop' } },
+            { cells: { type: 'Gantt / roadmap', family: 'แผนและเวลา', question: 'งานไหนทำก่อนหลัง เสร็จเมื่อไหร่', reader: 'PjM · ผู้บริหาร' } },
+            { cells: { type: 'Dependency graph', family: 'แผนและเวลา', question: 'อะไรต้องเสร็จก่อนอะไรถึงเริ่มได้', reader: 'architect · PjM' } },
+          ],
+          footnote: 'ไม่ต้องรู้จักครบทุกชนิด — ในการทำงานจริงส่วนใหญ่ใช้ซ้ำๆ อยู่ 3-4 ชนิดเท่านั้น ตารางนี้มีไว้ให้เปิดดูตอนไปเจอชื่อที่ไม่คุ้นในที่ประชุม',
+          mobile: 'stack',
+        },
+      ],
+    },
+    {
+      heading: '5.2 สามมุมมองที่ใช้ในงาน solution design',
+      blocks: [
+        {
+          kind: 'figure',
+          id: 's5-three-lenses',
+          figureKey: 'three-lenses',
+          title: 'ภาพที่ 4 — ระบบเดียวกัน มองด้วยเลนส์สามแบบ ได้คนละภาพ',
+          caption: 'สองมุมแรกบอกว่า "มีอะไรอยู่" มุมที่สามเท่านั้นที่บอกเรื่อง "เวลา" — ระบบที่มีชิ้นส่วนครบทุกอย่างยังพังได้ ถ้าลำดับการเรียกผิด',
+        },
+        {
+          kind: 'table',
+          id: 's5-three-views',
+          columns: [
+            { key: 'doc', label: 'เอกสาร' },
+            { key: 'question', label: 'ตอบคำถามว่า', widthHint: 'wide' },
+            { key: 'reader', label: 'ผู้อ่านหลัก' },
+          ],
+          rows: [
+            { cells: { doc: '**High-level solution**\nSystem context / C4 level 1', question: 'ขอบเขตระบบอยู่ตรงไหน ใคร/อะไรแตะมันบ้าง', reader: 'ผู้บริหาร ลูกค้าที่ไม่สนใจรายละเอียด' } },
+            { cells: { doc: '**Module + function mapping**\nStatic structure', question: 'ข้างในมีความสามารถอะไรบ้าง แต่ละก้อนพึ่งพากันยังไง', reader: 'Architect / tech lead แบ่งงาน ประเมินเวลา' } },
+            { cells: { doc: '**Use case / sequence diagram**\nDynamic behavior', question: 'สถานการณ์จริงหนึ่งอันไหลผ่านระบบยังไงตามลำดับเวลา', reader: 'Developer ที่ implement, QA ที่เขียน test case' } },
+          ],
+          footnote: 'ในตัวอย่างแอปสั่งอาหาร: high-level solution บอกว่ามี "ลูกค้า" "ร้านค้า" "rider" เป็น actor และเชื่อมกับ payment gateway/maps API ภายนอก, module mapping แจกแจงว่ามี module อย่าง Cart, Order, Payment, Rider matching, Notification และแต่ละอันเชื่อมกันยังไง, ส่วน sequence diagram ลงรายละเอียด scenario เช่น "ร้านปิดกะทันหันหลังลูกค้าสั่งไปแล้ว" ว่าระบบจัดการยังไงทีละสเต็ป',
+          mobile: 'stack',
+        },
+        {
+          kind: 'note',
+          id: 's5-sequence-note',
+          tone: 'info',
+          body: 'Use case diagram เองก็ยังตอบเรื่อง "เวลา/ลำดับ" ไม่ได้ ต้องเป็น **sequence diagram** โดยเฉพาะถึงจะเห็น step ที่ระบบ "รอ (async)" ก่อนไปสเต็ปถัดไป',
+        },
+        {
+          kind: 'details',
+          id: 's5-nfr-sequence',
+          summary: 'ตัวอย่างการต่อจุด: NFR ไปโผล่ใน sequence diagram ได้ยังไง',
+          body: [
+            {
+              kind: 'note',
+              id: 's5-nfr-sequence-steps',
+              tone: 'info',
+              body: 'สมมติมี NFR ว่า "ร้านต้องกดรับออเดอร์ภายใน 2 นาที ถ้าเกินต้องเสนอร้านอื่น" ตัวเลขนี้ไม่ได้ถูกก๊อบไปแปะทุกที่ แต่ "โยง" กันไว้:\n1. เกิดตอน elicit → เก็บเป็น NFR แยกจาก feature list\n2. traceability โยง NFR ไปหา mechanism ที่รองรับ (เช่น timeout/re-route logic ใน order module)\n3. sequence diagram ปัก annotation สั้นๆ ตรง arrow ที่รอ เช่น "async wait — ref NFR ร้านรับออเดอร์" ไม่ก๊อบเนื้อหาเต็ม\n4. engineer ตามรอย reference กลับไปหาตัวเลขจริงมาใส่ config\n\nหลักการเดียวกับ DRY ในโค้ด — แก้ตัวเลขที่เดียว ไม่ต้องไล่แก้ทุกไดอะแกรมที่อ้างถึง',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      heading: '5.3 มาตรฐานการวาดไดอะแกรมที่เจอบ่อย',
+      blocks: [
+        {
+          kind: 'table',
+          id: 's5-standards',
+          columns: [
+            { key: 'standard', label: 'มาตรฐาน', widthHint: 'narrow' },
+            { key: 'owner', label: 'ดูแลโดย' },
+            { key: 'use', label: 'ใช้ทำอะไร' },
+            { key: 'examples', label: 'ตัวอย่างไดอะแกรม' },
+          ],
+          rows: [
+            { cells: { standard: '**UML**', owner: 'OMG', use: 'โครงสร้าง + พฤติกรรมของซอฟต์แวร์', examples: 'Class, Component, Use case, Sequence, Activity, State machine' } },
+            { cells: { standard: '**C4 Model**', owner: 'Simon Brown (อิสระ ไม่ใช่ OMG)', use: 'ภาพรวมสถาปัตยกรรมแบบซูมทีละระดับ เบากว่า UML', examples: 'Context, Container, Component, Code' } },
+            { cells: { standard: '**BPMN**', owner: 'OMG', use: 'กระบวนการทางธุรกิจข้ามแผนก/บทบาท', examples: 'Swimlane / cross-functional flowchart' } },
+          ],
+          mobile: 'stack',
+        },
+        {
+          kind: 'note',
+          id: 's5-standards-note',
+          tone: 'info',
+          body: 'UML กับ BPMN ดูแลโดยองค์กรเดียวกัน (OMG) แต่คนละจุดเน้น — UML มองจากมุมซอฟต์แวร์ BPMN มองจากมุม process ธุรกิจ ส่วน C4 เป็น convention ที่ได้รับความนิยมจนกลายเป็นมาตรฐานโดยพฤตินัย ไม่ใช่มาตรฐานทางการของ OMG',
+        },
+        {
+          kind: 'figure',
+          id: 's5-c4-l1-hero',
+          figureKey: 'c4-l1-hero',
+          title: 'ภาพที่ 5 — ถ้าจะอ่านออกแค่ภาพเดียวในชีวิต ให้เป็นภาพนี้ (C4 level 1)',
+          caption: 'ใช้เวลาเรียนไม่ถึง 10 นาที และเป็นภาพที่คุ้มที่สุดสำหรับคนฝั่ง business — เพราะทุกครั้งที่คุณขอฟีเจอร์ใหม่ คำถามแรกคือมันไปแตะกล่องไหนบ้าง ดูอีก 3 ระดับที่ลึกลงไปได้ที่ Interactive C4 Model Explorer ในส่วนแผนภาพด้านบน',
+        },
+      ],
+    },
+  ],
+
   // Static s12 lines 1773–1787
   s12: [
     {
@@ -406,3 +526,38 @@ export const CHAPTER_CONTENT: Record<string, ChapterContentSection[]> = {
     },
   ],
 };
+
+/**
+ * Static s5 lines 1091–1103: table T4 and the quick-pick tip, rendered inside
+ * `SwimlaneVsSequence` (Diagram section) rather than through `CHAPTER_CONTENT`.
+ */
+export const S5_SWIMLANE_SEQUENCE_BLOCKS: ChapterContentSection[] = [
+  {
+    placement: 'diagram',
+    blocks: [
+      {
+        kind: 'table',
+        id: 's5-swimlane-vs-sequence-table',
+        columns: [
+          { key: 'aspect', label: '', widthHint: 'narrow' },
+          { key: 'swimlane', label: 'Swimlane' },
+          { key: 'sequence', label: 'Sequence' },
+        ],
+        rows: [
+          { cells: { aspect: 'จัดตาม', swimlane: 'ผู้รับผิดชอบ (คน/แผนก/ระบบ)', sequence: 'ผู้เกี่ยวข้อง + เวลาที่ไหลลงล่าง' } },
+          { cells: { aspect: 'เน้น', swimlane: 'การส่งต่องาน จุดอนุมัติ ทางแยกตัดสินใจ', sequence: 'ลำดับการเรียก การตอบกลับ และการรอ' } },
+          { cells: { aspect: 'เหมาะกับ', swimlane: 'งานที่มีคนทำเอง มีหลายแผนกเกี่ยวข้อง', sequence: 'ระบบคุยกับระบบ หรือ flow ที่ลำดับสำคัญมาก' } },
+          { cells: { aspect: 'คนอ่านหลัก', swimlane: 'business · ops · ผู้บริหาร', sequence: 'developer · QA' } },
+          { cells: { aspect: 'มาตรฐาน', swimlane: 'BPMN', sequence: 'UML' } },
+        ],
+        mobile: 'scroll',
+      },
+      {
+        kind: 'note',
+        id: 's5-swimlane-vs-sequence-tip',
+        tone: 'ok',
+        body: '**วิธีเลือกแบบเร็วๆ** — ถ้าคำถามที่ต้องตอบขึ้นต้นด้วย "ใครเป็นคนทำขั้นนี้" ให้ใช้ swimlane / ถ้าขึ้นต้นด้วย "แล้วเกิดอะไรต่อ" หรือ "ตรงนี้รออะไรอยู่" ให้ใช้ sequence — และถ้าเป็นการคุยกับฝั่ง business ที่ยังไม่คุ้นสัญลักษณ์ swimlane มักเป็นจุดเริ่มที่ปลอดภัยกว่า เพราะกล่องกับลูกศรตีความได้ตรงไปตรงมากว่า',
+      },
+    ],
+  },
+];
