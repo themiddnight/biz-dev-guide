@@ -48,6 +48,20 @@ describe('copy budgets', () => {
         over(v, at(`jargon[${j.term}].formalDefinition`), j.formalDefinition, 140);
         over(v, at(`jargon[${j.term}].meetingExample`), j.meetingExample, 160);
       });
+      // Other-side views (role-perspective spec P2.3).
+      for (const side of ['biz', 'eng'] as const) {
+        const view = ch.perspectives?.[side];
+        if (!view) continue;
+        const pv = (f: string) => at(`perspectives.${side}.${f}`);
+        over(v, pv('measuredBy'), view.measuredBy, 90);
+        view.fears.forEach((f, i) => over(v, pv(`fears[${i}]`), f, 70));
+        view.saysVsHears.forEach((row, i) => {
+          over(v, pv(`saysVsHears[${i}].youSay`), row.youSay, 60);
+          over(v, pv(`saysVsHears[${i}].theyHear`), row.theyHear, 70);
+          over(v, pv(`saysVsHears[${i}].sayInstead`), row.sayInstead, 80);
+        });
+        view.askThem.forEach((q, i) => over(v, pv(`askThem[${i}]`), q, 70));
+      }
     }
     expect(v).toEqual([]);
   });

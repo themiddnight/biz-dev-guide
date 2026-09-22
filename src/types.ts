@@ -1,5 +1,5 @@
 import type { SectionKey } from './data/sectionLayers';
-import type { ChapterHome } from './data/rolePerspective';
+import type { ChapterHome, Role } from './data/rolePerspective';
 
 export type ExperienceLevel = 'beginner' | 'experienced';
 
@@ -191,6 +191,24 @@ export interface RoleMindsetGuide {
   bridgeAdvice: string;
 }
 
+/** What one side typically says, how the other side hears it, and a rewrite that lands. */
+export interface SaysVsHears {
+  youSay: string; // what the READER's side typically says
+  theyHear: string; // how the explained side hears it
+  sayInstead: string; // a rewrite that lands
+}
+
+/** How one side sees this chapter's topic, written for a reader from the other side (spec P2.1). */
+export interface SideView {
+  measuredBy: string; // what this side is judged on, for this topic
+  fears: [string, string]; // two concrete, topic-specific fears
+  saysVsHears: [SaysVsHears, SaysVsHears];
+  askThem: string[]; // 2-3 questions the reader should ask this side
+}
+
+/** Key = the side being explained. A Dev reads `perspectives.biz`. */
+export type ChapterPerspectives = Record<Role, SideView>;
+
 export interface Chapter {
   id: string;
   num: number;
@@ -218,6 +236,7 @@ export interface Chapter {
   heroFigure?: ChapterHeroFigure;
   frictionPlaybook?: FrictionPlaybook;
   contentSections?: ChapterContentSection[];
+  perspectives?: ChapterPerspectives; // merged from chapterPerspectives.ts; required by a test
 }
 
 export interface QuizQuestion {

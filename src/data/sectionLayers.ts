@@ -5,22 +5,22 @@ export type Layer = 'core' | 'apply' | 'deep';
 export const LAYERS: readonly Layer[] = ['core', 'apply', 'deep'];
 
 export type SectionKey =
-  | 'mindset' | 'friction' | 'primer' | 'jargon' | 'dialogue' | 'diagram' | 'faq'
+  | 'mindset' | 'otherSide' | 'friction' | 'primer' | 'jargon' | 'dialogue' | 'diagram' | 'faq'
   | 'examples' | 'coreConcepts' | 'reference' | 'glossary' | 'workflow' | 'pitfalls' | 'checklist';
 
 export const SECTION_KEYS: readonly SectionKey[] = [
-  'mindset', 'friction', 'primer', 'jargon', 'dialogue', 'diagram', 'faq',
+  'mindset', 'otherSide', 'friction', 'primer', 'jargon', 'dialogue', 'diagram', 'faq',
   'examples', 'coreConcepts', 'reference', 'glossary', 'workflow', 'pitfalls', 'checklist',
 ];
 
 export const LAYER_CONFIG: Record<ExperienceLevel, Record<Layer, readonly SectionKey[]>> = {
   beginner: {
-    core: ['primer', 'jargon', 'diagram'],
+    core: ['primer', 'otherSide', 'jargon', 'diagram'],
     apply: ['dialogue', 'examples', 'workflow', 'checklist', 'faq', 'friction'],
     deep: ['coreConcepts', 'pitfalls', 'reference', 'glossary', 'mindset'],
   },
   experienced: {
-    core: ['coreConcepts', 'pitfalls', 'diagram'],
+    core: ['otherSide', 'coreConcepts', 'pitfalls', 'diagram'],
     apply: ['friction', 'dialogue', 'workflow', 'checklist', 'faq', 'examples'],
     deep: ['primer', 'jargon', 'reference', 'glossary', 'mindset'],
   },
@@ -47,6 +47,7 @@ export const SECTION_META: Record<SectionKey, { chip: string; minutes: number }>
   reference: { chip: 'อ้างอิง', minutes: 3 },
   glossary: { chip: 'รวมคำศัพท์', minutes: 5 },
   mindset: { chip: 'วิธีคิดแต่ละบทบาท', minutes: 2 },
+  otherSide: { chip: 'อีกฝั่งมองยังไง', minutes: 2 },
 };
 
 /** Layer header name (spec §2.3) and short outline label (spec §2.1). */
@@ -105,6 +106,7 @@ export function hasDiagramContent(chapter: Chapter): boolean {
 export function isSectionPresent(chapter: Chapter, key: SectionKey): boolean {
   switch (key) {
     case 'mindset': case 'friction': return true;
+    case 'otherSide': return !!chapter.perspectives;
     case 'diagram': return hasDiagramContent(chapter);
     case 'primer': return !!chapter.beginnerPrimer;
     case 'jargon': return (chapter.jargonList?.length ?? 0) > 0;

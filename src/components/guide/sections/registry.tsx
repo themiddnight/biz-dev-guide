@@ -6,6 +6,7 @@ import type { GlossaryFilter } from '../../glossary/GlossaryPanel';
 import { RoleMindsetCard } from '../../RoleMindsetCard';
 import { FrictionPlaybookCard } from '../../FrictionPlaybookCard';
 import type { SectionKey } from '../../../data/sectionLayers';
+import type { Role } from '../../../data/rolePerspective';
 import { PrimerSection } from './PrimerSection';
 import { JargonSection } from './JargonSection';
 import { DialogueSection } from './DialogueSection';
@@ -18,6 +19,10 @@ import { GlossarySection } from './GlossarySection';
 import { WorkflowSection } from './WorkflowSection';
 import { PitfallsSection } from './PitfallsSection';
 import { ChecklistSection } from './ChecklistSection';
+import { OtherSideSection } from './OtherSideSection';
+
+/** Which side the other-side box shows (spec P2.2). Session state in GuideTab, not persisted. */
+export type OtherSideView = Role | 'both';
 
 export interface GuideSectionContext {
   chapters: Chapter[];                                      // GlossaryPanel needs the chapter list (not in spec §1.7; required by the glossary block)
@@ -31,6 +36,8 @@ export interface GuideSectionContext {
   glossaryQuery: string; setGlossaryQuery: (q: string) => void;
   c4Level: number; setC4Level: (n: number) => void;
   checkedChecklist: Record<string, boolean>; onToggleChecklistItem: (key: string) => void;
+  role: Role | null;
+  otherSideView: OtherSideView; setOtherSideView: (v: OtherSideView) => void;
 }
 
 export interface SectionProps { chapter: Chapter; isOpen: boolean; onToggle: () => void; ctx: GuideSectionContext }
@@ -51,6 +58,7 @@ export const FrictionSection: React.FC<SectionProps> = ({ chapter, isOpen, onTog
 
 export const SECTION_COMPONENTS: Record<SectionKey, React.FC<SectionProps>> = {
   mindset: MindsetSection,
+  otherSide: OtherSideSection,
   friction: FrictionSection,
   primer: PrimerSection,
   jargon: JargonSection,

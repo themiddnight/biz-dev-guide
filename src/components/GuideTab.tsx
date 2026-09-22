@@ -4,7 +4,7 @@ import { CHAPTER_START_ID, scrollToChapterStart } from '../lib/chapterScroll';
 import { S5_JUMP_TARGET_IDS, DiagramJumpTarget } from '../data/diagramFamilies';
 import { GlossaryFilter } from './glossary/GlossaryPanel';
 import { GLOSSARY, GlossaryCategory } from '../data/glossary';
-import { SECTION_COMPONENTS, type GuideSectionContext } from './guide/sections/registry';
+import { SECTION_COMPONENTS, type GuideSectionContext, type OtherSideView } from './guide/sections/registry';
 import {
   getChapterLayout,
   deriveOpenState,
@@ -176,6 +176,13 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   const layout = useMemo(() => getChapterLayout(chapterLevel, activeChapter), [chapterLevel, activeChapter]);
   const [openState, setOpenState] = useState<OpenState>(() => deriveOpenState(layout, activeChapter.id));
 
+  // Other-side box: defaults to the other side (both when no role); resets on role change, not persisted (spec P2.2).
+  const defaultOtherSideView: OtherSideView = role ? otherRole(role) : 'both';
+  const [otherSideView, setOtherSideView] = useState<OtherSideView>(defaultOtherSideView);
+  useEffect(() => {
+    setOtherSideView(defaultOtherSideView);
+  }, [role]);
+
   // Each chapter (and each level) opens at its Core (spec §1.4, D3).
   useEffect(() => {
     setOpenState(deriveOpenState(layout, activeChapter.id));
@@ -295,6 +302,8 @@ export const GuideTab: React.FC<GuideTabProps> = ({
     glossaryQuery, setGlossaryQuery,
     c4Level, setC4Level,
     checkedChecklist, onToggleChecklistItem: toggleChecklistItem,
+    role,
+    otherSideView, setOtherSideView,
   };
 
   // Filtered chapters for the Index

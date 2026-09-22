@@ -19,14 +19,19 @@ const core = (level: ExperienceLevel, id: string) =>
   getChapterLayout(level, ch(id)).find(g => g.layer === 'core')!.sections;
 
 describe('LAYER_CONFIG', () => {
-  it.each(LEVELS)('%s contains all 14 keys exactly once', level => {
+  it.each(LEVELS)('%s contains all 15 keys exactly once', level => {
     const all = LAYERS.flatMap(l => LAYER_CONFIG[level][l]);
-    expect(all).toHaveLength(14);
+    expect(all).toHaveLength(15);
     expect([...all].sort()).toEqual([...SECTION_KEYS].sort());
   });
   it('isSectionKey accepts keys and rejects others', () => {
     expect(isSectionKey('diagram')).toBe(true);
     expect(isSectionKey('xyz')).toBe(false);
+  });
+  it('core puts otherSide after the primer for beginners and first for experienced (P2.2)', () => {
+    expect(LAYER_CONFIG.beginner.core).toEqual(['primer', 'otherSide', 'jargon', 'diagram']);
+    expect(LAYER_CONFIG.experienced.core).toEqual(['otherSide', 'coreConcepts', 'pitfalls', 'diagram']);
+    expect(SECTION_META.otherSide).toEqual({ chip: 'อีกฝั่งมองยังไง', minutes: 2 });
   });
 });
 
@@ -36,8 +41,8 @@ describe('role-resolved layout', () => {
     return getChapterLayout(level, ch(id)).find(g => g.layer === 'core')!.sections;
   };
   it('s6 opens as experienced for eng and beginner for biz', () => {
-    expect(coreFor('eng', 's6')).toEqual(['coreConcepts', 'pitfalls', 'diagram']);
-    expect(coreFor('biz', 's6')).toEqual(['primer', 'jargon', 'diagram']);
+    expect(coreFor('eng', 's6')).toEqual(['otherSide', 'coreConcepts', 'pitfalls', 'diagram']);
+    expect(coreFor('biz', 's6')).toEqual(['primer', 'otherSide', 'jargon', 'diagram']);
   });
 });
 
@@ -61,10 +66,10 @@ describe('getLayerOf', () => {
 
 describe('getChapterLayout', () => {
   it('beginner s1 core', () => {
-    expect(core('beginner', 's1')).toEqual(['primer', 'jargon']);
+    expect(core('beginner', 's1')).toEqual(['primer', 'otherSide', 'jargon']);
   });
   it('experienced s1 core', () => {
-    expect(core('experienced', 's1')).toEqual(['coreConcepts', 'pitfalls']);
+    expect(core('experienced', 's1')).toEqual(['otherSide', 'coreConcepts', 'pitfalls']);
   });
   it('always returns 3 groups in LAYERS order', () => {
     for (const level of LEVELS) for (const c of CHAPTERS) {
@@ -72,8 +77,8 @@ describe('getChapterLayout', () => {
     }
   });
   it('s15 has no jargon; glossary leads core for both levels', () => {
-    expect(core('beginner', 's15')).toEqual(['glossary', 'primer', 'diagram']);
-    expect(core('experienced', 's15')).toEqual(['glossary', 'coreConcepts', 'pitfalls', 'diagram']);
+    expect(core('beginner', 's15')).toEqual(['glossary', 'primer', 'otherSide', 'diagram']);
+    expect(core('experienced', 's15')).toEqual(['glossary', 'otherSide', 'coreConcepts', 'pitfalls', 'diagram']);
     for (const level of LEVELS) {
       const keys = getChapterLayout(level, ch('s15')).flatMap(g => g.sections);
       expect(keys).not.toContain('jargon');
@@ -87,13 +92,13 @@ describe('getChapterLayout', () => {
       expect(rest('s11')).not.toContain('faq');
       expect(rest('s15')).not.toContain('glossary');
     }
-    expect(core('beginner', 's11')).toEqual(['faq', 'primer', 'jargon', 'diagram']);
+    expect(core('beginner', 's11')).toEqual(['faq', 'primer', 'otherSide', 'jargon', 'diagram']);
   });
   it('layer minutes = sum of SECTION_META minutes', () => {
     for (const g of getChapterLayout('beginner', ch('s1'))) {
       expect(g.minutes).toBe(g.sections.reduce((s, k) => s + SECTION_META[k].minutes, 0));
     }
-    expect(getChapterLayout('beginner', ch('s1'))[0].minutes).toBe(4); // primer + jargon; s1 has no Diagram section after Q4
+    expect(getChapterLayout('beginner', ch('s1'))[0].minutes).toBe(6); // primer + otherSide + jargon; s1 has no Diagram section after Q4
   });
 });
 
@@ -106,8 +111,8 @@ describe('isSectionPresent', () => {
   it('reference exactly in s1, s2, s5, s6, s8, s12, s13, s14', () => {
     expect(idsWith('reference')).toEqual(['s1', 's2', 's5', 's6', 's8', 's12', 's13', 's14']);
   });
-  it('mindset, friction in every chapter', () => {
-    for (const key of ['mindset', 'friction'] as SectionKey[]) expect(idsWith(key)).toHaveLength(15);
+  it('mindset, friction, otherSide in every chapter', () => {
+    for (const key of ['mindset', 'friction', 'otherSide'] as SectionKey[]) expect(idsWith(key)).toHaveLength(15);
   });
   it('diagram in every chapter except s1 (widget moved to s8, Q4) and s14 (Q6)', () => {
     expect(idsWith('diagram')).toHaveLength(13);

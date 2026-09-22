@@ -5,6 +5,7 @@ import { chapters11_15 } from './chapters/chapters11_15';
 import { FRICTION_PLAYBOOKS } from './frictionPlaybooks';
 import { CHAPTER_CONTENT } from './chapterContentBlocks';
 import { CHAPTER_HERO_FIGURES } from './chapterHeroFigures';
+import { CHAPTER_PERSPECTIVES } from './chapterPerspectives';
 
 export const CHAPTERS: Chapter[] = [
   ...chapters1_5,
@@ -17,6 +18,7 @@ export const CHAPTERS: Chapter[] = [
     ...chapter,
     frictionPlaybook: frictionPlaybook || undefined,
     contentSections: contentSections || undefined,
-    heroFigure: CHAPTER_HERO_FIGURES[chapter.id]
+    heroFigure: CHAPTER_HERO_FIGURES[chapter.id],
+    perspectives: CHAPTER_PERSPECTIVES[chapter.id]
   };
 });

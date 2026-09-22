@@ -1,5 +1,5 @@
 import React from 'react';
-import { Clock, Check, Sparkles, Info, CheckCircle2 } from 'lucide-react';
+import { Clock, Check, Sparkles } from 'lucide-react';
 import type { Chapter, ExperienceLevel } from '../../types';
 import { HeroFigure } from './HeroFigure';
 
@@ -63,44 +63,19 @@ export const ChapterHero: React.FC<ChapterHeroProps> = ({ chapter, experienceLev
         </p>
       </div>
 
-      {/* Quick Metaphor & Perspectives Box */}
-      <div className="space-y-3">
-        {/* Plain Language Metaphor (เปรียบแบบบ้านๆ); hero chapters show it as one line under the figure */}
-        {chapter.heroFigure ? null : experienceLevel === 'beginner' ? (
-          <div className={analogyClassName} data-analogy>
-            {analogyHeading}
-            {analogyBody}
-          </div>
-        ) : (
-          <details className={analogyClassName} data-analogy>
-            <summary className="cursor-pointer">{analogyHeading}</summary>
-            {analogyBody}
-          </details>
-        )}
-
-        {/* Audience Perspectives (Business & Engineer Notes) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-1.5">
-            <div className="flex items-center gap-2 text-xs font-bold text-amber-800 dark:text-amber-300">
-              <Info className="w-4 h-4 text-amber-500" />
-              <span>มุมมองฝั่ง Business</span>
-            </div>
-            <p className="text-xs text-neutral-600 dark:text-[#a3a3a3] leading-relaxed font-normal">
-              {chapter.businessNote}
-            </p>
-          </div>
-
-          <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-1.5">
-            <div className="flex items-center gap-2 text-xs font-bold text-blue-800 dark:text-blue-300">
-              <CheckCircle2 className="w-4 h-4 text-blue-500" />
-              <span>มุมมองฝั่ง Engineer</span>
-            </div>
-            <p className="text-xs text-neutral-600 dark:text-[#a3a3a3] leading-relaxed font-normal">
-              {chapter.engineerNote}
-            </p>
-          </div>
+      {/* Quick Metaphor. Hero chapters show it as one line under the figure.
+          The business/engineer notes moved to OtherSideSection (spec D7). */}
+      {chapter.heroFigure ? null : experienceLevel === 'beginner' ? (
+        <div className={analogyClassName} data-analogy>
+          {analogyHeading}
+          {analogyBody}
         </div>
-      </div>
+      ) : (
+        <details className={analogyClassName} data-analogy>
+          <summary className="cursor-pointer">{analogyHeading}</summary>
+          {analogyBody}
+        </details>
+      )}
     </>
   );
 };
