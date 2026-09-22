@@ -31,6 +31,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
     ],
     xp: 25,
     forRole: 'both',
+    chapterId: 's2',
   },
   {
     id: 2,
@@ -62,6 +63,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
     ],
     xp: 25,
     forRole: 'both',
+    chapterId: 's4',
   },
   {
     id: 3,
@@ -93,6 +95,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
     ],
     xp: 25,
     forRole: 'both',
+    chapterId: 's11',
   },
   {
     id: 4,
@@ -124,6 +127,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
     ],
     xp: 25,
     forRole: 'both',
+    chapterId: 's5',
   },
   {
     id: 5,
@@ -155,6 +159,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
     ],
     xp: 25,
     forRole: 'both',
+    chapterId: 's7',
   },
   {
     id: 6,
@@ -186,6 +191,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
     ],
     xp: 25,
     forRole: 'both',
+    chapterId: 's10',
   },
   {
     id: 7,
@@ -217,6 +223,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
     ],
     xp: 25,
     forRole: 'both',
+    chapterId: 's9',
   },
   {
     id: 8,
@@ -248,6 +255,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
     ],
     xp: 25,
     forRole: 'both',
+    chapterId: 's11',
   },
   // Scenario questions (spec P5.1): ids 9-14 put a Dev in a business conversation,
   // ids 15-20 put PM/BA in an engineering one. Each maps to the chapter that teaches the answer.

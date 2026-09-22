@@ -22,9 +22,20 @@ describe('quiz questions', () => {
     }
   });
 
-  it('chapterId, when set, exists in CHAPTERS', () => {
+  // P2.1: every question must offer a route back to the chapter that teaches its answer.
+  it('every question has a chapterId that exists in CHAPTERS', () => {
     for (const q of QUIZ_QUESTIONS) {
-      if (q.chapterId !== undefined) expect(chapterIds.has(q.chapterId), `q${q.id} -> ${q.chapterId}`).toBe(true);
+      expect(q.chapterId, `q${q.id} has no chapterId`).toBeDefined();
+      expect(chapterIds.has(q.chapterId!), `q${q.id} -> ${q.chapterId}`).toBe(true);
+    }
+  });
+
+  it('the basics round points at the chapters that teach it (P2.1)', () => {
+    const map: Record<number, string> = {
+      1: 's2', 2: 's4', 3: 's11', 4: 's5', 5: 's7', 6: 's10', 7: 's9', 8: 's11',
+    };
+    for (const q of QUIZ_QUESTIONS.filter((q) => q.id <= 8)) {
+      expect(q.chapterId, `q${q.id}`).toBe(map[q.id]);
     }
   });
 

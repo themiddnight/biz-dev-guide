@@ -2,13 +2,12 @@ import React, { useMemo, useState } from 'react';
 import { QuizQuestion } from '../types';
 import type { Role } from '../data/rolePerspective';
 import { QUIZ_ROUNDS, QUIZ_ROUND_META, QuizRound, defaultQuizRound, getQuizRound } from '../data/quizRounds';
+import { missedItems, type QuizAnswer } from '../lib/quizResult';
+import { QuizResultScreen } from './quiz/QuizResultScreen';
 import { 
-  Sparkles, 
   CheckCircle2, 
   XCircle, 
   ArrowRight, 
-  RotateCcw, 
-  Trophy, 
   HelpCircle, 
   Award,
   Zap,
@@ -130,6 +129,7 @@ const QuizRun: React.FC<QuizRunProps> = ({
   const [selectedOptionIndex, setSelectedOptionIndex] = useState<number | null>(null);
   const [score, setScore] = useState(0);
   const [awardedXp, setAwardedXp] = useState(0);
+  const [answers, setAnswers] = useState<QuizAnswer[]>([]);
   const [isFinished, setIsFinished] = useState(false);
   const [shuffledOptions, setShuffledOptions] = useState(() => shuffleOptions(questions));
 
@@ -142,6 +142,8 @@ const QuizRun: React.FC<QuizRunProps> = ({
 
     const isCorrect = currentOptions[idx].isCorrect;
     if (isCorrect) setScore((prev) => prev + 1);
+    // chosenText, not the shuffled index: the shuffle is re-rolled on restart (spec P2.2).
+    setAnswers((prev) => [...prev, { questionId: currentQ.id, correct: isCorrect, chosenText: currentOptions[idx].text }]);
     onRunStarted(true);
     // XP is paid on the answer, not at the end, so leaving mid-round keeps it.
     const awarded = onAnswer(currentQ.id, isCorrect);
@@ -164,73 +166,23 @@ const QuizRun: React.FC<QuizRunProps> = ({
     setSelectedOptionIndex(null);
     setScore(0);
     setAwardedXp(0);
+    setAnswers([]);
     onRunStarted(false);
     setIsFinished(false);
     setShuffledOptions(shuffleOptions(questions));
   };
 
   if (isFinished) {
-    const percentage = Math.round((score / questions.length) * 100);
-
     return (
-      <div className="max-w-2xl mx-auto py-12 px-4 text-center space-y-6">
-        <div className="w-20 h-20 mx-auto rounded-3xl bg-amber-500/10 text-amber-500 flex items-center justify-center border-2 border-amber-500/20 shadow-lg shadow-amber-500/10 animate-bounce">
-          <Trophy className="w-10 h-10" />
-        </div>
-
-        <div className="space-y-2">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-xs font-semibold border border-emerald-500/20">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>ทำครบแล้ว! บันทึกผลแล้ว</span>
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-50">
-            ยินดีด้วย! คุณทำแบบทดสอบครบแล้ว
-          </h2>
-          <p className="text-slate-600 dark:text-slate-400 text-sm">
-            คุณเข้าใจงานระหว่าง Business กับ Engineering มากขึ้นแล้ว
-          </p>
-        </div>
-
-        {/* Score & XP Card */}
-        <div className="grid grid-cols-2 gap-4 max-w-md mx-auto p-6 bg-white dark:bg-[#141414] rounded-2xl sm:rounded-3xl border border-neutral-200 dark:border-[#262626] shadow-2xs">
-          <div className="space-y-1">
-            <span className="text-xs text-neutral-500 dark:text-[#8e8e8e] font-medium">คะแนนที่ได้</span>
-            <div className="text-3xl font-extrabold text-neutral-900 dark:text-[#fafafa]">
-              {score} <span className="text-lg text-neutral-400 dark:text-[#666666] font-normal">/ {questions.length}</span>
-            </div>
-            <span className="text-xs text-neutral-600 dark:text-[#a3a3a3] font-medium">{percentage}% ถูกต้อง</span>
-          </div>
-          <div className="space-y-1 border-l border-neutral-200 dark:border-[#262626] pl-4">
-            <span className="text-xs text-neutral-500 dark:text-[#8e8e8e] font-medium">XP ที่ได้รับ</span>
-            <div className="text-3xl font-extrabold text-amber-500 dark:text-amber-400 flex items-center justify-center gap-1">
-              <Zap className="w-6 h-6 fill-amber-500 text-amber-500" />
-              <span>+{awardedXp}</span>
-            </div>
-            <span className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold">
-              {awardedXp > 0 ? 'สะสมเข้าโปรไฟล์แล้ว' : 'ข้อที่ตอบถูกเคยได้รับ XP ไปแล้ว'}
-            </span>
-          </div>
-        </div>
-
-        {/* Actions */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
-          <button
-            onClick={handleRestart}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl sm:rounded-2xl bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] text-xs sm:text-sm font-semibold hover:opacity-90 transition-all cursor-pointer shadow-xs"
-          >
-            <RotateCcw className="w-4 h-4" />
-            <span>ทำแบบทดสอบอีกครั้ง</span>
-          </button>
-
-          <button
-            onClick={() => onAskAIWithPrompt("ช่วยสรุปข้อคิดและทบทวนสิ่งที่ควรระวังจากแบบทดสอบเรื่อง Business vs Engineering")}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl sm:rounded-2xl bg-neutral-100 dark:bg-[#1a1a1a] text-neutral-900 dark:text-[#e5e5e5] border border-neutral-200 dark:border-[#262626] text-xs sm:text-sm font-semibold hover:bg-neutral-200/70 dark:hover:bg-[#222222] transition-all cursor-pointer"
-          >
-            <Bot className="w-4 h-4" />
-            <span>ถาม AI ทบทวนข้อที่ยังไม่แม่น</span>
-          </button>
-        </div>
-      </div>
+      <QuizResultScreen
+        score={score}
+        total={questions.length}
+        awardedXp={awardedXp}
+        missed={missedItems(questions, answers)}
+        onRestart={handleRestart}
+        onAskAI={() => onAskAIWithPrompt('ช่วยสรุปข้อคิดและทบทวนสิ่งที่ควรระวังจากแบบทดสอบเรื่อง Business vs Engineering')}
+        onOpenChapter={onOpenChapter}
+      />
     );
   }
 
