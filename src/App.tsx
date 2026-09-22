@@ -6,6 +6,7 @@ import { formatChapterHash } from './lib/chapterRoute';
 import { useChapterRoute } from './hooks/useChapterRoute';
 import { QUIZ_QUESTIONS } from './data/quizQuestions';
 import { INITIAL_BADGES, LEVEL_TIERS } from './data/badgesData';
+import { applyXpClaims, unclaimed, seedLegacyClaims, xpKey, AI_XP_QUESTION_CAP, XpClaim } from './lib/xp';
 import { Header } from './components/Header';
 import { GuideTab } from './components/GuideTab';
 import { AIAssistantTab } from './components/AIAssistantTab';
@@ -110,12 +111,17 @@ export default function App() {
       aiQuestionsAsked: 0,
       readChapters: [],
       bookmarks: [],
+      xpClaims: [],
     };
     const saved = localStorage.getItem('be_guide_stats');
     if (!saved) return defaults;
     try {
       const { plainModeEnabled: _legacyPlain, ...rest } = JSON.parse(saved);
-      return { ...defaults, ...rest };
+      const stats: UserStats = { ...defaults, ...rest };
+      if (!Array.isArray(rest.xpClaims)) {
+        stats.xpClaims = seedLegacyClaims(stats, readStorage('be_guide_exp_level'));
+      }
+      return stats;
     } catch {
       return defaults;
     }
@@ -135,20 +141,15 @@ export default function App() {
     setTimeout(() => setToastMessage(null), 3500);
   };
 
-  // Recalculate level on XP change
-  const addXp = (amount: number, reason: string, title = `+${amount} XP!`) => {
-    setUserStats((prev) => {
-      const newXp = prev.xp + amount;
-      const currentTier = LEVEL_TIERS.slice().reverse().find(t => newXp >= t.minXp) || LEVEL_TIERS[0];
-      return {
-        ...prev,
-        xp: newXp,
-        level: currentTier.level,
-        levelTitle: currentTier.title,
-      };
-    });
-
-    showToast(title, reason);
+  // Pay out XP only for claims this profile hasn't earned yet; returns the XP
+  // actually awarded. Decided against the rendered state so the toast shows once,
+  // and re-checked inside the updater so a stale closure can't double-pay.
+  const claimXp = (claims: XpClaim[], reason: string, title?: string) => {
+    const amount = unclaimed(userStats, claims).reduce((sum, c) => sum + c.amount, 0);
+    if (amount === 0) return 0;
+    setUserStats((prev) => applyXpClaims(prev, claims));
+    showToast(title ?? `+${amount} XP!`, reason);
+    return amount;
   };
 
   // Decide the unlock outside the state updater so XP is awarded exactly once
@@ -160,7 +161,7 @@ export default function App() {
     setBadges((prev) =>
       prev.map((b) => (b.id === badgeId && !b.unlocked ? { ...b, unlocked: true, unlockedAt } : b))
     );
-    addXp(50, `ปลดล็อกเหรียญตรา: ${badge.title}`);
+    claimXp([{ key: xpKey.badge(badgeId), amount: 50 }], `ปลดล็อกเหรียญตรา: ${badge.title}`);
   };
 
   // Experience level toggle handler
@@ -169,10 +170,11 @@ export default function App() {
     setLevelChosen(true);
     if (level === experienceLevel) return;
     setExperienceLevel(level);
+    // First switch into each mode pays once; toggling back and forth pays nothing.
     if (level === 'experienced') {
-      addXp(15, 'เปิดโหมด Experienced: ศึกษาคัมภีร์รับมือ Friction');
+      claimXp([{ key: xpKey.mode(level), amount: 15 }], 'เปิดโหมด Experienced: ศึกษาคัมภีร์รับมือ Friction');
     } else {
-      addXp(10, 'เปิดโหมด Beginner: ปูพื้นฐาน Mindset');
+      claimXp([{ key: xpKey.mode(level), amount: 10 }], 'เปิดโหมด Beginner: ปูพื้นฐาน Mindset');
     }
   };
 
@@ -207,16 +209,19 @@ export default function App() {
       return;
     }
 
-    addXp(30, 'อ่านและทำความเข้าใจบทนี้สำเร็จ', 'ทำเครื่องหมายว่าอ่านแล้ว +30 XP');
+    // Re-marking a chapter after unmarking it does not pay again.
+    if (claimXp([{ key: xpKey.read(chapterId), amount: 30 }], 'อ่านและทำความเข้าใจบทนี้สำเร็จ', 'ทำเครื่องหมายว่าอ่านแล้ว +30 XP') === 0) {
+      showToast('ทำเครื่องหมายว่าอ่านแล้ว', 'บทนี้เคยได้รับ XP ไปแล้ว');
+    }
     unlockBadge('first_step');
     if (newRead.length >= CHAPTERS.length) {
       unlockBadge('deep_scholar');
     }
   };
 
-  // Friction dilemma: GuideTab only reports XP for an optimal dilemma pick
-  const handleDilemmaXp = (amount: number, reason: string) => {
-    addXp(amount, reason);
+  // Friction dilemma: GuideTab only reports XP for an optimal dilemma pick; once per chapter
+  const handleDilemmaXp = (chapterId: string, amount: number, reason: string) => {
+    claimXp([{ key: xpKey.dilemma(chapterId), amount }], reason);
     unlockBadge('conflict_mediator');
   };
 
@@ -227,16 +232,26 @@ export default function App() {
   };
 
   const handleQuestionAsked = () => {
+    const n = userStats.aiQuestionsAsked + 1;
     setUserStats((prev) => ({
       ...prev,
       aiQuestionsAsked: prev.aiQuestionsAsked + 1,
     }));
-    addXp(20, 'ปรึกษา AI Bridge Assistant');
+    if (n <= AI_XP_QUESTION_CAP) {
+      claimXp([{ key: xpKey.ai(n), amount: 20 }], `ปรึกษา AI Bridge Assistant (${n}/${AI_XP_QUESTION_CAP})`);
+    }
     unlockBadge('ai_consultant');
   };
 
   // Quiz completion
-  const handleCompleteQuiz = (score: number, totalEarnedXp: number) => {
+  // Each question pays its XP the first time it's answered correctly; retakes only
+  // pay for newly-correct questions. Returns the XP actually awarded.
+  const handleCompleteQuiz = (score: number, correctQuestionIds: number[]) => {
+    const claims = QUIZ_QUESTIONS.filter((q) => correctQuestionIds.includes(q.id)).map((q) => ({
+      key: xpKey.quiz(q.id),
+      amount: q.xp,
+    }));
+    const awarded = claimXp(claims, `ทำแบบทดสอบเสร็จ: ตอบถูก ${score} ข้อ`);
     setUserStats((prev) => ({
       ...prev,
       quizzesCompleted: prev.quizzesCompleted + 1,
@@ -247,6 +262,7 @@ export default function App() {
     if (score >= QUIZ_QUESTIONS.length * 0.8) {
       unlockBadge('quiz_master');
     }
+    return awarded;
   };
 
   return (

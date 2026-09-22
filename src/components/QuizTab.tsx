@@ -15,7 +15,7 @@ import {
 
 interface QuizTabProps {
   questions: QuizQuestion[];
-  onCompleteQuiz: (score: number, totalXpEarned: number) => void;
+  onCompleteQuiz: (score: number, correctQuestionIds: number[]) => number; // returns XP actually awarded
   onAskAIWithPrompt: (prompt: string) => void;
 }
 
@@ -39,7 +39,8 @@ export const QuizTab: React.FC<QuizTabProps> = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOptionIndex, setSelectedOptionIndex] = useState<number | null>(null);
   const [score, setScore] = useState(0);
-  const [earnedXp, setEarnedXp] = useState(0);
+  const [correctIds, setCorrectIds] = useState<number[]>([]);
+  const [awardedXp, setAwardedXp] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
   const [shuffledOptions, setShuffledOptions] = useState(() => shuffleOptions(questions));
 
@@ -53,7 +54,7 @@ export const QuizTab: React.FC<QuizTabProps> = ({
     const isCorrect = currentOptions[idx].isCorrect;
     if (isCorrect) {
       setScore((prev) => prev + 1);
-      setEarnedXp((prev) => prev + currentQ.xp);
+      setCorrectIds((prev) => [...prev, currentQ.id]);
     }
   };
 
@@ -63,8 +64,8 @@ export const QuizTab: React.FC<QuizTabProps> = ({
       setSelectedOptionIndex(null);
     } else {
       setIsFinished(true);
-      // score and earnedXp already include the last answer (updated in handleSelectOption).
-      onCompleteQuiz(score, earnedXp);
+      // score and correctIds already include the last answer (updated in handleSelectOption).
+      setAwardedXp(onCompleteQuiz(score, correctIds));
     }
   };
 
@@ -72,7 +73,8 @@ export const QuizTab: React.FC<QuizTabProps> = ({
     setCurrentIndex(0);
     setSelectedOptionIndex(null);
     setScore(0);
-    setEarnedXp(0);
+    setCorrectIds([]);
+    setAwardedXp(0);
     setIsFinished(false);
     setShuffledOptions(shuffleOptions(questions));
   };
@@ -112,9 +114,11 @@ export const QuizTab: React.FC<QuizTabProps> = ({
             <span className="text-xs text-neutral-500 dark:text-[#8e8e8e] font-medium">XP ที่ได้รับ</span>
             <div className="text-3xl font-extrabold text-amber-500 dark:text-amber-400 flex items-center justify-center gap-1 font-mono">
               <Zap className="w-6 h-6 fill-amber-500 text-amber-500" />
-              <span>+{earnedXp}</span>
+              <span>+{awardedXp}</span>
             </div>
-            <span className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold">สะสมเข้าโปรไฟล์แล้ว</span>
+            <span className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold">
+              {awardedXp > 0 ? 'สะสมเข้าโปรไฟล์แล้ว' : 'ข้อที่ตอบถูกเคยได้รับ XP ไปแล้ว'}
+            </span>
           </div>
         </div>
 

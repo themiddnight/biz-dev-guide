@@ -235,6 +235,7 @@ export interface UserStats {
   aiQuestionsAsked: number;
   readChapters: string[];
   bookmarks: string[];
+  xpClaims: string[]; // keys of XP awards already paid out (see lib/xp.ts)
 }
 
 export interface ChatMessage {

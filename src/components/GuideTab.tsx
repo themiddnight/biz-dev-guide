@@ -59,7 +59,7 @@ interface GuideTabProps {
   onToggleReadChapter?: (chapterId: string) => void;
   onAskAIWithPrompt: (prompt: string) => void;
   onStartQuiz: () => void;
-  onEarnXp?: (amount: number, reason: string) => void;
+  onEarnXp?: (chapterId: string, amount: number, reason: string) => void;
   activeChapterId: string;
   requestedSection: RequestedSection | null;
   onNavigateChapter: (chapterId: string, section?: SectionKey) => void;
