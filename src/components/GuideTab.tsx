@@ -1,34 +1,34 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Chapter, AudienceMode, ExperienceLevel } from '../types';
 import { ROLE_MINDSETS } from '../data/roleMindsets';
 import { FRICTION_PLAYBOOKS } from '../data/frictionPlaybooks';
 import { S5_JUMP_TARGET_IDS, DiagramJumpTarget } from '../data/diagramFamilies';
 import { GlossaryFilter } from './glossary/GlossaryPanel';
 import { GLOSSARY, GlossaryCategory } from '../data/glossary';
-import type { GuideSectionContext } from './guide/sections/registry';
-import { PrimerSection } from './guide/sections/PrimerSection';
-import { JargonSection } from './guide/sections/JargonSection';
-import { DialogueSection } from './guide/sections/DialogueSection';
-import { DiagramSection } from './guide/sections/DiagramSection';
-import { FaqSection } from './guide/sections/FaqSection';
-import { ExamplesSection } from './guide/sections/ExamplesSection';
-import { CoreConceptsSection } from './guide/sections/CoreConceptsSection';
-import { ReferenceSection } from './guide/sections/ReferenceSection';
-import { GlossarySection } from './guide/sections/GlossarySection';
-import { WorkflowSection } from './guide/sections/WorkflowSection';
-import { PitfallsSection } from './guide/sections/PitfallsSection';
-import { ChecklistSection } from './guide/sections/ChecklistSection';
-import { MindsetSection, FrictionSection } from './guide/sections/registry';
+import { SECTION_COMPONENTS, type GuideSectionContext } from './guide/sections/registry';
+import {
+  getChapterLayout,
+  deriveOpenState,
+  expandAll,
+  collapseAll,
+  openSection,
+  toggleSection,
+  toggleLayer,
+  isSectionPresent,
+  type OpenState,
+  type SectionKey,
+} from '../data/sectionLayers';
+import type { RequestedSection } from '../lib/chapterRoute';
+import { LayerGroupView } from './guide/LayerGroup';
+import { ChapterHero } from './guide/ChapterHero';
 import { 
   Search, 
   Bookmark, 
   BookmarkCheck, 
   Bot, 
   Sparkles,
-  Clock,
   ChevronRight,
   ChevronLeft,
-  Info,
   CheckCircle2,
   Workflow,
   BookOpen,
@@ -148,46 +148,28 @@ export const GuideTab: React.FC<GuideTabProps> = ({
     };
   }, [pendingScrollId, activeChapterId]);
 
-  // Accordion section states for the active chapter
-  const [openSections, setOpenSections] = useState<Record<string, boolean>>({
-    mindset: true,
-    friction: true,
-    primer: experienceLevel === 'beginner',
-    jargon: experienceLevel === 'beginner',
-    dialogue: true,
-    diagram: true,
-    faq: true,
-    examples: true,
-    coreConcepts: true,
-    reference: true,
-    glossary: true,
-    workflow: false,
-    pitfalls: experienceLevel === 'experienced',
-    checklist: false,
-  });
-
-  // Automatically adapt default visible sections when user toggles Experience Level
-  useEffect(() => {
-    if (experienceLevel === 'experienced') {
-      setOpenSections(prev => ({
-        ...prev,
-        friction: true,
-        dialogue: true,
-        pitfalls: true,
-      }));
-    } else {
-      setOpenSections(prev => ({
-        ...prev,
-        mindset: true,
-        primer: true,
-        jargon: true,
-      }));
-    }
-  }, [experienceLevel]);
-
   // Find active chapter object
   const activeChapter = chapters.find(c => c.id === activeChapterId) || chapters[0];
   const activeIndex = chapters.findIndex(c => c.id === activeChapterId);
+
+  const layout = useMemo(() => getChapterLayout(experienceLevel, activeChapter), [experienceLevel, activeChapter]);
+  const [openState, setOpenState] = useState<OpenState>(() => deriveOpenState(layout));
+  const [sectionRequest, setSectionRequest] = useState<RequestedSection | null>(null);
+  const requestSection = (key: SectionKey) => setSectionRequest(prev => ({ key, nonce: (prev?.nonce ?? 0) + 1 }));
+
+  // Each chapter (and each level) opens at its Core (spec §1.4, D3).
+  useEffect(() => {
+    setOpenState(deriveOpenState(layout));
+  }, [layout]);
+
+  // A requested section opens on top of the re-derived defaults. Declared after the
+  // re-derive effect so that, when both fire in one commit, this update wins.
+  useEffect(() => {
+    if (!sectionRequest) return;
+    if (!isSectionPresent(activeChapter, sectionRequest.key)) return;
+    setOpenState(openSection(deriveOpenState(layout), layout, sectionRequest.key));
+    setPendingScrollId(`sec-${sectionRequest.key}`);
+  }, [sectionRequest?.nonce]);
   const prevChapter = activeIndex > 0 ? chapters[activeIndex - 1] : null;
   const nextChapter = activeIndex < chapters.length - 1 ? chapters[activeIndex + 1] : null;
 
@@ -212,7 +194,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   // Category map tile (s15 diagram) -> filter the glossary panel and scroll to it
   const handleSelectGlossaryCategory = (category: GlossaryCategory) => {
     setGlossaryCategory(category);
-    setOpenSections(prev => ({ ...prev, glossary: true }));
+    setOpenState(prev => openSection(prev, layout, 'glossary'));
     window.setTimeout(() => {
       document.getElementById('glossary-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 50);
@@ -222,63 +204,23 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   const handleSearchGlossary = (query: string) => {
     setGlossaryQuery(query);
     setGlossaryCategory('all');
-    setOpenSections(prev => ({ ...prev, glossary: true }));
     setActiveChapterId('s15');
     setIsIndexOpen(false);
-    window.setTimeout(() => {
-      document.getElementById('glossary-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 50);
+    requestSection('glossary');
   };
 
   // s11 FAQ playbook link -> open (and navigate to) a chapter's friction playbook, then scroll to it.
-  // The scroll runs after the new chapter has rendered (see pendingScrollId effect) so it lands
-  // on the playbook heading instead of a position computed from the previous chapter's layout.
+  // A cross-chapter jump goes through requestSection so the open lands on top of the new
+  // chapter's re-derived defaults; the scroll then runs after the new chapter has rendered.
   const handleScrollToPlaybook = (chapterId: string) => {
-    setOpenSections(prev => ({ ...prev, friction: true }));
     if (chapterId !== activeChapterId) {
       setActiveChapterId(chapterId);
       setIsIndexOpen(false);
+      requestSection('friction');
+      return;
     }
+    setOpenState(prev => openSection(prev, layout, 'friction'));
     setPendingScrollId('friction-playbook-card');
-  };
-
-  const toggleSection = (sectionKey: string) => {
-    setOpenSections(prev => ({
-      ...prev,
-      [sectionKey]: !prev[sectionKey]
-    }));
-  };
-
-  const expandAllSections = () => {
-    setOpenSections({
-      mindset: true,
-      friction: true,
-      primer: true,
-      jargon: true,
-      dialogue: true,
-      diagram: true,
-      faq: true,
-      examples: true,
-      coreConcepts: true,
-      workflow: true,
-      pitfalls: true,
-      checklist: true,
-    });
-  };
-
-  const collapseAllSections = () => {
-    setOpenSections({
-      primer: false,
-      jargon: false,
-      dialogue: false,
-      diagram: false,
-      faq: false,
-      examples: false,
-      coreConcepts: false,
-      workflow: false,
-      pitfalls: false,
-      checklist: false,
-    });
   };
 
   const toggleChecklistItem = (key: string) => {
@@ -590,56 +532,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
           {/* Chapter Main Content Reader Card */}
           <div className="bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-7 shadow-2xs space-y-5 sm:space-y-6">
             
-            {/* Chapter Header */}
-            <div className="space-y-3 pb-4 sm:pb-5 border-b border-neutral-100 dark:border-[#262626]">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="w-8 h-8 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] font-black text-sm flex items-center justify-center shrink-0 shadow-xs font-mono">
-                  {activeChapter.num}
-                </span>
-                <span className="px-2.5 py-0.5 rounded-full bg-neutral-100 dark:bg-[#1f1f1f] border border-neutral-200 dark:border-[#333333] text-neutral-800 dark:text-[#d4d4d4] text-[11px] sm:text-xs font-semibold uppercase tracking-wider font-mono">
-                  {activeChapter.roleTag}
-                </span>
-                <span className="flex items-center gap-1 text-[11px] sm:text-xs text-neutral-500 dark:text-[#737373] font-medium font-mono">
-                  <Clock className="w-3.5 h-3.5" />
-                  {activeChapter.readTime}
-                </span>
-                {isCurrentRead && (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 border border-emerald-300/50 dark:border-emerald-800/50 text-emerald-800 dark:text-emerald-300 text-[11px] sm:text-xs font-semibold font-mono">
-                    <Check className="w-3 h-3" />
-                    ผ่านแล้ว
-                  </span>
-                )}
-              </div>
-
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-neutral-900 dark:text-[#fafafa] tracking-tight leading-tight">
-                {activeChapter.title}
-              </h1>
-              <p className="text-xs sm:text-sm text-neutral-500 dark:text-[#8e8e8e] leading-relaxed font-normal">
-                {activeChapter.subtitle}
-              </p>
-
-              {/* Expand/Collapse All Accordion Control */}
-              <div className="flex items-center justify-between pt-1 text-xs">
-                <div className="text-neutral-500 dark:text-[#737373] font-normal">
-                  คลิกที่หัวข้อเพื่อเปิด/ปิดเนื้อหาย่อย หรือดูทีละส่วน
-                </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={expandAllSections}
-                    className="text-neutral-800 dark:text-[#d4d4d4] hover:underline font-semibold cursor-pointer"
-                  >
-                    ขยายทั้งหมด
-                  </button>
-                  <span className="text-neutral-300 dark:text-[#333333]">|</span>
-                  <button
-                    onClick={collapseAllSections}
-                    className="text-neutral-500 dark:text-[#737373] hover:underline font-semibold cursor-pointer"
-                  >
-                    ย่อทั้งหมด
-                  </button>
-                </div>
-              </div>
-            </div>
+            <ChapterHero chapter={activeChapter} experienceLevel={experienceLevel} audienceMode={audienceMode} isRead={isCurrentRead} />
 
             {/* ADAPTIVE LENS CONTROLLER BANNER */}
             <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-2 sm:space-y-2.5">
@@ -667,7 +560,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                         : 'bg-white dark:bg-[#1f1f1f] text-neutral-600 dark:text-[#a3a3a3] border border-neutral-200 dark:border-[#333333] hover:bg-neutral-100 dark:hover:bg-[#262626]'
                     }`}
                   >
-                    🌱 ปูพื้นฐาน Mindset
+                    🌱 ใหม่กับเรื่องนี้
                   </button>
                   <button
                     onClick={() => onExperienceLevelChange && onExperienceLevelChange('experienced')}
@@ -677,181 +570,46 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                         : 'bg-white dark:bg-[#1f1f1f] text-neutral-600 dark:text-[#a3a3a3] border border-neutral-200 dark:border-[#333333] hover:bg-neutral-100 dark:hover:bg-[#262626]'
                     }`}
                   >
-                    ⚡ คัมภีร์รับมือ Friction
+                    ⚡ ทำงานข้ามทีมมาแล้ว
                   </button>
                 </div>
               </div>
 
               <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e] leading-relaxed">
                 {experienceLevel === 'beginner'
-                  ? '💡 โหมด Beginner: เน้นปูพื้นฐานวิธีคิด (Mindset) ของบทบาทที่เลือก สิ่งที่เขาแคร์ และคำแนะนำเชื่อมความสัมพันธ์'
-                  : '⚡ โหมด Experienced: เน้นกลยุทธ์รับมือข้อขัดแย้ง (Friction Playbook) ตาราง Trade-off ในการต่อรอง และสคริปต์พูดจริงในห้องประชุม'}
+                  ? '💡 โหมดมือใหม่: เปิด ปฐมบท · ศัพท์จำเป็น · แผนภาพ ไว้ก่อน ส่วนอื่นพับไว้ในชั้น "นำไปใช้" และ "เจาะลึก"'
+                  : '⚡ โหมดทำงานข้ามทีม: เปิด แนวคิดหลัก · กับดัก · แผนภาพ ไว้ก่อน วิธีรับมือ Friction อยู่ในชั้น "นำไปใช้"'}
               </p>
             </div>
 
-            <GlossarySection
-              chapter={activeChapter}
-              isOpen={openSections.glossary}
-              onToggle={() => toggleSection('glossary')}
-              ctx={sectionCtx}
-            />
-
-            {/* ADAPTIVE SECTION RENDERING: Beginner vs Experienced ordering */}
-            {experienceLevel === 'experienced' ? (
-              <>
-                {/* 1. Friction & Negotiation Playbook (Prioritized in Experienced mode) */}
-                <FrictionSection
-                  chapter={activeChapter}
-                  isOpen={openSections.friction}
-                  onToggle={() => toggleSection('friction')}
-                  ctx={sectionCtx}
-                />
-
-                {/* 2. Role Mindset & Empathy Guide */}
-                <MindsetSection
-                  chapter={activeChapter}
-                  isOpen={openSections.mindset}
-                  onToggle={() => toggleSection('mindset')}
-                  ctx={sectionCtx}
-                />
-              </>
-            ) : (
-              <>
-                {/* 1. Role Mindset & Empathy Guide (Prioritized in Beginner mode) */}
-                <MindsetSection
-                  chapter={activeChapter}
-                  isOpen={openSections.mindset}
-                  onToggle={() => toggleSection('mindset')}
-                  ctx={sectionCtx}
-                />
-
-                {/* 2. Friction & Negotiation Playbook */}
-                <FrictionSection
-                  chapter={activeChapter}
-                  isOpen={openSections.friction}
-                  onToggle={() => toggleSection('friction')}
-                  ctx={sectionCtx}
-                />
-              </>
-            )}
-
-            {/* Quick Perspective & Metaphor Box */}
-            <div className="space-y-3">
-              {/* Plain Language Metaphor (เปรียบแบบบ้านๆ) */}
-              <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-1.5">
-                <div className="flex items-center gap-2 text-xs font-bold text-neutral-900 dark:text-[#fafafa]">
-                  <Sparkles className="w-4 h-4 text-amber-500" />
-                  <span>เปรียบแบบบ้านๆ (Real-World Analogy)</span>
-                </div>
-                <p className="text-xs sm:text-sm text-neutral-700 dark:text-[#c4c4c4] leading-relaxed font-normal">
-                  {activeChapter.plainAnalogy}
-                </p>
-              </div>
-
-              {/* Audience Perspectives (Business & Engineer Notes) */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {(audienceMode === 'business' || audienceMode === 'both') && (
-                  <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-1.5">
-                    <div className="flex items-center gap-2 text-xs font-bold text-amber-800 dark:text-amber-300">
-                      <Info className="w-4 h-4 text-amber-500" />
-                      <span>มุมมองฝั่ง Business</span>
-                    </div>
-                    <p className="text-xs text-neutral-600 dark:text-[#a3a3a3] leading-relaxed font-normal">
-                      {activeChapter.businessNote}
-                    </p>
-                  </div>
-                )}
-
-                {(audienceMode === 'engineer' || audienceMode === 'both') && (
-                  <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-1.5">
-                    <div className="flex items-center gap-2 text-xs font-bold text-blue-800 dark:text-blue-300">
-                      <CheckCircle2 className="w-4 h-4 text-blue-500" />
-                      <span>มุมมองฝั่ง Engineer</span>
-                    </div>
-                    <p className="text-xs text-neutral-600 dark:text-[#a3a3a3] leading-relaxed font-normal">
-                      {activeChapter.engineerNote}
-                    </p>
-                  </div>
-                )}
-              </div>
+            <div className="flex items-center justify-end gap-2 text-xs" data-temp-expand-controls>
+              <button type="button" onClick={() => setOpenState(expandAll(layout))} className="text-neutral-800 dark:text-[#d4d4d4] hover:underline font-semibold cursor-pointer">ขยายทั้งหมด</button>
+              <span className="text-neutral-300 dark:text-[#333333]">|</span>
+              <button type="button" onClick={() => setOpenState(collapseAll(layout))} className="text-neutral-500 dark:text-[#737373] hover:underline font-semibold cursor-pointer">ย่อทั้งหมด</button>
             </div>
 
-            <PrimerSection
-              chapter={activeChapter}
-              isOpen={openSections.primer}
-              onToggle={() => toggleSection('primer')}
-              ctx={sectionCtx}
-            />
-
-            <JargonSection
-              chapter={activeChapter}
-              isOpen={openSections.jargon}
-              onToggle={() => toggleSection('jargon')}
-              ctx={sectionCtx}
-            />
-
-            <DialogueSection
-              chapter={activeChapter}
-              isOpen={openSections.dialogue}
-              onToggle={() => toggleSection('dialogue')}
-              ctx={sectionCtx}
-            />
-
-            <DiagramSection
-              chapter={activeChapter}
-              isOpen={openSections.diagram}
-              onToggle={() => toggleSection('diagram')}
-              ctx={sectionCtx}
-            />
-
-            <FaqSection
-              chapter={activeChapter}
-              isOpen={openSections.faq}
-              onToggle={() => toggleSection('faq')}
-              ctx={sectionCtx}
-            />
-
-            <ExamplesSection
-              chapter={activeChapter}
-              isOpen={openSections.examples}
-              onToggle={() => toggleSection('examples')}
-              ctx={sectionCtx}
-            />
-
-            <CoreConceptsSection
-              chapter={activeChapter}
-              isOpen={openSections.coreConcepts}
-              onToggle={() => toggleSection('coreConcepts')}
-              ctx={sectionCtx}
-            />
-
-            <ReferenceSection
-              chapter={activeChapter}
-              isOpen={openSections.reference}
-              onToggle={() => toggleSection('reference')}
-              ctx={sectionCtx}
-            />
-
-            <WorkflowSection
-              chapter={activeChapter}
-              isOpen={openSections.workflow}
-              onToggle={() => toggleSection('workflow')}
-              ctx={sectionCtx}
-            />
-
-            <PitfallsSection
-              chapter={activeChapter}
-              isOpen={openSections.pitfalls}
-              onToggle={() => toggleSection('pitfalls')}
-              ctx={sectionCtx}
-            />
-
-            <ChecklistSection
-              chapter={activeChapter}
-              isOpen={openSections.checklist}
-              onToggle={() => toggleSection('checklist')}
-              ctx={sectionCtx}
-            />
+            {layout.filter(group => group.sections.length > 0).map(group => (
+              <LayerGroupView
+                key={group.layer}
+                group={group}
+                isExpanded={openState.layers[group.layer]}
+                onToggle={() => setOpenState(prev => toggleLayer(prev, group.layer))}
+              >
+                {group.sections.map(key => {
+                  const Section = SECTION_COMPONENTS[key];
+                  return (
+                    <section key={key} id={`sec-${key}`} className="anchor-target" data-layer={group.layer}>
+                      <Section
+                        chapter={activeChapter}
+                        isOpen={!!openState.sections[key]}
+                        onToggle={() => setOpenState(prev => toggleSection(prev, key))}
+                        ctx={sectionCtx}
+                      />
+                    </section>
+                  );
+                })}
+              </LayerGroupView>
+            ))}
 
             {/* Chapter Footer Actions */}
             <div className="pt-5 border-t border-neutral-100 dark:border-[#262626] space-y-3.5">
