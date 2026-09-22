@@ -5,6 +5,7 @@ import { FRICTION_PLAYBOOKS } from '../data/frictionPlaybooks';
 import { ChapterDiagram } from './ChapterDiagram';
 import { RoleMindsetCard } from './RoleMindsetCard';
 import { FrictionPlaybookCard } from './FrictionPlaybookCard';
+import { FrictionFaqSection } from './FrictionFaqSection';
 import { ContentBlocks } from './content/ContentBlocks';
 import { GlossaryPanel, GlossaryFilter } from './glossary/GlossaryPanel';
 import { GlossaryCategoryMap } from './glossary/GlossaryCategoryMap';
@@ -22,7 +23,6 @@ import {
   ChevronDown, 
   ChevronUp,
   Info,
-  AlertCircle,
   Lightbulb,
   CheckCircle2,
   CheckSquare,
@@ -86,10 +86,10 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   const [isIndexOpen, setIsIndexOpen] = useState(false);
   const [checkedChecklist, setCheckedChecklist] = useState<Record<string, boolean>>({});
   const [c4Level, setC4Level] = useState<number>(1);
-  const [expandedFaqId, setExpandedFaqId] = useState<number | null>(1);
   const [mindsetSubTab, setMindsetSubTab] = useState<'business' | 'engineer'>('business');
   const [dilemmaAnswers, setDilemmaAnswers] = useState<Record<string, string>>({});
   const [glossaryCategory, setGlossaryCategory] = useState<GlossaryFilter>('all');
+  const [glossaryQuery, setGlossaryQuery] = useState('');
 
   // Accordion section states for the active chapter
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
@@ -99,6 +99,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
     jargon: experienceLevel === 'beginner',
     dialogue: true,
     diagram: true,
+    faq: true,
     examples: true,
     coreConcepts: true,
     reference: true,
@@ -155,6 +156,30 @@ export const GuideTab: React.FC<GuideTabProps> = ({
     }, 50);
   };
 
+  // s11 FAQ concept chip -> open the s15 glossary with the search prefilled
+  const handleSearchGlossary = (query: string) => {
+    setGlossaryQuery(query);
+    setGlossaryCategory('all');
+    setOpenSections(prev => ({ ...prev, glossary: true }));
+    setActiveChapterId('s15');
+    setIsIndexOpen(false);
+    window.setTimeout(() => {
+      document.getElementById('glossary-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
+  };
+
+  // s11 FAQ playbook link -> open (and navigate to) a chapter's friction playbook, then scroll to it
+  const handleScrollToPlaybook = (chapterId: string) => {
+    setOpenSections(prev => ({ ...prev, friction: true }));
+    if (chapterId !== activeChapterId) {
+      setActiveChapterId(chapterId);
+      setIsIndexOpen(false);
+    }
+    window.setTimeout(() => {
+      document.getElementById('friction-playbook-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
+  };
+
   const toggleSection = (sectionKey: string) => {
     setOpenSections(prev => ({
       ...prev,
@@ -170,6 +195,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
       jargon: true,
       dialogue: true,
       diagram: true,
+      faq: true,
       examples: true,
       coreConcepts: true,
       workflow: true,
@@ -184,6 +210,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
       jargon: false,
       dialogue: false,
       diagram: false,
+      faq: false,
       examples: false,
       coreConcepts: false,
       workflow: false,
@@ -616,6 +643,8 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                       onNavigateChapter={handleSelectChapter}
                       category={glossaryCategory}
                       onCategoryChange={setGlossaryCategory}
+                      query={glossaryQuery}
+                      onQueryChange={setGlossaryQuery}
                     />
                   </div>
                 )}
@@ -1094,71 +1123,46 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                       </div>
                     </div>
                   )}
-
-                  {/* Interactive Friction Scenarios for Chapter 11 */}
-                  {activeChapter.id === 's11' && (
-                    <div className="mt-4 space-y-2">
-                      <h4 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa] flex items-center gap-2">
-                        <AlertCircle className="w-4 h-4 text-amber-500" />
-                        <span>คลิกเพื่อดูทางออกของ 4 ข้อขัดแย้งยอดนิยมตลอดกาล:</span>
-                      </h4>
-
-                      {[
-                        {
-                          id: 1,
-                          q: 'ทำไม "แค่เพิ่มปุ่มเดียว" ถึงใช้เวลาเป็นสัปดาห์?',
-                          root: 'ปุ่มที่ตาเห็นคือ 5% ที่เหลือคือ logic คืนเงิน ตัดสต็อก แจ้งเตือนร้านค้า และ edge cases',
-                          script: 'ถามว่า: "เวอร์ชันที่เล็กที่สุดที่ยังใช้งานได้ (MVP) มีอะไรบ้าง ตัดเงื่อนไขไหนออกก่อนได้บ้าง?"',
-                        },
-                        {
-                          id: 2,
-                          q: 'ทำไม Requirement ถึงเปลี่ยนบ่อย ไม่มีวิธีรับมือเลยเหรอ?',
-                          root: 'โลกธุรกิจเปลี่ยนจริง (คู่แข่ง/ผู้ใช้) แต่ถ้ากระบวนการหย่อนจะเกิด Scope Creep เงียบๆ',
-                          script: 'ถามหา "ทำไม" เบื้องหลังความต้องการเสมอ และทำระบบ Change Request เบาๆ เพื่อให้เห็นต้นทุน',
-                        },
-                        {
-                          id: 3,
-                          q: 'ทำไมงาน Technical Debt ไม่เคยได้เข้า Sprint สักที?',
-                          root: 'ทีม Dev เสนอด้วยศัพท์เทคนิคที่ Business คำนวณความคุ้มค่าไม่ถูก เลยแพ้ Feature ใหม่เสมอ',
-                          script: 'Dev ต้องแปลเป็นความเสี่ยง: "ถ้าไม่แก้ตรงนี้ เมื่อยอดขายโต 2 เท่า ระบบจะรับไม่ไหวและส่งผลให้สูญเสียรายได้ X บาท"',
-                        },
-                        {
-                          id: 4,
-                          q: 'ทำไม Estimate ไม่เคยตรง แล้วจะวางแผนธุรกิจยังไง?',
-                          root: 'Cone of Uncertainty: วันแรกคือวันที่รู้น้อยที่สุด การขอตัวเลขเป๊ะๆ คือการขอสิ่งที่ไม่มีอยู่จริง',
-                          script: 'ขอ Estimate เป็นช่วง (เช่น 2-4 สัปดาห์) พร้อมระบุสมมติฐาน และมี Checkpoint ตรวจสอบความคืบหน้าถี่ๆ',
-                        },
-                      ].map((item) => (
-                        <div 
-                          key={item.id}
-                          className="p-3.5 bg-white dark:bg-[#141414] rounded-xl border border-neutral-200 dark:border-[#262626] space-y-2"
-                        >
-                          <div 
-                            onClick={() => setExpandedFaqId(expandedFaqId === item.id ? null : item.id)}
-                            className="font-bold text-xs sm:text-sm text-neutral-900 dark:text-[#fafafa] flex items-center justify-between cursor-pointer select-none"
-                          >
-                            <span>{item.q}</span>
-                            <span className="text-neutral-400 dark:text-[#737373] font-mono text-base">{expandedFaqId === item.id ? '−' : '+'}</span>
-                          </div>
-                          {expandedFaqId === item.id && (
-                            <div className="pt-2 border-t border-neutral-100 dark:border-[#262626] text-xs space-y-2">
-                              <div>
-                                <span className="font-bold text-neutral-700 dark:text-[#c4c4c4]">สาเหตุที่แท้จริง: </span>
-                                <span className="text-neutral-600 dark:text-[#a3a3a3]">{item.root}</span>
-                              </div>
-                              <div className="p-2.5 rounded-lg bg-neutral-100 dark:bg-[#1f1f1f] border border-neutral-200 dark:border-[#333333]">
-                                <span className="font-bold text-neutral-900 dark:text-white">ประโยคทางออกในห้องประชุม: </span>
-                                <span className="text-neutral-700 dark:text-[#d4d4d4]">{item.script}</span>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  )}
                 </div>
               )}
             </div>
+
+            {/* SECTION 4.4: คำถามที่เจอบ่อย (Chapter 11 FAQ, restored from the static guide) */}
+            {activeChapter.id === 's11' && (
+              <div className="border border-neutral-200 dark:border-[#262626] rounded-2xl overflow-hidden bg-white dark:bg-[#141414] shadow-2xs">
+                <button
+                  onClick={() => toggleSection('faq')}
+                  aria-expanded={!!openSections.faq}
+                  className="w-full p-3.5 sm:p-4.5 flex items-center justify-between bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f] text-left cursor-pointer select-none transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-7 h-7 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
+                      ❓
+                    </div>
+                    <div>
+                      <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
+                        คำถามที่แต่ละฝั่งบ่นกันจริงๆ (12 ข้อ)
+                      </h3>
+                      <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e]">
+                        คำอธิบายว่าอีกฝั่งกำลังเจออะไรอยู่ และทางออกที่ใช้ได้จริง
+                      </p>
+                    </div>
+                  </div>
+                  {openSections.faq ? <ChevronUp className="w-4 h-4 text-neutral-600 dark:text-[#a3a3a3]" /> : <ChevronDown className="w-4 h-4 text-neutral-400 dark:text-[#737373]" />}
+                </button>
+
+                {openSections.faq && (
+                  <div className="p-3.5 sm:p-5 border-t border-neutral-100 dark:border-[#262626] bg-neutral-50/50 dark:bg-[#111111]">
+                    <FrictionFaqSection
+                      audienceMode={audienceMode}
+                      onNavigateChapter={handleSelectChapter}
+                      onScrollToPlaybook={handleScrollToPlaybook}
+                      onSearchGlossary={handleSearchGlossary}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* SECTION 4.5: กรณีศึกษาจริงจากบริษัทเทค (Real-World Case Studies) */}
             {activeChapter.realWorldExamples && activeChapter.realWorldExamples.length > 0 && (

@@ -16,6 +16,9 @@ interface GlossaryPanelProps {
   /** Controlled category, lifted so GlossaryCategoryMap can set it. */
   category?: GlossaryFilter;
   onCategoryChange?: (category: GlossaryFilter) => void;
+  /** Controlled search query, lifted so other chapters can prefill it (s11 FAQ concept chips). */
+  query?: string;
+  onQueryChange?: (query: string) => void;
 }
 
 const chipClass = (active: boolean) =>
@@ -35,8 +38,16 @@ export const GlossaryPanel: React.FC<GlossaryPanelProps> = ({
   initialCategory = 'all',
   category,
   onCategoryChange,
+  query: controlledQuery,
+  onQueryChange,
 }) => {
-  const [query, setQuery] = useState('');
+  const [localQuery, setLocalQuery] = useState('');
+  const query = controlledQuery ?? localQuery;
+
+  const setQuery = (next: string) => {
+    if (controlledQuery === undefined) setLocalQuery(next);
+    onQueryChange?.(next);
+  };
   const [localCategory, setLocalCategory] = useState<GlossaryFilter>(initialCategory);
   const activeCategory = category ?? localCategory;
 
