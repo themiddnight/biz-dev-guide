@@ -397,7 +397,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
             </div>
 
             {/* Role Filter Chips */}
-            <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-none text-[11px]">
+            <div className="flex items-center gap-1 shrink-0 overflow-x-auto pb-1 scrollbar-none text-[11px]">
               {[
                 { id: 'all', label: 'ทั้งหมด' },
                 { id: 'pm', label: 'PM' },
