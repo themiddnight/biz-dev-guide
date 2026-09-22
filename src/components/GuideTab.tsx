@@ -7,6 +7,10 @@ import { RoleMindsetCard } from './RoleMindsetCard';
 import { FrictionPlaybookCard } from './FrictionPlaybookCard';
 import { FrictionFaqSection } from './FrictionFaqSection';
 import { ContentBlocks } from './content/ContentBlocks';
+import { DiagramFamilyGrid } from './diagrams/DiagramFamilyGrid';
+import { SwimlaneVsSequence } from './diagrams/SwimlaneVsSequence';
+import { S5_JUMP_TARGET_IDS, DiagramJumpTarget } from '../data/diagramFamilies';
+import { FIGURES } from './figures';
 import { GlossaryPanel, GlossaryFilter } from './glossary/GlossaryPanel';
 import { GlossaryCategoryMap } from './glossary/GlossaryCategoryMap';
 import { GLOSSARY, GlossaryCategory } from '../data/glossary';
@@ -138,6 +142,14 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   const referenceBlockCount = referenceSections.reduce((sum, section) => sum + section.blocks.length, 0);
 
   const isCurrentBookmarked = bookmarks.includes(activeChapter.id);
+
+  // s5 family-grid jump cards: open the target block (if it is a disclosure) and scroll it into view.
+  const handleDiagramJump = (target: DiagramJumpTarget) => {
+    const el = document.getElementById(S5_JUMP_TARGET_IDS[target]);
+    if (!el) return;
+    if (el instanceof HTMLDetailsElement) el.open = true;
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
   const isCurrentRead = readChapters.includes(activeChapter.id);
 
   // Scroll to top when active chapter changes
@@ -1042,6 +1054,20 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                     </div>
                   )}
 
+                  {/* s5: diagram families + T1 render above the Kitchen simulator (spec §3.4 order) */}
+                  {activeChapter.id === 's5' && (
+                    <div className="space-y-3">
+                      <DiagramFamilyGrid onJump={handleDiagramJump} />
+                      {activeChapter.contentSections && (
+                        <ContentBlocks
+                          sections={activeChapter.contentSections}
+                          placement="diagram"
+                          onNavigateChapter={handleSelectChapter}
+                        />
+                      )}
+                    </div>
+                  )}
+
                   {/* Interactive Chapter Diagram Simulator */}
                   {activeChapter.id === 's15' ? (
                     <GlossaryCategoryMap
@@ -1053,8 +1079,8 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                     <ChapterDiagram chapterId={activeChapter.id} />
                   )}
 
-                  {/* Restored static-guide blocks placed inside the diagram section */}
-                  {activeChapter.contentSections && (
+                  {/* Restored static-guide blocks placed inside the diagram section (s5 renders them above) */}
+                  {activeChapter.id !== 's5' && activeChapter.contentSections && (
                     <ContentBlocks
                       sections={activeChapter.contentSections}
                       placement="diagram"
@@ -1064,7 +1090,11 @@ export const GuideTab: React.FC<GuideTabProps> = ({
 
                   {/* Interactive C4 Model Zoom for Chapter 5 */}
                   {activeChapter.id === 's5' && (
-                    <div className="mt-4 p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] space-y-3">
+                    <>
+                    <div
+                      id={S5_JUMP_TARGET_IDS.c4}
+                      className="scroll-mt-4 mt-4 p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] space-y-3"
+                    >
                       <div className="flex items-center justify-between flex-wrap gap-2">
                         <h4 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa] flex items-center gap-2">
                           <Layers className="w-4 h-4 text-neutral-600 dark:text-[#a3a3a3]" />
@@ -1074,7 +1104,9 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                           {[1, 2, 3, 4].map((lvl) => (
                             <button
                               key={lvl}
+                              type="button"
                               onClick={() => setC4Level(lvl)}
+                              aria-pressed={c4Level === lvl}
                               className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer font-mono ${
                                 c4Level === lvl
                                   ? 'bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] shadow-xs'
@@ -1087,12 +1119,29 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                         </div>
                       </div>
 
+                      <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e] leading-relaxed">
+                        Metaphor แบบ Google Maps — ซูมเข้าไปทีละชั้น ยิ่งซูมเข้ายิ่งเห็นรายละเอียดมากขึ้น แต่ดูทีละระดับพอ
+                      </p>
+
+                      {/* Static C4 figure for the selected level (c4-l1…c4-l4) */}
+                      {(() => {
+                        const C4Figure = FIGURES[`c4-l${c4Level}` as 'c4-l1' | 'c4-l2' | 'c4-l3' | 'c4-l4'];
+                        return (
+                          <div className="p-3 rounded-xl bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626]">
+                            <C4Figure className="w-full" />
+                          </div>
+                        );
+                      })()}
+
                       <div className="p-3.5 bg-neutral-50 dark:bg-[#181818] rounded-xl border border-neutral-200 dark:border-[#262626] text-xs sm:text-sm space-y-1">
                         {c4Level === 1 && (
                           <div>
                             <span className="font-bold text-neutral-900 dark:text-[#fafafa] font-mono">Level 1: System Context</span>
                             <p className="text-neutral-600 dark:text-[#a3a3a3] mt-1 leading-relaxed text-xs">
                               ซูมออกสุด เห็นระบบเป็นกล่องเดียวตรงกลาง ล้อมรอบด้วย Actor (ลูกค้า, ร้านค้า, ไรเดอร์) และระบบภายนอก (Payment Gateway, Map API) — <b>เหมาะที่สุดสำหรับ Business Stakeholders และผู้บริหาร</b>
+                            </p>
+                            <p className="text-neutral-600 dark:text-[#a3a3a3] mt-1 leading-relaxed text-xs">
+                              ไม่มีรายละเอียดเทคโนโลยีเลย ผู้อ่าน: ทุกคนรวมถึงคนไม่เทคนิค
                             </p>
                           </div>
                         )}
@@ -1101,6 +1150,9 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                             <span className="font-bold text-neutral-900 dark:text-[#fafafa] font-mono">Level 2: Container Diagram</span>
                             <p className="text-neutral-600 dark:text-[#a3a3a3] mt-1 leading-relaxed text-xs">
                               ซูมเข้ามา 1 ชั้น เห็นหน่วยที่ Deploy แยกกันได้ เช่น Single Page App, Mobile App, Backend API, Database — <b>เหมาะสำหรับ Tech Lead &amp; Software Architects</b>
+                            </p>
+                            <p className="text-neutral-600 dark:text-[#a3a3a3] mt-1 leading-relaxed text-xs">
+                              "container" คือหน่วยที่ deploy/run แยกกันได้ ผู้อ่าน: คนเทคนิคที่ต้องเข้าใจ tech choice ระดับสูง
                             </p>
                           </div>
                         )}
@@ -1122,6 +1174,10 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                         )}
                       </div>
                     </div>
+
+                    {/* Swimlane vs sequence worked example (static s5 dg-behavior) */}
+                    <SwimlaneVsSequence />
+                    </>
                   )}
                 </div>
               )}
