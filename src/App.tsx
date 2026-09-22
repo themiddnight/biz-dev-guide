@@ -17,7 +17,9 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<TabType>('guide');
   const route = useChapterRoute(CHAPTERS, { onChapterRoute: () => setActiveTab('guide') });
 
-  // Tabs are not routes: clear the hash off the guide, restore it on return (spec §5.2).
+  // Tabs are not routes: clear the hash off the guide, restore it on return (spec §5.2) —
+  // but only when the URL had a chapter hash, so a plain visit stays a bare URL. A hash
+  // already present (back/forward from another tab) is kept as is, section included.
   const prevTabRef = useRef(activeTab);
   useEffect(() => {
     const prev = prevTabRef.current;
@@ -26,11 +28,11 @@ export default function App() {
       if (window.location.hash) window.history.replaceState(null, '', window.location.pathname + window.location.search);
       return;
     }
-    if (prev !== 'guide') {
+    if (prev !== 'guide' && route.hashInUrl && !window.location.hash) {
       const num = CHAPTERS.find(c => c.id === route.activeChapterId)?.num;
       if (num !== undefined) window.history.replaceState(null, '', formatChapterHash(num));
     }
-  }, [activeTab, route.activeChapterId]);
+  }, [activeTab, route.activeChapterId, route.hashInUrl]);
   const [audienceMode, setAudienceMode] = useState<AudienceMode>('both');
   const [experienceLevel, setExperienceLevel] = useState<ExperienceLevel>(() => {
     const saved = readStorage('be_guide_exp_level') as ExperienceLevel | null;
@@ -320,6 +322,8 @@ export default function App() {
             onReplaceSection={route.replaceSection}
             loadedFromHash={route.loadedFromHash}
             resumeCandidate={route.resumeCandidate}
+            resumeDismissed={route.resumeDismissed}
+            onDismissResume={route.dismissResume}
           />
         )}
 

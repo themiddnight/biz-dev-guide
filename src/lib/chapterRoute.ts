@@ -32,3 +32,31 @@ export function parseChapterHash(hash: string, chapters: ChapterRef[]): ChapterR
   }
   return null;
 }
+
+export const isBareHash = (hash: string): boolean => hash === '' || hash === '#';
+
+/**
+ * Per-page-session routing facts that must outlive GuideTab (it unmounts on other tabs):
+ * whether the URL carries a chapter hash the guide tab should restore, and whether the
+ * resume banner is done for this session (spec §5.2, §5.4).
+ */
+export interface RouteSession { hashInUrl: boolean; resumeDismissed: boolean }
+export type RouteSessionEvent =
+  | { type: 'navigate' }
+  | { type: 'pop'; hash: string }
+  | { type: 'dismissResume' };
+
+export function initRouteSession(hash: string): RouteSession {
+  return { hashInUrl: !isBareHash(hash), resumeDismissed: false };
+}
+
+export function reduceRouteSession(state: RouteSession, event: RouteSessionEvent): RouteSession {
+  switch (event.type) {
+    case 'navigate':
+      return { hashInUrl: true, resumeDismissed: true };
+    case 'pop':
+      return { hashInUrl: !isBareHash(event.hash), resumeDismissed: true };
+    case 'dismissResume':
+      return state.resumeDismissed ? state : { ...state, resumeDismissed: true };
+  }
+}

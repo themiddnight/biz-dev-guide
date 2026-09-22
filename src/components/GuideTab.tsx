@@ -52,6 +52,8 @@ interface GuideTabProps {
   onChooseInitialLevel?: (level: ExperienceLevel) => void;
   loadedFromHash: boolean;
   resumeCandidate: string | null;
+  resumeDismissed: boolean;
+  onDismissResume: () => void;
   onAudienceChange?: (mode: AudienceMode) => void;
   bookmarks: string[];
   readChapters?: string[];
@@ -75,6 +77,8 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   onChooseInitialLevel,
   loadedFromHash,
   resumeCandidate,
+  resumeDismissed,
+  onDismissResume,
   onAudienceChange,
   bookmarks,
   readChapters = [],
@@ -216,12 +220,8 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   };
   const handleFirstVisitSkip = () => onChooseInitialLevel?.('beginner');
 
-  const [resumeDismissed, setResumeDismissed] = useState(false);
-  const initialChapterRef = useRef(activeChapterId);
-  // Any navigation away from the initial chapter hides the banner for this page session.
-  useEffect(() => {
-    if (activeChapterId !== initialChapterRef.current) setResumeDismissed(true);
-  }, [activeChapterId]);
+  // resumeDismissed lives in useChapterRoute: any navigation or back/forward sets it, and it
+  // survives this component unmounting on other tabs (spec §5.4).
   const resumeChapter = resumeCandidate ? chapters.find(c => c.id === resumeCandidate) : undefined;
   const showResume = !loadedFromHash && !!resumeChapter && resumeChapter.id !== activeChapterId && !showFirstVisit && !resumeDismissed;
 
@@ -486,8 +486,8 @@ export const GuideTab: React.FC<GuideTabProps> = ({
           {showResume && resumeChapter && (
             <ResumeBanner
               chapter={resumeChapter}
-              onResume={() => { setResumeDismissed(true); handleSelectChapter(resumeChapter.id); }}
-              onDismiss={() => setResumeDismissed(true)}
+              onResume={() => handleSelectChapter(resumeChapter.id)}
+              onDismiss={onDismissResume}
             />
           )}
 

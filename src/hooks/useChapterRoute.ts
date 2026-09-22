@@ -1,7 +1,15 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react';
 import type { Chapter } from '../types';
 import type { SectionKey } from '../data/sectionLayers';
-import { formatChapterHash, parseChapterHash, type RequestedSection } from '../lib/chapterRoute';
+import {
+  formatChapterHash,
+  initRouteSession,
+  isBareHash,
+  parseChapterHash,
+  reduceRouteSession,
+  type ChapterRoute,
+  type RequestedSection,
+} from '../lib/chapterRoute';
 import { readStorage, writeStorage } from '../lib/storage';
 
 export interface ChapterRouteApi {
@@ -9,8 +17,13 @@ export interface ChapterRouteApi {
   requestedSection: RequestedSection | null;
   loadedFromHash: boolean;
   resumeCandidate: string | null;
+  /** Session-only; lives here so it survives GuideTab unmounting on other tabs (spec §5.4). */
+  resumeDismissed: boolean;
+  /** True once the URL carries a chapter hash: present at load, or written by a navigation. */
+  hashInUrl: boolean;
   navigate: (chapterId: string, section?: SectionKey) => void;
   replaceSection: (section: SectionKey | null) => void;
+  dismissResume: () => void;
 }
 
 const DEFAULT_CHAPTER = 's1';
@@ -26,6 +39,7 @@ export function useChapterRoute(chapters: Chapter[], opts: { onChapterRoute: () 
     init.route?.section ? { key: init.route.section, nonce: 1 } : null,
   );
   const [resumeCandidate] = useState(() => readStorage(LAST_CHAPTER_KEY));
+  const [session, dispatch] = useReducer(reduceRouteSession, window.location.hash, initRouteSession);
   const navigatedRef = useRef(false);
   const nonceRef = useRef(1);
   const activeRef = useRef(activeChapterId);
@@ -57,21 +71,15 @@ export function useChapterRoute(chapters: Chapter[], opts: { onChapterRoute: () 
   useEffect(() => {
     const onPopState = () => {
       const { hash } = window.location;
-      if (hash === '' || hash === '#') {
-        // The bare entry is the untouched initial page, which shows the default chapter.
-        navigatedRef.current = true;
-        setActiveChapterId(DEFAULT_CHAPTER);
-        setRequestedSection(null);
-        onRouteRef.current();
-        return;
-      }
-      const route = parseChapterHash(hash, chapters);
+      // The bare entry is the untouched initial page, which shows the default chapter.
+      const route: ChapterRoute | null = isBareHash(hash) ? { chapterId: DEFAULT_CHAPTER } : parseChapterHash(hash, chapters);
       if (!route) {
         const num = numOf(activeRef.current);
         if (num !== undefined) window.history.replaceState(null, '', formatChapterHash(num));
         return;
       }
       navigatedRef.current = true;
+      dispatch({ type: 'pop', hash });
       setActiveChapterId(route.chapterId);
       setRequestedSection(route.section ? { key: route.section, nonce: ++nonceRef.current } : null);
       onRouteRef.current();
@@ -84,6 +92,7 @@ export function useChapterRoute(chapters: Chapter[], opts: { onChapterRoute: () 
     navigatedRef.current = true;
     const num = numOf(chapterId);
     if (num === undefined) return;
+    dispatch({ type: 'navigate' });
     setActiveChapterId(chapterId);
     setRequestedSection(section ? { key: section, nonce: ++nonceRef.current } : null);
     const hash = formatChapterHash(num, section);
@@ -96,12 +105,17 @@ export function useChapterRoute(chapters: Chapter[], opts: { onChapterRoute: () 
     window.history.replaceState(null, '', formatChapterHash(num, section ?? undefined));
   }, [numOf]);
 
+  const dismissResume = useCallback(() => dispatch({ type: 'dismissResume' }), []);
+
   return {
     activeChapterId,
     requestedSection,
     loadedFromHash: init.route !== null,
     resumeCandidate,
+    resumeDismissed: session.resumeDismissed,
+    hashInUrl: session.hashInUrl,
     navigate,
     replaceSection,
+    dismissResume,
   };
 }
