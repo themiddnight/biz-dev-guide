@@ -35,7 +35,7 @@ export const CHAPTER_ILLUSTRATIONS: Record<string, ChapterIllustration> = {
   s3: {
     id: 'ill-s3',
     title: 'The Design Fidelity Cost Escalation Ladder',
-    subtitle: 'บันไดความละเอียด 4 ขั้น: ยิ่งรื้อช้า ต้นทุนการแก้พุ่งขึ้น 100 เท่า',
+    subtitle: 'บันไดความละเอียด 4 ขั้น: ยิ่งรื้อช้า ต้นทุนการแก้ยิ่งสูง',
     visualMetaphor: 'การแก้งานบนกระดาษร่างดินสอใช้แค่ยางลบก้อนละ 5 บาท แต่การแก้ตอนตึกสร้างเสร็จแล้วต้องทุบเสาเข็มคอนกรีตทิ้งด้วยเงินล้าน',
     svgType: 'pipeline',
     svgDescription: 'บันได 4 ขั้นไต่ระดับความสมจริง: 1. Paper Sketch ($10) ➔ 2. Low-Fi Wireframe ($100) ➔ 3. Hi-Fi Interactive Prototype ($1,000) ➔ 4. Live Production Code ($100,000)',

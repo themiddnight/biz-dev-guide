@@ -259,10 +259,10 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
           {[
-            { step: '1. Wireframe / Sketch', speed: 'ทำเสร็จใน 1 ชั่วโมง', cost: '1x (ถูกสุด)', change: 'ลบขีดใหม่ใน 3 นาที', color: 'border-blue-500/40' },
-            { step: '2. Low-Fi Wireframe', speed: 'ทำเสร็จใน 1 วัน', cost: '3x', change: 'จัด Layout ใหม่ใน 20 นาที', color: 'border-indigo-500/40' },
-            { step: '3. Hi-Fi Interactive Prototype', speed: 'ทำเสร็จใน 3-5 วัน', cost: '10x', change: 'แก้สี ฟอนต์ แอนิเมชัน 2 ชม.', color: 'border-purple-500/40' },
-            { step: '4. Production Live Code', speed: 'ทำเสร็จใน 2-4 สัปดาห์', cost: '100x (แพงสุด)', change: 'รื้อ Database/API/Test เป็นสัปดาห์', color: 'border-rose-500/40' },
+            { step: '1. Wireframe / Sketch', speed: 'ทำเสร็จใน 1 ชั่วโมง', cost: 'ถูกสุด', change: 'ลบขีดใหม่ใน 3 นาที', color: 'border-blue-500/40' },
+            { step: '2. Low-Fi Wireframe', speed: 'ทำเสร็จใน 1 วัน', cost: 'ยังถูก', change: 'จัด Layout ใหม่ใน 20 นาที', color: 'border-indigo-500/40' },
+            { step: '3. Hi-Fi Interactive Prototype', speed: 'ทำเสร็จใน 3-5 วัน', cost: 'เริ่มแพง', change: 'แก้สี ฟอนต์ แอนิเมชัน 2 ชม.', color: 'border-purple-500/40' },
+            { step: '4. Production Live Code', speed: 'ทำเสร็จใน 2-4 สัปดาห์', cost: 'แพงสุด', change: 'รื้อ Database/API/Test เป็นสัปดาห์', color: 'border-rose-500/40' },
           ].map((item, idx) => (
             <div key={idx} className={`p-4 rounded-2xl bg-white dark:bg-slate-900 border ${item.color} space-y-2`}>
               <span className="text-xs font-bold text-slate-900 dark:text-slate-100 block">{item.step}</span>
@@ -658,17 +658,17 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
   // =========================================================================
   if (chapterId === 's9') {
     const boehmData = [
-      { phase: 'Requirement', cost: '1x ($100)', desc: 'แก้คำในเอกสาร ลบข้อความแล้วพิมพ์ใหม่' },
-      { phase: 'Design/Prototype', cost: '5x ($500)', desc: 'แก้ Flow ใน Figma และแจ้งทีมปรับความเข้าใจ' },
-      { phase: 'Coding', cost: '10x ($1,000)', desc: 'แก้โครงสร้าง Logic และแก้ Unit Tests ที่เขียนไปแล้ว' },
-      { phase: 'QA Testing', cost: '50x ($5,000)', desc: 'ต้อง Re-test ทั้งระบบ ตก Sprint และเลื่อนวันส่งมอบ' },
-      { phase: 'Live Production', cost: '100x - 200x ($50,000+)', desc: 'ข้อมูลลูกค้าพัง ระบบล่ม เสียชื่อเสียง และต้องออก Hotfix เร่งด่วน' },
+      { phase: 'Requirement', cost: 'ถูกสุด', desc: 'แก้คำในเอกสาร ลบข้อความแล้วพิมพ์ใหม่' },
+      { phase: 'Design/Prototype', cost: 'ยังถูก', desc: 'แก้ Flow ใน Figma และแจ้งทีมปรับความเข้าใจ' },
+      { phase: 'Coding', cost: 'เริ่มแพง', desc: 'แก้โครงสร้าง Logic และแก้ Unit Tests ที่เขียนไปแล้ว' },
+      { phase: 'QA Testing', cost: 'แพง', desc: 'ต้อง Re-test ทั้งระบบ ตก Sprint และเลื่อนวันส่งมอบ' },
+      { phase: 'Live Production', cost: 'แพงสุด', desc: 'ข้อมูลลูกค้าพัง ระบบล่ม เสียชื่อเสียง และต้องออก Hotfix เร่งด่วน' },
     ];
 
     return (
       <div className="space-y-4">
         <div className="text-xs text-slate-500 dark:text-slate-400">
-          กราฟความชันของ Barry Boehm: ต้นทุนการแก้บั๊กหรือเปลี่ยนใจพุ่งขึ้นเป็นเท่าทวีคูณ (Exponential)
+          ยิ่งเจอบั๊กหรือเปลี่ยนใจช้า ต้นทุนการแก้ยิ่งสูง ตัวคูณที่อ้างกันบ่อย (เช่น 100 เท่า) มาจากงานวิจัยยุคเก่าและเชื่อได้แค่ทิศทาง ไม่ใช่ตัวเลข
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
           {boehmData.map((b, idx) => (

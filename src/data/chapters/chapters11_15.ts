@@ -4,7 +4,7 @@ export const chapters11_15: Chapter[] = [
   {
     id: 's11',
     num: 11,
-    title: '12 จุดปะทะที่เจอบ่อย',
+    title: 'จุดปะทะที่เจอบ่อย 12 ข้อ',
     enTerm: 'Cross-Team Friction',
     subtitle: 'คำขอคลาสสิกที่ทำให้ Business กับ Dev ปะทะกัน พร้อมสาเหตุและวิธีคุย',
     roleTag: 'friction',
