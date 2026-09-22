@@ -18,8 +18,11 @@ import { RefundAiReview } from './RefundAiReview';
 import { RefundBacklogCut } from './RefundBacklogCut';
 import { RefundC4Impact } from './RefundC4Impact';
 import { RefundDebtDiff } from './RefundDebtDiff';
+import { RefundDeployLog } from './RefundDeployLog';
+import { RefundDualTrackBoard } from './RefundDualTrackBoard';
 import { RefundFidelity } from './RefundFidelity';
 import { RefundGlossaryFix } from './RefundGlossaryFix';
+import { RefundHandoffDrift } from './RefundHandoffDrift';
 import { RefundKpiSplit } from './RefundKpiSplit';
 import { RefundNfrSpec } from './RefundNfrSpec';
 import { RefundSequence } from './RefundSequence';
@@ -88,6 +91,10 @@ export const FIGURES: Record<FigureKey, React.FC<FigureProps>> = {
   'refund-kpi-split': RefundKpiSplit,
   'refund-ai-review': RefundAiReview,
   'refund-glossary-fix': RefundGlossaryFix,
+  // s1, s8, s12 heroes (chapter figure briefs 2026-09-22, wave 3)
+  'refund-handoff-drift': RefundHandoffDrift,
+  'refund-deploy-log': RefundDeployLog,
+  'refund-dual-track-board': RefundDualTrackBoard,
   // Appendix figures (spec §6)
   'translation-layers': TranslationLayers,
   'gate-timeline': GateTimeline,

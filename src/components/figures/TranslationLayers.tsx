@@ -1,75 +1,102 @@
 import React, { useId } from 'react';
 import type { FigureProps } from './index';
 
-/** Static fig 1 (s1): one business sentence passing through translation layers to code. */
+/** Layer tops in the stacked 280-wide layout (each layer 42 units tall, 18-unit seams). */
+const LAYER_H = 42;
+const SEAM_H = 18;
+const BIZ_TOP = 4;
+const BIZ_H = 38;
+const FIRST_TOP = BIZ_TOP + BIZ_H + SEAM_H;
+const BOX_W = 256;
+const RAIL_X = 270;
+
+interface Layer { role: string; job: string; output?: string; accent?: boolean }
+
+const LAYERS: readonly Layer[] = [
+  { role: 'Product Manager', job: 'ตัดสินใจ "ควรทำอะไร ทำไม"', output: 'roadmap · PRD' },
+  { role: 'Business Analyst', job: 'แปลเป็น requirement ที่ชัดพอ', output: 'BRD · user story' },
+  { role: 'Solution Architect', job: 'แปลเป็นโครงสร้างระบบ', output: 'solution design' },
+  { role: 'Engineer', job: 'แปลเป็น code จริง', accent: true },
+];
+
+const top = (i: number) => FIRST_TOP + i * (LAYER_H + SEAM_H);
+const PM_TOP = top(LAYERS.length - 1) + LAYER_H + 10;
+const PM_H = 40;
+const muted = 'var(--fig-text-muted)';
+
+/**
+ * Static fig 1 (s1): one business sentence passing through translation layers to code.
+ * Stacked rows in a 280-wide viewBox so every label renders >= 10px in the
+ * ~287px column inside the core-concepts card at a 375px viewport.
+ */
 export const TranslationLayers: React.FC<FigureProps> = ({ className }) => {
   const uid = useId();
+  const seamTops = [BIZ_TOP + BIZ_H, ...LAYERS.slice(0, -1).map((_, i) => top(i) + LAYER_H)];
 
   return (
     <div className={`fig-scope ${className ?? ''}`}>
       <svg
-        viewBox="0 0 620 430"
+        viewBox={`0 0 280 ${PM_TOP + PM_H + 4}`}
         role="img"
         aria-labelledby={`${uid}-p1t ${uid}-p1d`}
         fontFamily="inherit"
-        style={{ width: '100%', height: 'auto', maxWidth: 620, display: 'block', margin: '0 auto' }}
+        style={{ width: '100%', height: 'auto', maxWidth: 360, display: 'block', margin: '0 auto' }}
       >
         <title id={`${uid}-p1t`}>แผนภาพเส้นทางการแปลความต้องการทางธุรกิจไปสู่โค้ด</title>
         <desc id={`${uid}-p1d`}>ความต้องการทางธุรกิจไหลลงผ่านสี่บทบาท ได้แก่ Product Manager, Business Analyst, Solution Architect และ Engineer โดยแต่ละบทบาทผลิตเอกสารของตัวเอง และมีจุดที่ความกำกวมรั่วไหลอยู่ระหว่างแต่ละชั้น ส่วน Project Manager ทำงานคู่ขนานตลอดเส้นโดยไม่ตัดสินใจเนื้อหา</desc>
         <defs>
-          <marker id={`${uid}-pipe-a`} viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-            <path d="M0,0 L10,5 L0,10 z" fill="var(--fig-text-muted)" />
+          <marker id={`${uid}-pipe-a`} viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill={muted} />
           </marker>
         </defs>
 
-        <rect x="20" y="8" width="330" height="42" rx="8" fill="var(--fig-warn-bg)" stroke="var(--fig-warn-border)" />
-        <text x="36" y="27" fontSize="12" fill="var(--fig-text)">ธุรกิจต้องการ</text>
-        <text x="36" y="43" fontSize="12.5" fontWeight="600" fill="var(--fig-text)">"ลูกค้าสั่งอาหารได้ง่ายขึ้น"</text>
+        {/* Business need */}
+        <rect x="4" y={BIZ_TOP} width={BOX_W} height={BIZ_H} rx="8" fill="var(--fig-warn-bg)" stroke="var(--fig-warn-border)" />
+        <text x="14" y={BIZ_TOP + 15} fontSize="10" fill="var(--fig-text-2)">ธุรกิจต้องการ</text>
+        <text x="14" y={BIZ_TOP + 31} fontSize="11" fontWeight="600" fill="var(--fig-text)">"ลูกค้าสั่งอาหารได้ง่ายขึ้น"</text>
 
-        <rect x="20" y="80" width="330" height="56" rx="8" fill="var(--fig-surface-2)" stroke="var(--fig-border)" />
-        <text x="36" y="102" fontSize="13" fontWeight="600" fill="var(--fig-text)">Product Manager</text>
-        <text x="36" y="121" fontSize="11.5" fill="var(--fig-text-2)">ตัดสินใจ "ควรทำอะไร ทำไม"</text>
-        <text x="370" y="102" fontSize="10.5" fill="var(--fig-text-muted)">ผลลัพธ์</text>
-        <text x="370" y="119" fontSize="11.5" fill="var(--fig-text-2)">roadmap · PRD</text>
+        {/* Role layers */}
+        {LAYERS.map((layer, i) => {
+          const y = top(i);
+          return (
+            <g key={layer.role}>
+              <rect
+                x="4" y={y} width={BOX_W} height={LAYER_H} rx="8"
+                fill={layer.accent ? 'var(--fig-accent-bg)' : 'var(--fig-surface-2)'}
+                stroke={layer.accent ? 'var(--fig-accent-border)' : 'var(--fig-border)'}
+              />
+              <text x="14" y={y + 17} fontSize="12" fontWeight="600" fill="var(--fig-text)">{layer.role}</text>
+              {layer.output && (
+                <text x={BOX_W - 4} y={y + 17} textAnchor="end" fontSize="10" fill={muted}>{layer.output}</text>
+              )}
+              <text x="14" y={y + 33} fontSize="10" fill="var(--fig-text-2)">{layer.job}</text>
+            </g>
+          );
+        })}
 
-        <rect x="20" y="166" width="330" height="56" rx="8" fill="var(--fig-surface-2)" stroke="var(--fig-border)" />
-        <text x="36" y="188" fontSize="13" fontWeight="600" fill="var(--fig-text)">Business Analyst</text>
-        <text x="36" y="207" fontSize="11.5" fill="var(--fig-text-2)">แปลเป็น requirement ที่ชัดพอ</text>
-        <text x="370" y="188" fontSize="10.5" fill="var(--fig-text-muted)">ผลลัพธ์</text>
-        <text x="370" y="205" fontSize="11.5" fill="var(--fig-text-2)">BRD · user story</text>
+        {/* Seams: hand-off arrow + leak marker ("!" drawn as shapes) */}
+        {seamTops.map((sy, i) => {
+          const cy = sy + SEAM_H / 2;
+          return (
+            <g key={sy}>
+              <line x1="30" y1={sy} x2="30" y2={sy + SEAM_H - 3} stroke={muted} strokeWidth="1.5" markerEnd={`url(#${uid}-pipe-a)`} />
+              <circle cx="56" cy={cy} r="6.5" fill="var(--fig-warn-bg)" stroke="var(--fig-warn-border)" />
+              <line x1="56" y1={cy - 3.5} x2="56" y2={cy + 1} stroke="var(--fig-warn)" strokeWidth="1.6" strokeLinecap="round" />
+              <circle cx="56" cy={cy + 3.3} r="0.95" fill="var(--fig-warn)" />
+              {i === 0 && (
+                <text x="68" y={cy + 3.5} fontSize="10" fill="var(--fig-warn)">จุดที่ความหมายรั่วได้มากที่สุด</text>
+              )}
+            </g>
+          );
+        })}
 
-        <rect x="20" y="252" width="330" height="56" rx="8" fill="var(--fig-surface-2)" stroke="var(--fig-border)" />
-        <text x="36" y="274" fontSize="13" fontWeight="600" fill="var(--fig-text)">Solution Architect</text>
-        <text x="36" y="293" fontSize="11.5" fill="var(--fig-text-2)">แปลเป็นโครงสร้างระบบ</text>
-        <text x="370" y="274" fontSize="10.5" fill="var(--fig-text-muted)">ผลลัพธ์</text>
-        <text x="370" y="291" fontSize="11.5" fill="var(--fig-text-2)">solution design</text>
-
-        <rect x="20" y="338" width="330" height="52" rx="8" fill="var(--fig-accent-bg)" stroke="var(--fig-accent-border)" />
-        <text x="36" y="360" fontSize="13" fontWeight="600" fill="var(--fig-text)">Engineer</text>
-        <text x="36" y="378" fontSize="11.5" fill="var(--fig-text-2)">แปลเป็น code จริง</text>
-
-        <line x1="60" y1="50" x2="60" y2="76" stroke="var(--fig-text-muted)" strokeWidth="1.6" markerEnd={`url(#${uid}-pipe-a)`}/>
-        <line x1="60" y1="136" x2="60" y2="162" stroke="var(--fig-text-muted)" strokeWidth="1.6" markerEnd={`url(#${uid}-pipe-a)`}/>
-        <line x1="60" y1="222" x2="60" y2="248" stroke="var(--fig-text-muted)" strokeWidth="1.6" markerEnd={`url(#${uid}-pipe-a)`}/>
-        <line x1="60" y1="308" x2="60" y2="334" stroke="var(--fig-text-muted)" strokeWidth="1.6" markerEnd={`url(#${uid}-pipe-a)`}/>
-
-        <circle cx="112" cy="63" r="7" fill="var(--fig-warn-bg)" stroke="var(--fig-warn-border)" />
-        <text x="112" y="67" textAnchor="middle" fontSize="9.5" fill="var(--fig-warn)">!</text>
-        <circle cx="112" cy="149" r="7" fill="var(--fig-warn-bg)" stroke="var(--fig-warn-border)" />
-        <text x="112" y="153" textAnchor="middle" fontSize="9.5" fill="var(--fig-warn)">!</text>
-        <circle cx="112" cy="235" r="7" fill="var(--fig-warn-bg)" stroke="var(--fig-warn-border)" />
-        <text x="112" y="239" textAnchor="middle" fontSize="9.5" fill="var(--fig-warn)">!</text>
-        <circle cx="112" cy="321" r="7" fill="var(--fig-warn-bg)" stroke="var(--fig-warn-border)" />
-        <text x="112" y="325" textAnchor="middle" fontSize="9.5" fill="var(--fig-warn)">!</text>
-        <text x="128" y="67" fontSize="10.5" fill="var(--fig-warn)">จุดที่ความหมายรั่วได้มากที่สุด</text>
-
-        <rect x="500" y="80" width="104" height="310" rx="8" fill="none" stroke="var(--fig-border)" strokeDasharray="5 4" />
-        <text x="552" y="212" textAnchor="middle" fontSize="11.5" fontWeight="600" fill="var(--fig-text-2)">Project</text>
-        <text x="552" y="228" textAnchor="middle" fontSize="11.5" fontWeight="600" fill="var(--fig-text-2)">Manager</text>
-        <text x="552" y="250" textAnchor="middle" fontSize="10" fill="var(--fig-text-muted)">คุมเวลา/คน</text>
-        <text x="552" y="264" textAnchor="middle" fontSize="10" fill="var(--fig-text-muted)">คู่ขนานทั้งเส้น</text>
-        <text x="552" y="284" textAnchor="middle" fontSize="10" fill="var(--fig-text-muted)">ไม่ตัดสินใจ</text>
-        <text x="552" y="298" textAnchor="middle" fontSize="10" fill="var(--fig-text-muted)">เนื้อหา</text>
+        {/* Project Manager runs in parallel along the whole line */}
+        <line x1={RAIL_X} y1={FIRST_TOP} x2={RAIL_X} y2={PM_TOP} stroke="var(--fig-border)" strokeWidth="1.5" strokeDasharray="4 3" />
+        <line x1={RAIL_X - 4} y1={FIRST_TOP} x2={RAIL_X + 4} y2={FIRST_TOP} stroke="var(--fig-border)" strokeWidth="1.5" />
+        <rect x="4" y={PM_TOP} width="272" height={PM_H} rx="8" fill="none" stroke="var(--fig-border)" strokeDasharray="5 4" />
+        <text x="14" y={PM_TOP + 17} fontSize="11" fontWeight="600" fill="var(--fig-text-2)">Project Manager</text>
+        <text x="266" y={PM_TOP + 17} textAnchor="end" fontSize="10" fill={muted}>คู่ขนานทั้งเส้น</text>
+        <text x="14" y={PM_TOP + 32} fontSize="10" fill={muted}>คุมเวลา/คน · ไม่ตัดสินใจเนื้อหา</text>
       </svg>
     </div>
   );

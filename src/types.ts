@@ -45,7 +45,10 @@ export type FigureKey =
   | 'refund-slo-dashboard'
   | 'refund-kpi-split'
   | 'refund-ai-review'
-  | 'refund-glossary-fix';
+  | 'refund-glossary-fix'
+  | 'refund-handoff-drift'
+  | 'refund-deploy-log'
+  | 'refund-dual-track-board';
 
 /** One figure shown right under a chapter's subtitle (visual-first pilot). */
 export interface ChapterHeroFigure {

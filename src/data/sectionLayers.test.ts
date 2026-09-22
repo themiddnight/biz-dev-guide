@@ -49,10 +49,10 @@ describe('getLayerOf', () => {
 
 describe('getChapterLayout', () => {
   it('beginner s1 core', () => {
-    expect(core('beginner', 's1')).toEqual(['primer', 'jargon', 'diagram']);
+    expect(core('beginner', 's1')).toEqual(['primer', 'jargon']);
   });
   it('experienced s1 core', () => {
-    expect(core('experienced', 's1')).toEqual(['coreConcepts', 'pitfalls', 'diagram']);
+    expect(core('experienced', 's1')).toEqual(['coreConcepts', 'pitfalls']);
   });
   it('always returns 3 groups in LAYERS order', () => {
     for (const level of LEVELS) for (const c of CHAPTERS) {
@@ -81,7 +81,7 @@ describe('getChapterLayout', () => {
     for (const g of getChapterLayout('beginner', ch('s1'))) {
       expect(g.minutes).toBe(g.sections.reduce((s, k) => s + SECTION_META[k].minutes, 0));
     }
-    expect(getChapterLayout('beginner', ch('s1'))[0].minutes).toBe(7);
+    expect(getChapterLayout('beginner', ch('s1'))[0].minutes).toBe(4); // primer + jargon; s1 has no Diagram section after Q4
   });
 });
 
@@ -97,15 +97,16 @@ describe('isSectionPresent', () => {
   it('mindset, friction in every chapter', () => {
     for (const key of ['mindset', 'friction'] as SectionKey[]) expect(idsWith(key)).toHaveLength(15);
   });
-  it('diagram in every chapter except s14 (hero replaced it, Q6)', () => {
-    expect(idsWith('diagram')).toHaveLength(14);
+  it('diagram in every chapter except s1 (widget moved to s8, Q4) and s14 (Q6)', () => {
+    expect(idsWith('diagram')).toHaveLength(13);
+    expect(idsWith('diagram')).not.toContain('s1');
     expect(idsWith('diagram')).not.toContain('s14');
   });
 });
 
 describe('sectionHasTool', () => {
-  it('diagram in all chapters but s14; friction only in s1, s2, s6', () => {
-    expect(CHAPTERS.filter(c => !sectionHasTool(c, 'diagram')).map(c => c.id)).toEqual(['s14']);
+  it('diagram in all chapters but s1 and s14; friction only in s1, s2, s6', () => {
+    expect(CHAPTERS.filter(c => !sectionHasTool(c, 'diagram')).map(c => c.id)).toEqual(['s1', 's14']);
     expect(CHAPTERS.filter(c => sectionHasTool(c, 'friction')).map(c => c.id)).toEqual(['s1', 's2', 's6']);
     expect(sectionHasTool(ch('s1'), 'primer')).toBe(false);
   });

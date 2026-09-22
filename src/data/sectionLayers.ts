@@ -1,4 +1,5 @@
 import type { Chapter, ChapterContentSection, ContentPlacement, ExperienceLevel } from '../types';
+import { DIAGRAM_WIDGET_CHAPTERS, GLOSSARY_MAP_CHAPTER } from './diagramWidgets';
 
 export type Layer = 'core' | 'apply' | 'deep';
 export const LAYERS: readonly Layer[] = ['core', 'apply', 'deep'];
@@ -88,16 +89,24 @@ export function getInlineSectionsAt(chapter: Chapter, key: SectionKey, conceptIn
 }
 
 /**
- * Chapters with nothing left in the Diagram section: s14's hero replaced both its
- * illustration card and its text-card widget (chapter figure briefs 2026-09-22, Q6).
+ * Whether the Diagram section has anything to show: an illustration card, a widget,
+ * the glossary map, or content placed in it. Chapters whose hero replaced all of these
+ * (s1 after Q4, s14 after Q6) drop the section.
  */
-export const CHAPTERS_WITHOUT_DIAGRAM: readonly string[] = ['s14'];
+export function hasDiagramContent(chapter: Chapter): boolean {
+  return (
+    (chapter.illustrations?.length ?? 0) > 0 ||
+    DIAGRAM_WIDGET_CHAPTERS.has(chapter.id) ||
+    chapter.id === GLOSSARY_MAP_CHAPTER ||
+    (chapter.contentSections ?? []).some(section => placementOf(section) === 'diagram')
+  );
+}
 
 /** Mirrors the pre-refactor render guards in GuideTab exactly (spec §1.3). */
 export function isSectionPresent(chapter: Chapter, key: SectionKey): boolean {
   switch (key) {
     case 'mindset': case 'friction': return true;
-    case 'diagram': return !CHAPTERS_WITHOUT_DIAGRAM.includes(chapter.id);
+    case 'diagram': return hasDiagramContent(chapter);
     case 'primer': return !!chapter.beginnerPrimer;
     case 'jargon': return (chapter.jargonList?.length ?? 0) > 0;
     case 'dialogue': return !!chapter.dialogueExample;
@@ -113,7 +122,7 @@ export function isSectionPresent(chapter: Chapter, key: SectionKey): boolean {
 }
 
 export function sectionHasTool(chapter: Chapter, key: SectionKey): boolean {
-  if (key === 'diagram') return !CHAPTERS_WITHOUT_DIAGRAM.includes(chapter.id);
+  if (key === 'diagram') return hasDiagramContent(chapter);
   if (key === 'friction') return !!chapter.frictionPlaybook?.dilemma;
   return false;
 }

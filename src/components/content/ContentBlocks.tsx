@@ -36,7 +36,6 @@ const getFigure = (key: FigureKey): React.FC<FigureProps> | undefined => FIGURES
 // Figures drawn ≥600 units wide: keep labels legible on narrow screens by scrolling inside the figure only.
 const WIDE_FIGURES: ReadonlySet<FigureKey> = new Set<FigureKey>([
   'c4-l1-hero',
-  'translation-layers',
   'gate-timeline',
   'env-flow',
   'uncertainty-spectrum',

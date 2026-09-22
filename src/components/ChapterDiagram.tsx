@@ -44,7 +44,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
   const [canaryPercent, setCanaryPercent] = useState<number>(5);
   const [boehmPhase, setBoehmPhase] = useState<number>(0);
 
-  // Chapter 1: Subway Train state
+  // Release train state (s8)
   const [subwayStation, setSubwayStation] = useState<number>(0);
   const [skipChecks, setSkipChecks] = useState<boolean>(false);
   const [trainStatus, setTrainStatus] = useState<'idle' | 'running' | 'derailed' | 'success'>('idle');
@@ -62,9 +62,9 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
   const [dualTrackPhase, setDualTrackPhase] = useState<'discovery' | 'delivery' | 'synchronized'>('synchronized');
 
   // =========================================================================
-  // CHAPTER 1: The Subway Release Train & The Leaky Translation Pipeline
+  // Release train (rendered in s8; moved from s1 per chapter figure briefs Q4)
   // =========================================================================
-  if (chapterId === 's1') {
+  const renderReleaseTrain = () => {
     const stations = [
       { name: '1. Local Branch', role: 'Developer Desk', passText: 'เขียนโค้ดและทดสอบบนเครื่องเดฟ', risk: 'ความเข้าใจผิดส่วนตัว' },
       { name: '2. Pull Request', role: '4-Eyes Review', passText: 'ตรวจโค้ดร่วมกับ Senior Engineer', risk: 'ถ้ากดยอมรับโดยไม่อ่าน บั๊กจะหลุด' },
@@ -186,7 +186,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
         </div>
       </div>
     );
-  }
+  };
 
   // =========================================================================
   // CHAPTER 2: MoSCoW & RICE Matrix
@@ -608,11 +608,12 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
   }
 
   // =========================================================================
-  // CHAPTER 8: DevOps & Canary Release
+  // CHAPTER 8: DevOps release train & Canary Release
   // =========================================================================
   if (chapterId === 's8') {
     return (
       <div className="space-y-4">
+        {renderReleaseTrain()}
         <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
@@ -1008,6 +1009,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
     );
   }
 
-  // s14 (Q6: the hero replaced its text cards) and s15 (glossary map) have no widget here.
+  // s1 (Q4: its release train moved to s8), s14 (Q6: the hero replaced its text cards)
+  // and s15 (glossary map) have no widget here. Keep DIAGRAM_WIDGET_CHAPTERS in sync.
   return null;
 };

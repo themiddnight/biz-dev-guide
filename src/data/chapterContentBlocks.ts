@@ -9,6 +9,10 @@ export const CHAPTER_CONTENT: Record<string, ChapterContentSection[]> = {
   // Static s1 line 359 (fig 1) and 423; static s9 fig 7 (lines 1363–1423), placed here because React s1 is the pipeline chapter
   s1: [
     {
+      // Inline after core concept 2 "งานรั่วตรงไหนบ้างตอนเปลี่ยนมือ" (figure briefs s1)
+      placement: 'inline',
+      after: 'coreConcepts',
+      conceptIndex: 1,
       blocks: [
         {
           kind: 'figure',
@@ -18,6 +22,10 @@ export const CHAPTER_CONTENT: Record<string, ChapterContentSection[]> = {
           caption:
             'วงกลมสีเหลืองคือรอยต่อระหว่างชั้น — เอกสารทุกชนิดในคู่มือนี้ถูกคิดขึ้นมาเพื่ออุดรอยพวกนี้ ไม่ใช่เพื่อความสวยงาม',
         },
+      ],
+    },
+    {
+      blocks: [
         {
           kind: 'note',
           id: 's1-pm-vs-pjm',
