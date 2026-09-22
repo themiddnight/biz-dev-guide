@@ -14,7 +14,7 @@ export const CHAPTER_CONTENT: Record<string, ChapterContentSection[]> = {
           kind: 'figure',
           id: 's1-translation-layers',
           figureKey: 'translation-layers',
-          title: 'ภาพที่ 1 — ความคิดหนึ่งประโยค ผ่านการแปลกี่ชั้นกว่าจะเป็นโค้ด',
+          title: 'ความคิดหนึ่งประโยค ผ่านการแปลกี่ชั้นกว่าจะเป็นโค้ด',
           caption:
             'วงกลมสีเหลืองคือรอยต่อระหว่างชั้น — เอกสารทุกชนิดในคู่มือนี้ถูกคิดขึ้นมาเพื่ออุดรอยพวกนี้ ไม่ใช่เพื่อความสวยงาม',
         },
@@ -29,7 +29,7 @@ export const CHAPTER_CONTENT: Record<string, ChapterContentSection[]> = {
           kind: 'figure',
           id: 's1-gate-timeline',
           figureKey: 'gate-timeline',
-          title: 'ภาพที่ 7 — gate แต่ละจุด และต้นทุนของการเปลี่ยนใจที่ไต่ขึ้นเรื่อยๆ',
+          title: 'gate แต่ละจุด และต้นทุนของการเปลี่ยนใจที่ไต่ขึ้นเรื่อยๆ',
           caption:
             'gate ไม่ได้มีไว้ห้ามเปลี่ยน แต่มีไว้ทำให้เห็นว่าตอนนี้การเปลี่ยนมีราคาเท่าไหร่แล้ว — ทีมที่ไม่มี gate เลย การเปลี่ยนแปลงไม่ได้หายไป มันแค่กลายเป็นภาระเงียบๆ ของคนสร้าง',
         },
@@ -127,7 +127,7 @@ export const CHAPTER_CONTENT: Record<string, ChapterContentSection[]> = {
           kind: 'figure',
           id: 's5-three-lenses',
           figureKey: 'three-lenses',
-          title: 'ภาพที่ 4 — ระบบเดียวกัน มองด้วยเลนส์สามแบบ ได้คนละภาพ',
+          title: 'ระบบเดียวกัน มองด้วยเลนส์สามแบบ ได้คนละภาพ',
           caption: 'สองมุมแรกบอกว่า "มีอะไรอยู่" มุมที่สามเท่านั้นที่บอกเรื่อง "เวลา" — ระบบที่มีชิ้นส่วนครบทุกอย่างยังพังได้ ถ้าลำดับการเรียกผิด',
         },
         {
@@ -196,7 +196,7 @@ export const CHAPTER_CONTENT: Record<string, ChapterContentSection[]> = {
           kind: 'figure',
           id: 's5-c4-l1-hero',
           figureKey: 'c4-l1-hero',
-          title: 'ภาพที่ 5 — ถ้าจะอ่านออกแค่ภาพเดียวในชีวิต ให้เป็นภาพนี้ (C4 level 1)',
+          title: 'ถ้าจะอ่านออกแค่ภาพเดียวในชีวิต ให้เป็นภาพนี้ (C4 level 1)',
           caption: 'ใช้เวลาเรียนไม่ถึง 10 นาที และเป็นภาพที่คุ้มที่สุดสำหรับคนฝั่ง business — เพราะทุกครั้งที่คุณขอฟีเจอร์ใหม่ คำถามแรกคือมันไปแตะกล่องไหนบ้าง ดูอีก 3 ระดับที่ลึกลงไปได้ที่ Interactive C4 Model Explorer ในส่วนแผนภาพด้านบน',
         },
       ],
@@ -269,7 +269,7 @@ export const CHAPTER_CONTENT: Record<string, ChapterContentSection[]> = {
           kind: 'figure',
           id: 's8-env-flow',
           figureKey: 'env-flow',
-          title: 'ภาพที่ 6 — การไหลของโค้ดผ่าน environment แต่ละชุดก่อนถึง user จริง',
+          title: 'การไหลของโค้ดผ่าน environment แต่ละชุดก่อนถึง user จริง',
           caption:
             'โค้ดไม่ได้กระโดดจาก dev ไป production ตรงๆ แต่ไล่ผ่านแต่ละ environment ทีละขั้น เพื่อให้จับปัญหาได้ก่อนถึงมือ user จริง',
         },
@@ -285,7 +285,7 @@ export const CHAPTER_CONTENT: Record<string, ChapterContentSection[]> = {
           kind: 'figure',
           id: 's12-uncertainty-spectrum',
           figureKey: 'uncertainty-spectrum',
-          title: 'ภาพที่ 10 — จากเดิมพันด้วยข้อมูลไม่ครบ ไปจนถึงทำซ้ำได้แม่นยำ',
+          title: 'จากเดิมพันด้วยข้อมูลไม่ครบ ไปจนถึงทำซ้ำได้แม่นยำ',
           caption:
             'ตำแหน่งบนเส้นนี้ไม่ได้บอกว่าใครสำคัญกว่าใคร แต่บอกว่าแต่ละคน "ควรทนความไม่แน่นอน" ได้มากแค่ไหนถึงจะทำงานได้ดี — เอาเกณฑ์ของฝั่งหนึ่งไปวัดอีกฝั่งจึงมักออกมาเป็นความขัดแย้ง',
         },

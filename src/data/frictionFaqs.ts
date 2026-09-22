@@ -151,7 +151,7 @@ export const FRICTION_FAQS: FrictionFaq[] = [
     concepts: ['YAGNI', 'technical debt quadrant', 'over-engineering'],
     figure: {
       key: 'tech-debt-quadrant',
-      title: 'ภาพที่ 8 — หนี้ทางเทคนิคไม่เท่ากันทุกก้อน — กรอบของ Martin Fowler',
+      title: 'หนี้ทางเทคนิคไม่เท่ากันทุกก้อน — กรอบของ Martin Fowler',
       caption: 'คำถามที่ควรถามไม่ใช่ "มีหนี้ไหม" (มีเสมอ) แต่คือ "หนี้ก้อนนี้อยู่ช่องไหน" — ช่องซ้ายบนคือช่องเดียวที่ควรกังวลจริงจัง',
     },
     relatedPlaybookChapterId: 's1',
@@ -182,7 +182,7 @@ export const FRICTION_FAQS: FrictionFaq[] = [
     concepts: ['cone of uncertainty', 'planning fallacy'],
     figure: {
       key: 'cone-of-uncertainty',
-      title: 'ภาพที่ 9 — Cone of uncertainty — ความแม่นยำของ estimate ตามเวลา',
+      title: 'Cone of uncertainty — ความแม่นยำของ estimate ตามเวลา',
       caption: 'ความกว้างของแถบสีคือช่วงที่ estimate เป็นไปได้ ณ เวลานั้น — มันแคบลงเพราะทีมได้ลงมือทำ ไม่ใช่เพราะทีมตั้งใจมากขึ้น การขอตัวเลขเป๊ะตั้งแต่วันแรกจึงเป็นการขอสิ่งที่ยังไม่มีอยู่จริง',
     },
   },
