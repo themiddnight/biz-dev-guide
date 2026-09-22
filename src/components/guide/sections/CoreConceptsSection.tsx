@@ -1,0 +1,56 @@
+import React from 'react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import type { SectionProps } from './registry';
+
+export const CoreConceptsSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggle }) => {
+  if (!chapter.coreConcepts || chapter.coreConcepts.length === 0) return null;
+  return (
+    <div className="border border-neutral-200 dark:border-[#262626] rounded-2xl overflow-hidden bg-white dark:bg-[#141414] shadow-2xs">
+      <button
+        onClick={onToggle}
+        className="w-full p-3.5 sm:p-4.5 flex items-center justify-between bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f] text-left cursor-pointer select-none transition-colors"
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-7 h-7 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
+            💡
+          </div>
+          <div>
+            <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
+              ความรู้เชิงลึกและหลักการสำคัญ (Core Deep-Dive Concepts)
+            </h3>
+            <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e]">
+              แนวคิดและทฤษฎีสำคัญที่ใช้ในการทำงานจริง ({chapter.coreConcepts.length} หัวข้อ)
+            </p>
+          </div>
+        </div>
+        {isOpen ? <ChevronUp className="w-4 h-4 text-neutral-600 dark:text-[#a3a3a3]" /> : <ChevronDown className="w-4 h-4 text-neutral-400 dark:text-[#737373]" />}
+      </button>
+
+      {isOpen && (
+        <div className="p-3.5 sm:p-5 space-y-3.5 border-t border-neutral-100 dark:border-[#262626] bg-white dark:bg-[#141414]">
+          {chapter.coreConcepts.map((concept, cIdx) => (
+            <div
+              key={cIdx}
+              className="p-3.5 sm:p-4 rounded-xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-2"
+            >
+              <div className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa] flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-neutral-900 dark:bg-white inline-block"></span>
+                <span>{concept.heading}</span>
+              </div>
+              <p className="text-xs sm:text-sm text-neutral-600 dark:text-[#a3a3a3] leading-relaxed pl-3 font-normal">
+                {concept.detail}
+              </p>
+              {concept.bulletPoints && concept.bulletPoints.length > 0 && (
+                <ul className="pt-1 pl-7 space-y-1.5 list-disc text-xs sm:text-sm text-neutral-600 dark:text-[#a3a3a3] font-normal">
+                  {concept.bulletPoints.map((bp, bpIdx) => (
+                    <li key={bpIdx} className="leading-relaxed">{bp}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};

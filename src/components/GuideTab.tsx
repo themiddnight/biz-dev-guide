@@ -4,16 +4,19 @@ import { ROLE_MINDSETS } from '../data/roleMindsets';
 import { FRICTION_PLAYBOOKS } from '../data/frictionPlaybooks';
 import { RoleMindsetCard } from './RoleMindsetCard';
 import { FrictionPlaybookCard } from './FrictionPlaybookCard';
-import { FrictionFaqSection } from './FrictionFaqSection';
-import { ContentBlocks } from './content/ContentBlocks';
 import { S5_JUMP_TARGET_IDS, DiagramJumpTarget } from '../data/diagramFamilies';
-import { GlossaryPanel, GlossaryFilter } from './glossary/GlossaryPanel';
+import { GlossaryFilter } from './glossary/GlossaryPanel';
 import { GLOSSARY, GlossaryCategory } from '../data/glossary';
 import type { GuideSectionContext } from './guide/sections/registry';
 import { PrimerSection } from './guide/sections/PrimerSection';
 import { JargonSection } from './guide/sections/JargonSection';
 import { DialogueSection } from './guide/sections/DialogueSection';
 import { DiagramSection } from './guide/sections/DiagramSection';
+import { FaqSection } from './guide/sections/FaqSection';
+import { ExamplesSection } from './guide/sections/ExamplesSection';
+import { CoreConceptsSection } from './guide/sections/CoreConceptsSection';
+import { ReferenceSection } from './guide/sections/ReferenceSection';
+import { GlossarySection } from './guide/sections/GlossarySection';
 import { 
   Search, 
   Bookmark, 
@@ -192,9 +195,6 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   const activeIndex = chapters.findIndex(c => c.id === activeChapterId);
   const prevChapter = activeIndex > 0 ? chapters[activeIndex - 1] : null;
   const nextChapter = activeIndex < chapters.length - 1 ? chapters[activeIndex + 1] : null;
-
-  const referenceSections = (activeChapter.contentSections ?? []).filter(section => section.placement !== 'diagram');
-  const referenceBlockCount = referenceSections.reduce((sum, section) => sum + section.blocks.length, 0);
 
   const isCurrentBookmarked = bookmarks.includes(activeChapter.id);
 
@@ -694,45 +694,12 @@ export const GuideTab: React.FC<GuideTabProps> = ({
               </p>
             </div>
 
-            {/* GLOSSARY (chapter 15 only): searchable, filterable term library */}
-            {activeChapter.id === 's15' && (
-              <div className="border border-neutral-200 dark:border-[#262626] rounded-2xl overflow-hidden bg-white dark:bg-[#141414] shadow-2xs">
-                <button
-                  onClick={() => toggleSection('glossary')}
-                  aria-expanded={!!openSections.glossary}
-                  className="w-full p-3.5 sm:p-4.5 flex items-center justify-between bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f] text-left cursor-pointer select-none transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-7 h-7 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
-                      📖
-                    </div>
-                    <div>
-                      <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
-                        คลังคำศัพท์ (Glossary)
-                      </h3>
-                      <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e]">
-                        ค้นหาและกรองศัพท์ทั้งหมด {GLOSSARY.length} คำ ตามหมวด
-                      </p>
-                    </div>
-                  </div>
-                  {openSections.glossary ? <ChevronUp className="w-4 h-4 text-neutral-600 dark:text-[#a3a3a3]" /> : <ChevronDown className="w-4 h-4 text-neutral-400 dark:text-[#737373]" />}
-                </button>
-
-                {openSections.glossary && (
-                  <div className="p-3.5 sm:p-5 border-t border-neutral-100 dark:border-[#262626] bg-white dark:bg-[#141414]">
-                    <GlossaryPanel
-                      terms={GLOSSARY}
-                      chapters={chapters}
-                      onNavigateChapter={handleSelectChapter}
-                      category={glossaryCategory}
-                      onCategoryChange={setGlossaryCategory}
-                      query={glossaryQuery}
-                      onQueryChange={setGlossaryQuery}
-                    />
-                  </div>
-                )}
-              </div>
-            )}
+            <GlossarySection
+              chapter={activeChapter}
+              isOpen={openSections.glossary}
+              onToggle={() => toggleSection('glossary')}
+              ctx={sectionCtx}
+            />
 
             {/* ADAPTIVE SECTION RENDERING: Beginner vs Experienced ordering */}
             {experienceLevel === 'experienced' ? (
@@ -846,92 +813,33 @@ export const GuideTab: React.FC<GuideTabProps> = ({
               ctx={sectionCtx}
             />
 
-            {/* SECTION 5: ความรู้เชิงลึก & แนวคิดหลัก (Core Concepts) */}
-            {activeChapter.coreConcepts && activeChapter.coreConcepts.length > 0 && (
-              <div className="border border-neutral-200 dark:border-[#262626] rounded-2xl overflow-hidden bg-white dark:bg-[#141414] shadow-2xs">
-                <button
-                  onClick={() => toggleSection('coreConcepts')}
-                  className="w-full p-3.5 sm:p-4.5 flex items-center justify-between bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f] text-left cursor-pointer select-none transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-7 h-7 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
-                      💡
-                    </div>
-                    <div>
-                      <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
-                        ความรู้เชิงลึกและหลักการสำคัญ (Core Deep-Dive Concepts)
-                      </h3>
-                      <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e]">
-                        แนวคิดและทฤษฎีสำคัญที่ใช้ในการทำงานจริง ({activeChapter.coreConcepts.length} หัวข้อ)
-                      </p>
-                    </div>
-                  </div>
-                  {openSections.coreConcepts ? <ChevronUp className="w-4 h-4 text-neutral-600 dark:text-[#a3a3a3]" /> : <ChevronDown className="w-4 h-4 text-neutral-400 dark:text-[#737373]" />}
-                </button>
+            <FaqSection
+              chapter={activeChapter}
+              isOpen={openSections.faq}
+              onToggle={() => toggleSection('faq')}
+              ctx={sectionCtx}
+            />
 
-                {openSections.coreConcepts && (
-                  <div className="p-3.5 sm:p-5 space-y-3.5 border-t border-neutral-100 dark:border-[#262626] bg-white dark:bg-[#141414]">
-                    {activeChapter.coreConcepts.map((concept, cIdx) => (
-                      <div 
-                        key={cIdx}
-                        className="p-3.5 sm:p-4 rounded-xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-2"
-                      >
-                        <div className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa] flex items-center gap-2">
-                          <span className="w-1.5 h-1.5 rounded-full bg-neutral-900 dark:bg-white inline-block"></span>
-                          <span>{concept.heading}</span>
-                        </div>
-                        <p className="text-xs sm:text-sm text-neutral-600 dark:text-[#a3a3a3] leading-relaxed pl-3 font-normal">
-                          {concept.detail}
-                        </p>
-                        {concept.bulletPoints && concept.bulletPoints.length > 0 && (
-                          <ul className="pt-1 pl-7 space-y-1.5 list-disc text-xs sm:text-sm text-neutral-600 dark:text-[#a3a3a3] font-normal">
-                            {concept.bulletPoints.map((bp, bpIdx) => (
-                              <li key={bpIdx} className="leading-relaxed">{bp}</li>
-                            ))}
-                          </ul>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
+            <ExamplesSection
+              chapter={activeChapter}
+              isOpen={openSections.examples}
+              onToggle={() => toggleSection('examples')}
+              ctx={sectionCtx}
+            />
 
-            {/* SECTION 5.5: เนื้อหาอ้างอิง (Reference) — restored tables/cards/sources from the static guide */}
-            {referenceSections.length > 0 && (
-              <div className="border border-neutral-200 dark:border-[#262626] rounded-2xl overflow-hidden bg-white dark:bg-[#141414] shadow-2xs">
-                <button
-                  onClick={() => toggleSection('reference')}
-                  aria-expanded={!!openSections.reference}
-                  className="w-full p-3.5 sm:p-4.5 flex items-center justify-between bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f] text-left cursor-pointer select-none transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-7 h-7 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
-                      📚
-                    </div>
-                    <div>
-                      <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
-                        เนื้อหาอ้างอิง (Reference)
-                      </h3>
-                      <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e]">
-                        ตาราง การ์ด และแหล่งอ้างอิงประกอบบทนี้ ({referenceBlockCount} รายการ)
-                      </p>
-                    </div>
-                  </div>
-                  {openSections.reference ? <ChevronUp className="w-4 h-4 text-neutral-600 dark:text-[#a3a3a3]" /> : <ChevronDown className="w-4 h-4 text-neutral-400 dark:text-[#737373]" />}
-                </button>
+            <CoreConceptsSection
+              chapter={activeChapter}
+              isOpen={openSections.coreConcepts}
+              onToggle={() => toggleSection('coreConcepts')}
+              ctx={sectionCtx}
+            />
 
-                {openSections.reference && (
-                  <div className="p-3.5 sm:p-5 border-t border-neutral-100 dark:border-[#262626] bg-white dark:bg-[#141414]">
-                    <ContentBlocks
-                      sections={referenceSections}
-                      placement="reference"
-                      onNavigateChapter={handleSelectChapter}
-                    />
-                  </div>
-                )}
-              </div>
-            )}
+            <ReferenceSection
+              chapter={activeChapter}
+              isOpen={openSections.reference}
+              onToggle={() => toggleSection('reference')}
+              ctx={sectionCtx}
+            />
 
             {/* SECTION 6: ขั้นตอนการทำงานจริง (Real-World Workflow) */}
             {activeChapter.realWorldWorkflow && activeChapter.realWorldWorkflow.length > 0 && (
