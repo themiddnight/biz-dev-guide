@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatChapterHash } from '../../lib/chapterRoute';
 
 /**
  * Renders the restored-content rich text subset without dangerouslySetInnerHTML:
@@ -41,7 +42,7 @@ export const RichText: React.FC<RichTextProps> = ({ text, onNavigateChapter }) =
           return (
             <a
               key={idx}
-              href={`#${chapterId}`}
+              href={formatChapterHash(Number(chapterId.slice(1)))}
               onClick={event => {
                 event.preventDefault();
                 onNavigateChapter(chapterId);

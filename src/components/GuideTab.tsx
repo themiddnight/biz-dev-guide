@@ -63,7 +63,7 @@ interface GuideTabProps {
   onExperienceLevelChange?: (lvl: ExperienceLevel) => void;
   showFirstVisit?: boolean;
   onChooseInitialLevel?: (level: ExperienceLevel) => void;
-  loadedFromHash?: boolean;
+  loadedFromHash: boolean;
   onAudienceChange?: (mode: AudienceMode) => void;
   bookmarks: string[];
   readChapters?: string[];
@@ -72,7 +72,10 @@ interface GuideTabProps {
   onAskAIWithPrompt: (prompt: string) => void;
   onStartQuiz: () => void;
   onEarnXp?: (amount: number, reason: string) => void;
-  onReplaceSection?: (section: SectionKey | null) => void;
+  activeChapterId: string;
+  requestedSection: RequestedSection | null;
+  onNavigateChapter: (chapterId: string, section?: SectionKey) => void;
+  onReplaceSection: (section: SectionKey | null) => void;
 }
 
 export const GuideTab: React.FC<GuideTabProps> = ({
@@ -82,7 +85,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   onExperienceLevelChange,
   showFirstVisit,
   onChooseInitialLevel,
-  loadedFromHash = false,
+  loadedFromHash,
   onAudienceChange,
   bookmarks,
   readChapters = [],
@@ -92,8 +95,10 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   onStartQuiz,
   onEarnXp,
   onReplaceSection,
+  activeChapterId,
+  requestedSection,
+  onNavigateChapter,
 }) => {
-  const [activeChapterId, setActiveChapterId] = useState<string>('s1');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRole, setSelectedRole] = useState<string>('all');
   const [isIndexOpen, setIsIndexOpen] = useState(false);
@@ -167,8 +172,6 @@ export const GuideTab: React.FC<GuideTabProps> = ({
 
   const layout = useMemo(() => getChapterLayout(experienceLevel, activeChapter), [experienceLevel, activeChapter]);
   const [openState, setOpenState] = useState<OpenState>(() => deriveOpenState(layout));
-  const [sectionRequest, setSectionRequest] = useState<RequestedSection | null>(null);
-  const requestSection = (key: SectionKey) => setSectionRequest(prev => ({ key, nonce: (prev?.nonce ?? 0) + 1 }));
 
   // Each chapter (and each level) opens at its Core (spec §1.4, D3).
   useEffect(() => {
@@ -178,17 +181,20 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   // A requested section opens on top of the re-derived defaults. Declared after the
   // re-derive effect so that, when both fire in one commit, this update wins.
   useEffect(() => {
-    if (!sectionRequest) return;
-    if (!isSectionPresent(activeChapter, sectionRequest.key)) return;
-    setOpenState(openSection(deriveOpenState(layout), layout, sectionRequest.key));
-    setPendingScrollId(`sec-${sectionRequest.key}`);
-  }, [sectionRequest?.nonce]);
+    if (!requestedSection) return;
+    if (!isSectionPresent(activeChapter, requestedSection.key)) {
+      onReplaceSection(null);
+      return;
+    }
+    setOpenState(openSection(deriveOpenState(layout), layout, requestedSection.key));
+    setPendingScrollId(`sec-${requestedSection.key}`);
+  }, [requestedSection?.nonce]);
 
   // Chip click: open (never close) the section, scroll to it, and record it in the URL (spec §2.1).
   const handleOutlineSelect = (key: SectionKey) => {
     setOpenState(prev => openSection(prev, layout, key));
     setPendingScrollId(`sec-${key}`);
-    onReplaceSection?.(key);
+    onReplaceSection(key);
   };
   const prevChapter = activeIndex > 0 ? chapters[activeIndex - 1] : null;
   const nextChapter = activeIndex < chapters.length - 1 ? chapters[activeIndex + 1] : null;
@@ -207,7 +213,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
 
   // Scroll to top when active chapter changes
   const handleSelectChapter = (chapterId: string) => {
-    setActiveChapterId(chapterId);
+    onNavigateChapter(chapterId);
     setIsIndexOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -234,19 +240,17 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   const handleSearchGlossary = (query: string) => {
     setGlossaryQuery(query);
     setGlossaryCategory('all');
-    setActiveChapterId('s15');
+    onNavigateChapter('s15', 'glossary');
     setIsIndexOpen(false);
-    requestSection('glossary');
   };
 
   // s11 FAQ playbook link -> open (and navigate to) a chapter's friction playbook, then scroll to it.
-  // A cross-chapter jump goes through requestSection so the open lands on top of the new
+  // A cross-chapter jump requests the section via the route so the open lands on top of the new
   // chapter's re-derived defaults; the scroll then runs after the new chapter has rendered.
   const handleScrollToPlaybook = (chapterId: string) => {
     if (chapterId !== activeChapterId) {
-      setActiveChapterId(chapterId);
+      onNavigateChapter(chapterId, 'friction');
       setIsIndexOpen(false);
-      requestSection('friction');
       return;
     }
     setOpenState(prev => openSection(prev, layout, 'friction'));

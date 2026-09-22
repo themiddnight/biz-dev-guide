@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { AudienceMode, ExperienceLevel, TabType, UserStats, Badge } from './types';
 import { readStorage, writeStorage } from './lib/storage';
 import { CHAPTERS } from './data/chaptersData';
+import { formatChapterHash } from './lib/chapterRoute';
+import { useChapterRoute } from './hooks/useChapterRoute';
 import { QUIZ_QUESTIONS } from './data/quizQuestions';
 import { INITIAL_BADGES, LEVEL_TIERS } from './data/badgesData';
 import { Header } from './components/Header';
@@ -13,6 +15,22 @@ import { Sparkles, Trophy, Zap, X } from 'lucide-react';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<TabType>('guide');
+  const route = useChapterRoute(CHAPTERS, { onChapterRoute: () => setActiveTab('guide') });
+
+  // Tabs are not routes: clear the hash off the guide, restore it on return (spec §5.2).
+  const prevTabRef = useRef(activeTab);
+  useEffect(() => {
+    const prev = prevTabRef.current;
+    prevTabRef.current = activeTab;
+    if (activeTab !== 'guide') {
+      if (window.location.hash) window.history.replaceState(null, '', window.location.pathname + window.location.search);
+      return;
+    }
+    if (prev !== 'guide') {
+      const num = CHAPTERS.find(c => c.id === route.activeChapterId)?.num;
+      if (num !== undefined) window.history.replaceState(null, '', formatChapterHash(num));
+    }
+  }, [activeTab, route.activeChapterId]);
   const [audienceMode, setAudienceMode] = useState<AudienceMode>('both');
   const [experienceLevel, setExperienceLevel] = useState<ExperienceLevel>(() => {
     const saved = readStorage('be_guide_exp_level') as ExperienceLevel | null;
@@ -296,6 +314,11 @@ export default function App() {
             onAskAIWithPrompt={handleAskAIWithPrompt}
             onStartQuiz={() => setActiveTab('quiz')}
             onEarnXp={handleDilemmaXp}
+            activeChapterId={route.activeChapterId}
+            requestedSection={route.requestedSection}
+            onNavigateChapter={route.navigate}
+            onReplaceSection={route.replaceSection}
+            loadedFromHash={route.loadedFromHash}
           />
         )}
 
