@@ -1,5 +1,3 @@
-export type AudienceMode = 'business' | 'engineer' | 'both';
-
 export type ExperienceLevel = 'beginner' | 'experienced';
 
 /**

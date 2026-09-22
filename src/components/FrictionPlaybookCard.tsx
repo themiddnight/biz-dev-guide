@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FrictionPlaybook, AudienceMode } from '../types';
+import { FrictionPlaybook } from '../types';
 import { 
   Flame, 
   ChevronDown, 
@@ -16,7 +16,6 @@ import {
 interface FrictionPlaybookCardProps {
   playbook?: FrictionPlaybook;
   chapterTitle: string;
-  audienceMode: AudienceMode;
   isOpen: boolean;
   onToggle: () => void;
   onEarnXp?: (amount: number, reason: string) => void;
@@ -25,7 +24,6 @@ interface FrictionPlaybookCardProps {
 export const FrictionPlaybookCard: React.FC<FrictionPlaybookCardProps> = ({
   playbook,
   chapterTitle,
-  audienceMode,
   isOpen,
   onToggle,
   onEarnXp,
@@ -238,7 +236,7 @@ export const FrictionPlaybookCard: React.FC<FrictionPlaybookCardProps> = ({
                     สถานการณ์: {script.situation}
                   </div>
 
-                  {script.businessScript && (audienceMode === 'business' || audienceMode === 'both') && (
+                  {script.businessScript && (
                     <div className="space-y-1">
                       <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-800 dark:text-amber-300 border border-amber-500/20">
                         💼 Business ควรพูด:
@@ -249,7 +247,7 @@ export const FrictionPlaybookCard: React.FC<FrictionPlaybookCardProps> = ({
                     </div>
                   )}
 
-                  {script.engineerScript && (audienceMode === 'engineer' || audienceMode === 'both') && (
+                  {script.engineerScript && (
                     <div className="space-y-1">
                       <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-indigo-500/10 text-indigo-800 dark:text-indigo-300 border border-indigo-500/20">
                         💻 Engineer ควรพูด:

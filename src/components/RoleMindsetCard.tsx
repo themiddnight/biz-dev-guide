@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AudienceMode, RoleMindsetGuide } from '../types';
+import { RoleMindsetGuide } from '../types';
 import { ROLE_MINDSETS } from '../data/roleMindsets';
 import { 
   Briefcase, 
@@ -15,22 +15,17 @@ import {
 } from 'lucide-react';
 
 interface RoleMindsetCardProps {
-  audienceMode: AudienceMode;
-  onSelectRole?: (mode: AudienceMode) => void;
   isOpen: boolean;
   onToggle: () => void;
 }
 
 export const RoleMindsetCard: React.FC<RoleMindsetCardProps> = ({
-  audienceMode,
-  onSelectRole,
   isOpen,
   onToggle,
 }) => {
-  // If in 'both' mode, allow local tab switching between business and engineer
   const [activeTab, setActiveTab] = useState<'business' | 'engineer'>('business');
 
-  const currentRoleKey = audienceMode === 'both' ? activeTab : audienceMode;
+  const currentRoleKey = activeTab;
   const guide: RoleMindsetGuide = ROLE_MINDSETS[currentRoleKey];
 
   return (
@@ -68,19 +63,16 @@ export const RoleMindsetCard: React.FC<RoleMindsetCardProps> = ({
 
       {isOpen && (
         <div className="p-4 sm:p-5 space-y-3.5 sm:space-y-4 border-t border-neutral-200 dark:border-[#262626] bg-white dark:bg-[#141414] text-xs sm:text-sm">
-          {/* Role Perspective Selector Tabs (when in 'both' mode or to quickly peek) */}
+          {/* Role Perspective Selector Tabs */}
           <div className="flex items-center justify-between flex-wrap gap-2 pb-1.5 border-b border-neutral-100 dark:border-[#222222]">
             <span className="text-[11px] sm:text-xs font-semibold text-neutral-600 dark:text-[#a3a3a3]">
               กำลังดู Mindset ของ:
             </span>
             <div className="flex items-center gap-1 p-0.5 sm:p-1 bg-neutral-100 dark:bg-[#1a1a1a] rounded-lg sm:rounded-xl border border-neutral-200/60 dark:border-[#262626]">
               <button
-                onClick={() => {
-                  setActiveTab('business');
-                  if (onSelectRole && audienceMode !== 'both') onSelectRole('business');
-                }}
+                onClick={() => setActiveTab('business')}
                 className={`flex items-center gap-1 sm:gap-1.5 px-2.5 py-1 rounded-md sm:rounded-lg text-[11px] sm:text-xs font-medium cursor-pointer transition-all ${
-                  (audienceMode === 'both' ? activeTab === 'business' : audienceMode === 'business')
+                  activeTab === 'business'
                     ? 'bg-white dark:bg-[#262626] text-amber-700 dark:text-amber-300 shadow-2xs font-bold'
                     : 'text-neutral-600 dark:text-[#737373] hover:text-neutral-900 dark:hover:text-white'
                 }`}
@@ -89,12 +81,9 @@ export const RoleMindsetCard: React.FC<RoleMindsetCardProps> = ({
                 <span>ฝั่ง Business</span>
               </button>
               <button
-                onClick={() => {
-                  setActiveTab('engineer');
-                  if (onSelectRole && audienceMode !== 'both') onSelectRole('engineer');
-                }}
+                onClick={() => setActiveTab('engineer')}
                 className={`flex items-center gap-1 sm:gap-1.5 px-2.5 py-1 rounded-md sm:rounded-lg text-[11px] sm:text-xs font-medium cursor-pointer transition-all ${
-                  (audienceMode === 'both' ? activeTab === 'engineer' : audienceMode === 'engineer')
+                  activeTab === 'engineer'
                     ? 'bg-white dark:bg-[#262626] text-indigo-700 dark:text-indigo-300 shadow-2xs font-bold'
                     : 'text-neutral-600 dark:text-[#737373] hover:text-neutral-900 dark:hover:text-white'
                 }`}

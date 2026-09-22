@@ -1,5 +1,5 @@
 import React from 'react';
-import type { AudienceMode, Chapter } from '../../../types';
+import type { Chapter } from '../../../types';
 import type { DiagramJumpTarget } from '../../../data/diagramFamilies';
 import type { GlossaryCategory } from '../../../data/glossary';
 import type { GlossaryFilter } from '../../glossary/GlossaryPanel';
@@ -21,8 +21,6 @@ import { ChecklistSection } from './ChecklistSection';
 
 export interface GuideSectionContext {
   chapters: Chapter[];                                      // GlossaryPanel needs the chapter list (not in spec §1.7; required by the glossary block)
-  audienceMode: AudienceMode;
-  onAudienceChange?: (m: AudienceMode) => void;
   onEarnXp?: (amount: number, reason: string) => void;
   onNavigateChapter: (chapterId: string) => void;
   onDiagramJump: (t: DiagramJumpTarget) => void;
@@ -37,15 +35,14 @@ export interface GuideSectionContext {
 
 export interface SectionProps { chapter: Chapter; isOpen: boolean; onToggle: () => void; ctx: GuideSectionContext }
 
-export const MindsetSection: React.FC<SectionProps> = ({ isOpen, onToggle, ctx }) => (
-  <RoleMindsetCard audienceMode={ctx.audienceMode} onSelectRole={ctx.onAudienceChange} isOpen={isOpen} onToggle={onToggle} />
+export const MindsetSection: React.FC<SectionProps> = ({ isOpen, onToggle }) => (
+  <RoleMindsetCard isOpen={isOpen} onToggle={onToggle} />
 );
 
 export const FrictionSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggle, ctx }) => (
   <FrictionPlaybookCard
     playbook={chapter.frictionPlaybook}
     chapterTitle={chapter.title}
-    audienceMode={ctx.audienceMode}
     isOpen={isOpen}
     onToggle={onToggle}
     onEarnXp={ctx.onEarnXp}

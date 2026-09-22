@@ -1,6 +1,5 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { ArrowRight, ChevronDown, ChevronUp, ExternalLink, ListOrdered } from 'lucide-react';
-import { AudienceMode } from '../types';
 import {
   FAQ_AUDIENCE_CALLOUTS,
   FAQ_CAVEAT,
@@ -17,7 +16,6 @@ import { FIGURES } from './figures';
 import { RichText } from './content/RichText';
 
 interface FrictionFaqSectionProps {
-  audienceMode: AudienceMode;
   onNavigateChapter: (chapterId: string) => void;
   /** Scroll to the friction playbook of a chapter (the current one scrolls in-page). */
   onScrollToPlaybook: (chapterId: string) => void;
@@ -40,19 +38,12 @@ const chipClass =
   'px-2.5 py-1 rounded-lg text-[11px] sm:text-xs font-medium border transition-colors';
 
 export const FrictionFaqSection: React.FC<FrictionFaqSectionProps> = ({
-  audienceMode,
   onNavigateChapter,
   onScrollToPlaybook,
   onSearchGlossary,
 }) => {
   const [openIds, setOpenIds] = useState<Set<string>>(() => new Set());
   const [isJumpOpen, setIsJumpOpen] = useState(false);
-
-  // Static behavior: the reader's own group comes first; 'both' keeps A then B.
-  const groups = useMemo(
-    () => (audienceMode === 'business' ? [...FAQ_GROUPS].reverse() : FAQ_GROUPS),
-    [audienceMode]
-  );
 
   const toggleItem = (id: string) => {
     setOpenIds(prev => {
@@ -183,15 +174,21 @@ export const FrictionFaqSection: React.FC<FrictionFaqSectionProps> = ({
 
   return (
     <div className="space-y-5">
-      {/* Audience callout (static .aud-callout) */}
-      {audienceMode !== 'both' && (
-        <div className="p-3 sm:p-3.5 rounded-xl border bg-neutral-50 dark:bg-[#181818] border-neutral-200 dark:border-[#262626] text-xs sm:text-sm text-neutral-700 dark:text-[#d4d4d4] leading-relaxed">
+      {/* Audience callouts (static .aud-callout) — both shown together */}
+      <div className="p-3 sm:p-3.5 rounded-xl border bg-neutral-50 dark:bg-[#181818] border-neutral-200 dark:border-[#262626] text-xs sm:text-sm text-neutral-700 dark:text-[#d4d4d4] leading-relaxed space-y-2.5">
+        <div>
           <span className="block font-bold text-neutral-900 dark:text-[#fafafa] mb-0.5">
-            {FAQ_AUDIENCE_CALLOUTS[audienceMode].who}
+            {FAQ_AUDIENCE_CALLOUTS.business.who}
           </span>
-          {FAQ_AUDIENCE_CALLOUTS[audienceMode].body}
+          {FAQ_AUDIENCE_CALLOUTS.business.body}
         </div>
-      )}
+        <div>
+          <span className="block font-bold text-neutral-900 dark:text-[#fafafa] mb-0.5">
+            {FAQ_AUDIENCE_CALLOUTS.engineer.who}
+          </span>
+          {FAQ_AUDIENCE_CALLOUTS.engineer.body}
+        </div>
+      </div>
 
       {/* Quick jump chips (collapsible on mobile) */}
       <nav aria-label="สารบัญคำถามในบทนี้" className="p-3 rounded-xl bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] space-y-2">
@@ -225,14 +222,15 @@ export const FrictionFaqSection: React.FC<FrictionFaqSectionProps> = ({
         </div>
       </nav>
 
-      {/* Groups, ordered by audience lens */}
-      {groups.map(group => (
+      {/* Groups, normal order */}
+      {FAQ_GROUPS.map(group => (
         <section key={group.key} className="space-y-2.5">
           <div>
             <h4 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">{group.title}</h4>
-            {audienceMode !== 'both' && (
-              <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e]">{group.subtitle[audienceMode]}</p>
-            )}
+            <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e] flex flex-wrap gap-x-3 gap-y-0.5">
+              <span><span className="font-semibold">Biz:</span> {group.subtitle.business}</span>
+              <span><span className="font-semibold">Eng:</span> {group.subtitle.engineer}</span>
+            </p>
           </div>
           {FRICTION_FAQS.filter(faq => faq.group === group.key).map(renderItem)}
         </section>

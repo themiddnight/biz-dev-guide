@@ -1,15 +1,14 @@
 import React from 'react';
 import { Clock, Check, Sparkles, Info, CheckCircle2 } from 'lucide-react';
-import type { Chapter, ExperienceLevel, AudienceMode } from '../../types';
+import type { Chapter, ExperienceLevel } from '../../types';
 
 interface ChapterHeroProps {
   chapter: Chapter;
   experienceLevel: ExperienceLevel;
-  audienceMode: AudienceMode;
   isRead: boolean;
 }
 
-export const ChapterHero: React.FC<ChapterHeroProps> = ({ chapter, experienceLevel, audienceMode, isRead }) => {
+export const ChapterHero: React.FC<ChapterHeroProps> = ({ chapter, experienceLevel, isRead }) => {
   const analogyHeading = (
     <div className="flex items-center gap-2 text-xs font-bold text-neutral-900 dark:text-[#fafafa]">
       <Sparkles className="w-4 h-4 text-amber-500" />
@@ -57,7 +56,7 @@ export const ChapterHero: React.FC<ChapterHeroProps> = ({ chapter, experienceLev
         </p>
       </div>
 
-      {/* Quick Perspective & Metaphor Box */}
+      {/* Quick Metaphor & Perspectives Box */}
       <div className="space-y-3">
         {/* Plain Language Metaphor (เปรียบแบบบ้านๆ) */}
         {experienceLevel === 'beginner' ? (
@@ -74,29 +73,25 @@ export const ChapterHero: React.FC<ChapterHeroProps> = ({ chapter, experienceLev
 
         {/* Audience Perspectives (Business & Engineer Notes) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {(audienceMode === 'business' || audienceMode === 'both') && (
-            <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-1.5">
-              <div className="flex items-center gap-2 text-xs font-bold text-amber-800 dark:text-amber-300">
-                <Info className="w-4 h-4 text-amber-500" />
-                <span>มุมมองฝั่ง Business</span>
-              </div>
-              <p className="text-xs text-neutral-600 dark:text-[#a3a3a3] leading-relaxed font-normal">
-                {chapter.businessNote}
-              </p>
+          <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-1.5">
+            <div className="flex items-center gap-2 text-xs font-bold text-amber-800 dark:text-amber-300">
+              <Info className="w-4 h-4 text-amber-500" />
+              <span>มุมมองฝั่ง Business</span>
             </div>
-          )}
+            <p className="text-xs text-neutral-600 dark:text-[#a3a3a3] leading-relaxed font-normal">
+              {chapter.businessNote}
+            </p>
+          </div>
 
-          {(audienceMode === 'engineer' || audienceMode === 'both') && (
-            <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-1.5">
-              <div className="flex items-center gap-2 text-xs font-bold text-blue-800 dark:text-blue-300">
-                <CheckCircle2 className="w-4 h-4 text-blue-500" />
-                <span>มุมมองฝั่ง Engineer</span>
-              </div>
-              <p className="text-xs text-neutral-600 dark:text-[#a3a3a3] leading-relaxed font-normal">
-                {chapter.engineerNote}
-              </p>
+          <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-1.5">
+            <div className="flex items-center gap-2 text-xs font-bold text-blue-800 dark:text-blue-300">
+              <CheckCircle2 className="w-4 h-4 text-blue-500" />
+              <span>มุมมองฝั่ง Engineer</span>
             </div>
-          )}
+            <p className="text-xs text-neutral-600 dark:text-[#a3a3a3] leading-relaxed font-normal">
+              {chapter.engineerNote}
+            </p>
+          </div>
         </div>
       </div>
     </>

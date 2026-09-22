@@ -1,14 +1,11 @@
 import React from 'react';
-import { AudienceMode, ExperienceLevel, TabType, UserStats } from '../types';
+import { ExperienceLevel, TabType, UserStats } from '../types';
 import { LEVEL_TIERS } from '../data/badgesData';
-import { 
-  BookOpen, 
-  Bot, 
-  Sparkles, 
-  Trophy, 
-  Briefcase, 
-  Code2, 
-  Users, 
+import {
+  BookOpen,
+  Bot,
+  Sparkles,
+  Trophy,
   Award,
   Zap,
   Sun,
@@ -21,8 +18,6 @@ import {
 interface HeaderProps {
   activeTab: TabType;
   setActiveTab: (tab: TabType) => void;
-  audienceMode: AudienceMode;
-  setAudienceMode: (mode: AudienceMode) => void;
   experienceLevel: ExperienceLevel;
   setExperienceLevel: (level: ExperienceLevel) => void;
   userStats: UserStats;
@@ -33,8 +28,6 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({
   activeTab,
   setActiveTab,
-  audienceMode,
-  setAudienceMode,
   experienceLevel,
   setExperienceLevel,
   userStats,
@@ -143,7 +136,7 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
-      {/* Control Bar: Tabs & Audience Switcher */}
+      {/* Control Bar: Tabs & Experience Level */}
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-2 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 border-t border-neutral-200 dark:border-[#262626]">
         {/* Navigation Tabs (Variation 4 Mono Button Style) */}
         <nav className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none font-mono" aria-label="Main Navigation">
@@ -196,7 +189,7 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
         </nav>
 
-        {/* Controls: Experience Level & Role */}
+        {/* Controls: Experience Level */}
         <div className="flex flex-wrap items-center gap-2 shrink-0 font-mono">
           {/* Experience Level Switcher (Beginner vs Experienced) */}
           <div 
@@ -227,50 +220,6 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <Handshake className="w-3.5 h-3.5" />
               <span>Experienced</span>
-            </button>
-          </div>
-
-          {/* Audience / Role Switcher */}
-          <div 
-            className="flex items-center p-0.5 bg-neutral-100 dark:bg-[#141414] rounded-[4px] border border-neutral-200 dark:border-[#262626]"
-            role="group"
-            aria-label="Role Perspective Switcher"
-          >
-            <button
-              onClick={() => setAudienceMode('business')}
-              title="มุมมองฝั่ง Business"
-              className={`flex items-center gap-1 px-2 py-1 rounded-[3px] text-xs transition-all cursor-pointer ${
-                audienceMode === 'business'
-                  ? 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 font-bold'
-                  : 'text-neutral-600 dark:text-[#737373] hover:text-neutral-900 dark:hover:text-white font-medium'
-              }`}
-            >
-              <Briefcase className="w-3 h-3" />
-              <span>Biz</span>
-            </button>
-            <button
-              onClick={() => setAudienceMode('engineer')}
-              title="มุมมองฝั่ง Engineer"
-              className={`flex items-center gap-1 px-2 py-1 rounded-[3px] text-xs transition-all cursor-pointer ${
-                audienceMode === 'engineer'
-                  ? 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 font-bold'
-                  : 'text-neutral-600 dark:text-[#737373] hover:text-neutral-900 dark:hover:text-white font-medium'
-              }`}
-            >
-              <Code2 className="w-3 h-3" />
-              <span>Eng</span>
-            </button>
-            <button
-              onClick={() => setAudienceMode('both')}
-              title="The Bridge: แสดงมุมมองทั้งสองฝั่งร่วมกัน"
-              className={`flex items-center gap-1 px-2 py-1 rounded-[3px] text-xs transition-all cursor-pointer ${
-                audienceMode === 'both'
-                  ? 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 font-bold'
-                  : 'text-neutral-600 dark:text-[#737373] hover:text-neutral-900 dark:hover:text-white font-medium'
-              }`}
-            >
-              <Users className="w-3 h-3" />
-              <span>Both</span>
             </button>
           </div>
         </div>

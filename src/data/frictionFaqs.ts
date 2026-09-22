@@ -1,4 +1,4 @@
-import { AudienceMode, FigureKey, RichText } from '../types';
+import { FigureKey, RichText } from '../types';
 
 /**
  * Chapter 11 FAQ restored from the static guide (spec §5). Text is verbatim;
@@ -19,14 +19,14 @@ export interface FrictionFaq {
 export interface FaqGroup {
   key: FrictionFaq['group'];
   title: string;
-  /** Static `.grp-sub` text differs by audience lens; the 'both' lens shows no subtitle, as in the static page. */
-  subtitle: Record<Exclude<AudienceMode, 'both'>, string>;
+  /** Static `.grp-sub` text differs by audience lens; both lenses' subtitles are shown together. */
+  subtitle: Record<'business' | 'engineer', string>;
 }
 
 export const FAQ_QUICK_JUMP_TITLE = 'คำถามในบทนี้ (12 ข้อ) — คลิกเพื่อข้ามไป';
 
-/** Static `.aud-callout` shown for the matching audience lens. */
-export const FAQ_AUDIENCE_CALLOUTS: Record<Exclude<AudienceMode, 'both'>, { who: string; body: string }> = {
+/** Static `.aud-callout` text for each audience lens; both are shown together. */
+export const FAQ_AUDIENCE_CALLOUTS: Record<'business' | 'engineer', { who: string; body: string }> = {
   business: { who: 'สำหรับคุณที่มาจากฝั่ง business', body: 'คำถามของคุณถูกจัดขึ้นก่อน แต่อยากให้เลื่อนอ่านกลุ่มล่างด้วย — นั่นคือสิ่งที่ทีม dev ของคุณกำลังคิดอยู่แต่อาจไม่เคยพูดออกมาตรงๆ' },
   engineer: { who: 'สำหรับคุณที่มาจากฝั่ง engineer', body: 'คำถามของคุณถูกจัดขึ้นก่อน แต่อยากให้เลื่อนอ่านกลุ่มล่างด้วย — นั่นคือสิ่งที่ฝั่ง business กำลังคิดเกี่ยวกับพฤติกรรมของคุณอยู่' },
 };

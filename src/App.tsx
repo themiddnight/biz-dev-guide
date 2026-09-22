@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { AudienceMode, ExperienceLevel, TabType, UserStats, Badge } from './types';
+import { ExperienceLevel, TabType, UserStats, Badge } from './types';
 import { readStorage, writeStorage } from './lib/storage';
 import { CHAPTERS } from './data/chaptersData';
 import { formatChapterHash } from './lib/chapterRoute';
@@ -33,7 +33,6 @@ export default function App() {
       if (num !== undefined) window.history.replaceState(null, '', formatChapterHash(num));
     }
   }, [activeTab, route.activeChapterId, route.hashInUrl]);
-  const [audienceMode, setAudienceMode] = useState<AudienceMode>('both');
   const [experienceLevel, setExperienceLevel] = useState<ExperienceLevel>(() => {
     const saved = readStorage('be_guide_exp_level') as ExperienceLevel | null;
     return saved || 'beginner';
@@ -164,15 +163,6 @@ export default function App() {
     addXp(50, `ปลดล็อกเหรียญตรา: ${badge.title}`);
   };
 
-  // Audience toggle handler
-  const handleAudienceChange = (mode: AudienceMode) => {
-    if (mode === audienceMode) return;
-    setAudienceMode(mode);
-    if (mode !== 'both') {
-      unlockBadge('view_switcher');
-    }
-  };
-
   // Experience level toggle handler
   const handleExperienceLevelChange = (level: ExperienceLevel) => {
     writeStorage('be_guide_exp_level', level);
@@ -289,8 +279,6 @@ export default function App() {
       <Header
         activeTab={activeTab}
         setActiveTab={setActiveTab}
-        audienceMode={audienceMode}
-        setAudienceMode={handleAudienceChange}
         experienceLevel={experienceLevel}
         setExperienceLevel={handleExperienceLevelChange}
         userStats={userStats}
@@ -303,12 +291,10 @@ export default function App() {
         {activeTab === 'guide' && (
           <GuideTab
             chapters={CHAPTERS}
-            audienceMode={audienceMode}
             experienceLevel={experienceLevel}
             onExperienceLevelChange={handleExperienceLevelChange}
             showFirstVisit={!levelChosen}
             onChooseInitialLevel={handleChooseInitialLevel}
-            onAudienceChange={handleAudienceChange}
             bookmarks={userStats.bookmarks}
             readChapters={userStats.readChapters}
             onToggleBookmark={handleToggleBookmark}

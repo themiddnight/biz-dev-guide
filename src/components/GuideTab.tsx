@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Chapter, AudienceMode, ExperienceLevel } from '../types';
+import { Chapter, ExperienceLevel } from '../types';
 import { S5_JUMP_TARGET_IDS, DiagramJumpTarget } from '../data/diagramFamilies';
 import { GlossaryFilter } from './glossary/GlossaryPanel';
 import { GLOSSARY, GlossaryCategory } from '../data/glossary';
@@ -45,7 +45,6 @@ import {
 
 interface GuideTabProps {
   chapters: Chapter[];
-  audienceMode: AudienceMode;
   experienceLevel?: ExperienceLevel;
   onExperienceLevelChange?: (lvl: ExperienceLevel) => void;
   showFirstVisit?: boolean;
@@ -54,7 +53,6 @@ interface GuideTabProps {
   resumeCandidate: string | null;
   resumeDismissed: boolean;
   onDismissResume: () => void;
-  onAudienceChange?: (mode: AudienceMode) => void;
   bookmarks: string[];
   readChapters?: string[];
   onToggleBookmark: (chapterId: string) => void;
@@ -71,7 +69,6 @@ interface GuideTabProps {
 
 export const GuideTab: React.FC<GuideTabProps> = ({
   chapters,
-  audienceMode,
   experienceLevel = 'beginner',
   onExperienceLevelChange,
   showFirstVisit,
@@ -80,7 +77,6 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   resumeCandidate,
   resumeDismissed,
   onDismissResume,
-  onAudienceChange,
   bookmarks,
   readChapters = [],
   onToggleBookmark,
@@ -269,8 +265,6 @@ export const GuideTab: React.FC<GuideTabProps> = ({
 
   const sectionCtx: GuideSectionContext = {
     chapters,
-    audienceMode,
-    onAudienceChange,
     onEarnXp,
     onNavigateChapter: handleSelectChapter,
     onDiagramJump: handleDiagramJump,
@@ -585,7 +579,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
           {/* Chapter Main Content Reader Card */}
           <div className="bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-7 shadow-2xs space-y-5 sm:space-y-6">
             
-            <ChapterHero chapter={activeChapter} experienceLevel={experienceLevel} audienceMode={audienceMode} isRead={isCurrentRead} />
+            <ChapterHero chapter={activeChapter} experienceLevel={experienceLevel} isRead={isCurrentRead} />
 
             {/* ADAPTIVE LENS CONTROLLER BANNER */}
             <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-2 sm:space-y-2.5">
@@ -593,10 +587,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                 <div className="flex items-center gap-1.5 flex-wrap">
                   <span className="text-xs font-bold text-neutral-800 dark:text-[#e5e5e5] flex items-center gap-1.5 font-mono">
                     <SlidersHorizontal className="w-3.5 h-3.5 text-neutral-600 dark:text-[#a3a3a3]" />
-                    <span>Active Lens:</span>
-                  </span>
-                  <span className="text-[11px] sm:text-xs font-semibold px-2 py-0.5 rounded-md bg-neutral-200 dark:bg-[#262626] text-neutral-800 dark:text-[#d4d4d4]">
-                    {audienceMode === 'business' ? '💼 Business' : audienceMode === 'engineer' ? '💻 Engineer' : '👥 The Bridge (ทั้งสองฝั่ง)'}
+                    <span>Active Mode:</span>
                   </span>
                   <span className="text-[11px] sm:text-xs font-semibold px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300">
                     {experienceLevel === 'beginner' ? '🌱 Beginner' : '⚡ Experienced'}

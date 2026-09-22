@@ -31,7 +31,6 @@ export const FaqSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggle, 
       {isOpen && (
         <div className="p-3.5 sm:p-5 border-t border-neutral-100 dark:border-[#262626] bg-neutral-50/50 dark:bg-[#111111]">
           <FrictionFaqSection
-            audienceMode={ctx.audienceMode}
             onNavigateChapter={ctx.onNavigateChapter}
             onScrollToPlaybook={ctx.onScrollToPlaybook}
             onSearchGlossary={ctx.onSearchGlossary}

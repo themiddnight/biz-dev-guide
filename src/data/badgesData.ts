@@ -10,14 +10,6 @@ export const INITIAL_BADGES: Badge[] = [
     unlocked: false,
   },
   {
-    id: 'view_switcher',
-    title: 'ผู้มองสองฟากฟ้า',
-    description: 'ลองสลับมุมมองระหว่าง "ฝั่ง Business" และ "ฝั่ง Engineer"',
-    icon: 'Repeat',
-    category: 'exploration',
-    unlocked: false,
-  },
-  {
     id: 'quiz_starter',
     title: 'ผู้ท้าชิงมือใหม่',
     description: 'ทำแบบทดสอบจำลองสถานการณ์ข้อแรกสำเร็จ',
