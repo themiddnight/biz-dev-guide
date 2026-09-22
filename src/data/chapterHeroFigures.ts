@@ -9,4 +9,8 @@ export const CHAPTER_HERO_FIGURES: Readonly<Record<string, ChapterHeroFigure>> =
     figureKey: 'refund-c4-impact',
     caption: 'ระบบคืนเงินล่มตัวเดียว ดูแผนผังก็ชี้ได้ว่าใครโดนบ้าง',
   },
+  s14: {
+    figureKey: 'refund-spec-stack',
+    caption: 'ฟีเจอร์ขอคืนเงินใน 4 เอกสาร ทุกชั้นชี้กลับไปหาเหตุผลได้',
+  },
 };

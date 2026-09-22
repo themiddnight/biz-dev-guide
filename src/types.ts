@@ -35,7 +35,8 @@ export type FigureKey =
   | 'env-flow'
   | 'uncertainty-spectrum'
   | 'refund-fidelity'
-  | 'refund-c4-impact';
+  | 'refund-c4-impact'
+  | 'refund-spec-stack';
 
 /** One figure shown right under a chapter's subtitle (visual-first pilot). */
 export interface ChapterHeroFigure {

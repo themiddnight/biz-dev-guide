@@ -94,14 +94,18 @@ describe('isSectionPresent', () => {
   it('reference exactly in s1, s2, s5, s6, s8, s12, s13, s14', () => {
     expect(idsWith('reference')).toEqual(['s1', 's2', 's5', 's6', 's8', 's12', 's13', 's14']);
   });
-  it('mindset, friction, diagram in every chapter', () => {
-    for (const key of ['mindset', 'friction', 'diagram'] as SectionKey[]) expect(idsWith(key)).toHaveLength(15);
+  it('mindset, friction in every chapter', () => {
+    for (const key of ['mindset', 'friction'] as SectionKey[]) expect(idsWith(key)).toHaveLength(15);
+  });
+  it('diagram in every chapter except s14 (hero replaced it, Q6)', () => {
+    expect(idsWith('diagram')).toHaveLength(14);
+    expect(idsWith('diagram')).not.toContain('s14');
   });
 });
 
 describe('sectionHasTool', () => {
-  it('diagram in all chapters; friction only in s1, s2, s6', () => {
-    expect(CHAPTERS.every(c => sectionHasTool(c, 'diagram'))).toBe(true);
+  it('diagram in all chapters but s14; friction only in s1, s2, s6', () => {
+    expect(CHAPTERS.filter(c => !sectionHasTool(c, 'diagram')).map(c => c.id)).toEqual(['s14']);
     expect(CHAPTERS.filter(c => sectionHasTool(c, 'friction')).map(c => c.id)).toEqual(['s1', 's2', 's6']);
     expect(sectionHasTool(ch('s1'), 'primer')).toBe(false);
   });

@@ -17,6 +17,7 @@ import { GateTimeline } from './GateTimeline';
 import { RefundC4Impact } from './RefundC4Impact';
 import { RefundFidelity } from './RefundFidelity';
 import { RefundSequence } from './RefundSequence';
+import { RefundSpecStack } from './RefundSpecStack';
 import { RefundSwimlane } from './RefundSwimlane';
 import { TechDebtQuadrant } from './TechDebtQuadrant';
 import { ThreeLenses } from './ThreeLenses';
@@ -61,6 +62,8 @@ export const FIGURES: Record<FigureKey, React.FC<FigureProps>> = {
   'refund-fidelity': RefundFidelity,
   // s5 hero (chapter figure briefs 2026-09-22, s5 option B)
   'refund-c4-impact': RefundC4Impact,
+  // s14 hero (chapter figure briefs 2026-09-22, s14)
+  'refund-spec-stack': RefundSpecStack,
   // Appendix figures (spec §6)
   'translation-layers': TranslationLayers,
   'gate-timeline': GateTimeline,

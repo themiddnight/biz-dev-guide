@@ -4,7 +4,11 @@ import { CHAPTER_ILLUSTRATIONS } from './chapterIllustrations';
 import { FIGURES } from '../components/figures';
 
 const chapter = (id: string) => CHAPTERS.find((c) => c.id === id)!;
-const HERO_FIGURES: Record<string, string> = { s3: 'refund-fidelity', s5: 'refund-c4-impact' };
+const HERO_FIGURES: Record<string, string> = {
+  s3: 'refund-fidelity',
+  s5: 'refund-c4-impact',
+  s14: 'refund-spec-stack',
+};
 const MONEY = /\$\s?\d/;
 
 describe('visual-first heroes', () => {

@@ -87,10 +87,17 @@ export function getInlineSectionsAt(chapter: Chapter, key: SectionKey, conceptIn
   return getInlineSections(chapter).filter(s => s.after === key && s.conceptIndex === conceptIndex);
 }
 
+/**
+ * Chapters with nothing left in the Diagram section: s14's hero replaced both its
+ * illustration card and its text-card widget (chapter figure briefs 2026-09-22, Q6).
+ */
+export const CHAPTERS_WITHOUT_DIAGRAM: readonly string[] = ['s14'];
+
 /** Mirrors the pre-refactor render guards in GuideTab exactly (spec §1.3). */
 export function isSectionPresent(chapter: Chapter, key: SectionKey): boolean {
   switch (key) {
-    case 'mindset': case 'friction': case 'diagram': return true;
+    case 'mindset': case 'friction': return true;
+    case 'diagram': return !CHAPTERS_WITHOUT_DIAGRAM.includes(chapter.id);
     case 'primer': return !!chapter.beginnerPrimer;
     case 'jargon': return (chapter.jargonList?.length ?? 0) > 0;
     case 'dialogue': return !!chapter.dialogueExample;
@@ -106,7 +113,7 @@ export function isSectionPresent(chapter: Chapter, key: SectionKey): boolean {
 }
 
 export function sectionHasTool(chapter: Chapter, key: SectionKey): boolean {
-  if (key === 'diagram') return true;
+  if (key === 'diagram') return !CHAPTERS_WITHOUT_DIAGRAM.includes(chapter.id);
   if (key === 'friction') return !!chapter.frictionPlaybook?.dilemma;
   return false;
 }

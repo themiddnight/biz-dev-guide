@@ -143,18 +143,5 @@ export const CHAPTER_ILLUSTRATIONS: Record<string, ChapterIllustration> = {
       { label: 'Human Engineer Review', role: 'กัปตันผู้ตรวจรับ', color: '#10b981', detail: 'วิศวกรมนุษย์ใช้ Domain Judgment ตรวจสอบความถูกต้องขั้นสุดท้าย' }
     ],
     takeaway: 'AI ไม่ได้มาแทนที่วิศวกร แต่วิศวกรที่ใช้ AI อย่างรู้เท่าทันและมีระบบตรวจสอบ จะก้าวล้ำหน้าคนที่ไม่ใช้อย่างมหาศาล'
-  },
-  s14: {
-    id: 'ill-s14',
-    title: 'The Specification Hierarchy Pyramid (BRD ➔ PRD ➔ Story ➔ ADR)',
-    subtitle: 'พิมพ์เขียว 4 ชั้น: แปลงเป้าหมายกำไรขององค์กร ให้กลายเป็นโค้ด 1 บรรทัดที่รันได้จริง',
-    visualMetaphor: 'การสร้างตึกระฟ้า: BRD คือการศึกษาความเป็นไปได้ทางการเงิน, PRD คือแบบสถาปัตยกรรมภายนอก, User Story คือแปลนห้องและปลั๊กไฟ, ADR คือสูตรผสมคอนกรีตของวิศวกรโครงสร้าง',
-    elements: [
-      { label: '1. BRD (Business Goal)', role: 'เป้าหมายธุรกิจ', color: '#f59e0b', detail: 'ระบุผลตอบแทนการลงทุน (ROI) และโอกาสทางการตลาด' },
-      { label: '2. PRD (Product Spec)', role: 'พิมพ์เขียวฟังก์ชัน', color: '#3b82f6', detail: 'ระบุพฤติกรรมของระบบและขอบเขตฟีเจอร์สำหรับผู้ใช้' },
-      { label: '3. User Story & AC', role: 'เกณฑ์ตรวจรับงาน', color: '#8b5cf6', detail: 'เขียนเงื่อนไข Given-When-Then ให้ทั้งเดฟและ QA ตรวจตรงกัน' },
-      { label: '4. Tech Design & ADR', role: 'บันทึกวิศวกรรม', color: '#10b981', detail: 'บันทึกเหตุผลว่าทำไมถึงเลือกเทคโนโลยีนี้ เพื่อคนรุ่นหลัง' }
-    ],
-    takeaway: 'ความชัดเจนในเอกสารเพียง 1 ประโยค ช่วยประหยัดเวลาการถกเถียงและเขียนโค้ดผิดพลาดได้นับร้อยชั่วโมง'
   }
 };
