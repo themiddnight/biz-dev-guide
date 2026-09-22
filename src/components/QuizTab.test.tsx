@@ -7,7 +7,7 @@ import { QuizTab } from './QuizTab';
 const noop = () => {};
 const render = (role: 'eng' | 'biz' | null) =>
   renderToStaticMarkup(
-    <QuizTab questions={QUIZ_QUESTIONS} role={role} onCompleteQuiz={() => 0} onAskAIWithPrompt={noop} onOpenChapter={noop} />,
+    <QuizTab questions={QUIZ_QUESTIONS} role={role} onAnswer={() => 0} onCompleteQuiz={noop} onAskAIWithPrompt={noop} onOpenChapter={noop} />,
   );
 
 describe('QuizTab rounds', () => {

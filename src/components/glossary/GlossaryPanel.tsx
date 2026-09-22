@@ -73,12 +73,16 @@ export const GlossaryPanel: React.FC<GlossaryPanelProps> = ({
 
   const orderedTerms = useMemo(() => sortTermsForRole(terms, role), [terms, role]);
 
+  // Category counts follow the active side filter, so a chip never promises terms it won't show.
   const categoryCounts = useMemo(() => {
     const counts = {} as Record<GlossaryCategory, number>;
     for (const cat of GLOSSARY_CATEGORIES) counts[cat.key] = 0;
-    for (const term of terms) counts[term.category] += 1;
+    for (const term of terms) {
+      if (side !== 'all' && termSide(term) !== side) continue;
+      counts[term.category] += 1;
+    }
     return counts;
-  }, [terms]);
+  }, [terms, side]);
 
   const chapterNum = useMemo(() => {
     const map: Record<string, number> = {};
@@ -151,7 +155,7 @@ export const GlossaryPanel: React.FC<GlossaryPanelProps> = ({
       {/* Category chips: scroll horizontally on mobile, wrap from sm */}
       <div className="flex flex-nowrap sm:flex-wrap gap-1.5 overflow-x-auto sm:overflow-visible pb-1 sm:pb-0 -mx-1 px-1">
         <button type="button" onClick={() => setCategory('all')} aria-pressed={activeCategory === 'all'} className={chipClass(activeCategory === 'all')}>
-          ทั้งหมด ({terms.length})
+          ทั้งหมด ({side === 'all' ? terms.length : sideCounts[side]})
         </button>
         {GLOSSARY_CATEGORIES.map(cat => (
           <button

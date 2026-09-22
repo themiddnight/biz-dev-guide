@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { applyXpClaims, unclaimed, seedLegacyClaims, xpKey, qualifiesQuizMaster } from './xp';
+import { applyXpClaims, unclaimed, seedLegacyClaims, xpKey, qualifiesQuizMaster, quizAnswerClaims } from './xp';
 import { LEVEL_TIERS } from '../data/badgesData';
 import type { UserStats } from '../types';
 
@@ -77,5 +77,23 @@ describe('qualifiesQuizMaster', () => {
     expect(qualifiesQuizMaster(6, 8)).toBe(false);
     expect(qualifiesQuizMaster(16, 20)).toBe(true);
     expect(qualifiesQuizMaster(5, 5)).toBe(false);
+  });
+});
+
+describe('quizAnswerClaims (per-answer quiz XP)', () => {
+  const q = { id: 7, xp: 15 };
+  it('a correct answer claims its XP immediately, keyed by question', () => {
+    expect(quizAnswerClaims(q, true)).toEqual([{ key: xpKey.quiz(7), amount: 15 }]);
+  });
+  it('a wrong answer claims nothing', () => {
+    expect(quizAnswerClaims(q, false)).toEqual([]);
+  });
+  it('XP earned before leaving the round mid-way is kept, and a retake pays nothing again', () => {
+    const afterAnswer = applyXpClaims(base(), quizAnswerClaims(q, true));
+    expect(afterAnswer.xp).toBe(15);
+    // Round unmounted ("read related chapter"), then retaken and answered correctly again.
+    const afterRetake = applyXpClaims(afterAnswer, quizAnswerClaims(q, true));
+    expect(afterRetake.xp).toBe(15);
+    expect(unclaimed(afterRetake, quizAnswerClaims(q, true))).toEqual([]);
   });
 });

@@ -16,11 +16,13 @@ import {
   BookOpen
 } from 'lucide-react';
 
-type CompleteQuiz = (score: number, correctQuestionIds: number[], roundSize: number) => number; // returns XP actually awarded
+type AnswerQuiz = (questionId: number, correct: boolean) => number; // pays XP now; returns XP actually awarded
+type CompleteQuiz = (score: number, roundSize: number) => void; // stats and badges only
 
 interface QuizTabProps {
   questions: QuizQuestion[]; // the full bank; the tab picks the round
   role: Role | null;
+  onAnswer: AnswerQuiz;
   onCompleteQuiz: CompleteQuiz;
   onAskAIWithPrompt: (prompt: string) => void;
   onOpenChapter: (chapterId: string) => void;
@@ -28,7 +30,9 @@ interface QuizTabProps {
 
 interface QuizRunProps {
   questions: QuizQuestion[]; // one round
+  onAnswer: AnswerQuiz;
   onCompleteQuiz: CompleteQuiz;
+  onRunStarted: (started: boolean) => void;
   onAskAIWithPrompt: (prompt: string) => void;
   onOpenChapter: (chapterId: string) => void;
 }
@@ -50,17 +54,26 @@ const shuffleOptions = (questions: QuizQuestion[]): QuizQuestion['options'][] =>
 export const QuizTab: React.FC<QuizTabProps> = ({
   questions,
   role,
+  onAnswer,
   onCompleteQuiz,
   onAskAIWithPrompt,
   onOpenChapter,
 }) => {
   const [round, setRound] = useState<QuizRound>(() => defaultQuizRound(role));
   const [roundRole, setRoundRole] = useState(role);
+  // True once a question in the current run has been answered.
+  const [runStarted, setRunStarted] = useState(false);
   if (role !== roundRole) {
-    // A role change elsewhere moves the reader to their new default round.
+    // A role change elsewhere moves the reader to their new default round, but never
+    // abandons a run they have already started answering.
     setRoundRole(role);
-    setRound(defaultQuizRound(role));
+    if (!runStarted) setRound(defaultQuizRound(role));
   }
+  const chooseRound = (r: QuizRound) => {
+    if (r === round) return;
+    setRound(r);
+    setRunStarted(false);
+  };
   const roundQuestions = useMemo(() => getQuizRound(questions, round), [questions, round]);
 
   return (
@@ -79,7 +92,7 @@ export const QuizTab: React.FC<QuizTabProps> = ({
               type="button"
               aria-pressed={selected}
               data-quiz-round={r}
-              onClick={() => setRound(r)}
+              onClick={() => chooseRound(r)}
               className={`px-3 py-1.5 rounded-full border text-xs font-semibold transition-colors cursor-pointer ${
                 selected
                   ? 'bg-neutral-900 text-white border-neutral-900 dark:bg-white dark:text-[#0a0a0a] dark:border-white'
@@ -95,7 +108,9 @@ export const QuizTab: React.FC<QuizTabProps> = ({
       <QuizRun
         key={round}
         questions={roundQuestions}
+        onAnswer={onAnswer}
         onCompleteQuiz={onCompleteQuiz}
+        onRunStarted={setRunStarted}
         onAskAIWithPrompt={onAskAIWithPrompt}
         onOpenChapter={onOpenChapter}
       />
@@ -105,14 +120,15 @@ export const QuizTab: React.FC<QuizTabProps> = ({
 
 const QuizRun: React.FC<QuizRunProps> = ({
   questions,
+  onAnswer,
   onCompleteQuiz,
+  onRunStarted,
   onAskAIWithPrompt,
   onOpenChapter,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOptionIndex, setSelectedOptionIndex] = useState<number | null>(null);
   const [score, setScore] = useState(0);
-  const [correctIds, setCorrectIds] = useState<number[]>([]);
   const [awardedXp, setAwardedXp] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
   const [shuffledOptions, setShuffledOptions] = useState(() => shuffleOptions(questions));
@@ -125,10 +141,11 @@ const QuizRun: React.FC<QuizRunProps> = ({
     setSelectedOptionIndex(idx);
 
     const isCorrect = currentOptions[idx].isCorrect;
-    if (isCorrect) {
-      setScore((prev) => prev + 1);
-      setCorrectIds((prev) => [...prev, currentQ.id]);
-    }
+    if (isCorrect) setScore((prev) => prev + 1);
+    onRunStarted(true);
+    // XP is paid on the answer, not at the end, so leaving mid-round keeps it.
+    const awarded = onAnswer(currentQ.id, isCorrect);
+    if (awarded > 0) setAwardedXp((prev) => prev + awarded);
   };
 
   const handleNext = () => {
@@ -137,8 +154,8 @@ const QuizRun: React.FC<QuizRunProps> = ({
       setSelectedOptionIndex(null);
     } else {
       setIsFinished(true);
-      // score and correctIds already include the last answer (updated in handleSelectOption).
-      setAwardedXp(onCompleteQuiz(score, correctIds, questions.length));
+      // score already includes the last answer (updated in handleSelectOption).
+      onCompleteQuiz(score, questions.length);
     }
   };
 
@@ -146,8 +163,8 @@ const QuizRun: React.FC<QuizRunProps> = ({
     setCurrentIndex(0);
     setSelectedOptionIndex(null);
     setScore(0);
-    setCorrectIds([]);
     setAwardedXp(0);
+    onRunStarted(false);
     setIsFinished(false);
     setShuffledOptions(shuffleOptions(questions));
   };

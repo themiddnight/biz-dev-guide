@@ -31,13 +31,13 @@ export const HeroFigure: React.FC<HeroFigureProps> = ({ figure, analogy, role, s
         {figure.caption}
       </figcaption>
       {role ? (
-        <div data-seat={seat} className="flex flex-wrap items-baseline gap-x-2 gap-y-1 min-w-0">
+        <div data-seat={seat} aria-live="polite" className="flex flex-wrap items-baseline gap-x-2 gap-y-1 min-w-0">
           <SeatLine side={seat} line={figure.seats[seat]} />
           <button
             type="button"
             data-seat-flip
             onClick={onFlipSeat}
-            className="text-xs font-semibold text-neutral-600 dark:text-[#a3a3a3] underline underline-offset-2 hover:text-neutral-900 dark:hover:text-[#fafafa]"
+            className="cursor-pointer text-xs font-semibold text-neutral-600 dark:text-[#a3a3a3] underline underline-offset-2 hover:text-neutral-900 dark:hover:text-[#fafafa]"
           >
             {seat === role ? 'นั่งเก้าอี้อีกฝั่ง' : 'กลับเก้าอี้ตัวเอง'}
           </button>

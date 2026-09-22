@@ -15,6 +15,7 @@ import {
   toggleLayer,
   isSectionPresent,
   getInlineSectionsAt,
+  SECTION_META,
   type OpenState,
   type SectionKey,
 } from '../data/sectionLayers';
@@ -26,7 +27,8 @@ import { SectionOutline } from './guide/SectionOutline';
 import { TrackPanel } from './guide/TrackPanel';
 import { TrackNextCard, TrackEndCard } from './guide/TrackFooter';
 import { getTrackNext, resolveTrack, type TrackKey } from '../data/readingTracks';
-import { ROLE_META, otherRole, resolveChapterLevel, getActiveTrackKey, type LevelInputs, type LevelMode, type Role } from '../data/rolePerspective';
+import { planChapterLevelChoice } from '../lib/rolePrefs';
+import { ROLE_META, otherRole, resolveChapterLevel, getActiveTrackKey, type LevelInputs, type Role } from '../data/rolePerspective';
 import { FirstVisitCard } from './guide/FirstVisitCard';
 import { ResumeBanner } from './guide/ResumeBanner';
 import { 
@@ -52,7 +54,6 @@ interface GuideTabProps {
   levelInputs: LevelInputs;
   onExperienceLevelChange?: (lvl: ExperienceLevel) => void;
   onChooseRole?: (role: Role | null) => void;
-  onLevelModeChange?: (mode: LevelMode) => void;
   onChapterLevelChange?: (chapterId: string, level: ExperienceLevel | null) => void;
   showFirstVisit?: boolean;
   onChooseInitialLevel?: (level: ExperienceLevel) => void;
@@ -178,17 +179,28 @@ export const GuideTab: React.FC<GuideTabProps> = ({
 
   // Other-side box: defaults to the other side (both when no role); resets on role change, not persisted (spec P2.2).
   const defaultOtherSideView: OtherSideView = role ? otherRole(role) : 'both';
-  const [otherSideView, setOtherSideView] = useState<OtherSideView>(defaultOtherSideView);
-  useEffect(() => {
-    setOtherSideView(defaultOtherSideView);
-  }, [role]);
+  // The pick remembers the role it was made under, so a role change falls back to the
+  // default in the same render (no effect, no stale frame).
+  const [otherSidePick, setOtherSidePick] = useState<{ role: Role | null; view: OtherSideView } | null>(null);
+  const otherSideView = otherSidePick && otherSidePick.role === role ? otherSidePick.view : defaultOtherSideView;
+  const setOtherSideView = (view: OtherSideView) => setOtherSidePick({ role, view });
 
   // Hero seat: the reader's own seat unless flipped; resets on chapter or role change, not persisted (spec P3.3).
-  const [seatFlipped, setSeatFlipped] = useState(false);
-  useEffect(() => {
-    setSeatFlipped(false);
-  }, [activeChapter.id, role]);
+  // Stored with the chapter:role key it applies to, so it is derived rather than reset by an effect.
+  const seatKey = `${activeChapter.id}:${role}`;
+  const [flippedFor, setFlippedFor] = useState<string | null>(null);
+  const seatFlipped = flippedFor === seatKey;
   const seat = role ? (seatFlipped ? otherRole(role) : role) : 'biz';
+
+  // Lens hint names the Core sections this chapter actually opens with (from the layer config).
+  const coreHint = (layout.find(g => g.layer === 'core')?.sections ?? []).map(k => SECTION_META[k].chip).join(' · ');
+
+  // Per-chapter level button: no redundant override; picking the fallback level clears it.
+  const handleChapterLevelPick = (lvl: ExperienceLevel) => {
+    const action = planChapterLevelChoice(levelInputs, activeChapter, lvl);
+    if (action.kind === 'clear') onChapterLevelChange?.(activeChapter.id, null);
+    else if (action.kind === 'set') onChapterLevelChange?.(activeChapter.id, action.level);
+  };
 
   // Each chapter (and each level) opens at its Core (spec §1.4, D3).
   useEffect(() => {
@@ -444,17 +456,17 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                 { id: 'qa', label: 'QA' },
                 { id: 'friction', label: 'ขัดแย้ง' },
                 { id: 'biz', label: 'ธุรกิจ' },
-              ].map((role) => (
+              ].map((tag) => (
                 <button
-                  key={role.id}
-                  onClick={() => setSelectedRole(role.id)}
+                  key={tag.id}
+                  onClick={() => setSelectedRole(tag.id)}
                   className={`px-2.5 py-1 rounded-lg font-medium whitespace-nowrap transition-all cursor-pointer ${
-                    selectedRole === role.id
+                    selectedRole === tag.id
                       ? 'bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] font-bold shadow-xs'
                       : 'bg-neutral-100 dark:bg-[#1f1f1f] text-neutral-600 dark:text-[#a3a3a3] hover:bg-neutral-200 dark:hover:bg-[#262626]'
                   }`}
                 >
-                  {role.label}
+                  {tag.label}
                 </button>
               ))}
             </div>
@@ -623,7 +635,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
               isRead={isCurrentRead}
               role={role}
               seat={seat}
-              onFlipSeat={() => setSeatFlipped((f) => !f)}
+              onFlipSeat={() => setFlippedFor((f) => (f === seatKey ? null : seatKey))}
             />
 
             {/* ADAPTIVE LENS CONTROLLER BANNER */}
@@ -687,7 +699,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                         type="button"
                         data-chapter-level={lvl}
                         aria-pressed={chapterLevel === lvl}
-                        onClick={() => onChapterLevelChange?.(activeChapter.id, lvl)}
+                        onClick={() => handleChapterLevelPick(lvl)}
                         className={`px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer transition-all ${
                           chapterLevel === lvl
                             ? 'bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] shadow-xs font-bold'
@@ -713,8 +725,8 @@ export const GuideTab: React.FC<GuideTabProps> = ({
 
               <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e] leading-relaxed">
                 {chapterLevel === 'beginner'
-                  ? '💡 โหมดมือใหม่: เปิด จุดเริ่มต้น · ศัพท์จำเป็น · แผนภาพ ไว้ก่อน ส่วนอื่นพับไว้ในชั้น "นำไปใช้" และ "เจาะลึก"'
-                  : '⚡ โหมดทำงานข้ามทีม: เปิด แนวคิดหลัก · กับดัก · แผนภาพ ไว้ก่อน วิธีรับมือ Friction อยู่ในชั้น "นำไปใช้"'}
+                  ? `💡 โหมดมือใหม่: เปิด ${coreHint} ไว้ก่อน ส่วนอื่นพับไว้ในชั้น "นำไปใช้" และ "เจาะลึก"`
+                  : `⚡ โหมดทำงานข้ามทีม: เปิด ${coreHint} ไว้ก่อน วิธีรับมือ Friction อยู่ในชั้น "นำไปใช้"`}
               </p>
             </div>
 
@@ -885,17 +897,17 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                   { id: 'qa', label: 'QA' },
                   { id: 'friction', label: 'ขัดแย้ง' },
                   { id: 'biz', label: 'ธุรกิจ' },
-                ].map((role) => (
+                ].map((tag) => (
                   <button
-                    key={role.id}
-                    onClick={() => setSelectedRole(role.id)}
+                    key={tag.id}
+                    onClick={() => setSelectedRole(tag.id)}
                     className={`px-3 py-1 rounded-lg font-medium whitespace-nowrap transition-all cursor-pointer text-[11px] ${
-                      selectedRole === role.id
+                      selectedRole === tag.id
                         ? 'bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] font-bold'
                         : 'bg-neutral-200/80 dark:bg-[#262626] text-neutral-700 dark:text-[#a3a3a3] hover:bg-neutral-300 dark:hover:bg-[#333333]'
                     }`}
                   >
-                    {role.label}
+                    {tag.label}
                   </button>
                 ))}
               </div>

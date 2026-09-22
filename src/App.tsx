@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ExperienceLevel, TabType, UserStats, Badge } from './types';
 import { readStorage, writeStorage, removeStorage } from './lib/storage';
-import { parseRole, parseLevelMode, parseChapterLevels } from './lib/rolePrefs';
+import { parseRole, parseLevelMode, parseChapterLevels, planRoleChoice } from './lib/rolePrefs';
 import type { LevelInputs, LevelMode, Role } from './data/rolePerspective';
 import { CHAPTERS } from './data/chaptersData';
 import { formatChapterHash } from './lib/chapterRoute';
 import { useChapterRoute } from './hooks/useChapterRoute';
 import { QUIZ_QUESTIONS } from './data/quizQuestions';
 import { INITIAL_BADGES, LEVEL_TIERS } from './data/badgesData';
-import { applyXpClaims, unclaimed, seedLegacyClaims, xpKey, AI_XP_QUESTION_CAP, XpClaim, qualifiesQuizMaster } from './lib/xp';
+import { applyXpClaims, unclaimed, seedLegacyClaims, xpKey, AI_XP_QUESTION_CAP, XpClaim, qualifiesQuizMaster, quizAnswerClaims } from './lib/xp';
 import { Header } from './components/Header';
 import { GuideTab } from './components/GuideTab';
 import { AIAssistantTab } from './components/AIAssistantTab';
@@ -63,15 +63,15 @@ export default function App() {
   };
 
   // Changing role clears per-chapter overrides but keeps levelMode (D4).
+  // Re-choosing the current role changes nothing, so overrides survive.
   const handleChooseRole = (next: Role | null) => {
+    const plan = planRoleChoice(role, next, levelChosen);
+    // An explicit "no role" is a choice too: without this the first-visit card would reappear.
+    if (plan.dismissFirstVisit) handleChooseInitialLevel(experienceLevel);
+    if (!plan.changeRole) return;
     setRole(next);
-    if (next === null) {
-      removeStorage('be_guide_role');
-      // An explicit "no role" is a choice too: without this the first-visit card would reappear.
-      if (!levelChosen) handleChooseInitialLevel(experienceLevel);
-    } else {
-      writeStorage('be_guide_role', next);
-    }
+    if (next === null) removeStorage('be_guide_role');
+    else writeStorage('be_guide_role', next);
     persistChapterLevels({});
   };
 
@@ -289,15 +289,17 @@ export default function App() {
     route.navigate(chapterId);
   };
 
-  // Quiz completion
-  // Each question pays its XP the first time it's answered correctly; retakes only
-  // pay for newly-correct questions. Returns the XP actually awarded.
-  const handleCompleteQuiz = (score: number, correctQuestionIds: number[], roundSize: number) => {
-    const claims = QUIZ_QUESTIONS.filter((q) => correctQuestionIds.includes(q.id)).map((q) => ({
-      key: xpKey.quiz(q.id),
-      amount: q.xp,
-    }));
-    const awarded = claimXp(claims, `ทำแบบทดสอบเสร็จ: ตอบถูก ${score} ข้อ`);
+  // Quiz answer: each question pays its XP the moment it is first answered correctly,
+  // so leaving mid-round keeps it; retakes only pay for newly-correct questions.
+  // Returns the XP actually awarded.
+  const handleQuizAnswer = (questionId: number, correct: boolean) => {
+    const question = QUIZ_QUESTIONS.find((q) => q.id === questionId);
+    if (!question) return 0;
+    return claimXp(quizAnswerClaims(question, correct), 'ตอบแบบทดสอบถูก');
+  };
+
+  // Quiz completion: stats and badges only (XP was already paid per answer).
+  const handleCompleteQuiz = (score: number, roundSize: number) => {
     setUserStats((prev) => ({
       ...prev,
       quizzesCompleted: prev.quizzesCompleted + 1,
@@ -309,7 +311,6 @@ export default function App() {
     if (qualifiesQuizMaster(score, roundSize)) {
       unlockBadge('quiz_master');
     }
-    return awarded;
   };
 
   return (
@@ -362,7 +363,6 @@ export default function App() {
             levelInputs={levelInputs}
             onExperienceLevelChange={handleExperienceLevelChange}
             onChooseRole={handleChooseRole}
-            onLevelModeChange={handleLevelModeChange}
             onChapterLevelChange={handleChapterLevelChange}
             showFirstVisit={!levelChosen && role === null}
             onChooseInitialLevel={handleChooseInitialLevel}
@@ -396,6 +396,7 @@ export default function App() {
           <QuizTab
             questions={QUIZ_QUESTIONS}
             role={role}
+            onAnswer={handleQuizAnswer}
             onCompleteQuiz={handleCompleteQuiz}
             onAskAIWithPrompt={handleAskAIWithPrompt}
             onOpenChapter={handleOpenChapterFromQuiz}

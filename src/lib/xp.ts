@@ -61,3 +61,9 @@ export const seedLegacyClaims = (stats: UserStats, savedLevel: string | null): s
 export const QUIZ_MASTER_MIN_ROUND = 6;
 export const qualifiesQuizMaster = (score: number, roundSize: number): boolean =>
   roundSize >= QUIZ_MASTER_MIN_ROUND && score >= roundSize * 0.8;
+
+// Quiz XP is paid per question the moment it is answered correctly, so leaving the
+// round mid-way (e.g. "read the related chapter") never loses what was earned.
+// The key makes it idempotent: a retake pays only for newly-correct questions.
+export const quizAnswerClaims = (question: { id: number; xp: number }, correct: boolean): XpClaim[] =>
+  correct ? [{ key: xpKey.quiz(question.id), amount: question.xp }] : [];
