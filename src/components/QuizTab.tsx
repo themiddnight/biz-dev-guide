@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { QuizQuestion } from '../types';
+import type { Role } from '../data/rolePerspective';
+import { QUIZ_ROUNDS, QUIZ_ROUND_META, QuizRound, defaultQuizRound, getQuizRound } from '../data/quizRounds';
 import { 
   Sparkles, 
   CheckCircle2, 
@@ -10,13 +12,25 @@ import {
   HelpCircle, 
   Award,
   Zap,
-  Bot
+  Bot,
+  BookOpen
 } from 'lucide-react';
 
+type CompleteQuiz = (score: number, correctQuestionIds: number[], roundSize: number) => number; // returns XP actually awarded
+
 interface QuizTabProps {
-  questions: QuizQuestion[];
-  onCompleteQuiz: (score: number, correctQuestionIds: number[]) => number; // returns XP actually awarded
+  questions: QuizQuestion[]; // the full bank; the tab picks the round
+  role: Role | null;
+  onCompleteQuiz: CompleteQuiz;
   onAskAIWithPrompt: (prompt: string) => void;
+  onOpenChapter: (chapterId: string) => void;
+}
+
+interface QuizRunProps {
+  questions: QuizQuestion[]; // one round
+  onCompleteQuiz: CompleteQuiz;
+  onAskAIWithPrompt: (prompt: string) => void;
+  onOpenChapter: (chapterId: string) => void;
 }
 
 // Shuffle options once per attempt so the correct answer is not tied to a fixed position.
@@ -31,10 +45,69 @@ const shuffleOptions = (questions: QuizQuestion[]): QuizQuestion['options'][] =>
     return opts;
   });
 
+// Round chips (spec P5.3). The run below is keyed by round, so switching rounds
+// restarts index, score and shuffled options with no confirmation (D12).
 export const QuizTab: React.FC<QuizTabProps> = ({
+  questions,
+  role,
+  onCompleteQuiz,
+  onAskAIWithPrompt,
+  onOpenChapter,
+}) => {
+  const [round, setRound] = useState<QuizRound>(() => defaultQuizRound(role));
+  const [roundRole, setRoundRole] = useState(role);
+  if (role !== roundRole) {
+    // A role change elsewhere moves the reader to their new default round.
+    setRoundRole(role);
+    setRound(defaultQuizRound(role));
+  }
+  const roundQuestions = useMemo(() => getQuizRound(questions, round), [questions, round]);
+
+  return (
+    <div className="space-y-5 sm:space-y-6">
+      <div
+        role="group"
+        aria-label="เลือกชุดคำถาม"
+        className="max-w-3xl mx-auto flex flex-wrap gap-2"
+      >
+        {QUIZ_ROUNDS.map((r) => {
+          const selected = r === round;
+          const count = getQuizRound(questions, r).length;
+          return (
+            <button
+              key={r}
+              type="button"
+              aria-pressed={selected}
+              data-quiz-round={r}
+              onClick={() => setRound(r)}
+              className={`px-3 py-1.5 rounded-full border text-xs font-semibold transition-colors cursor-pointer ${
+                selected
+                  ? 'bg-neutral-900 text-white border-neutral-900 dark:bg-white dark:text-[#0a0a0a] dark:border-white'
+                  : 'bg-white dark:bg-[#141414] text-neutral-700 dark:text-[#c4c4c4] border-neutral-200 dark:border-[#262626] hover:border-neutral-400 dark:hover:border-[#404040]'
+              }`}
+            >
+              {QUIZ_ROUND_META[r].label}{r === role ? ' (สายคุณ)' : ''} · {count} ข้อ
+            </button>
+          );
+        })}
+      </div>
+
+      <QuizRun
+        key={round}
+        questions={roundQuestions}
+        onCompleteQuiz={onCompleteQuiz}
+        onAskAIWithPrompt={onAskAIWithPrompt}
+        onOpenChapter={onOpenChapter}
+      />
+    </div>
+  );
+};
+
+const QuizRun: React.FC<QuizRunProps> = ({
   questions,
   onCompleteQuiz,
   onAskAIWithPrompt,
+  onOpenChapter,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOptionIndex, setSelectedOptionIndex] = useState<number | null>(null);
@@ -65,7 +138,7 @@ export const QuizTab: React.FC<QuizTabProps> = ({
     } else {
       setIsFinished(true);
       // score and correctIds already include the last answer (updated in handleSelectOption).
-      setAwardedXp(onCompleteQuiz(score, correctIds));
+      setAwardedXp(onCompleteQuiz(score, correctIds, questions.length));
     }
   };
 
@@ -251,9 +324,20 @@ export const QuizTab: React.FC<QuizTabProps> = ({
         </div>
       )}
 
-      {/* Next Button */}
+      {/* Next Button (+ related chapter, spec P5.3) */}
       {isAnswered && (
-        <div className="flex justify-end pt-2">
+        <div className="flex flex-wrap items-center justify-end gap-2 pt-2">
+          {currentQ.chapterId && (
+            <button
+              type="button"
+              data-quiz-chapter={currentQ.chapterId}
+              onClick={() => onOpenChapter(currentQ.chapterId!)}
+              className="inline-flex items-center gap-2 px-4 py-3 rounded-xl sm:rounded-2xl bg-neutral-100 dark:bg-[#1a1a1a] text-neutral-900 dark:text-[#e5e5e5] border border-neutral-200 dark:border-[#262626] text-xs sm:text-sm font-semibold hover:bg-neutral-200/70 dark:hover:bg-[#222222] transition-all cursor-pointer"
+            >
+              <BookOpen className="w-4 h-4" />
+              <span>อ่านบทที่เกี่ยวข้อง</span>
+            </button>
+          )}
           <button
             onClick={handleNext}
             className="inline-flex items-center gap-2 px-6 py-3 rounded-xl sm:rounded-2xl bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:hover:bg-neutral-200 dark:text-[#0a0a0a] text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer"

@@ -8,7 +8,7 @@ import { formatChapterHash } from './lib/chapterRoute';
 import { useChapterRoute } from './hooks/useChapterRoute';
 import { QUIZ_QUESTIONS } from './data/quizQuestions';
 import { INITIAL_BADGES, LEVEL_TIERS } from './data/badgesData';
-import { applyXpClaims, unclaimed, seedLegacyClaims, xpKey, AI_XP_QUESTION_CAP, XpClaim } from './lib/xp';
+import { applyXpClaims, unclaimed, seedLegacyClaims, xpKey, AI_XP_QUESTION_CAP, XpClaim, qualifiesQuizMaster } from './lib/xp';
 import { Header } from './components/Header';
 import { GuideTab } from './components/GuideTab';
 import { AIAssistantTab } from './components/AIAssistantTab';
@@ -283,10 +283,16 @@ export default function App() {
     unlockBadge('ai_consultant');
   };
 
+  // Quiz "อ่านบทที่เกี่ยวข้อง": leave the quiz for the mapped chapter in the guide.
+  const handleOpenChapterFromQuiz = (chapterId: string) => {
+    setActiveTab('guide');
+    route.navigate(chapterId);
+  };
+
   // Quiz completion
   // Each question pays its XP the first time it's answered correctly; retakes only
   // pay for newly-correct questions. Returns the XP actually awarded.
-  const handleCompleteQuiz = (score: number, correctQuestionIds: number[]) => {
+  const handleCompleteQuiz = (score: number, correctQuestionIds: number[], roundSize: number) => {
     const claims = QUIZ_QUESTIONS.filter((q) => correctQuestionIds.includes(q.id)).map((q) => ({
       key: xpKey.quiz(q.id),
       amount: q.xp,
@@ -299,7 +305,8 @@ export default function App() {
     }));
     unlockBadge('quiz_starter');
 
-    if (score >= QUIZ_QUESTIONS.length * 0.8) {
+    // Judged on the round played, not the whole bank (D13).
+    if (qualifiesQuizMaster(score, roundSize)) {
       unlockBadge('quiz_master');
     }
     return awarded;
@@ -388,8 +395,10 @@ export default function App() {
         {activeTab === 'quiz' && (
           <QuizTab
             questions={QUIZ_QUESTIONS}
+            role={role}
             onCompleteQuiz={handleCompleteQuiz}
             onAskAIWithPrompt={handleAskAIWithPrompt}
+            onOpenChapter={handleOpenChapterFromQuiz}
           />
         )}
 

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { applyXpClaims, unclaimed, seedLegacyClaims, xpKey } from './xp';
+import { applyXpClaims, unclaimed, seedLegacyClaims, xpKey, qualifiesQuizMaster } from './xp';
 import { LEVEL_TIERS } from '../data/badgesData';
 import type { UserStats } from '../types';
 
@@ -66,5 +66,16 @@ describe('seedLegacyClaims', () => {
       'read:s2',
       'mode:beginner',
     ]);
+  });
+});
+
+describe('qualifiesQuizMaster', () => {
+  it('needs a round of at least 6 and at least 80%', () => {
+    expect(qualifiesQuizMaster(5, 6)).toBe(true);
+    expect(qualifiesQuizMaster(4, 6)).toBe(false);
+    expect(qualifiesQuizMaster(7, 8)).toBe(true);
+    expect(qualifiesQuizMaster(6, 8)).toBe(false);
+    expect(qualifiesQuizMaster(16, 20)).toBe(true);
+    expect(qualifiesQuizMaster(5, 5)).toBe(false);
   });
 });

@@ -55,3 +55,9 @@ export const seedLegacyClaims = (stats: UserStats, savedLevel: string | null): s
   if (savedLevel) keys.push(xpKey.mode(savedLevel));
   return keys;
 };
+
+// quiz_master (D13): judged on the round actually played, not the whole bank.
+// A round under 6 questions never qualifies, so a trivially small round can't count.
+export const QUIZ_MASTER_MIN_ROUND = 6;
+export const qualifiesQuizMaster = (score: number, roundSize: number): boolean =>
+  roundSize >= QUIZ_MASTER_MIN_ROUND && score >= roundSize * 0.8;

@@ -253,6 +253,8 @@ export interface QuizQuestion {
     explanation: string;
   }[];
   xp: number;
+  forRole: Role | 'both'; // 'both' = role literacy for everyone; otherwise a seat-specific scenario (spec P5.1)
+  chapterId?: string; // chapter behind the question, opened by อ่านบทที่เกี่ยวข้อง
 }
 
 export interface Badge {
