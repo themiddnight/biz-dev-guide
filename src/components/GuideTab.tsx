@@ -4,6 +4,8 @@ import { CHAPTER_START_ID, scrollToChapterStart } from '../lib/chapterScroll';
 import { S5_JUMP_TARGET_IDS, DiagramJumpTarget } from '../data/diagramFamilies';
 import { GlossaryFilter } from './glossary/GlossaryPanel';
 import { GLOSSARY, GlossaryCategory } from '../data/glossary';
+import { filterIndexChapters } from '../lib/chapterSearch';
+import { IndexEmptyState } from './guide/IndexEmptyState';
 import { SECTION_COMPONENTS, type GuideSectionContext, type OtherSideView } from './guide/sections/registry';
 import {
   getChapterLayout,
@@ -48,6 +50,9 @@ import {
   Check,
   SlidersHorizontal
 } from 'lucide-react';
+
+/** Glossary terms the index search matches for s15, computed once. */
+const GLOSSARY_TERMS = GLOSSARY.map(g => g.term);
 
 interface GuideTabProps {
   chapters: Chapter[];
@@ -326,24 +331,15 @@ export const GuideTab: React.FC<GuideTabProps> = ({
     otherSideView, setOtherSideView,
   };
 
-  // Filtered chapters for the Index
-  const filteredChapters = chapters.filter((ch) => {
-    const matchesSearch = 
-      ch.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      ch.subtitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (ch.enTerm?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false) ||
-      ch.keyTakeaway.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      ch.plainAnalogy.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (ch.jargonList && ch.jargonList.some(j => j.term.toLowerCase().includes(searchQuery.toLowerCase()))) ||
-      (ch.id === 's15' && GLOSSARY.some(g => g.term.toLowerCase().includes(searchQuery.toLowerCase())));
-
-    const matchesRole = 
-      selectedRole === 'all' || 
-      ch.roleTag === selectedRole || 
-      ch.roleTag === 'all';
-
-    return matchesSearch && matchesRole;
-  });
+  // Filtered chapters for the Index (search reads core concepts too; role UX fixes P4.1)
+  const filteredChapters = filterIndexChapters(chapters, searchQuery, selectedRole, GLOSSARY_TERMS);
+  const clearIndexFilters = () => {
+    setSearchQuery('');
+    setSelectedRole('all');
+  };
+  const indexEmpty = filteredChapters.length === 0 && (
+    <IndexEmptyState query={searchQuery} roleFiltered={selectedRole !== 'all'} onClear={clearIndexFilters} />
+  );
 
   const percentCompleted = Math.round((readChapters.length / chapters.length) * 100);
 
@@ -474,6 +470,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
 
             {/* Chapter List Scrollable */}
             <div className="space-y-1.5 overflow-y-auto pr-1 flex-1 scrollbar-thin">
+              {indexEmpty}
               {filteredChapters.map((chapter) => {
                 const isActive = chapter.id === activeChapterId;
                 const isRead = readChapters.includes(chapter.id);
@@ -916,6 +913,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
 
             {/* Chapter Items List */}
             <div className="p-3.5 overflow-y-auto flex-1 space-y-1.5 divide-y divide-neutral-100 dark:divide-[#262626]">
+              {indexEmpty}
               {filteredChapters.map((chapter) => {
                 const isActive = chapter.id === activeChapterId;
                 const isRead = readChapters.includes(chapter.id);
