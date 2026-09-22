@@ -53,16 +53,18 @@
 
 /*
  * Anchor offset (I-18): GuideTab measures the sticky app header with a ResizeObserver and
- * writes its height to --header-h on <html>. Every id'd element (anchor / scrollIntoView
- * target) keeps clear of the header. Unlayered on purpose so it beats Tailwind scroll-mt-*.
+ * writes its height to --header-h on <html>. SectionOutline does the same for its own bar,
+ * writing --outline-h. Every id'd element (anchor / scrollIntoView target) keeps clear of
+ * both. Unlayered on purpose so it beats Tailwind scroll-mt-*.
  */
 :root {
   --header-h: 0px;
+  --outline-h: 0px;
 }
 
 [id],
 .anchor-target {
-  scroll-margin-top: calc(var(--header-h) + 16px);
+  scroll-margin-top: calc(var(--header-h) + var(--outline-h, 0px) + 16px);
 }
 
 /* Design Token Utility Classes */

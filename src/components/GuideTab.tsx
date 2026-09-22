@@ -21,6 +21,7 @@ import {
 import type { RequestedSection } from '../lib/chapterRoute';
 import { LayerGroupView } from './guide/LayerGroup';
 import { ChapterHero } from './guide/ChapterHero';
+import { SectionOutline } from './guide/SectionOutline';
 import { 
   Search, 
   Bookmark, 
@@ -64,6 +65,7 @@ interface GuideTabProps {
   onAskAIWithPrompt: (prompt: string) => void;
   onStartQuiz: () => void;
   onEarnXp?: (amount: number, reason: string) => void;
+  onReplaceSection?: (section: SectionKey | null) => void;
 }
 
 export const GuideTab: React.FC<GuideTabProps> = ({
@@ -79,6 +81,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   onAskAIWithPrompt,
   onStartQuiz,
   onEarnXp,
+  onReplaceSection,
 }) => {
   const [activeChapterId, setActiveChapterId] = useState<string>('s1');
   const [searchQuery, setSearchQuery] = useState('');
@@ -170,6 +173,13 @@ export const GuideTab: React.FC<GuideTabProps> = ({
     setOpenState(openSection(deriveOpenState(layout), layout, sectionRequest.key));
     setPendingScrollId(`sec-${sectionRequest.key}`);
   }, [sectionRequest?.nonce]);
+
+  // Chip click: open (never close) the section, scroll to it, and record it in the URL (spec §2.1).
+  const handleOutlineSelect = (key: SectionKey) => {
+    setOpenState(prev => openSection(prev, layout, key));
+    setPendingScrollId(`sec-${key}`);
+    onReplaceSection?.(key);
+  };
   const prevChapter = activeIndex > 0 ? chapters[activeIndex - 1] : null;
   const nextChapter = activeIndex < chapters.length - 1 ? chapters[activeIndex + 1] : null;
 
@@ -582,11 +592,14 @@ export const GuideTab: React.FC<GuideTabProps> = ({
               </p>
             </div>
 
-            <div className="flex items-center justify-end gap-2 text-xs" data-temp-expand-controls>
-              <button type="button" onClick={() => setOpenState(expandAll(layout))} className="text-neutral-800 dark:text-[#d4d4d4] hover:underline font-semibold cursor-pointer">ขยายทั้งหมด</button>
-              <span className="text-neutral-300 dark:text-[#333333]">|</span>
-              <button type="button" onClick={() => setOpenState(collapseAll(layout))} className="text-neutral-500 dark:text-[#737373] hover:underline font-semibold cursor-pointer">ย่อทั้งหมด</button>
-            </div>
+            <SectionOutline
+              chapter={activeChapter}
+              layout={layout}
+              openState={openState}
+              onSelectSection={handleOutlineSelect}
+              onExpandAll={() => setOpenState(expandAll(layout))}
+              onCollapseAll={() => setOpenState(collapseAll(layout))}
+            />
 
             {layout.filter(group => group.sections.length > 0).map(group => (
               <LayerGroupView
