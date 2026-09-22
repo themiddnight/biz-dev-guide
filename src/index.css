@@ -140,3 +140,41 @@
 .dark ::-webkit-scrollbar-thumb:hover {
   background: #404040;
 }
+
+/* Static figure port scope (SVG -> JSX). Figures reference var(--fig-*) only,
+   so they never shadow the app's own --text-muted / --border-color tokens. */
+.fig-scope {
+  --fig-bg: #ffffff;
+  --fig-surface-2: #eeeef0;
+  --fig-border: #e2e2e5;
+  --fig-text: #1a1a1e;
+  --fig-text-2: #5b5b63;
+  --fig-text-muted: #8a8a92;
+  --fig-accent: #3b4bd6;
+  --fig-accent-bg: #eef2ff;
+  --fig-accent-border: #c7cffa;
+  --fig-warn: #9a6400;
+  --fig-warn-bg: #fff6e5;
+  --fig-warn-border: #f3dfa8;
+  --fig-ok: #1a7a4c;
+  --fig-ok-bg: #e9f8f0;
+  --fig-ok-border: #b9e6cf;
+}
+
+.dark .fig-scope {
+  --fig-bg: #141414;
+  --fig-surface-2: #1f1f1f;
+  --fig-border: #333333;
+  --fig-text: #e5e5e5;
+  --fig-text-2: #a3a3a3;
+  --fig-text-muted: #737373;
+  --fig-accent: #aab4ff;
+  --fig-accent-bg: #232a52;
+  --fig-accent-border: #3b4487;
+  --fig-warn: #f0c674;
+  --fig-warn-bg: #3a2e12;
+  --fig-warn-border: #5c4a1e;
+  --fig-ok: #7fe0b3;
+  --fig-ok-bg: #123324;
+  --fig-ok-border: #1f5c3e;
+}
