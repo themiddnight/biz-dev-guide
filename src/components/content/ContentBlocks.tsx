@@ -30,7 +30,7 @@ const SummaryChevron = () => (
   <ChevronDown className="w-4 h-4 shrink-0 text-neutral-400 dark:text-[#737373] transition-transform group-open:rotate-180" />
 );
 
-// Declared return type keeps this callable while the registry is still empty (FigureKey = never).
+// Guards against keys missing at runtime (e.g. stale data) even though FIGURES is typed as complete.
 const getFigure = (key: FigureKey): React.FC<FigureProps> | undefined => FIGURES[key];
 
 interface BlockProps {
