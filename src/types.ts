@@ -217,7 +217,7 @@ export interface Chapter {
   title: string;
   enTerm?: string; // canonical English name, shown as a tag and matched by search
   subtitle: string;
-  roleTag: 'all' | 'pm' | 'ux' | 'ba' | 'sa' | 'eng' | 'qa' | 'devops' | 'support' | 'friction' | 'ai';
+  roleTag: 'all' | 'pm' | 'ux' | 'ba' | 'sa' | 'eng' | 'qa' | 'devops' | 'support' | 'friction' | 'ai' | 'biz';
   home: ChapterHome; // which side does this work (role perspective, spec P1.1)
   businessNote: string;
   engineerNote: string;

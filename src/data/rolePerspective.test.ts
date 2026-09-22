@@ -9,6 +9,7 @@ const EXPECTED_HOME: Record<string, ChapterHome> = {
   s1: 'shared', s2: 'biz', s3: 'biz', s4: 'shared', s5: 'eng',
   s6: 'eng', s7: 'eng', s8: 'eng', s9: 'eng', s10: 'eng',
   s11: 'shared', s12: 'shared', s13: 'eng', s14: 'shared', s15: 'eng',
+  s16: 'biz', s17: 'biz', s18: 'biz', s19: 'biz',
 };
 
 const ch = (id: string) => {

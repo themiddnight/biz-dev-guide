@@ -647,6 +647,40 @@ export const CHAPTER_CONTENT: Record<string, ChapterContentSection[]> = {
       ],
     },
   ],
+  // Role-perspective spec P4.1: the #A1024 refund as a P&L, right after the s16 primer
+  s16: [
+    {
+      placement: 'inline',
+      after: 'primer',
+      blocks: [
+        {
+          kind: 'table',
+          id: 's16-refund-pnl',
+          title: 'หูฟัง #A1024 หนึ่งออเดอร์ ร้านเหลือเงินเท่าไร',
+          intro:
+            'ออเดอร์ #A1024 หูฟังไร้สาย ราคา ฿1,290 เทียบสามกรณี: ขายปกติ, คืนเงินแล้วได้ของกลับมาขายต่อ และคืนเงินโดยไม่ได้ของคืน (กรณีบั๊กที่เปิดให้คืนเงินทั้งที่ของส่งถึงแล้ว) **ตัวเลขสมมติ**',
+          columns: [
+            { key: 'item', label: 'รายการ', widthHint: 'wide' },
+            { key: 'sale', label: 'ขายปกติ', widthHint: 'narrow' },
+            { key: 'returned', label: 'คืนเงิน ได้ของคืน', widthHint: 'narrow' },
+            { key: 'lost', label: 'คืนเงิน ไม่ได้ของคืน', widthHint: 'narrow' },
+          ],
+          rows: [
+            { cells: { item: 'รายได้ (ลูกค้าจ่าย)', sale: '+฿1,290', returned: '฿0 (คืนลูกค้าแล้ว)', lost: '฿0 (คืนลูกค้าแล้ว)' } },
+            { cells: { item: 'ทุนสินค้า', sale: '−฿780', returned: '฿0 (ของกลับเข้าสต็อก)', lost: '−฿780' } },
+            { cells: { item: 'ค่าส่งไปหาลูกค้า', sale: '−฿50', returned: '−฿50', lost: '−฿50' } },
+            { cells: { item: 'ค่าส่งของกลับ', sale: '—', returned: '−฿50', lost: '—' } },
+            { cells: { item: 'ค่าธรรมเนียมรับชำระ 3% (ผู้ให้บริการส่วนใหญ่ไม่คืนเมื่อคืนเงิน)', sale: '−฿39', returned: '−฿39', lost: '−฿39' } },
+            { cells: { item: 'เวลาแอดมินตรวจเคส', sale: '—', returned: '−฿30', lost: '−฿30' } },
+            { cells: { item: '**เหลือต่อออเดอร์**', sale: '**+฿421**', returned: '**−฿169**', lost: '**−฿899**' } },
+          ],
+          footnote:
+            'กำไรขั้นต้นของขายปกติคือ ฿1,290 − ฿780 = ฿510 (ราว 40%) แต่หลังหักค่าส่งและค่าธรรมเนียมเหลือ ฿421 คืนเงินหนึ่งเคสที่ไม่ได้ของคืน ต้องขายปกติเกิน 2 ออเดอร์ถึงจะได้เงินกลับมา นี่คือเหตุผลที่บั๊กคืนเงินใน [[s1|บทที่ 1]] แพงกว่าที่เห็น **ตัวเลขสมมติ**',
+          mobile: 'stack',
+        },
+      ],
+    },
+  ],
 };
 
 /**
