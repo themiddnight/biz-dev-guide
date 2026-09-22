@@ -3,6 +3,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { CHAPTERS } from '../../data/chaptersData';
 import { FirstVisitCard } from './FirstVisitCard';
 import { TrackPanel } from './TrackPanel';
+import { chapterLevelResetLabel, chapterLevelScopeLabel } from './rolePerspectiveUi';
 
 const noop = () => {};
 
@@ -33,5 +34,29 @@ describe('TrackPanel', () => {
     );
     expect(html).toContain('data-track-panel="eng"');
     expect(html).toContain('เส้นทางคนสาย Engineering');
+  });
+});
+
+// The lens row itself lives inline in GuideTab, which needs hooks and a DOM; its copy is
+// asserted here and the row renders these literals (round3 spec P4.1, P4.2).
+describe('chapterLevelResetLabel', () => {
+  it('auto mode falls back to the role default', () => {
+    expect(chapterLevelResetLabel('auto')).toBe('กลับไปใช้ค่าตามสายงาน');
+  });
+  it('a header level mode falls back to the header, and says so', () => {
+    expect(chapterLevelResetLabel('beginner')).toBe('กลับไปใช้ระดับจากแถบบน');
+    expect(chapterLevelResetLabel('experienced')).toBe('กลับไปใช้ระดับจากแถบบน');
+  });
+});
+
+describe('chapterLevelScopeLabel', () => {
+  it('names this chapter and the track it belongs to', () => {
+    expect(chapterLevelScopeLabel('eng')).toContain('เฉพาะบทนี้');
+    expect(chapterLevelScopeLabel('eng')).toContain('Engineering');
+    expect(chapterLevelScopeLabel('biz')).toContain('เฉพาะบทนี้');
+    expect(chapterLevelScopeLabel('biz')).toContain('Business');
+  });
+  it('the two roles get different chips', () => {
+    expect(chapterLevelScopeLabel('eng')).not.toBe(chapterLevelScopeLabel('biz'));
   });
 });

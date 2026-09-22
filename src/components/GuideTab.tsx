@@ -27,6 +27,7 @@ import { InlineSections } from './guide/InlineSections';
 import { ChapterHero } from './guide/ChapterHero';
 import { SectionOutline } from './guide/SectionOutline';
 import { TrackPanel } from './guide/TrackPanel';
+import { chapterLevelResetLabel, chapterLevelScopeLabel } from './guide/rolePerspectiveUi';
 import { TrackNextCard, TrackEndCard } from './guide/TrackFooter';
 import { getTrackNext, resolveTrack, type TrackKey } from '../data/readingTracks';
 import { planChapterLevelChoice } from '../lib/rolePrefs';
@@ -173,7 +174,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   const activeChapter = chapters.find(c => c.id === activeChapterId) || chapters[0];
   const activeIndex = chapters.findIndex(c => c.id === activeChapterId);
 
-  const { role } = levelInputs;
+  const { role, levelMode } = levelInputs;
   const { level: chapterLevel, source: levelSource } = resolveChapterLevel(levelInputs, activeChapter);
   const trackKey = getActiveTrackKey(role, levelInputs.baseLevel);
   const layout = useMemo(() => getChapterLayout(chapterLevel, activeChapter), [chapterLevel, activeChapter]);
@@ -702,14 +703,19 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                       </button>
                     ))}
                     {levelSource === 'chapter' && (
-                      <button
-                        type="button"
-                        data-chapter-level-reset
-                        onClick={() => onChapterLevelChange?.(activeChapter.id, null)}
-                        className="text-xs font-semibold text-neutral-500 dark:text-[#8e8e8e] hover:underline cursor-pointer"
-                      >
-                        กลับไปใช้ค่าตามสายงาน
-                      </button>
+                      <>
+                        <span data-chapter-level-scope className="text-xs text-neutral-500 dark:text-[#8e8e8e]">
+                          {chapterLevelScopeLabel(role)}
+                        </span>
+                        <button
+                          type="button"
+                          data-chapter-level-reset
+                          onClick={() => onChapterLevelChange?.(activeChapter.id, null)}
+                          className="text-xs font-semibold text-neutral-500 dark:text-[#8e8e8e] hover:underline cursor-pointer"
+                        >
+                          {chapterLevelResetLabel(levelMode)}
+                        </button>
+                      </>
                     )}
                   </div>
                 </div>
