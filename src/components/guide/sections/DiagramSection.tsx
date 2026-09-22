@@ -35,7 +35,7 @@ export const DiagramSection: React.FC<SectionProps> = ({ chapter, isOpen, onTogg
 
       {isOpen && (
         <div className="p-3.5 sm:p-5 border-t border-neutral-100 dark:border-[#262626] bg-neutral-50/50 dark:bg-[#111111] space-y-4">
-          {/* s5: diagram families + T1 render above the Kitchen simulator (spec §3.4 order) */}
+          {/* s5: diagram families + T1 render above the Monolith vs Microservices simulator (spec §3.4 order) */}
           {chapter.id === 's5' && (
             <div className="space-y-3">
               <DiagramFamilyGrid onJump={ctx.onDiagramJump} />

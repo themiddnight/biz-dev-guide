@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { RefreshCw, Radio, Zap } from 'lucide-react';
 
 /**
- * Sync vs Async protocol simulator (REST polling / Webhook / WebSocket).
- * Moved unchanged from ChapterDiagram's former s15 branch into chapter 5
+ * Sync vs Async protocol simulator (Polling / Webhook / WebSocket).
+ * Polling is still plain HTTP/REST underneath; the contrast is who asks, not the protocol.
+ * Moved from ChapterDiagram's former s15 branch into chapter 5
  * (owner decision Q2); chapter 15 now hosts the glossary.
  */
 export const ProtocolSimulator: React.FC = () => {
   // Chapter 15: Protocol Simulator state
-  const [protocolMode, setProtocolMode] = useState<'rest' | 'webhook' | 'websocket'>('webhook');
+  const [protocolMode, setProtocolMode] = useState<'polling' | 'webhook' | 'websocket'>('webhook');
   const [isPolling, setIsPolling] = useState<boolean>(false);
   const [pollCount, setPollCount] = useState<number>(0);
   const [webhookLogs, setWebhookLogs] = useState<string[]>([]);
@@ -48,7 +49,7 @@ export const ProtocolSimulator: React.FC = () => {
                   The Visual Communication Protocol Matrix &amp; Simulator
                 </h4>
                 <p className="text-[11px] text-slate-500">
-                  จำลองการสื่อสาร 3 รูปแบบ: โทรเช็คทุก 5 นาที (REST) vs กริ่งหน้าบ้านดัง (Webhook) vs เปิดสายคุยสด (WebSocket)
+                  จำลองการสื่อสาร 3 รูปแบบ: โทรเช็คทุก 5 นาที (Polling) vs กริ่งหน้าบ้านดัง (Webhook) vs เปิดสายคุยสด (WebSocket)
                 </p>
               </div>
             </div>
@@ -56,12 +57,12 @@ export const ProtocolSimulator: React.FC = () => {
             {/* Protocol Switcher */}
             <div className="flex rounded-xl bg-slate-100 dark:bg-slate-800 p-1">
               <button
-                onClick={() => { setProtocolMode('rest'); setIsPolling(false); }}
+                onClick={() => { setProtocolMode('polling'); setIsPolling(false); }}
                 className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                  protocolMode === 'rest' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 dark:text-slate-300'
+                  protocolMode === 'polling' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 dark:text-slate-300'
                 }`}
               >
-                1. REST API
+                1. Polling (ถามซ้ำ)
               </button>
               <button
                 onClick={() => { setProtocolMode('webhook'); setIsPolling(false); setWsConnected(false); }}
@@ -83,12 +84,12 @@ export const ProtocolSimulator: React.FC = () => {
           </div>
 
           {/* Interactive Protocol Workspace */}
-          {protocolMode === 'rest' && (
+          {protocolMode === 'polling' && (
             <div className="p-4 rounded-xl bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 space-y-3">
               <div className="flex justify-between items-center">
                 <span className="text-xs font-bold text-blue-700 dark:text-blue-300 flex items-center gap-1.5">
                   <RefreshCw className="w-4 h-4 text-blue-500" />
-                  <span>REST API Polling: ฝั่งเราต้องยิงถามเซิร์ฟเวอร์ซ้ำๆ ตลอดเวลา</span>
+                  <span>Polling: ฝั่งเราต้องยิงถามเซิร์ฟเวอร์ซ้ำๆ ตลอดเวลา</span>
                 </span>
                 <button
                   onClick={() => setIsPolling(!isPolling)}
@@ -110,7 +111,7 @@ export const ProtocolSimulator: React.FC = () => {
                 </span>
               </div>
               <p className="text-[11px] text-slate-500">
-                💡 <b>คำอธิบาย:</b> เหมือนคุณโทรไปหาบริษัทส่งของทุก 5 นาที เปลืองแบตโทรศัพท์และเปลืองเงินทั้งสองฝ่าย (ตัวจำลองนี้เร่งให้เร็วขึ้น ถามทุก 1.5 วินาที เพื่อให้เห็นภาพทันที)
+                💡 <b>คำอธิบาย:</b> เหมือนคุณโทรไปหาบริษัทส่งของทุก 5 นาที เปลืองแบตโทรศัพท์และเปลืองเงินทั้งสองฝ่าย (ตัวจำลองนี้เร่งให้เร็วขึ้น ถามทุก 1.5 วินาที เพื่อให้เห็นภาพทันที) เบื้องหลังแต่ละครั้งก็ยังเป็นการเรียก HTTP/REST ธรรมดา ต่างกันแค่ว่าฝั่งเราต้องเป็นคนถาม
               </p>
             </div>
           )}
@@ -191,8 +192,8 @@ export const ProtocolSimulator: React.FC = () => {
           {/* Quick Matrix Comparison Table */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs pt-1">
             <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-              <b className="text-blue-600 dark:text-blue-400 block mb-0.5">REST API</b>
-              <span className="text-[10px] text-slate-500">เหมาะกับ: หน้าร้านค้า, ข้อมูลนิ่ง, CRUD ทั่วไป</span>
+              <b className="text-blue-600 dark:text-blue-400 block mb-0.5">Polling (ถามซ้ำ)</b>
+              <span className="text-[10px] text-slate-500">เหมาะกับ: เช็คสถานะงานที่ไม่รีบ, ปลายทางที่ส่ง Webhook ไม่ได้</span>
             </div>
             <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
               <b className="text-emerald-600 dark:text-emerald-400 block mb-0.5">Webhook</b>

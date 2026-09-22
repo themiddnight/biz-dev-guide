@@ -45,14 +45,14 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
   const [canaryBug, setCanaryBug] = useState<boolean>(false);
   const [boehmPhase, setBoehmPhase] = useState<number>(0);
 
-  // Release train state (s8)
-  const [subwayStation, setSubwayStation] = useState<number>(0);
+  // Code route state (s8)
+  const [routeGate, setRouteGate] = useState<number>(0);
   const [skipChecks, setSkipChecks] = useState<boolean>(false);
-  const [trainStatus, setTrainStatus] = useState<'idle' | 'running' | 'derailed' | 'success'>('idle');
+  const [routeStatus, setRouteStatus] = useState<'idle' | 'running' | 'caught' | 'incident' | 'success'>('idle');
 
-  // Chapter 5: Kitchen Metaphor state
-  const [kitchenMode, setKitchenMode] = useState<'monolith' | 'microservices'>('microservices');
-  const [stationFailed, setStationFailed] = useState<boolean>(false);
+  // Chapter 5: Monolith vs Microservices failure state
+  const [archMode, setArchMode] = useState<'monolith' | 'microservices'>('microservices');
+  const [paymentFailed, setPaymentFailed] = useState<boolean>(false);
 
   // Chapter 11: Iron Triangle state
   const [scopeVal, setScopeVal] = useState<number>(80); // 20 - 100
@@ -63,50 +63,55 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
   const [dualTrackPhase, setDualTrackPhase] = useState<'discovery' | 'delivery' | 'synchronized'>('synchronized');
 
   // =========================================================================
-  // Release train (rendered in s8; moved from s1 per chapter figure briefs Q4)
+  // Code route through the release gates (rendered in s8; moved from s1 per chapter figure briefs Q4)
   // =========================================================================
   const renderReleaseTrain = () => {
-    const stations = [
-      { name: '1. Local Branch', role: 'Developer Desk', passText: 'เขียนโค้ดและทดสอบบนเครื่องเดฟ', risk: 'ความเข้าใจผิดส่วนตัว' },
-      { name: '2. Pull Request', role: '4-Eyes Review', passText: 'ตรวจโค้ดร่วมกับ Senior Engineer', risk: 'ถ้ากดยอมรับโดยไม่อ่าน บั๊กจะหลุด' },
-      { name: '3. Automated CI', role: 'Testing Station', passText: 'รัน Unit Tests + Security Scanner', risk: 'ตรวจจับตรรกะผิดพลาดอัตโนมัติ' },
-      { name: '4. Staging Yard', role: 'Pre-Production', passText: 'ทดสอบระบบบนสภาพแวดล้อมเสมือนจริง', risk: 'ตรวจพบความไม่เข้ากันของ Third-party' },
-      { name: '5. Production', role: 'Live Terminal', passText: 'ส่งมอบแก่ผู้ใช้งานจริงอย่างปลอดภัย', risk: 'ปลายทางแห่งความสำเร็จ' }
+    const gates = [
+      { name: 'Local Branch', role: 'เครื่อง Dev', passText: 'เขียนโค้ดและทดสอบบนเครื่องตัวเอง', risk: 'เห็นแค่มุมของคนเขียนคนเดียว' },
+      { name: 'Pull Request', role: 'Code Review', passText: 'เพื่อนร่วมทีมอ่านและตรวจโค้ด', skippedText: 'ไม่มีใครอ่านโค้ดก่อน Merge', risk: 'ถ้ากดอนุมัติโดยไม่อ่าน บั๊กจะหลุด' },
+      { name: 'Automated CI', role: 'เทสต์อัตโนมัติ', passText: 'รัน Unit Tests + Security Scan ทุกครั้ง', skippedText: 'ไม่มีเทสต์อัตโนมัติรันเลย', risk: 'จับตรรกะผิดได้เร็วและถูกที่สุด' },
+      { name: 'Staging', role: 'ทดสอบรวมระบบ (QA)', passText: 'ทดสอบบนสภาพแวดล้อมใกล้ของจริง', risk: 'เจอปัญหาการเชื่อมกับระบบภายนอก' },
+      { name: 'Production', role: 'ผู้ใช้จริง', passText: 'ส่งถึงผู้ใช้จริง', risk: 'บั๊กที่หลุดมาถึงตรงนี้ ลูกค้าเจอก่อนทีม' }
     ];
+    // Gates 2 (PR review) and 3 (CI) are the ones "skip mode" bypasses.
+    const isSkipped = (idx: number, skip: boolean) => skip && (idx === 1 || idx === 2);
 
-    const runSubway = (stationIdx: number) => {
-      setSubwayStation(stationIdx);
-      if (skipChecks && stationIdx >= 3) {
-        setTrainStatus('derailed');
-      } else if (stationIdx === 4) {
-        setTrainStatus('success');
-      } else {
-        setTrainStatus('running');
-      }
+    // Where the bug surfaces depends on the gate: Staging still catches it before users.
+    const statusAt = (gateIdx: number, skip: boolean) =>
+      skip && gateIdx === 4 ? 'incident'
+        : skip && gateIdx === 3 ? 'caught'
+        : gateIdx === 4 ? 'success'
+        : 'running';
+
+    const selectGate = (gateIdx: number) => {
+      setRouteGate(gateIdx);
+      setRouteStatus(statusAt(gateIdx, skipChecks));
     };
+
+    const current = gates[routeGate];
 
     return (
       <div className="space-y-4">
-        {/* Release Subway Line */}
+        {/* Code route: five gates from a dev's branch to real users */}
         <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-2">
-              <span className="text-base">🚇</span>
+              <GitBranch className="w-4 h-4 text-indigo-500 shrink-0" />
               <div>
                 <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100">
-                  The Subway Release Train Simulator
+                  เส้นทางของโค้ดก่อนถึงผู้ใช้
                 </h4>
                 <p className="text-[11px] text-slate-500">
-                  คลิกสถานีเพื่อดูการเดินทางของโค้ด หรือทดสอบลักไก่ข้ามด่านตรวจ
+                  คลิกแต่ละด่านเพื่อดูว่าโค้ดผ่านอะไรมาบ้าง แล้วลองข้าม Review &amp; Tests
                 </p>
               </div>
             </div>
             
             <button
               onClick={() => {
+                // Keep the selected gate; re-evaluate it under the new mode.
                 setSkipChecks(!skipChecks);
-                setTrainStatus('idle');
-                setSubwayStation(0);
+                if (routeStatus !== 'idle') setRouteStatus(statusAt(routeGate, !skipChecks));
               }}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
                 skipChecks 
@@ -115,73 +120,104 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
               }`}
             >
               <AlertTriangle className="w-3.5 h-3.5" />
-              <span>{skipChecks ? 'โหมดลักไก่ (Skip 4-Eyes & Tests): ON' : 'โหมดลักไก่: OFF (ปลอดภัย)'}</span>
+              <span>ข้าม Review &amp; Tests: {skipChecks ? 'ON' : 'OFF'}</span>
             </button>
           </div>
 
-          {/* Subway Track Visual */}
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-1">
-            {stations.map((st, idx) => {
-              const isCurrent = subwayStation === idx;
-              const isPassed = subwayStation > idx;
+          {/* Gates with connectors (connectors hidden on the 2-column phone grid) */}
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-4 pt-1">
+            {gates.map((g, idx) => {
+              const skipped = isSkipped(idx, skipChecks);
+              const isCurrent = routeGate === idx;
+              const isPassed = routeGate > idx && !skipped;
               return (
-                <button
-                  key={idx}
-                  onClick={() => runSubway(idx)}
-                  className={`p-3 rounded-xl border text-left transition-all cursor-pointer relative ${
-                    isCurrent
-                      ? trainStatus === 'derailed'
+                <div key={idx} className="relative">
+                  <button
+                    onClick={() => selectGate(idx)}
+                    className={`w-full h-full p-3 rounded-xl border text-left transition-all cursor-pointer ${
+                      isCurrent && routeStatus === 'incident'
                         ? 'border-rose-500 bg-rose-50 dark:bg-rose-950/40 text-rose-900 dark:text-rose-200 ring-2 ring-rose-400'
-                        : 'border-indigo-500 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-900 dark:text-indigo-200 ring-2 ring-indigo-400'
-                      : isPassed
-                      ? 'border-emerald-300 dark:border-emerald-800 bg-emerald-50/40 dark:bg-emerald-950/20 text-slate-700 dark:text-slate-300'
-                      : 'border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-850/50 text-slate-600 dark:text-slate-400'
-                  }`}
-                >
-                  <div className="flex items-center justify-between text-[10px] mb-1">
-                    <span className="text-slate-400">สถานี {idx + 1}</span>
-                    {isCurrent && trainStatus === 'derailed' ? (
-                      <span className="text-rose-500 font-bold">💥 รถไฟตกราง</span>
-                    ) : isCurrent ? (
-                      <span className="text-indigo-600 dark:text-indigo-400 font-bold">● กำลังจอด</span>
-                    ) : isPassed ? (
-                      <Check className="w-3.5 h-3.5 text-emerald-500" />
-                    ) : (
-                      <span className="text-slate-400">รอขบวน</span>
-                    )}
-                  </div>
-                  <div className="font-bold text-xs truncate">{st.name}</div>
-                  <div className="text-[10px] text-slate-500 truncate">{st.role}</div>
-                </button>
+                        : isCurrent && routeStatus === 'caught'
+                        ? 'border-amber-500 bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200 ring-2 ring-amber-400'
+                        : isCurrent
+                        ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-900 dark:text-indigo-200 ring-2 ring-indigo-400'
+                        : skipped
+                        ? 'border-dashed border-slate-300 dark:border-slate-700 bg-slate-100/60 dark:bg-slate-800/40 text-slate-400 dark:text-slate-500'
+                        : isPassed
+                        ? 'border-emerald-300 dark:border-emerald-800 bg-emerald-50/40 dark:bg-emerald-950/20 text-slate-700 dark:text-slate-300'
+                        : 'border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-850/50 text-slate-600 dark:text-slate-400'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between text-[10px] mb-1">
+                      <span className="text-slate-400">ด่าน {idx + 1}</span>
+                      {skipped ? (
+                        <span className="text-slate-500 dark:text-slate-400 font-bold">⤼ ถูกข้าม</span>
+                      ) : isCurrent && routeStatus === 'incident' ? (
+                        <span className="text-rose-500 font-bold">💥 เกิดเหตุ</span>
+                      ) : isCurrent && routeStatus === 'caught' ? (
+                        <span className="text-amber-600 dark:text-amber-400 font-bold">⚠ จับบั๊กได้</span>
+                      ) : isCurrent ? (
+                        <span className="text-indigo-600 dark:text-indigo-400 font-bold">● อยู่ที่นี่</span>
+                      ) : isPassed ? (
+                        <span className="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-0.5">
+                          <Check className="w-3.5 h-3.5" /> ผ่าน
+                        </span>
+                      ) : (
+                        <span className="text-slate-400">ยังไม่ถึง</span>
+                      )}
+                    </div>
+                    <div className={`font-bold text-xs truncate ${skipped ? 'line-through' : ''}`}>{g.name}</div>
+                    <div className={`text-[10px] truncate ${skipped ? 'line-through text-slate-400' : 'text-slate-500'}`}>{g.role}</div>
+                  </button>
+                  {idx < gates.length - 1 && (
+                    <div className="hidden sm:flex absolute left-full top-1/2 -translate-y-1/2 w-4 justify-center pointer-events-none" aria-hidden="true">
+                      <ArrowRight className={`w-3.5 h-3.5 ${routeGate > idx ? 'text-emerald-500' : 'text-slate-300 dark:text-slate-600'}`} />
+                    </div>
+                  )}
+                </div>
               );
             })}
           </div>
 
-          {/* Train Status Banner */}
-          {trainStatus === 'derailed' ? (
+          {/* Outcome Banner */}
+          {routeStatus === 'incident' ? (
             <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-300 dark:border-rose-800 text-rose-900 dark:text-rose-200 text-xs space-y-1">
               <div className="font-bold flex items-center gap-1.5 text-rose-700 dark:text-rose-300">
                 <Flame className="w-4 h-4" />
-                <span>วิกฤติตกราง: โค้ดข้ามด่านตรวจจนเกิดข้อผิดพลาดระดับ Production!</span>
+                <span>เกิดเหตุบน Production: บั๊กหลุดถึงผู้ใช้จริง</span>
               </div>
               <p className="text-[11px] leading-relaxed text-rose-800 dark:text-rose-300/90">
-                เหมือนกรณี Knight Capital หรือระบบตัดเงินล่ม: เมื่อกดข้ามการรีวิวและการทดสอบอัตโนมัติ โค้ดที่แอบมีข้อผิดพลาดร้ายแรงหลุดไปถึงเซิร์ฟเวอร์จริง สร้างความเสียหายเป็นล้านบาท
+                ข้าม Review และเทสต์อัตโนมัติ แล้ว Staging ก็ไม่เจอ (บางบั๊กโผล่เฉพาะกับข้อมูลจริง) ลูกค้าเจอก่อนทีม ต้อง Rollback และแก้ด่วน เคส Knight Capital เสียไปราว 440 ล้านดอลลาร์ในไม่ถึงชั่วโมง
               </p>
             </div>
-          ) : trainStatus === 'success' ? (
+          ) : routeStatus === 'caught' ? (
+            <div className="p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200 text-xs space-y-1">
+              <div className="font-bold flex items-center gap-1.5 text-amber-700 dark:text-amber-300">
+                <AlertTriangle className="w-4 h-4" />
+                <span>จับได้ก่อนถึงผู้ใช้: บั๊กโผล่ที่ Staging</span>
+              </div>
+              <p className="text-[11px] leading-relaxed text-amber-800 dark:text-amber-300/90">
+                ด่านสุดท้ายก่อน Production ช่วยไว้ แต่ต้องย้อนกลับไปแก้ ซึ่งช้าและแพงกว่าจับได้ตั้งแต่ Review หรือ CI
+              </p>
+            </div>
+          ) : routeStatus === 'success' ? (
             <div className="p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200 text-xs space-y-1">
               <div className="font-bold flex items-center gap-1.5 text-emerald-700 dark:text-emerald-300">
                 <CheckCircle2 className="w-4 h-4" />
-                <span>ขบวนรถไฟเทียบชานชาลา Production สำเร็จ 100%!</span>
+                <span>ถึงผู้ใช้อย่างปลอดภัย</span>
               </div>
               <p className="text-[11px] text-emerald-800 dark:text-emerald-300/90">
-                โค้ดผ่านการตรวจ 4-Eyes Review, Unit Tests ครอบคลุม, และทดสอบบน Staging ทำให้ผู้ใช้งานจริงได้รับฟีเจอร์ใหม่โดยไม่มีระบบล่ม
+                ผ่าน Code Review, เทสต์อัตโนมัติ และทดสอบบน Staging ครบทุกด่าน ผู้ใช้ได้ฟีเจอร์ใหม่โดยระบบไม่ล่ม
               </p>
             </div>
           ) : (
-            <div className="p-3 bg-slate-900 text-slate-200 rounded-xl text-xs flex items-center justify-between">
-              <span>สถานีปัจจุบัน: <b>{stations[subwayStation].name}</b> ({stations[subwayStation].passText})</span>
-              <span className="text-[11px] text-indigo-400">ความเสี่ยง: {stations[subwayStation].risk}</span>
+            <div className="p-3 bg-slate-900 text-slate-200 rounded-xl text-xs flex items-center justify-between flex-wrap gap-1">
+              {isSkipped(routeGate, skipChecks) ? (
+                <span>ด่าน <b>{current.name}</b> ถูกข้าม: {current.skippedText}</span>
+              ) : (
+                <span>ด่านปัจจุบัน: <b>{current.name}</b> ({current.passText})</span>
+              )}
+              <span className="text-[11px] text-indigo-400">ความเสี่ยง: {current.risk}</span>
             </div>
           )}
         </div>
@@ -341,21 +377,22 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
   }
 
   // =========================================================================
-  // CHAPTER 5: The Kitchen Metaphor: Monolith vs Microservices & Gateway
+  // CHAPTER 5: Monolith vs Microservices & API Gateway (failure blast radius)
   // =========================================================================
   if (chapterId === 's5') {
+    const svcOk = 'bg-white dark:bg-slate-800 border-emerald-300 dark:border-emerald-800';
     return (
       <div className="space-y-4">
         <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-2">
-              <span className="text-base">🍳</span>
+              <span className="text-base">🧩</span>
               <div>
                 <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100">
-                  The Kitchen Metaphor Architecture Simulator
+                  Monolith vs Microservices: เมื่อ Payment ล่ม
                 </h4>
                 <p className="text-[11px] text-slate-500">
-                  เปรียบเทียบครัวเดี่ยวรวนหมดทั้งร้าน vs ครัวแยกสเตชั่นพร้อมหัวหน้าบริกร API Gateway
+                  ลองทำให้ส่วนตัดเงินพัง แล้วดูว่าแต่ละแบบเสียหายกว้างแค่ไหน
                 </p>
               </div>
             </div>
@@ -363,134 +400,148 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
             <div className="flex items-center gap-2">
               <div className="flex rounded-xl bg-slate-100 dark:bg-slate-800 p-1">
                 <button
-                  onClick={() => { setKitchenMode('monolith'); setStationFailed(false); }}
+                  onClick={() => { setArchMode('monolith'); setPaymentFailed(false); }}
                   className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                    kitchenMode === 'monolith' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600 dark:text-slate-300'
+                    archMode === 'monolith' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600 dark:text-slate-300'
                   }`}
                 >
-                  1. Monolith (ครัวเดี่ยว)
+                  1. Monolith
                 </button>
                 <button
-                  onClick={() => { setKitchenMode('microservices'); setStationFailed(false); }}
+                  onClick={() => { setArchMode('microservices'); setPaymentFailed(false); }}
                   className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                    kitchenMode === 'microservices' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600 dark:text-slate-300'
+                    archMode === 'microservices' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600 dark:text-slate-300'
                   }`}
                 >
-                  2. Microservices (ครัวแยก)
+                  2. Microservices
                 </button>
               </div>
 
               <button
-                onClick={() => setStationFailed(!stationFailed)}
+                onClick={() => setPaymentFailed(!paymentFailed)}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                  stationFailed 
+                  paymentFailed 
                     ? 'bg-rose-500 text-white shadow-xs' 
                     : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200'
                 }`}
               >
-                {stationFailed ? '🔥 ดับไฟเตา Payment' : '⚡ จุดชนวน Payment ล่ม'}
+                {paymentFailed ? '↺ กู้ Payment กลับมา' : '⚡ จำลอง Payment ล่ม'}
               </button>
             </div>
           </div>
 
-          {/* Kitchen Display */}
-          {kitchenMode === 'monolith' ? (
+          {/* Architecture Display */}
+          {archMode === 'monolith' ? (
             <div className={`p-4 rounded-2xl border transition-all ${
-              stationFailed 
+              paymentFailed 
                 ? 'bg-rose-950/20 border-rose-500 text-rose-900 dark:text-rose-200' 
                 : 'bg-slate-50 dark:bg-slate-850/60 border-slate-200 dark:border-slate-700'
             }`}>
-              <div className="flex justify-between items-center mb-3">
+              <div className="flex justify-between items-center mb-3 gap-2 flex-wrap">
                 <span className="font-bold text-xs uppercase tracking-wider text-slate-500">
-                  สถาปัตยกรรมแบบ Monolith (ครัวรวมศูนย์กล่องเดียว)
+                  Monolith: แอปก้อนเดียว Deploy ก้อนเดียว
                 </span>
-                {stationFailed ? (
+                {paymentFailed ? (
                   <span className="px-2 py-0.5 rounded bg-rose-500 text-white text-[10px] font-bold">
-                    💥 ทั้งร้านหยุดทำงาน (Single Point of Failure)
+                    💥 Deploy ก้อนเดียว พังพร้อมกันทั้งระบบ
                   </span>
                 ) : (
                   <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-600 text-[10px] font-bold">
-                    ● ครัวทำงานปกติ
+                    ● ระบบทำงานปกติ
                   </span>
                 )}
               </div>
 
               <div className="p-4 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 bg-white/80 dark:bg-slate-900/80 text-center space-y-2">
                 <div className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                  📦 Monolith Application (Order + User + Payment + Inventory ผูกอยู่ในเซิร์ฟเวอร์เดียวกัน)
+                  📦 Monolith Application (User + Order + Payment + Inventory อยู่ในโปรแกรมเดียวกัน)
                 </div>
-                <div className="grid grid-cols-4 gap-2 text-[11px] pt-1">
-                  <div className={`p-2 rounded-lg ${stationFailed ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300' : 'bg-slate-100 dark:bg-slate-800'}`}>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] pt-1">
+                  <div className={`p-2 rounded-lg ${paymentFailed ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300' : 'bg-slate-100 dark:bg-slate-800'}`}>
                     1. จัดการสมาชิก
                   </div>
-                  <div className={`p-2 rounded-lg ${stationFailed ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300' : 'bg-slate-100 dark:bg-slate-800'}`}>
+                  <div className={`p-2 rounded-lg ${paymentFailed ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300' : 'bg-slate-100 dark:bg-slate-800'}`}>
                     2. สั่งสินค้า
                   </div>
-                  <div className={`p-2 rounded-lg font-bold ${stationFailed ? 'bg-rose-500 text-white animate-pulse' : 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300'}`}>
-                    3. ตัดบัตร (Payment) {stationFailed && '🔥 ล่ม'}
+                  <div className={`p-2 rounded-lg font-bold ${paymentFailed ? 'bg-rose-500 text-white animate-pulse' : 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300'}`}>
+                    3. ตัดบัตร (Payment) {paymentFailed && '🔥 ล่ม'}
                   </div>
-                  <div className={`p-2 rounded-lg ${stationFailed ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300' : 'bg-slate-100 dark:bg-slate-800'}`}>
+                  <div className={`p-2 rounded-lg ${paymentFailed ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300' : 'bg-slate-100 dark:bg-slate-800'}`}>
                     4. ตัดสต็อก
                   </div>
                 </div>
               </div>
               <p className="text-[11px] text-slate-500 mt-2">
-                {stationFailed 
-                  ? '⚠️ ผลกระทบ: เมื่อโค้ดตัดบัตรเกิด Memory Leak เซิร์ฟเวอร์ตัวเดียวดับสนิท ลูกค้าไม่สามารถล็อกอินหรือเปิดดูรายการสินค้าได้เลย' 
-                  : '💡 จุดเด่น: พัฒนาง่าย ส่งมอบเร็วในวันแรก แต่มีความเสี่ยงสูงเมื่อเริ่มมีผู้ใช้เยอะ'}
+                {paymentFailed 
+                  ? '⚠️ ผลกระทบ: โค้ดตัดบัตรมี Memory Leak จนโปรแกรมทั้งก้อนดับ ลูกค้าล็อกอินหรือดูสินค้าไม่ได้เลย' 
+                  : '💡 จุดเด่น: พัฒนาง่าย ส่งมอบเร็วในช่วงแรก แต่ส่วนหนึ่งพังอาจลากทั้งระบบลงไปด้วย'}
               </p>
             </div>
           ) : (
             <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-850/60 border border-slate-200 dark:border-slate-700 space-y-3">
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-center gap-2 flex-wrap">
                 <span className="font-bold text-xs uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-                  สถาปัตยกรรมแบบ Microservices &amp; API Gateway
+                  Microservices &amp; API Gateway
                 </span>
-                {stationFailed ? (
+                {paymentFailed ? (
                   <span className="px-2 py-0.5 rounded bg-amber-500 text-white text-[10px] font-bold">
-                    🛡️ Circuit Breaker ทำงาน: ระบบอื่นยังรันได้ 100%
+                    ⚠️ เสียบางส่วน: ดูสินค้าได้ แต่จ่ายเงินไม่ได้
                   </span>
                 ) : (
                   <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-600 text-[10px] font-bold">
-                    ● ทุกสเตชั่นสมบูรณ์
+                    ● ทุก Service ทำงานปกติ
                   </span>
                 )}
               </div>
 
               {/* API Gateway */}
               <div className="p-2.5 rounded-xl bg-purple-600 text-white text-center text-xs font-bold shadow-xs">
-                🤵 Maitre d' API Gateway (รับออเดอร์จาก Mobile/Web และตรวจ Rate Limit)
+                🚪 API Gateway (ประตูเดียวรับคำขอจาก Mobile/Web ส่งต่อให้แต่ละ Service และตรวจ Rate Limit)
               </div>
 
-              {/* Distributed Stations */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                <div className="p-3 rounded-xl bg-white dark:bg-slate-800 border border-emerald-300 dark:border-emerald-800 text-center space-y-1">
+              {/* Independent services */}
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
+                <div className={`p-3 rounded-xl border text-center space-y-1 ${svcOk}`}>
                   <span className="text-base">👤</span>
                   <div className="font-bold text-emerald-700 dark:text-emerald-400">User Service</div>
-                  <span className="text-[10px] text-emerald-600">● ใช้งานได้ปกติ</span>
+                  <span className="text-[10px] text-emerald-600">● ล็อกอินได้</span>
                 </div>
 
-                <div className="p-3 rounded-xl bg-white dark:bg-slate-800 border border-emerald-300 dark:border-emerald-800 text-center space-y-1">
+                <div className={`p-3 rounded-xl border text-center space-y-1 ${svcOk}`}>
                   <span className="text-base">📋</span>
                   <div className="font-bold text-emerald-700 dark:text-emerald-400">Catalog Service</div>
                   <span className="text-[10px] text-emerald-600">● ค้นหาสินค้าได้</span>
                 </div>
 
                 <div className={`p-3 rounded-xl border text-center space-y-1 transition-all ${
-                  stationFailed 
-                    ? 'bg-rose-50 dark:bg-rose-950/60 border-rose-500 text-rose-800 dark:text-rose-200' 
-                    : 'bg-white dark:bg-slate-800 border-emerald-300 dark:border-emerald-800'
+                  paymentFailed
+                    ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-400 dark:border-amber-700 text-amber-900 dark:text-amber-200'
+                    : svcOk
                 }`}>
-                  <span className="text-base">💳</span>
-                  <div className="font-bold">Payment Station</div>
-                  {stationFailed ? (
-                    <span className="text-[10px] text-rose-500 font-bold">🔥 ล่ม (โอนเงินชั่วคราว)</span>
+                  <span className="text-base">🛒</span>
+                  <div className={`font-bold ${paymentFailed ? '' : 'text-emerald-700 dark:text-emerald-400'}`}>Order Service</div>
+                  {paymentFailed ? (
+                    <span className="text-[10px] text-amber-600 dark:text-amber-400 font-bold">◐ ทำงานบางส่วน (จ่ายเงินไม่ได้ชั่วคราว)</span>
                   ) : (
-                    <span className="text-[10px] text-emerald-600">● ใช้งานได้ปกติ</span>
+                    <span className="text-[10px] text-emerald-600">● สั่งซื้อได้</span>
                   )}
                 </div>
 
-                <div className="p-3 rounded-xl bg-white dark:bg-slate-800 border border-emerald-300 dark:border-emerald-800 text-center space-y-1">
+                <div className={`p-3 rounded-xl border text-center space-y-1 transition-all ${
+                  paymentFailed 
+                    ? 'bg-rose-50 dark:bg-rose-950/60 border-rose-500 text-rose-800 dark:text-rose-200' 
+                    : svcOk
+                }`}>
+                  <span className="text-base">💳</span>
+                  <div className={`font-bold ${paymentFailed ? '' : 'text-emerald-700 dark:text-emerald-400'}`}>Payment Service</div>
+                  {paymentFailed ? (
+                    <span className="text-[10px] text-rose-500 font-bold">🔥 ล่ม</span>
+                  ) : (
+                    <span className="text-[10px] text-emerald-600">● ตัดบัตรได้</span>
+                  )}
+                </div>
+
+                <div className={`p-3 rounded-xl border text-center space-y-1 col-span-2 sm:col-span-1 ${svcOk}`}>
                   <span className="text-base">📦</span>
                   <div className="font-bold text-emerald-700 dark:text-emerald-400">Inventory Service</div>
                   <span className="text-[10px] text-emerald-600">● เช็คสต็อกได้</span>
@@ -498,9 +549,9 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
               </div>
 
               <p className="text-[11px] text-slate-500">
-                {stationFailed 
-                  ? '✅ บทเรียน: แม้สถานี Payment จะล่ม แต่ลูกค้ายังเปิดดูของ หยิบใส่ตะกร้า และจองโต๊ะได้ตามปกติ ระบบไม่ล่มทั้งระบบเหมือน Monolith' 
-                  : '💡 การแลกเปลี่ยน: Microservices ซับซ้อนกว่าและต้นทุนเซิร์ฟเวอร์สูงกว่า จึงเหมาะเมื่อระบบเริ่มมีขนาดใหญ่'}
+                {paymentFailed 
+                  ? '✅ บทเรียน: Payment ล่ม แต่ลูกค้ายังล็อกอิน ค้นหา และหยิบใส่ตะกร้าได้ ขั้นจ่ายเงินเท่านั้นที่ต้องรอ ทีมต้องออกแบบไว้ล่วงหน้าว่าช่วงนั้นจะบอกลูกค้าอย่างไร' 
+                  : '💡 การแลกเปลี่ยน: Microservices ซับซ้อนกว่าและต้นทุนดูแลสูงกว่า จึงคุ้มเมื่อระบบและทีมเริ่มใหญ่'}
               </p>
             </div>
           )}
@@ -509,7 +560,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
         <details className="group rounded-2xl bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] overflow-hidden">
           <summary className="flex items-center justify-between gap-2 p-3.5 sm:p-4 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f] transition-colors">
             <span className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
-              Sync vs Async: REST / Webhook / WebSocket
+              Sync vs Async: Polling / Webhook / WebSocket
             </span>
             <ChevronDown className="w-4 h-4 shrink-0 text-neutral-400 dark:text-[#737373] transition-transform group-open:rotate-180" />
           </summary>
@@ -612,7 +663,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
   }
 
   // =========================================================================
-  // CHAPTER 8: DevOps release train & Canary Release
+  // CHAPTER 8: DevOps release gates & Canary Release
   // =========================================================================
   if (chapterId === 's8') {
     return (
@@ -751,6 +802,14 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
           <div className="p-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800">
             <b className="text-indigo-700 dark:text-indigo-300 block mb-1">Tier 3: Engineering Team</b>
             <p className="text-[11px] text-slate-600 dark:text-slate-400">วิเคราะห์ Code, ออกแบบ Hotfix และนำข้อผิดพลาดเข้า Product Backlog</p>
+          </div>
+        </div>
+        {/* Return leg: without it the "loop" is just a one-way escalation */}
+        <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 text-xs flex items-start gap-2">
+          <RotateCcw className="w-4 h-4 shrink-0 mt-0.5 text-emerald-600 dark:text-emerald-400" />
+          <div>
+            <b className="text-emerald-800 dark:text-emerald-300 block mb-0.5">ปิดวงจร: แก้เสร็จ → L1 แจ้งลูกค้า → อัปเดต FAQ/Runbook</b>
+            <p className="text-[11px] text-slate-600 dark:text-slate-400">ครั้งหน้าที่เจอเรื่องเดิม L1 ตอบได้เองโดยไม่ต้องส่งต่อ</p>
           </div>
         </div>
       </div>
@@ -924,7 +983,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
   }
 
   // =========================================================================
-  // CHAPTER 12: Dual-Track Agile Orbit (Discovery & Delivery Gears)
+  // CHAPTER 12: Dual-Track Agile (Discovery & Delivery, one team)
   // =========================================================================
   if (chapterId === 's12') {
     return (
@@ -932,13 +991,13 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
         <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-2">
-              <span className="text-base">⚙️</span>
+              <span className="text-base">🔀</span>
               <div>
                 <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100">
-                  Dual-Track Agile Orbit Diagram
+                  Dual-Track Agile: ทีมเดียว สองเส้นงาน
                 </h4>
                 <p className="text-[11px] text-slate-500">
-                  ฟันเฟืองคู่ขนาน: ฝั่งค้นคว้าวิ่งนำหน้า 1-2 สปรินต์เพื่อส่งแบบแปลนที่พิสูจน์แล้วให้ฝั่งก่อสร้าง
+                  ทีมเดียวกันทำสองงานคู่กัน: Discovery พิสูจน์ไอเดียล่วงหน้า 1-2 สปรินต์ ส่งงานที่ผ่านแล้วให้ Delivery สร้าง
                 </p>
               </div>
             </div>
@@ -950,7 +1009,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
                   dualTrackPhase === 'discovery' ? 'bg-pink-600 text-white shadow-xs' : 'text-slate-600 dark:text-slate-300'
                 }`}
               >
-                1. Discovery Orbit
+                1. Discovery
               </button>
               <button
                 onClick={() => setDualTrackPhase('delivery')}
@@ -958,7 +1017,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
                   dualTrackPhase === 'delivery' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 dark:text-slate-300'
                 }`}
               >
-                2. Delivery Orbit
+                2. Delivery
               </button>
               <button
                 onClick={() => setDualTrackPhase('synchronized')}
@@ -966,12 +1025,12 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
                   dualTrackPhase === 'synchronized' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600 dark:text-slate-300'
                 }`}
               >
-                3. วงโคจรคู่ขนาน
+                3. ทำคู่ขนาน
               </button>
             </div>
           </div>
 
-          {/* Visual Dual Orbit */}
+          {/* Two tracks, same team */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
             <div className={`p-4 rounded-xl border transition-all ${
               dualTrackPhase === 'discovery' || dualTrackPhase === 'synchronized'
@@ -981,14 +1040,14 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
               <div className="flex items-center justify-between mb-2">
                 <b className="text-pink-700 dark:text-pink-300 font-bold flex items-center gap-1.5">
                   <Compass className="w-4 h-4" />
-                  <span>วงโคจรที่ 1: Discovery Track (วิ่งล่วงหน้า N+1)</span>
+                  <span>Track 1: Discovery (ล่วงหน้า สปรินต์ N+1)</span>
                 </b>
                 <span className="text-[10px] px-2 py-0.5 rounded bg-pink-100 dark:bg-pink-900/50 text-pink-700 dark:text-pink-300">
                   เน้นหาคำตอบ
                 </span>
               </div>
               <p className="text-[11px] text-slate-600 dark:text-slate-300 mb-2">
-                ทีม Product + Designer สัมภาษณ์ลูกค้า ทำ Figma Prototype ทดสอบสมมติฐานว่า "มีคนต้องการฟีเจอร์นี้จริงไหม"
+                PM + Designer นำ โดยมี Dev ร่วมประเมินความเป็นไปได้: สัมภาษณ์ลูกค้า ทำ Prototype ทดสอบว่า "มีคนต้องการฟีเจอร์นี้จริงไหม"
               </p>
               <div className="p-2 rounded-lg bg-white/80 dark:bg-slate-900/80 text-[10px] text-pink-600 dark:text-pink-300">
                 เอาต์พุต: Validated Backlog + ชัดเจนเรื่อง Acceptance Criteria
@@ -1003,24 +1062,24 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
               <div className="flex items-center justify-between mb-2">
                 <b className="text-blue-700 dark:text-blue-300 font-bold flex items-center gap-1.5">
                   <FileCode2 className="w-4 h-4" />
-                  <span>วงโคจรที่ 2: Delivery Track (สปรินต์ปัจจุบัน N)</span>
+                  <span>Track 2: Delivery (สปรินต์ปัจจุบัน N)</span>
                 </b>
                 <span className="text-[10px] px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300">
                   เน้นสร้างของจริง
                 </span>
               </div>
               <p className="text-[11px] text-slate-600 dark:text-slate-300 mb-2">
-                ทีม Developer + QA หยิบชิ้นงานที่ผ่าน Discovery แล้วมาสร้างโค้ดระดับ Production เขียน Automated Test และ Deploy
+                ทีมเดียวกัน (Dev + QA เป็นแกน) หยิบงานที่ผ่าน Discovery แล้วมาสร้างโค้ดระดับ Production เขียน Automated Test และ Deploy
               </p>
               <div className="p-2 rounded-lg bg-white/80 dark:bg-slate-900/80 text-[10px] text-blue-600 dark:text-blue-300">
-                เอาต์พุต: Working Tested Software ไม่มีงานรื้อทิ้ง
+                เอาต์พุต: ซอฟต์แวร์ที่ใช้งานได้และผ่านการทดสอบ
               </div>
             </div>
           </div>
 
           <div className="p-3 bg-slate-100 dark:bg-slate-800 rounded-xl text-xs text-slate-600 dark:text-slate-300 flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-            <span><b>กฎทอง:</b> อย่าส่งงานที่ยังไม่ผ่าน Discovery ไปให้ทีม Delivery ทำ เพราะการเขียนโค้ดเพื่อทิ้งคือการเผาเงินที่แพงที่สุด</span>
+            <span><b>กฎทอง:</b> อย่าเริ่มสร้างงานระดับ production ก่อน validate ไอเดียนั้น ถ้ายังไม่แน่ใจ ให้ทดสอบด้วย Prototype ที่ทิ้งได้ถูกๆ ก่อน</span>
           </div>
         </div>
       </div>
