@@ -4,8 +4,9 @@ export const chapters6_10: Chapter[] = [
   {
     id: 's6',
     num: 6,
-    title: 'จากสเปกสู่โค้ด: วงจรการส่งมอบแบบอไจล์ (Agile & Quality Gates)',
-    subtitle: 'ทำความเข้าใจจังหวะการทำงานแบบ Sprint และสองประตูกลั่นกรองคุณภาพ DoR กับ DoD',
+    title: 'Sprint และด่าน DoR/DoD',
+    enTerm: 'Agile & Quality Gates',
+    subtitle: 'ทำงานเป็นรอบ Sprint มี DoR กันงานไม่พร้อม และ DoD กันงานที่ยังไม่เสร็จ',
     roleTag: 'eng',
     businessNote: 'ใช้ Sprint เพื่อดูงานจริงทุก 2 สัปดาห์แล้วปรับแผนให้ทัน ไม่ใช่เพื่อเร่งทีมให้ทำเร็วขึ้น',
     engineerNote: 'รับงานเข้า Sprint เฉพาะที่ผ่าน DoR แล้ว เพราะถ้าเริ่มเขียนตอนสเปกยังไม่ชัด สุดท้ายต้องรื้อ',
@@ -51,15 +52,15 @@ export const chapters6_10: Chapter[] = [
     ],
     realWorldExamples: [
       {
-        title: 'ฟีเจอร์ครึ่งๆ กลางๆ ที่ทำระบบล่มกลางดึก (The Incomplete Done Trap)',
+        title: 'รีบปิด Sprint เงินไหลออกคืนศุกร์',
         companyOrIndustry: 'FinTech Wallet & Remittance',
-        situation: 'วันสุดท้ายของ Sprint Dev ทั้งทีมเร่งปิดงานระบบโอนเงินข้ามประเทศ ให้ตัวเลข Velocity สวยตามที่ผู้บริหารตั้งเป้า',
+        situation: '(ตัวอย่างสมมติ) วันสุดท้ายของ Sprint Dev ทั้งทีมเร่งปิดงานระบบโอนเงินข้ามประเทศ ให้ตัวเลข Velocity สวยตามที่ผู้บริหารตั้งเป้า',
         whatHappened: 'Dev บอกว่า "เสร็จแล้ว" ทั้งที่ยังไม่มี Unit Test และยังไม่ได้ลองกับระบบจริง คืนวันศุกร์ที่ Deploy ขึ้น Production ระบบคำนวณอัตราแลกเปลี่ยนผิด เงินไหลออกเกินจริงหลายแสนบาทจนยอดติดลบ',
         resolution: 'ทีมเขียน Definition of Done แปะผนังออฟฟิศ: "ไม่มี Automated Test และไม่ผ่าน Review จากเพื่อน 2 คน ห้ามกด Done"',
         keyLesson: 'งานที่ "เสร็จ" แต่ยังไม่ได้ทดสอบ คือระเบิดเวลาใน Production'
       },
       {
-        title: 'สงครามรับงานแทรกกลางสปรินต์ (The Sprint Hijacking Chaos)',
+        title: 'ผู้บริหารสั่งงานแทรกกลาง Sprint',
         companyOrIndustry: 'Enterprise Retail Management',
         situation: 'ผู้บริหารฝ่ายขายเดินมาสั่ง Dev ทีละคนให้หยุดงานใน Sprint ไปทำฟีเจอร์พิมพ์ใบเสร็จแบบใหม่ให้ลูกค้ารายใหญ่',
         whatHappened: 'Dev 3 ใน 5 คนทิ้งงานใน Sprint ไปทำงานแทรก พอถึงวัน Sprint Review งานตามแผนไม่เสร็จสักชิ้น ทีมเครียดจัดและทะเลาะกันแรง',
@@ -143,8 +144,9 @@ export const chapters6_10: Chapter[] = [
   {
     id: 's7',
     num: 7,
-    title: 'การประกันคุณภาพและการทดสอบ (QA, Testing Pyramid & Bug Severity)',
-    subtitle: 'ทำไมการพึ่งพาคนคลิกทดสอบอย่างเดียวถึงทำให้ระบบล่ม และพีระมิดการทดสอบช่วยประหยัดเงินได้อย่างไร',
+    title: 'QA และ Test Pyramid',
+    enTerm: 'Quality Assurance',
+    subtitle: 'ให้คนคลิกเทสอย่างเดียวไม่พอ Test Pyramid จับบั๊กได้เร็วกว่าและถูกกว่า',
     roleTag: 'qa',
     businessNote: 'ลงทุนเทสต์อัตโนมัติให้ปล่อยงานเร็วขึ้น และมอง QA เป็นคนปกป้องความเชื่อมั่นแบรนด์ ไม่ใช่คนจับผิด Dev',
     engineerNote: 'เขียน Unit Test ก่อนส่งงานให้ QA เพราะเป็นหน้าที่ของ Dev ไม่ใช่ของ QA',
@@ -188,7 +190,7 @@ export const chapters6_10: Chapter[] = [
     ],
     realWorldExamples: [
       {
-        title: 'สูญเสีย 440 ล้านดอลลาร์ใน 45 นาที เพราะขาด Regression Testing (Knight Capital Disaster)',
+        title: 'Knight Capital: $440M ใน 45 นาที',
         companyOrIndustry: 'Knight Capital Group (Financial Trading)',
         situation: 'ปี 2012 มาร์เก็ตเมกเกอร์รายใหญ่ของตลาดหุ้นสหรัฐฯ (สำนักงานใหญ่ที่ Jersey City) เตรียมเปิดใช้โค้ดซื้อขายตัวใหม่',
         whatHappened: 'ทีมขึ้นโค้ดใหม่บนเซิร์ฟเวอร์ 7 เครื่อง แต่ลืมเครื่องที่ 8 โค้ดเก่าในเครื่องนั้นตีความข้อมูลผิด แล้วยิงคำสั่งซื้อขายออกไปนับล้านคำสั่งใน 45 นาที ขาดทุน 440 ล้านดอลลาร์ จนต้องรับเงินช่วยเหลือฉุกเฉิน และถูกควบรวมในปีถัดมา',
@@ -196,7 +198,7 @@ export const chapters6_10: Chapter[] = [
         keyLesson: 'เทสต์และการตรวจอัตโนมัติไม่ใช่เรื่องความสะดวก แต่คือเกราะกันบริษัทล่มทางการเงิน'
       },
       {
-        title: 'ส่วนลด 100% บั๊กสะท้านวงการอีคอมเมิร์ซ (The Zero-Dollar Cart Bug)',
+        title: 'โปรซื้อ 2 แถม 1 กลายเป็นของฟรี',
         companyOrIndustry: 'Omnichannel Fashion Retailer',
         situation: 'ตัวอย่างสมมติ: ทีมปล่อยโค้ดโปรโมชัน "ซื้อ 2 แถม 1" ช่วงเทศกาล 11.11',
         whatHappened: 'ไม่มีใครเทสต์กรณีใช้โค้ดส่วนลดคู่กับคูปองวันเกิด เมื่อผู้ใช้ใส่โค้ดซ้ำ 3 ครั้ง ส่วนลดเกิน 100% สินค้าเหลือ 0 บาท แถมระบบคืนเงินเข้า e-Wallet อีก ข่าวแพร่ในโซเชียล ออเดอร์ฟรีทะลัก 50,000 ชิ้นใน 1 ชั่วโมง',
@@ -282,8 +284,9 @@ export const chapters6_10: Chapter[] = [
   {
     id: 's8',
     num: 8,
-    title: 'การส่งมอบอย่างต่อเนื่อง (DevOps, CI/CD & Progressive Delivery)',
-    subtitle: 'ทำความเข้าใจท่อส่งโค้ดอัตโนมัติ และวิธีปล่อยอัปเดตระบบโดยที่ลูกค้าไม่รู้สึกว่าระบบหยุดทำงาน',
+    title: 'CI/CD และการปล่อยของ',
+    enTerm: 'DevOps',
+    subtitle: 'ส่งโค้ดขึ้นระบบได้วันละหลายรอบ โดยที่ลูกค้าไม่รู้สึกว่าระบบหยุด',
     roleTag: 'devops',
     businessNote: 'ลงทุนกับท่อ CI/CD ก่อนเร่งฟีเจอร์ เพราะท่อที่ดีทำให้ทุกฟีเจอร์หลังจากนั้นปล่อยได้เร็วและปลอดภัยขึ้น',
     engineerNote: 'เปลี่ยนทุกขั้นตอน Deploy ที่ยังทำมือให้เป็นสคริปต์อัตโนมัติ อย่าให้การขึ้นระบบเป็นพิธีกรรมตอนตี 2',
@@ -328,7 +331,7 @@ export const chapters6_10: Chapter[] = [
     ],
     realWorldExamples: [
       {
-        title: 'การอัปเดตระบบที่ทำให้อุปกรณ์ 8.5 ล้านเครื่องทั่วโลกจอฟ้า (CrowdStrike Global Outage)',
+        title: 'CrowdStrike ทำจอฟ้าทั้งโลก',
         companyOrIndustry: 'CrowdStrike (Cybersecurity & Global IT Infrastructure)',
         situation: 'กรกฎาคม 2024 CrowdStrike ปล่อยไฟล์อัปเดตการตรวจจับภัย (Rapid Response Content) ไปยังเครื่องลูกค้าทั่วโลก',
         whatHappened: 'ไฟล์ไม่ได้ทยอยปล่อยเป็นขั้น (Staged Rollout) แต่ส่งถึงทุกเครื่องพร้อมกัน ไฟล์มีข้อผิดพลาด ทำให้เครื่อง Windows ราว 8.5 ล้านเครื่องขึ้นจอฟ้า (BSOD) สนามบิน โรงพยาบาล และธนาคารทั่วโลกหยุดชะงัก',
@@ -336,7 +339,7 @@ export const chapters6_10: Chapter[] = [
         keyLesson: 'มั่นใจในโค้ดแค่ไหน ก็อย่าปล่อยอัปเดตถึงทุกเครื่องพร้อมกัน ให้ทยอยปล่อยแบบ Canary เสมอ'
       },
       {
-        title: 'พิธีกรรมอดนอนคืนวันศุกร์สู่การ Deploy วันละ 50 ครั้ง (Transformation to Continuous Delivery)',
+        title: 'เลิกเฝ้าคืนศุกร์ Deploy ทุกวัน',
         companyOrIndustry: 'Leading Southeast Asian Super-App',
         situation: 'ตัวอย่างสมมติ: บริษัทรวมโค้ดปล่อยเดือนละครั้งในคืนวันศุกร์ ทีม 40 คนเฝ้าออฟฟิศถึงตี 4 และเช้าวันเสาร์มักเจอบั๊กลึกลับที่หาเจ้าของไม่ได้',
         whatHappened: 'ทีมนำ CI/CD และ Feature Flag มาใช้ แตกงานเป็นชิ้นเล็ก แล้ว Deploy ขึ้น Production ได้ตลอดเวลาทำการวันจันทร์ถึงพฤหัสฯ โดยซ่อนฟีเจอร์ที่ยังไม่เสร็จไว้หลัง Flag',
@@ -421,8 +424,9 @@ export const chapters6_10: Chapter[] = [
   {
     id: 's9',
     num: 9,
-    title: 'หนี้ทางเทคนิคและการปรับปรุงโครงสร้าง (Technical Debt & Refactoring)',
-    subtitle: 'ทำความเข้าใจหนี้ที่มองไม่เห็น แต่คิดดอกเบี้ยทบต้นเป็นความล่าช้าในการส่งมอบงาน',
+    title: 'Tech Debt และ Refactor',
+    enTerm: 'Technical Debt',
+    subtitle: 'หนี้ที่มองไม่เห็น แต่คิดดอกเบี้ยทบต้นเป็นงานที่ช้าลงทุก Sprint',
     roleTag: 'eng',
     businessNote: 'กันเวลาจ่ายหนี้ทางเทคนิคทุกรอบ: กู้เพื่อให้ทันตลาดได้ แต่ถ้าไม่จ่าย ดอกเบี้ยจะทำให้ทีมช้าลงเรื่อยๆ',
     engineerNote: 'อธิบายหนี้ทางเทคนิคเป็นผลทางธุรกิจ เช่น "ถ้าไม่แก้ ฟีเจอร์ถัดไปจะช้าลงมาก" ไม่ใช่ "โค้ดไม่สวย"',
@@ -467,7 +471,7 @@ export const chapters6_10: Chapter[] = [
     ],
     realWorldExamples: [
       {
-        title: 'ความล้มเหลวครั้งประวัติศาสตร์ของการรื้อระบบใหม่ทั้งดุ้น (Netscape Navigator Collapse)',
+        title: 'Netscape เขียนใหม่หมดจนเสียตลาด',
         companyOrIndustry: 'Netscape Communications (Web Browsers)',
         situation: 'Netscape เคยครองตลาดเบราว์เซอร์ช่วงกลางยุค 90 แต่โค้ดเดิมเริ่มรุงรังและแก้ยาก',
         whatHappened: 'ราวปี 1998 ทีมตัดสินใจทิ้งโค้ดเดิมแล้วเขียนเบราว์เซอร์ใหม่ตั้งแต่ศูนย์ (Big Rewrite) ผลคือจากเวอร์ชัน 4 ถึง 6 ห่างกันราว 3 ปี (ไม่มีเวอร์ชัน 5) ระหว่างนั้น Internet Explorer ที่แถมมากับ Windows ออกฟีเจอร์ต่อเนื่อง และแซงขึ้นมาครองตลาด',
@@ -475,7 +479,7 @@ export const chapters6_10: Chapter[] = [
         keyLesson: 'การรื้อเขียนใหม่ทั้งหมด (Big Rewrite) เสี่ยงถึงขั้นเสียธุรกิจ เพราะตลาดไม่หยุดรอ'
       },
       {
-        title: 'ระบบเช็คอินสายการบินล่มเพราะหนี้ระบบเก่า 30 ปี (Southwest Airlines Meltdown)',
+        title: 'Southwest ล่มเพราะระบบเก่า',
         companyOrIndustry: 'Southwest Airlines (Commercial Aviation)',
         situation: 'สายการบินรายใหญ่ของสหรัฐฯ ใช้ระบบจัดตารางลูกเรือ (Crew Scheduling) ยุค 1990 มานาน และเลื่อนการอัปเกรดออกไปเรื่อยๆ',
         whatHappened: 'ธันวาคม 2022 พายุหิมะถล่ม ระบบจัดตารางรับการเปลี่ยนแปลงจำนวนมากไม่ไหว จับคู่ลูกเรือกับเที่ยวบินไม่ได้ ลูกเรือต้องโทรเข้าศูนย์จัดตารางเพื่อแจ้งว่าอยู่ที่ไหน และรอสายนานหลายชั่วโมง สุดท้ายยกเลิกกว่า 16,700 เที่ยวบิน ผู้โดยสารได้รับผลกระทบราว 2 ล้านคน เสียหายรวมกว่า 1,000 ล้านดอลลาร์',
@@ -555,8 +559,9 @@ export const chapters6_10: Chapter[] = [
   {
     id: 's10',
     num: 10,
-    title: 'การเฝ้าระวังและการดูแลระบบหลังบ้าน (SRE, Monitoring & Incident Management)',
-    subtitle: 'ทำความเข้าใจคำสัญญา SLA/SLO และวิธีจัดการเมื่อระบบมีปัญหาเพื่อให้ธุรกิจเดินหน้าต่อได้',
+    title: 'SRE และการรับมือระบบล่ม',
+    enTerm: 'Incident Management',
+    subtitle: 'SLA กับ SLO ต่างกันยังไง และพอระบบล่มต้องทำอะไรก่อน',
     roleTag: 'support',
     businessNote: 'เลิกหวังระบบที่ไม่ล่มเลย เพราะไม่คุ้ม ให้ลงทุนกับการจับเหตุให้เร็ว และแจ้งลูกค้าอย่างมืออาชีพ',
     engineerNote: 'ตั้ง Monitoring และ Alert ให้ปลุกทีมได้ก่อนลูกค้ารู้ตัว อย่ารอให้ลูกค้าโทรมาต่อว่า',
@@ -600,7 +605,7 @@ export const chapters6_10: Chapter[] = [
     ],
     realWorldExamples: [
       {
-        title: 'ระบบล่มระดับโลก 6 ชั่วโมงเพราะพิมพ์คำสั่งผิด (GitLab Database Deletion Incident)',
+        title: 'GitLab ลบฐานข้อมูลผิดเครื่อง',
         companyOrIndustry: 'GitLab (Developer Platform)',
         situation: 'มกราคม 2017 คนในทีมดูแลระบบของ GitLab กำลังแก้ปัญหาฐานข้อมูลสำรองซิงก์ช้าตอนดึก',
         whatHappened: 'ด้วยความล้า เขาเผลอสั่งลบโฟลเดอร์ฐานข้อมูลตัวจริงราว 300GB แล้วพบว่าวิธีสำรองข้อมูลทั้ง 5 แบบไม่มีแบบไหนทำงานได้ตามที่คิด GitLab ล่มราว 18 ชั่วโมง และข้อมูลช่วงราว 6 ชั่วโมงหายไป',
@@ -608,7 +613,7 @@ export const chapters6_10: Chapter[] = [
         keyLesson: 'อย่าโทษคน ให้ถามว่า "ทำไมระบบถึงยอมให้คำสั่งอันตรายทำงานโดยไม่ต้องยืนยันสองชั้น"'
       },
       {
-        title: 'การล่มยาว 6 ชั่วโมงของ Meta และการสื่อสารผ่านทวิตเตอร์ (The BGP Routing Collapse)',
+        title: 'Facebook ล่มทั้งโลก 6 ชั่วโมง',
         companyOrIndustry: 'Meta (Facebook, Instagram, WhatsApp)',
         situation: 'ตุลาคม 2021 ระหว่างงานซ่อมบำรุง ทีมเครือข่ายของ Meta ส่งคำสั่งตรวจความจุของเครือข่ายหลัก (Backbone)',
         whatHappened: 'คำสั่งนั้นตัดการเชื่อมต่อระหว่างศูนย์ข้อมูลทั้งหมด เซิร์ฟเวอร์ DNS ของ Meta จึงถอนเส้นทาง BGP ออก ทำให้คนภายนอกเข้า Facebook, Instagram และ WhatsApp ไม่ได้ราว 6 ชั่วโมง เครื่องมือภายในที่ใช้กู้ระบบก็ล่มไปด้วย',

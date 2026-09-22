@@ -54,7 +54,7 @@
   - `หนี้ทางเทคนิค` + `Tech Debt`
 - **Case-study titles** (`RealWorldExample.title`): same rule. A short Thai headline. Keep the English name only if the case is known by it (e.g. `Knight Capital`).
 - **Process:** one agent drafts **2–3 options per chapter** with R7 review notes. The **owner picks**. Nothing is committed before the owner picks.
-- **Budgets** (see §8): `title` ≤ 24 characters, `enTerm` ≤ 24, `subtitle` ≤ 70, case-study `title` ≤ 32.
+- **Budgets** (see §8): `title` ≤ 25 characters, `enTerm` ≤ 24, `subtitle` ≤ 70, case-study `title` ≤ 32.
 
 ## 4. Chapter hero and Primer — one job per field
 

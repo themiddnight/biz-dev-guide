@@ -107,7 +107,6 @@ export interface ChapterPitfall {
   pitfall: string;
   symptom?: string; // อาการเตือนภัยที่เห็นในทีม
   solution: string; // ทางออกที่แก้ได้จริง
-  preventionRule?: string; // กฎเหล็กป้องกันล่วงหน้า
 }
 
 export interface SvgVisualElement {
