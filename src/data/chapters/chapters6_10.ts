@@ -566,7 +566,7 @@ export const chapters6_10: Chapter[] = [
     businessNote: 'เลิกหวังระบบที่ไม่ล่มเลย เพราะไม่คุ้ม ให้ลงทุนกับการจับเหตุให้เร็ว และแจ้งลูกค้าอย่างมืออาชีพ',
     engineerNote: 'ตั้ง Monitoring และ Alert ให้ปลุกทีมได้ก่อนลูกค้ารู้ตัว อย่ารอให้ลูกค้าโทรมาต่อว่า',
     keyTakeaway: 'ตั้ง SLO ให้เข้มกว่า SLA เสมอ จะได้รู้ตัวก่อนผิดสัญญากับลูกค้า',
-    plainAnalogy: 'เหมือนโรงพยาบาล: Monitoring คือเครื่องวัดชีพจร, Incident Response คือทีมฉุกเฉิน ส่วน Postmortem คือชันสูตรหาสาเหตุ',
+    plainAnalogy: 'เหมือนโรงพยาบาล: Monitoring คือเครื่องวัดชีพจร Incident Response คือทีมฉุกเฉิน',
     readTime: '12 นาที',
     diagramTitle: 'Closed-Loop Support & Escalation (L1 ➔ L2 ➔ L3 ➔ Product Backlog)',
     diagramDescription: 'วงจรปิดการจัดการปัญหา: ลูกค้าแจ้งเรื่อง ➔ L1 กรองเบื้องต้น ➔ L2 วิเคราะห์ระบบ ➔ L3 แก้โค้ดฉุกเฉิน ➔ วิเคราะห์สาเหตุแท้จริง (Root Cause) แล้ววนกลับเป็นงานปรับปรุงใน Backlog',

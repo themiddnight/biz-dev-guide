@@ -28,32 +28,6 @@ export const CHAPTER_ILLUSTRATIONS: Record<string, ChapterIllustration> = {
     ],
     takeaway: 'ในโลกวิศวกรรมยุคใหม่ เราไม่หวังพึ่งโชคชะตา แต่เราออกแบบระบบให้ผิดพลาดได้อย่างจำกัดและฟื้นตัวได้ทันที'
   },
-  s10: {
-    id: 'ill-s10',
-    title: 'Closed-Loop Incident Escalation Funnel (L1 ➔ L2 ➔ L3)',
-    subtitle: 'กรวยคัดกรองปัญหา: จัดการหน้าบ้านให้ไว นำข้อผิดพลาดมาเป็นโจทย์พัฒนาหลังบ้าน',
-    visualMetaphor: 'ห้องฉุกเฉินโรงพยาบาล: พยาบาลคัดกรองอาการ (L1) ➔ แพทย์ตรวจทั่วไป (L2) ➔ ทีมศัลยแพทย์เฉพาะทางผ่าตัดด่วน (L3)',
-    elements: [
-      { label: 'Tier 1: Customer Support', role: 'ด่านหน้า', color: '#38bdf8', detail: 'ช่วยเหลือลูกค้า ตอบคำถามตามคู่มือ แก้ปัญหาทั่วไป' },
-      { label: 'Tier 2: Tech Ops', role: 'ตรวจเช็คเชิงลึก', color: '#818cf8', detail: 'ตรวจ Log, เช็ค Database, ตรวจสอบสิทธิ์ผู้ใช้' },
-      { label: 'Tier 3: Core Engineers', role: 'ผ่าตัดระบบ', color: '#c084fc', detail: 'เขียน Hotfix แก้โค้ดระดับรากเหง้าของปัญหา' },
-      { label: 'Closed-Loop Backlog', role: 'วงจรเรียนรู้', color: '#34d399', detail: 'บันทึกสาเหตุเข้า Sprint ถัดไปเพื่อป้องกันไม่ให้เกิดซ้ำ' }
-    ],
-    takeaway: 'การบริการที่ดีไม่ใช่แค่ขอโทษลูกค้า แต่คือการมีระบบส่งต่อข้อมูลที่ทำให้บั๊กเดิมไม่มีวันเกิดขึ้นเป็นครั้งที่สอง'
-  },
-  s11: {
-    id: 'ill-s11',
-    title: 'The Interactive Iron Triangle Trade-Off Simulator',
-    subtitle: 'สามเหลี่ยมเหล็กแห่งโครงการ: ขยับ Scope, Time, หรือ Cost จะกระทบ Quality ทันที',
-    visualMetaphor: 'เส้นยางยืด 3 ด้าน: ถ้าคุณดึงให้เวลาร่นเร็วขึ้น แต่ไม่ยอมลดของและไม่เพิ่มงบ เส้นยางจะตึงจนขาดตรงกลาง ซึ่งก็คือ "คุณภาพของซอฟต์แวร์"',
-    elements: [
-      { label: 'Scope (ขอบเขตงาน)', role: 'ยอดบน', color: '#f59e0b', detail: 'จำนวนฟีเจอร์และระดับความละเอียดของระบบ' },
-      { label: 'Time (เวลาส่งมอบ)', role: 'ยอดซ้าย', color: '#3b82f6', detail: 'กำหนดวันเปิดตัว (Deadline) ของโครงการ' },
-      { label: 'Cost / People (ทรัพยากร)', role: 'ยอดขวา', color: '#8b5cf6', detail: 'งบประมาณ ขนาดทีม และโครงสร้างพื้นฐาน' },
-      { label: 'Quality Core (ใจกลาง)', role: 'ผลลัพธ์', color: '#ef4444', detail: 'หากกดดันทั้ง 3 ด้าน คุณภาพจะพังทลายเกิดบั๊กมหาศาล' }
-    ],
-    takeaway: 'คุณเลือกปรับได้ 2 ด้านเสมอเพื่อแลกกับอีก 1 ด้าน ไม่มีโปรเจกต์ใดที่เร็วที่สุด เยอะที่สุด และถูกที่สุดไปพร้อมกันได้'
-  },
   s12: {
     id: 'ill-s12',
     title: 'Dual-Track Agile: Discovery & Delivery Gears',
@@ -67,17 +41,4 @@ export const CHAPTER_ILLUSTRATIONS: Record<string, ChapterIllustration> = {
     ],
     takeaway: 'อย่าส่งงานที่ไม่ผ่าน Discovery ไปให้ทีม Delivery ทำ เพราะการเขียนโค้ดเพื่อทิ้งคือการเผาผลาญงบประมาณที่แพงที่สุด'
   },
-  s13: {
-    id: 'ill-s13',
-    title: 'AI-Assisted SDLC: The Copilot Cockpit & Guardrails',
-    subtitle: 'ห้องนักบิน AI: AI ช่วยเร่งความเร็ว 10 เท่า แต่มนุษย์ต้องเป็นคนตรวจเช็คความปลอดภัย',
-    visualMetaphor: 'ระบบขับเคลื่อนอัตโนมัติในเครื่องบิน: Auto-pilot ช่วยลดความเหนื่อยล้าของนักบิน แต่กัปตันมนุษย์ต้องมีสติคอยตรวจเครื่องวัดและตัดสินใจเมื่อเจอสภาพอากาศแปรปรวน',
-    elements: [
-      { label: 'Rich Context & Prompt', role: 'อินพุตสเปก', color: '#a855f7', detail: 'ป้อนข้อมูลทางธุรกิจ Type Definitions และตัวอย่างที่ชัดเจน (Few-shot)' },
-      { label: 'AI Code Engine', role: 'เครื่องทุ่นแรง', color: '#ec4899', detail: 'เขียน Boilerplate, เขียน Unit Test, แปลงดีไซน์เป็นโค้ดในไม่กี่วินาที' },
-      { label: 'Security Guardrails', role: 'เกราะป้องกัน', color: '#f59e0b', detail: 'สแกนหาช่องโหว่ ตรวจสอบ Token และป้องกันปัญหา Hallucination' },
-      { label: 'Human Engineer Review', role: 'กัปตันผู้ตรวจรับ', color: '#10b981', detail: 'วิศวกรมนุษย์ใช้ Domain Judgment ตรวจสอบความถูกต้องขั้นสุดท้าย' }
-    ],
-    takeaway: 'AI ไม่ได้มาแทนที่วิศวกร แต่วิศวกรที่ใช้ AI อย่างรู้เท่าทันและมีระบบตรวจสอบ จะก้าวล้ำหน้าคนที่ไม่ใช้อย่างมหาศาล'
-  }
 };

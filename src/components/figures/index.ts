@@ -14,12 +14,16 @@ import { FamilyScreenSig } from './FamilyScreenSig';
 import { FamilyStructureSig } from './FamilyStructureSig';
 import { FamilyThinkingSig } from './FamilyThinkingSig';
 import { GateTimeline } from './GateTimeline';
+import { RefundAiReview } from './RefundAiReview';
 import { RefundBacklogCut } from './RefundBacklogCut';
 import { RefundC4Impact } from './RefundC4Impact';
 import { RefundDebtDiff } from './RefundDebtDiff';
 import { RefundFidelity } from './RefundFidelity';
+import { RefundGlossaryFix } from './RefundGlossaryFix';
+import { RefundKpiSplit } from './RefundKpiSplit';
 import { RefundNfrSpec } from './RefundNfrSpec';
 import { RefundSequence } from './RefundSequence';
+import { RefundSloDashboard } from './RefundSloDashboard';
 import { RefundSpecStack } from './RefundSpecStack';
 import { RefundStoryGates } from './RefundStoryGates';
 import { RefundSwimlane } from './RefundSwimlane';
@@ -79,6 +83,11 @@ export const FIGURES: Record<FigureKey, React.FC<FigureProps>> = {
   'refund-debt-diff': RefundDebtDiff,
   // s14 hero (chapter figure briefs 2026-09-22, s14)
   'refund-spec-stack': RefundSpecStack,
+  // s10, s11, s13, s15 heroes (chapter figure briefs 2026-09-22, wave 2c)
+  'refund-slo-dashboard': RefundSloDashboard,
+  'refund-kpi-split': RefundKpiSplit,
+  'refund-ai-review': RefundAiReview,
+  'refund-glossary-fix': RefundGlossaryFix,
   // Appendix figures (spec §6)
   'translation-layers': TranslationLayers,
   'gate-timeline': GateTimeline,

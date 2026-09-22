@@ -29,8 +29,24 @@ export const CHAPTER_HERO_FIGURES: Readonly<Record<string, ChapterHeroFigure>> =
     figureKey: 'refund-debt-diff',
     caption: 'งานเท่ากัน: โค้ดมีหนี้แก้ 6 ไฟล์ หลัง Refactor แก้ไฟล์เดียว',
   },
+  s10: {
+    figureKey: 'refund-slo-dashboard',
+    caption: 'เส้น SLO อยู่เหนือ SLA ระบบจึงเตือนก่อนผิดสัญญากับลูกค้า',
+  },
+  s11: {
+    figureKey: 'refund-kpi-split',
+    caption: 'คำขอเดียวกัน ดูหน้าปัด KPI คนละตัว จึงเห็นความเสี่ยงคนละแบบ',
+  },
+  s13: {
+    figureKey: 'refund-ai-review',
+    caption: 'AI เขียนโค้ดเสร็จในนาที แต่ตั้งโจทย์กับตรวจงานยังเป็นของคน',
+  },
   s14: {
     figureKey: 'refund-spec-stack',
     caption: 'ฟีเจอร์ขอคืนเงินใน 4 เอกสาร ทุกชั้นชี้กลับไปหาเหตุผลได้',
+  },
+  s15: {
+    figureKey: 'refund-glossary-fix',
+    caption: 'เรียกเรื่องเดียวกัน 3 ชื่อ ทีมสร้างผิด ตกลงคำเดียวก็จบ',
   },
 };

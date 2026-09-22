@@ -41,7 +41,11 @@ export type FigureKey =
   | 'refund-test-report'
   | 'refund-spec-stack'
   | 'refund-backlog-cut'
-  | 'refund-debt-diff';
+  | 'refund-debt-diff'
+  | 'refund-slo-dashboard'
+  | 'refund-kpi-split'
+  | 'refund-ai-review'
+  | 'refund-glossary-fix';
 
 /** One figure shown right under a chapter's subtitle (visual-first pilot). */
 export interface ChapterHeroFigure {

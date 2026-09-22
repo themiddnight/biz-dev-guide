@@ -12,7 +12,11 @@ const HERO_FIGURES: Record<string, string> = {
   s6: 'refund-story-gates',
   s7: 'refund-test-report',
   s9: 'refund-debt-diff',
+  s10: 'refund-slo-dashboard',
+  s11: 'refund-kpi-split',
+  s13: 'refund-ai-review',
   s14: 'refund-spec-stack',
+  s15: 'refund-glossary-fix',
 };
 const MONEY = /\$\s?\d/;
 
