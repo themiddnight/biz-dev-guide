@@ -559,12 +559,39 @@ export const chapters11_15: Chapter[] = [
     plainAnalogy: 'เหมือนคนไทยคุยกับคนญี่ปุ่น: ต่างคนต่างพูดไม่รู้เรื่อง มีศัพท์กลางก็คุยได้',
     readTime: '15 นาที',
     diagramTitle: 'แผนที่หมวดคำศัพท์ (Glossary Category Map)',
-    diagramDescription: 'รวมคำศัพท์ 99 คำ แบ่งเป็น 13 หมวด ตั้งแต่ Requirements, Architecture และ Product ไปจนถึง QA, DevOps, Delivery metrics และ UX/UI — กดที่หมวดเพื่อกรองคำศัพท์ด้านล่างทันที',
+    diagramDescription: 'รวมคำศัพท์กว่า 130 คำ แบ่งเป็น 14 หมวด ตั้งแต่ Requirements, Architecture และ Product ไปจนถึง QA, DevOps, Delivery metrics และ UX/UI — กดที่หมวดเพื่อกรองคำศัพท์ด้านล่างทันที',
     beginnerPrimer: {
       whatIsIt: 'Knowledge Map & Jargon Buster คือที่รวมคำศัพท์ที่แปลภาษาเทคและภาษาธุรกิจเป็นภาษาคน แบ่งหมวดไว้ให้เห็นว่าคำไหนอยู่ส่วนไหนของงาน',
       whyItMatters: 'วงการซอฟต์แวร์มีคำย่อเป็นร้อย (API, CI/CD, SLA, MVP, NFR, SDK) คนใหม่ที่ตามไม่ทันมักเงียบ ไม่กล้าออกความเห็น การตัดสินใจจึงผ่านไปโดยไม่มีมุมมองของเขา',
       realWorldScenario: 'ในประชุม: "ทำ MVP ผ่าน API Gateway ดู SLA ก่อน Refactor Tech Debt" -> คนใหม่ตามไม่ทัน -> เปิดหน้ารวมคำศัพท์ -> แปลได้ว่า "ทำระบบทดลองเล็กๆ ต่อผ่านประตูกลาง ดูว่าเสถียรไหม ก่อนกลับไปจัดโค้ดให้สะอาด"'
     },
+    jargonList: [
+      {
+        term: 'API (Application Programming Interface) และ SDK (Software Development Kit)',
+        humanTranslation: 'API คือช่องบริการที่ระบบอื่นเรียกใช้ตามเมนูที่ตกลงไว้ ส่วน SDK คือกล่องเครื่องมือที่เจ้าของบริการแจกมาให้ต่อเข้าช่องนั้น',
+        meetingExample: '"ธนาคารมี API ให้เช็กสถานะการจ่ายเงินอยู่แล้วครับ แล้วมี SDK ภาษาที่เราใช้ให้ด้วย ไม่ต้องเขียนเองทั้งหมด"'
+      },
+      {
+        term: 'CI/CD (Continuous Integration / Continuous Deployment)',
+        humanTranslation: 'สายพานอัตโนมัติที่รวมโค้ด ทดสอบ และส่งขึ้นระบบให้เอง แทนการรวมงานด้วยมือทีเดียวตอนใกล้เปิดตัว',
+        meetingExample: '"มี CI/CD แล้วครับ แก้เสร็จวันนี้ขึ้นได้วันนี้ ไม่ต้องรอรอบปล่อยของสิ้นเดือน"'
+      },
+      {
+        term: 'SLA (Service Level Agreement)',
+        humanTranslation: 'คำสัญญาเรื่องคุณภาพบริการที่เขียนไว้ในสัญญา เช่น uptime 99.9% พลาดแล้วมีค่าปรับจริง',
+        meetingExample: '"SLA กับลูกค้ารายนี้คือ 99.9% ต่อเดือนครับ ล่มได้ราว 43 นาที เกินนั้นต้องคืนส่วนลด"'
+      },
+      {
+        term: 'MVP (Minimum Viable Product)',
+        humanTranslation: 'ของเล็กที่สุดที่ใช้งานได้จริงและตอบคำถามว่าลูกค้าเอาไหม ไม่ใช่ของที่ทำครึ่งๆ กลางๆ',
+        meetingExample: '"MVP รอบนี้คือขายได้และเก็บเงินได้ครับ ส่วนรายงานย้อนหลังไว้รอบถัดไป"'
+      },
+      {
+        term: 'NFR (Non-Functional Requirements)',
+        humanTranslation: 'ข้อกำหนดว่าระบบต้อง "ดีแค่ไหน" ไม่ใช่ "ทำอะไรได้" เช่น เร็วเท่าไร รับคนพร้อมกันกี่คน ปลอดภัยระดับไหน',
+        meetingExample: '"ฟีเจอร์ครบแล้ว แต่ NFR ยังไม่มีเลขครับ วันเปิดตัวจะมีคนเข้าพร้อมกันกี่คน"'
+      }
+    ],
     realWorldExamples: [
       {
         title: '"User" ที่แต่ละฝ่ายเข้าใจต่างกัน',

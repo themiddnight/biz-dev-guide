@@ -1,6 +1,22 @@
 import { describe, it, expect } from 'vitest';
 import { CHAPTERS } from './chaptersData';
 import { CATEGORY_SIDE, GLOSSARY, GLOSSARY_CATEGORIES, sortTermsForRole, termSide } from './glossary';
+import { glossaryKeys } from './termInventory';
+
+/** The abbreviations the term-definitions spec added in Phase 2 (P2.1). */
+const PHASE2_TERM_IDS = [
+  'slo', 'sre', 'qa', 'ba', 'kr', 'sprint', 'agile', 'waterfall', 'quality-gate', 'test-pyramid',
+  'refactoring', 'microservices', 'monolith', 'ux-ui', 'furps-plus', 'kiss', 'erd', 'json', 'faq',
+  'otp', 'sms', 'qr-code', 'availability-zone', 'sketch', 'api', 'sa',
+];
+
+/**
+ * Attributions the chapters teach without ever writing the term (D19's untestable half):
+ * s10 covers customer retention in Thai only (s4's "Retention" is data retention, a different
+ * thing), and s18/s9 argue about return on investment without writing `ROI`. Every other
+ * entry must cite a chapter that names it.
+ */
+const TOPICAL_ATTRIBUTIONS = ['retention -> s10', 'roi -> s18', 'roi -> s9'];
 
 const BUSINESS_TERM_IDS = [
   'revenue',
@@ -56,6 +72,64 @@ describe('glossary data', () => {
       const term = GLOSSARY.find(t => t.id === id)!;
       expect(['s16', 's17', 's18', 's19']).toContain(term.relatedChapterIds[0]);
     }
+  });
+
+  it('no entry cites a chapter that does not contain the term (D19, round-3 I-10)', () => {
+    const content = new Map(CHAPTERS.map(c => [c.id, JSON.stringify(c).toLowerCase()]));
+    const wrong: string[] = [];
+    for (const term of GLOSSARY) {
+      const keys = glossaryKeys(term);
+      const named = [...content].filter(([, text]) => keys.some(k => text.includes(k))).map(([id]) => id);
+      if (named.length === 0) continue; // no chapter writes it: the attribution is topical only
+      for (const chapterId of term.relatedChapterIds) {
+        const pair = `${term.id} -> ${chapterId}`;
+        if (!named.includes(chapterId) && !TOPICAL_ATTRIBUTIONS.includes(pair)) {
+          wrong.push(`${pair} (named in: ${named.join(' ')})`);
+        }
+      }
+    }
+    expect(wrong).toEqual([]);
+  });
+
+  it('every topical attribution is still one the chapters really do not name', () => {
+    const content = new Map(CHAPTERS.map(c => [c.id, JSON.stringify(c).toLowerCase()]));
+    for (const pair of TOPICAL_ATTRIBUTIONS) {
+      const [id, chapterId] = pair.split(' -> ');
+      const term = GLOSSARY.find(t => t.id === id);
+      expect(term, id).toBeDefined();
+      expect(term!.relatedChapterIds, pair).toContain(chapterId);
+      const text = content.get(chapterId) ?? '';
+      expect(glossaryKeys(term!).some(k => text.includes(k)), pair).toBe(false);
+    }
+  });
+
+  it('User story points at the chapters that teach it, not chapter 4 (P2.5)', () => {
+    const term = GLOSSARY.find(t => t.id === 'user-story')!;
+    expect(term.relatedChapterIds).toEqual(['s14', 's2']);
+  });
+
+  it('the Phase 2 abbreviations are app-origin with a plain line and at least one alias', () => {
+    for (const id of PHASE2_TERM_IDS) {
+      const term = GLOSSARY.find(t => t.id === id);
+      expect(term, id).toBeDefined();
+      expect(term!.origin, id).toBe('app');
+      expect(term!.plain?.trim().length ?? 0, id).toBeGreaterThan(0);
+      expect(term!.aliases?.length ?? 0, id).toBeGreaterThan(0);
+      expect(term!.relatedChapterIds.length, id).toBeGreaterThan(0);
+    }
+  });
+
+  it('no alias repeats its own entry\'s term, and no two entries share an alias', () => {
+    const owners = new Map<string, string[]>();
+    for (const term of GLOSSARY) {
+      for (const alias of term.aliases ?? []) {
+        expect(alias.toLowerCase(), term.id).not.toBe(term.term.toLowerCase());
+        const key = alias.toLowerCase();
+        owners.set(key, [...(owners.get(key) ?? []), term.id]);
+      }
+    }
+    const shared = [...owners].filter(([, ids]) => ids.length > 1).map(([a, ids]) => `${a}: ${ids.join(', ')}`);
+    expect(shared).toEqual([]);
   });
 
   it('money amounts use baht, never dollars', () => {

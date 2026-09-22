@@ -92,13 +92,10 @@ describe('getChapterLayout', () => {
       expect(getChapterLayout(level, c).map(g => g.layer)).toEqual(['core', 'apply', 'deep']);
     }
   });
-  it('s15 has no jargon; glossary leads core for both levels', () => {
-    expect(core('beginner', 's15')).toEqual(['glossary', 'primer', 'otherSide', 'coreConcepts', 'diagram']);
+  it('s15 leads core with the glossary, then its own jargon list (term-definitions P2.3)', () => {
+    expect(core('beginner', 's15')).toEqual(['glossary', 'primer', 'jargon', 'otherSide', 'coreConcepts', 'diagram']);
     expect(core('experienced', 's15')).toEqual(['glossary', 'otherSide', 'coreConcepts', 'pitfalls', 'diagram']);
-    for (const level of LEVELS) {
-      const keys = getChapterLayout(level, ch('s15')).flatMap(g => g.sections);
-      expect(keys).not.toContain('jargon');
-    }
+    expect(getChapterLayout('experienced', ch('s15')).find(g => g.layer === 'deep')!.sections).toContain('jargon');
   });
   it('override keys appear only in core for s11/s15', () => {
     for (const level of LEVELS) {
