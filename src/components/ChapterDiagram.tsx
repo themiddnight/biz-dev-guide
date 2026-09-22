@@ -42,6 +42,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
   const [c4Zoom, setC4Zoom] = useState<1 | 2 | 3 | 4>(1);
   const [pyramidLevel, setPyramidLevel] = useState<'unit' | 'integration' | 'e2e'>('unit');
   const [canaryPercent, setCanaryPercent] = useState<number>(5);
+  const [canaryBug, setCanaryBug] = useState<boolean>(false);
   const [boehmPhase, setBoehmPhase] = useState<number>(0);
 
   // Release train state (s8)
@@ -618,23 +619,35 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
       <div className="space-y-4">
         {renderReleaseTrain()}
         <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-3">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-2">
             <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
               Canary Release Simulator (ปล่อยผู้ใช้ทีละกลุ่ม)
             </span>
-            <span className="text-xs font-bold text-amber-500">
-              {canaryPercent}% Traffic สู่เวอร์ชันใหม่
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-amber-500">
+                {canaryPercent}% Traffic สู่เวอร์ชันใหม่
+              </span>
+              <button
+                onClick={() => setCanaryBug(!canaryBug)}
+                className={`px-2.5 py-1 rounded-lg text-xs font-bold cursor-pointer transition-all ${
+                  canaryBug ? 'bg-rose-500 text-white shadow-xs' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
+                }`}
+              >
+                🐞 เวอร์ชันใหม่มีบั๊ก: {canaryBug ? 'ON' : 'OFF'}
+              </button>
+            </div>
           </div>
 
           <div className="w-full bg-slate-100 dark:bg-slate-800 h-3 rounded-full overflow-hidden p-0.5 border border-slate-200 dark:border-slate-700">
             <div
-              className="bg-gradient-to-r from-emerald-500 to-indigo-600 h-full rounded-full transition-all duration-300"
+              className={`h-full rounded-full transition-all duration-300 ${
+                canaryBug ? 'bg-rose-500' : 'bg-gradient-to-r from-emerald-500 to-indigo-600'
+              }`}
               style={{ width: `${canaryPercent}%` }}
             />
           </div>
 
-          <div className="flex items-center justify-between text-xs">
+          <div className="flex items-center justify-between flex-wrap gap-2 text-xs">
             <div className="flex gap-1.5">
               {[5, 10, 25, 50, 100].map((pct) => (
                 <button
@@ -649,9 +662,28 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
               ))}
             </div>
             <span className="text-[11px] text-slate-400">
-              {canaryPercent < 100 ? '🛡️ ถ้าตัวชี้วัดเกินเกณฑ์ ระบบ Rollback อัตโนมัติ (เร็วแค่ไหนขึ้นกับรอบการเฝ้าวัดผล)' : '✅ ปล่อยเต็ม 100% ปลอดภัย'}
+              {canaryPercent < 100 ? '🛡️ ถ้าตัวชี้วัดเกินเกณฑ์ ระบบ Rollback อัตโนมัติ (เร็วแค่ไหนขึ้นกับรอบการเฝ้าวัดผล)' : '✅ ปล่อยครบ, ปลอดภัยเพราะทุกขั้นก่อนหน้าผ่านเกณฑ์'}
             </span>
           </div>
+
+          {canaryBug && (
+            <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-300 dark:border-rose-800 text-xs text-rose-900 dark:text-rose-200 space-y-1">
+              {canaryPercent < 100 ? (
+                <>
+                  <div className="font-bold text-rose-700 dark:text-rose-300">
+                    กระทบผู้ใช้แค่ {canaryPercent}% → Error พุ่งเกินเกณฑ์ → Rollback อัตโนมัติ
+                  </div>
+                  <p className="text-[11px] text-rose-800 dark:text-rose-300/90">
+                    อีก {100 - canaryPercent}% ยังใช้เวอร์ชันเดิมอยู่และไม่เจอบั๊กเลย ยิ่งเริ่มจากกลุ่มเล็ก ความเสียหายยิ่งจำกัด
+                  </p>
+                </>
+              ) : (
+                <div className="font-bold text-rose-700 dark:text-rose-300">
+                  ถ้าเวอร์ชันนี้มีบั๊ก ระบบจะ Rollback ไปตั้งแต่ขั้นแรกแล้ว จึงไม่มีทางมาถึง 100%
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     );
@@ -726,22 +758,24 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
   }
 
   // =========================================================================
-  // CHAPTER 11: The Interactive Iron Triangle Physics Simulator
+  // CHAPTER 11: The Interactive Iron Triangle Simulator
   // =========================================================================
   if (chapterId === 's11') {
-    // Calculate tension & defect risk
-    // Baseline: Scope 50, Time 3, Cost 3
-    const tension = Math.max(10, Math.round((scopeVal * 1.5) / (timeVal * costVal)));
-    const defectRisk = Math.min(65, Math.max(3, Math.round(tension * 1.2)));
-
-    let qualityStatus = { text: '✨ คุณภาพสูงสุด (Pristine Quality)', color: 'text-emerald-500', bg: 'bg-emerald-500/10 border-emerald-500/30' };
-    if (defectRisk > 35) {
-      qualityStatus = { text: '💥 วิกฤติบั๊กล้นระบบ (System Meltdown Risk)', color: 'text-rose-500', bg: 'bg-rose-500/10 border-rose-500/30' };
-    } else if (defectRisk > 20) {
-      qualityStatus = { text: '⚠️ หนี้ทางเทคนิคสะสมสูง (High Tech Debt)', color: 'text-amber-500', bg: 'bg-amber-500/10 border-amber-500/30' };
-    } else if (defectRisk > 10) {
-      qualityStatus = { text: '⚖️ สมดุลใช้งานได้จริง (Production Balanced)', color: 'text-indigo-500', bg: 'bg-indigo-500/10 border-indigo-500/30' };
-    }
+    // Qualitative pressure model: no real defect rate exists, so the output is a
+    // level, not a percentage. Headcount has diminishing returns (Brooks's law):
+    // effective team output flattens after scale 3.
+    const TEAM_OUTPUT = [1, 1.8, 2.4, 2.6, 2.7];
+    const pressure = (scopeVal * 1.5) / (timeVal * TEAM_OUTPUT[costVal - 1]);
+    // One set of thresholds drives the badge, the meter, the advice and the triangle.
+    const PRESSURE_LEVELS = [
+      { max: 6, label: 'ต่ำ', text: '✨ คุณภาพสูงสุด (Pristine Quality)', color: 'text-emerald-500', bg: 'bg-emerald-500/10 border-emerald-500/30', stroke: '#10b981', core: '#10b981' },
+      { max: 18, label: 'ปานกลาง', text: '⚖️ สมดุลใช้งานได้จริง (Production Balanced)', color: 'text-indigo-500', bg: 'bg-indigo-500/10 border-indigo-500/30', stroke: '#6366f1', core: '#10b981' },
+      { max: 35, label: 'สูง', text: '⚠️ หนี้ทางเทคนิคสะสมสูง (High Tech Debt)', color: 'text-amber-500', bg: 'bg-amber-500/10 border-amber-500/30', stroke: '#f59e0b', core: '#f59e0b' },
+      { max: Infinity, label: 'สูงมาก', text: '💥 วิกฤติบั๊กล้นระบบ (System Meltdown Risk)', color: 'text-rose-500', bg: 'bg-rose-500/10 border-rose-500/30', stroke: '#f43f5e', core: '#f43f5e' },
+    ];
+    const levelIdx = PRESSURE_LEVELS.findIndex((l) => pressure <= l.max);
+    const level = PRESSURE_LEVELS[levelIdx];
+    const isDanger = levelIdx >= 2;
 
     return (
       <div className="space-y-4">
@@ -751,16 +785,16 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
               <span className="text-base">🔺</span>
               <div>
                 <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100">
-                  The Interactive Iron Triangle Physics Simulator
+                  The Interactive Iron Triangle Simulator
                 </h4>
                 <p className="text-[11px] text-slate-500">
-                  ลองเลื่อนตัวแปร 3 ด้าน เพื่อดูว่า "แรงดึง" กระทบต่อคุณภาพและอัตราการเกิดบั๊กอย่างไร
+                  ลองเลื่อน 3 ด้าน แล้วดูว่าแรงกดดันต่อคุณภาพขึ้นหรือลง (ภาพเชิงเปรียบเทียบ ไม่ใช่ตัวเลขจริง)
                 </p>
               </div>
             </div>
 
-            <span className={`text-xs px-2.5 py-1 rounded-xl font-bold border ${qualityStatus.bg} ${qualityStatus.color}`}>
-              {qualityStatus.text}
+            <span className={`text-xs px-2.5 py-1 rounded-xl font-bold border ${level.bg} ${level.color}`}>
+              {level.text}
             </span>
           </div>
 
@@ -822,7 +856,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
                 className="w-full accent-purple-500 cursor-pointer"
               />
               <span className="text-[10px] text-slate-400 block">
-                {costVal <= 1 ? 'เดฟทำงานคนเดียว' : costVal <= 3 ? 'ทีมขนาดกะทัดรัด' : 'ทีมใหญ่พร้อมผู้เชี่ยวชาญ'}
+                {costVal <= 1 ? 'เดฟทำงานคนเดียว' : costVal <= 3 ? 'ทีมขนาดกะทัดรัด' : 'ทีมใหญ่ขึ้น แต่ได้งานเพิ่มไม่มาก'}
               </span>
             </div>
           </div>
@@ -830,18 +864,29 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
           {/* Real-time Triangle Visual & Metrics */}
           <div className="p-4 rounded-2xl bg-slate-950 text-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4 border border-slate-800">
             <div className="space-y-1.5 text-xs text-center sm:text-left">
-              <div className="text-slate-400">อัตราความเสี่ยงการเกิดข้อผิดพลาด (Projected Defect Rate):</div>
-              <div className="text-2xl sm:text-3xl font-bold text-rose-400 flex items-center justify-center sm:justify-start gap-2">
-                <span>{defectRisk}%</span>
-                <span className="text-xs px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-normal">
-                  ดัชนีแรงดึง: {tension} pts
+              <div className="text-slate-400">แรงกดดันต่อคุณภาพ:</div>
+              <div className={`text-2xl sm:text-3xl font-bold flex items-center justify-center sm:justify-start gap-2 ${level.color}`}>
+                <span>{level.label}</span>
+                <span className="flex gap-1" aria-hidden="true">
+                  {PRESSURE_LEVELS.map((l, i) => (
+                    <span
+                      key={l.label}
+                      className="w-4 h-2 rounded-sm"
+                      style={{ backgroundColor: i <= levelIdx ? level.stroke : '#334155' }}
+                    />
+                  ))}
                 </span>
               </div>
               <p className="text-[11px] text-slate-400 max-w-md">
-                {defectRisk > 30 
-                  ? '⚠️ แรงดึงสูงเกินไป! หากอยากเปิดตัวเร็วในขณะที่ของเยอะ ต้องยอมเพิ่มคน หรืองดฟังก์ชันที่ไม่จำเป็น มิฉะนั้นจะเสียเงินแก้บั๊กแพงกว่าค่าทำระบบ' 
+                {isDanger 
+                  ? '⚠️ แรงกดดันสูงเกินไป ทางที่ได้ผลคือตัด Scope ที่ไม่จำเป็นหรือขยายเวลา การเติมคนกลางทางมักทำให้ช้าลง (Brooks\'s law) เพราะคนใหม่ต้องเรียนรู้และคนเดิมต้องเสียเวลาสอน' 
                   : '✅ อยู่ในเกณฑ์ที่ทีมสามารถควบคุมคุณภาพการเขียนโค้ดและทดสอบได้ครบถ้วน'}
               </p>
+              {costVal >= 4 && (
+                <p className="text-[11px] text-amber-300/90 max-w-md">
+                  💡 เพิ่มคนเกินจุดหนึ่งแทบไม่ได้งานเพิ่ม เพราะต้องประสานงานกันมากขึ้น
+                </p>
+              )}
             </div>
 
             {/* SVG Triangle Graphic */}
@@ -850,17 +895,17 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
                 {/* Triangle background */}
                 <polygon
                   points="50,10 90,80 10,80"
-                  fill={defectRisk > 30 ? 'rgba(244, 63, 94, 0.15)' : 'rgba(99, 102, 241, 0.15)'}
-                  stroke={defectRisk > 30 ? '#f43f5e' : '#6366f1'}
+                  fill={`${level.stroke}26`}
+                  stroke={level.stroke}
                   strokeWidth="2"
                   strokeLinejoin="round"
                 />
-                {/* Core Quality Circle */}
+                {/* Core Quality Circle: shrinks one step per pressure level */}
                 <circle
                   cx="50"
                   cy="55"
-                  r={Math.max(6, 18 - defectRisk / 3)}
-                  fill={defectRisk > 30 ? '#f43f5e' : '#10b981'}
+                  r={18 - levelIdx * 4}
+                  fill={level.core}
                   className="transition-all duration-300"
                 />
                 <text x="50" y="58" textAnchor="middle" fill="#ffffff" fontSize="6" fontWeight="bold">
