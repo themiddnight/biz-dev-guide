@@ -9,7 +9,6 @@ import {
   Briefcase, 
   Code2, 
   Users, 
-  Languages, 
   Award,
   Zap,
   Sun,
@@ -27,7 +26,6 @@ interface HeaderProps {
   experienceLevel: ExperienceLevel;
   setExperienceLevel: (level: ExperienceLevel) => void;
   userStats: UserStats;
-  togglePlainMode: () => void;
   theme?: 'light' | 'dark' | 'system';
   setTheme?: (theme: 'light' | 'dark' | 'system') => void;
 }
@@ -40,7 +38,6 @@ export const Header: React.FC<HeaderProps> = ({
   experienceLevel,
   setExperienceLevel,
   userStats,
-  togglePlainMode,
   theme = 'system',
   setTheme,
 }) => {
@@ -199,7 +196,7 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
         </nav>
 
-        {/* Controls: Experience Level, Role & Plain Language */}
+        {/* Controls: Experience Level & Role */}
         <div className="flex flex-wrap items-center gap-2 shrink-0 font-mono">
           {/* Experience Level Switcher (Beginner vs Experienced) */}
           <div 
@@ -276,21 +273,6 @@ export const Header: React.FC<HeaderProps> = ({
               <span>Both</span>
             </button>
           </div>
-
-          {/* Plain Metaphor Toggle Button */}
-          <button
-            onClick={togglePlainMode}
-            title="เปิด/ปิด คำอธิบายแบบภาษาบ้านๆ ทันที"
-            className={`flex items-center gap-1 px-2 py-1 rounded-[4px] text-xs font-mono font-medium border transition-colors cursor-pointer ${
-              userStats.plainModeEnabled
-                ? 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 border-neutral-900 dark:border-white'
-                : 'bg-neutral-100 dark:bg-[#141414] text-neutral-600 dark:text-[#a3a3a3] border-neutral-200 dark:border-[#262626] hover:text-neutral-900 dark:hover:text-white'
-            }`}
-          >
-            <Languages className="w-3 h-3" />
-            <span className="hidden sm:inline">Plain:</span>
-            <span>{userStats.plainModeEnabled ? 'ON' : 'OFF'}</span>
-          </button>
         </div>
       </div>
     </header>

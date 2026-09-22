@@ -12,7 +12,8 @@ import {
   Copy, 
   Check, 
   Lightbulb, 
-  RefreshCw 
+  RefreshCw,
+  WifiOff
 } from 'lucide-react';
 
 interface AIAssistantTabProps {
@@ -107,6 +108,10 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
     }
   };
 
+  // Source of the most recent server answer ('gemini' | 'fallback' | undefined before any answer).
+  const lastSource = [...messages].reverse().find((m) => m.role === 'assistant' && m.source)?.source;
+  const isOffline = lastSource !== undefined && lastSource !== 'gemini';
+
   const copyToClipboard = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
     setCopiedId(id);
@@ -115,12 +120,24 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
 
   return (
     <div className="max-w-4xl mx-auto space-y-5 sm:space-y-6 pb-16">
+      {isOffline && (
+        <div
+          role="status"
+          className="flex items-start gap-2.5 p-4 rounded-2xl border border-amber-300 dark:border-amber-500/40 bg-amber-50 dark:bg-amber-500/10 text-amber-900 dark:text-amber-200 text-xs sm:text-sm"
+        >
+          <WifiOff className="w-4 h-4 mt-0.5 shrink-0" aria-hidden="true" />
+          <p>
+            <strong className="font-semibold">โหมดออฟไลน์:</strong> ยังไม่ได้เชื่อมต่อ AI จริง คำตอบเป็นคำแนะนำทั่วไป
+          </p>
+        </div>
+      )}
+
       {/* Header Info */}
       <div className="bg-white dark:bg-[#141414] p-5 sm:p-6 rounded-2xl sm:rounded-3xl border border-neutral-200 dark:border-[#262626] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-2xs">
         <div className="space-y-1">
           <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-neutral-100 dark:bg-[#1f1f1f] text-neutral-800 dark:text-[#d4d4d4] text-[11px] sm:text-xs font-semibold border border-neutral-200 dark:border-[#333333]">
             <Sparkles className="w-3 h-3 text-amber-500" />
-            <span>AI Bridge Assistant Powered by Gemini</span>
+            <span>{lastSource === 'gemini' ? 'AI Bridge Assistant Powered by Gemini' : 'AI Bridge Assistant'}</span>
           </div>
           <h2 className="text-lg sm:text-2xl font-bold text-neutral-900 dark:text-[#fafafa]">
             ถาม AI เพิ่มเติม &amp; ปรึกษาสถานการณ์จริง
@@ -249,7 +266,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
                       {msg.source === 'gemini' ? (
                         <span className="text-amber-600 dark:text-amber-400 font-semibold">● Gemini Model</span>
                       ) : (
-                        <span>● Expert Assistant</span>
+                        <span>{msg.source ? '● โหมดออฟไลน์ (คำแนะนำทั่วไป)' : '● Expert Assistant'}</span>
                       )}
                       <span>• {msg.timestamp}</span>
                     </span>

@@ -105,12 +105,12 @@ export const GamificationTab: React.FC<GamificationTabProps> = ({
         <div className="p-3.5 sm:p-4 bg-white dark:bg-[#141414] rounded-xl sm:rounded-2xl border border-neutral-200 dark:border-[#262626] shadow-2xs space-y-1">
           <div className="flex items-center gap-1.5 text-neutral-500 dark:text-[#8e8e8e] text-xs font-medium">
             <BookOpen className="w-3.5 h-3.5 text-neutral-700 dark:text-[#a3a3a3]" />
-            <span>บทที่บันทึก/อ่าน</span>
+            <span>อ่านแล้ว</span>
           </div>
           <div className="text-xl sm:text-2xl font-extrabold text-neutral-900 dark:text-[#fafafa] font-mono">
-            {userStats.bookmarks.length}
+            {userStats.readChapters.length}/15
           </div>
-          <span className="text-[11px] text-neutral-400 dark:text-[#666666] font-mono">จากทั้งหมด 15 บท</span>
+          <span className="text-[11px] text-neutral-400 dark:text-[#666666] font-mono">บุ๊กมาร์ก {userStats.bookmarks.length}</span>
         </div>
 
         <div className="p-3.5 sm:p-4 bg-white dark:bg-[#141414] rounded-xl sm:rounded-2xl border border-neutral-200 dark:border-[#262626] shadow-2xs space-y-1">

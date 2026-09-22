@@ -80,7 +80,7 @@ export const FrictionFaqSection: React.FC<FrictionFaqSectionProps> = ({
       <div
         key={faq.id}
         id={faq.id}
-        className="scroll-mt-24 bg-white dark:bg-[#141414] rounded-xl border border-neutral-200 dark:border-[#262626] overflow-hidden"
+        className="anchor-target bg-white dark:bg-[#141414] rounded-xl border border-neutral-200 dark:border-[#262626] overflow-hidden"
       >
         <button
           type="button"

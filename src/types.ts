@@ -237,7 +237,6 @@ export interface UserStats {
   aiQuestionsAsked: number;
   readChapters: string[];
   bookmarks: string[];
-  plainModeEnabled: boolean;
 }
 
 export interface ChatMessage {

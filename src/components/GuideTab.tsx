@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Chapter, AudienceMode, ExperienceLevel } from '../types';
 import { ROLE_MINDSETS } from '../data/roleMindsets';
 import { FRICTION_PLAYBOOKS } from '../data/frictionPlaybooks';
@@ -59,7 +59,6 @@ interface GuideTabProps {
   experienceLevel?: ExperienceLevel;
   onExperienceLevelChange?: (lvl: ExperienceLevel) => void;
   onAudienceChange?: (mode: AudienceMode) => void;
-  plainModeEnabled: boolean;
   bookmarks: string[];
   readChapters?: string[];
   onToggleBookmark: (chapterId: string) => void;
@@ -75,7 +74,6 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   experienceLevel = 'beginner',
   onExperienceLevelChange,
   onAudienceChange,
-  plainModeEnabled,
   bookmarks,
   readChapters = [],
   onToggleBookmark,
@@ -94,6 +92,65 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   const [dilemmaAnswers, setDilemmaAnswers] = useState<Record<string, string>>({});
   const [glossaryCategory, setGlossaryCategory] = useState<GlossaryFilter>('all');
   const [glossaryQuery, setGlossaryQuery] = useState('');
+  const [pendingScrollId, setPendingScrollId] = useState<string | null>(null);
+  // Button that opened the index drawer, so focus can return to it on close (I-25).
+  const indexOpenerRef = useRef<HTMLElement | null>(null);
+
+  const openIndex = (event: React.MouseEvent<HTMLElement>) => {
+    indexOpenerRef.current = event.currentTarget;
+    setIsIndexOpen(true);
+  };
+
+  const closeIndex = () => {
+    setIsIndexOpen(false);
+    const opener = indexOpenerRef.current;
+    indexOpenerRef.current = null;
+    if (opener && document.contains(opener)) {
+      window.requestAnimationFrame(() => opener.focus());
+    }
+  };
+
+  // Esc closes the index drawer and returns focus to its opener.
+  useEffect(() => {
+    if (!isIndexOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        closeIndex();
+      }
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [isIndexOpen]);
+
+  // Publish the sticky app header height as --header-h so anchor targets clear it (I-18).
+  useEffect(() => {
+    const header = document.querySelector<HTMLElement>('header.sticky') ?? document.querySelector<HTMLElement>('header');
+    if (!header) return;
+    const root = document.documentElement;
+    const update = () => root.style.setProperty('--header-h', `${Math.ceil(header.getBoundingClientRect().height)}px`);
+    update();
+    if (typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(update);
+    observer.observe(header);
+    return () => observer.disconnect();
+  }, []);
+
+  // Deferred scroll: wait for the committed render + layout before scrolling to the target.
+  useEffect(() => {
+    if (!pendingScrollId) return;
+    let raf2 = 0;
+    const raf1 = window.requestAnimationFrame(() => {
+      raf2 = window.requestAnimationFrame(() => {
+        document.getElementById(pendingScrollId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setPendingScrollId(null);
+      });
+    });
+    return () => {
+      window.cancelAnimationFrame(raf1);
+      window.cancelAnimationFrame(raf2);
+    };
+  }, [pendingScrollId, activeChapterId]);
 
   // Accordion section states for the active chapter
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
@@ -180,16 +237,16 @@ export const GuideTab: React.FC<GuideTabProps> = ({
     }, 50);
   };
 
-  // s11 FAQ playbook link -> open (and navigate to) a chapter's friction playbook, then scroll to it
+  // s11 FAQ playbook link -> open (and navigate to) a chapter's friction playbook, then scroll to it.
+  // The scroll runs after the new chapter has rendered (see pendingScrollId effect) so it lands
+  // on the playbook heading instead of a position computed from the previous chapter's layout.
   const handleScrollToPlaybook = (chapterId: string) => {
     setOpenSections(prev => ({ ...prev, friction: true }));
     if (chapterId !== activeChapterId) {
       setActiveChapterId(chapterId);
       setIsIndexOpen(false);
     }
-    window.setTimeout(() => {
-      document.getElementById('friction-playbook-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 50);
+    setPendingScrollId('friction-playbook-card');
   };
 
   const toggleSection = (sectionKey: string) => {
@@ -279,7 +336,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
           <div className="flex flex-wrap items-center gap-2 shrink-0">
             {/* Open Table of Contents Button */}
             <button
-              onClick={() => setIsIndexOpen(true)}
+              onClick={openIndex}
               className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:hover:bg-neutral-200 dark:text-[#0a0a0a] text-xs sm:text-sm font-semibold shadow-xs transition-all cursor-pointer"
             >
               <List className="w-4 h-4" />
@@ -455,7 +512,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
 
               {/* Mobile Table of Contents Toggle */}
               <button
-                onClick={() => setIsIndexOpen(true)}
+                onClick={openIndex}
                 className="lg:hidden px-3 py-2 rounded-xl bg-neutral-100 dark:bg-[#1f1f1f] hover:bg-neutral-200 text-neutral-700 dark:text-[#d4d4d4] text-xs font-semibold flex items-center gap-1.5 cursor-pointer font-mono"
               >
                 <List className="w-3.5 h-3.5" />
@@ -1093,7 +1150,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                     <>
                     <div
                       id={S5_JUMP_TARGET_IDS.c4}
-                      className="scroll-mt-4 mt-4 p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] space-y-3"
+                      className="anchor-target mt-4 p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] space-y-3"
                     >
                       <div className="flex items-center justify-between flex-wrap gap-2">
                         <h4 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa] flex items-center gap-2">
@@ -1611,7 +1668,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                 </p>
               </div>
               <button
-                onClick={() => setIsIndexOpen(false)}
+                onClick={closeIndex}
                 className="p-2 rounded-xl text-neutral-400 hover:text-neutral-700 dark:hover:text-[#fafafa] hover:bg-neutral-100 dark:hover:bg-[#1f1f1f] cursor-pointer"
               >
                 <X className="w-5 h-5" />
@@ -1717,7 +1774,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
             <div className="p-4 border-t border-neutral-200 dark:border-[#262626] bg-neutral-50 dark:bg-[#181818] flex items-center justify-between text-xs">
               <span className="text-neutral-500 dark:text-[#8e8e8e] font-mono text-[11px]">สะสม XP จากการอ่านและการทำควิซ</span>
               <button
-                onClick={() => setIsIndexOpen(false)}
+                onClick={closeIndex}
                 className="px-4 py-2 bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] font-semibold rounded-xl cursor-pointer"
               >
                 ปิดสารบัญ
