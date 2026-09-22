@@ -22,6 +22,9 @@ import type { RequestedSection } from '../lib/chapterRoute';
 import { LayerGroupView } from './guide/LayerGroup';
 import { ChapterHero } from './guide/ChapterHero';
 import { SectionOutline } from './guide/SectionOutline';
+import { TrackPanel } from './guide/TrackPanel';
+import { TrackNextCard, TrackEndCard } from './guide/TrackFooter';
+import { getTrackNext, resolveTrack } from '../data/readingTracks';
 import { 
   Search, 
   Bookmark, 
@@ -193,6 +196,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
     el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
   const isCurrentRead = readChapters.includes(activeChapter.id);
+  const trackNext = getTrackNext(resolveTrack(experienceLevel, chapters), activeChapter.id);
 
   // Scroll to top when active chapter changes
   const handleSelectChapter = (chapterId: string) => {
@@ -353,6 +357,10 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                 บทที่ {activeIndex + 1}/{chapters.length}
               </span>
             </div>
+
+            <TrackPanel chapters={chapters} experienceLevel={experienceLevel} readChapters={readChapters} activeChapterId={activeChapterId} onSelectChapter={handleSelectChapter} onStartQuiz={onStartQuiz} />
+
+            <h3 data-all-chapters-heading className="text-xs font-bold text-neutral-500 dark:text-[#8e8e8e] font-mono">ทุกบท ({chapters.length})</h3>
 
             {/* Quick Search in Index */}
             <div className="relative">
@@ -639,14 +647,19 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                   <button
                     onClick={() => {
                       onToggleReadChapter(activeChapter.id);
-                      if (nextChapter) {
-                        handleSelectChapter(nextChapter.id);
-                      }
+                      if (trackNext.kind === 'next') handleSelectChapter(trackNext.chapterId);
+                      else if (trackNext.kind === 'not-in-track' && nextChapter) handleSelectChapter(nextChapter.id);
                     }}
                     className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer font-mono"
                   >
                     <CheckCircle2 className="w-4 h-4" />
-                    <span>อ่านจบแล้ว! ไปบทถัดไป (+30 XP)</span>
+                    <span>
+                      {trackNext.kind === 'next'
+                        ? 'อ่านจบแล้ว! ไปบทถัดไปใน track (+30 XP)'
+                        : trackNext.kind === 'end'
+                        ? 'อ่านจบแล้ว! (+30 XP)'
+                        : 'อ่านจบแล้ว! ไปบทถัดไป (+30 XP)'}
+                    </span>
                   </button>
                 )}
               </div>
@@ -668,19 +681,25 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                   </button>
                 ) : <div />}
 
-                {nextChapter && (
-                  <button
-                    onClick={() => handleSelectChapter(nextChapter.id)}
-                    className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-neutral-200 dark:border-[#262626] hover:border-neutral-400 dark:hover:border-[#404040] text-right transition-all cursor-pointer bg-neutral-50/70 dark:bg-[#181818] group"
-                  >
-                    <div className="flex items-center justify-end gap-1 text-[11px] text-neutral-900 dark:text-white font-semibold font-mono">
-                      <span>บทถัดไป</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </div>
-                    <div className="font-bold text-xs sm:text-sm text-neutral-900 dark:text-[#fafafa] mt-1 truncate">
-                      บทที่ {nextChapter.num}: {nextChapter.title}
-                    </div>
-                  </button>
+                {trackNext.kind === 'next' ? (
+                  <TrackNextCard next={trackNext} chapters={chapters} onSelectChapter={handleSelectChapter} />
+                ) : trackNext.kind === 'end' ? (
+                  <TrackEndCard experienceLevel={experienceLevel} onStartQuiz={onStartQuiz} onOpenIndex={openIndex} />
+                ) : (
+                  nextChapter && (
+                    <button
+                      onClick={() => handleSelectChapter(nextChapter.id)}
+                      className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-neutral-200 dark:border-[#262626] hover:border-neutral-400 dark:hover:border-[#404040] text-right transition-all cursor-pointer bg-neutral-50/70 dark:bg-[#181818] group"
+                    >
+                      <div className="flex items-center justify-end gap-1 text-[11px] text-neutral-900 dark:text-white font-semibold font-mono">
+                        <span>บทถัดไป</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </div>
+                      <div className="font-bold text-xs sm:text-sm text-neutral-900 dark:text-[#fafafa] mt-1 truncate">
+                        บทที่ {nextChapter.num}: {nextChapter.title}
+                      </div>
+                    </button>
+                  )
                 )}
               </div>
             </div>
@@ -715,6 +734,10 @@ export const GuideTab: React.FC<GuideTabProps> = ({
 
             {/* Drawer Search & Filter */}
             <div className="p-4 border-b border-neutral-100 dark:border-[#262626] space-y-3 bg-neutral-50 dark:bg-[#181818]">
+              <TrackPanel chapters={chapters} experienceLevel={experienceLevel} readChapters={readChapters} activeChapterId={activeChapterId} onSelectChapter={handleSelectChapter} onStartQuiz={onStartQuiz} />
+
+              <h3 data-all-chapters-heading className="text-xs font-bold text-neutral-500 dark:text-[#8e8e8e] font-mono">ทุกบท ({chapters.length})</h3>
+
               <div className="relative">
                 <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-[#737373]" />
                 <input
