@@ -1,5 +1,7 @@
 import type React from 'react';
 import type { FigureKey } from '../../types';
+import { ConeOfUncertainty } from './ConeOfUncertainty';
+import { TechDebtQuadrant } from './TechDebtQuadrant';
 
 /**
  * Registry of static figures ported from the original HTML guide (SVG -> JSX).
@@ -16,4 +18,7 @@ export interface FigureProps {
   className?: string;
 }
 
-export const FIGURES: Record<FigureKey, React.FC<FigureProps>> = {};
+export const FIGURES: Record<FigureKey, React.FC<FigureProps>> = {
+  'tech-debt-quadrant': TechDebtQuadrant,
+  'cone-of-uncertainty': ConeOfUncertainty,
+};

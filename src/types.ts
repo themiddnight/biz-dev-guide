@@ -12,10 +12,9 @@ export type RichText = string;
  * Keys of the static-figure registry (`src/components/figures/index.ts`).
  * Each workstream that ports a figure adds its key here together with the
  * component, so `FIGURES` stays an exhaustive `Record<FigureKey, …>`.
- * Planned: s5 family/C4/refund figures (spec §3.3), s11 `tech-debt-quadrant`
- * and `cone-of-uncertainty` (spec §5.3).
+ * Planned: s5 family/C4/refund figures (spec §3.3).
  */
-export type FigureKey = never;
+export type FigureKey = 'tech-debt-quadrant' | 'cone-of-uncertainty';
 
 export interface TableColumn {
   key: string;
