@@ -1,7 +1,7 @@
 # Spec: Concise, scannable Thai copy
 
 - Date: 2026-09-22
-- Status: Draft — awaiting owner review
+- Status: Approved; pilot s1 done (owner decisions recorded in R1a, R6, R8, R9)
 - Branch: `copy/concise-rewrite` (from `fix/ux-test-quick-fixes` @ `3f0081b`)
 - Supersedes, for chapter titles only: the "English only in parentheses after the Thai label" rule in `2026-09-22-layers-and-tracks.md`. UI chrome labels keep that rule.
 
@@ -23,7 +23,17 @@
 
 **R5 — Banned fillers:** ทำความเข้าใจ, หัวใจของ, กฎเหล็ก, ศิลปะการ…, ทำการ…, ในการ… (when removable), ซึ่ง… (when a new sentence works), passive ถูก… (when active works), อย่างไร at the end of a title.
 
-**R6 — Numbers.** Keep figures from real, attributable cases (e.g. Knight Capital $440M). Replace unsourced precise figures with an honest magnitude word ("หายไปเยอะ", "เกือบทั้งหมด") or delete them.
+**R6 — Numbers.** Keep figures from real, attributable cases (e.g. Knight Capital $440M). Story parameters inside fictional scenarios (200,000 fans, 40% of customers) may stay; a scenario that reads like a real event should say it is illustrative. Replace unsourced precise figures with an honest magnitude word ("หายไปเยอะ", "เกือบทั้งหมด") or delete them.
+
+**R1a — Cut clauses, not connectors.** Keep `ส่วน`, `พอ`, `กลับ`, `แต่` and list commas. The pilot showed that dropping them causes most segmentation ambiguity (e.g. `Output คือของที่ทีมส่งมอบ Outcome คือ…` reads as "the team delivers the Outcome"). Watch `เลย`/`พอ` right after a number or noun, where they can bind either way (`ไม่ถามทีม Dev เลยต้องทำโอที`).
+
+**R8 — Canonical terms (site-wide).**
+- Use `Dev` for the person in speech and in meeting examples. Use `ทีม Engineering` for the function. Don't use โปรแกรมเมอร์, วิศวกร or Developer as synonyms.
+- Write `Sprint`, not สปรินต์ (R3).
+
+**R9 — Jargon cards.**
+- A `meetingExample` must contain the term itself.
+- Keep `formalDefinition` whenever `humanTranslation` alone would misdefine the term. Example: Hand-off is neutral; "throwing work over the wall" is only its bad form.
 
 **R7 — Thai readability** (checked by the reviewer, §7):
 - (a) No segmentation ambiguity. Example: `ความต้องการรั่วระหว่างทาง` reads as `ความต้องการ|รั่ว` or `ความ|ต้องการรั่ว`. Fix it with a clear subject + verb or a different word (`โจทย์เพี้ยนระหว่างทาง`).
