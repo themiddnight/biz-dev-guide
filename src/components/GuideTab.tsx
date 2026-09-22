@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Chapter, AudienceMode, ExperienceLevel } from '../types';
-import { ROLE_MINDSETS } from '../data/roleMindsets';
-import { FRICTION_PLAYBOOKS } from '../data/frictionPlaybooks';
 import { S5_JUMP_TARGET_IDS, DiagramJumpTarget } from '../data/diagramFamilies';
 import { GlossaryFilter } from './glossary/GlossaryPanel';
 import { GLOSSARY, GlossaryCategory } from '../data/glossary';
@@ -36,25 +34,13 @@ import {
   ChevronRight,
   ChevronLeft,
   CheckCircle2,
-  Workflow,
-  BookOpen,
   List,
   X,
   ArrowLeft,
   ArrowRight,
   GraduationCap,
-  MessageSquare,
   Check,
-  Share2,
-  SlidersHorizontal,
-  Briefcase,
-  Code2,
-  Users,
-  Handshake,
-  Sprout,
-  Scale,
-  Flame,
-  Zap
+  SlidersHorizontal
 } from 'lucide-react';
 
 interface GuideTabProps {
