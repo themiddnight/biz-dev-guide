@@ -61,8 +61,10 @@ export default function App() {
   const [chapterLevelsByRole, setChapterLevelsByRole] = useState(levelsInit.byRole);
   useEffect(() => {
     if (!levelsInit.migrated) return;
-    writeStorage('be_guide_chapter_levels_by_role', JSON.stringify(levelsInit.byRole));
-    removeStorage('be_guide_chapter_levels');
+    const json = JSON.stringify(levelsInit.byRole);
+    writeStorage('be_guide_chapter_levels_by_role', json);
+    // Drop the legacy key only once the new one is really stored (a full quota fails silently).
+    if (readStorage('be_guide_chapter_levels_by_role') === json) removeStorage('be_guide_chapter_levels');
   }, [levelsInit]);
   const chapterLevels = chapterLevelsFor(chapterLevelsByRole, role);
   const levelInputs: LevelInputs = { role, baseLevel: experienceLevel, levelMode, chapterLevels };

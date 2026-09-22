@@ -6,7 +6,9 @@ import type { SectionProps } from './registry';
 
 export const CoreConceptsSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggle, ctx }) => {
   // Beginners see each concept compact (heading + detail); bullets and inline sections sit behind a toggle.
-  const [moreOpen, setMoreOpen] = useState<Record<number, boolean>>({});
+  // Toggles are keyed by concept index, so they belong to one chapter and reset when it changes.
+  const [more, setMore] = useState<{ chapterId: string; open: Record<number, boolean> }>({ chapterId: chapter.id, open: {} });
+  const moreOpen = more.chapterId === chapter.id ? more.open : {};
   if (!chapter.coreConcepts || chapter.coreConcepts.length === 0) return null;
   const compact = ctx.chapterLevel === 'beginner';
   return (
@@ -55,8 +57,8 @@ export const CoreConceptsSection: React.FC<SectionProps> = ({ chapter, isOpen, o
                     type="button"
                     data-concept-more={cIdx}
                     aria-expanded={!!moreOpen[cIdx]}
-                    onClick={() => setMoreOpen(prev => ({ ...prev, [cIdx]: !prev[cIdx] }))}
-                    className="ml-3 inline-flex items-center gap-1 text-[11px] sm:text-xs font-semibold text-neutral-700 dark:text-[#d4d4d4] underline underline-offset-2 hover:text-neutral-900 dark:hover:text-white cursor-pointer"
+                    onClick={() => setMore({ chapterId: chapter.id, open: { ...moreOpen, [cIdx]: !moreOpen[cIdx] } })}
+                    className="ml-3 -my-3.5 py-3.5 sm:my-0 sm:py-0 inline-flex items-center gap-1 text-[11px] sm:text-xs font-semibold text-neutral-700 dark:text-[#d4d4d4] underline underline-offset-2 hover:text-neutral-900 dark:hover:text-white cursor-pointer"
                   >
                     {moreOpen[cIdx] ? 'ซ่อนรายละเอียด' : bulletCount > 0 ? `ดูรายละเอียด (${bulletCount} ข้อ)` : 'ดูรายละเอียด'}
                   </button>
