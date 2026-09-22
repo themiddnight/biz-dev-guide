@@ -6,6 +6,9 @@ import { ChapterDiagram } from './ChapterDiagram';
 import { RoleMindsetCard } from './RoleMindsetCard';
 import { FrictionPlaybookCard } from './FrictionPlaybookCard';
 import { ContentBlocks } from './content/ContentBlocks';
+import { GlossaryPanel, GlossaryFilter } from './glossary/GlossaryPanel';
+import { GlossaryCategoryMap } from './glossary/GlossaryCategoryMap';
+import { GLOSSARY, GlossaryCategory } from '../data/glossary';
 import { 
   Search, 
   Bookmark, 
@@ -86,6 +89,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   const [expandedFaqId, setExpandedFaqId] = useState<number | null>(1);
   const [mindsetSubTab, setMindsetSubTab] = useState<'business' | 'engineer'>('business');
   const [dilemmaAnswers, setDilemmaAnswers] = useState<Record<string, string>>({});
+  const [glossaryCategory, setGlossaryCategory] = useState<GlossaryFilter>('all');
 
   // Accordion section states for the active chapter
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
@@ -98,6 +102,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
     examples: true,
     coreConcepts: true,
     reference: true,
+    glossary: true,
     workflow: false,
     pitfalls: experienceLevel === 'experienced',
     checklist: false,
@@ -139,6 +144,15 @@ export const GuideTab: React.FC<GuideTabProps> = ({
     setActiveChapterId(chapterId);
     setIsIndexOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Category map tile (s15 diagram) -> filter the glossary panel and scroll to it
+  const handleSelectGlossaryCategory = (category: GlossaryCategory) => {
+    setGlossaryCategory(category);
+    setOpenSections(prev => ({ ...prev, glossary: true }));
+    window.setTimeout(() => {
+      document.getElementById('glossary-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
   };
 
   const toggleSection = (sectionKey: string) => {
@@ -192,7 +206,8 @@ export const GuideTab: React.FC<GuideTabProps> = ({
       ch.subtitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
       ch.keyTakeaway.toLowerCase().includes(searchQuery.toLowerCase()) ||
       ch.plainAnalogy.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (ch.jargonList && ch.jargonList.some(j => j.term.toLowerCase().includes(searchQuery.toLowerCase())));
+      (ch.jargonList && ch.jargonList.some(j => j.term.toLowerCase().includes(searchQuery.toLowerCase()))) ||
+      (ch.id === 's15' && GLOSSARY.some(g => g.term.toLowerCase().includes(searchQuery.toLowerCase())));
 
     const matchesRole = 
       selectedRole === 'all' || 
@@ -238,6 +253,15 @@ export const GuideTab: React.FC<GuideTabProps> = ({
             >
               <GraduationCap className="w-4 h-4 text-amber-500" />
               <span>ทำควิซสะสม XP</span>
+            </button>
+
+            {/* Quick jump to the glossary (chapter 15) */}
+            <button
+              onClick={() => handleSelectChapter('s15')}
+              className="inline-flex items-center gap-2 px-3 sm:px-3.5 py-2 sm:py-2.5 rounded-xl bg-neutral-100 dark:bg-[#1a1a1a] border border-neutral-200 dark:border-[#262626] text-neutral-700 dark:text-[#d4d4d4] text-xs sm:text-sm font-medium hover:bg-neutral-200/70 dark:hover:bg-[#222222] transition-all cursor-pointer"
+            >
+              <span aria-hidden="true">📖</span>
+              <span>Glossary</span>
             </button>
           </div>
         </div>
@@ -559,6 +583,44 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                   : '⚡ โหมด Experienced: เน้นกลยุทธ์รับมือข้อขัดแย้ง (Friction Playbook) ตาราง Trade-off ในการต่อรอง และสคริปต์พูดจริงในห้องประชุม'}
               </p>
             </div>
+
+            {/* GLOSSARY (chapter 15 only): searchable, filterable term library */}
+            {activeChapter.id === 's15' && (
+              <div className="border border-neutral-200 dark:border-[#262626] rounded-2xl overflow-hidden bg-white dark:bg-[#141414] shadow-2xs">
+                <button
+                  onClick={() => toggleSection('glossary')}
+                  aria-expanded={!!openSections.glossary}
+                  className="w-full p-3.5 sm:p-4.5 flex items-center justify-between bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f] text-left cursor-pointer select-none transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-7 h-7 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
+                      📖
+                    </div>
+                    <div>
+                      <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
+                        คลังคำศัพท์ (Glossary)
+                      </h3>
+                      <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e]">
+                        ค้นหาและกรองศัพท์ทั้งหมด {GLOSSARY.length} คำ ตามหมวด
+                      </p>
+                    </div>
+                  </div>
+                  {openSections.glossary ? <ChevronUp className="w-4 h-4 text-neutral-600 dark:text-[#a3a3a3]" /> : <ChevronDown className="w-4 h-4 text-neutral-400 dark:text-[#737373]" />}
+                </button>
+
+                {openSections.glossary && (
+                  <div className="p-3.5 sm:p-5 border-t border-neutral-100 dark:border-[#262626] bg-white dark:bg-[#141414]">
+                    <GlossaryPanel
+                      terms={GLOSSARY}
+                      chapters={chapters}
+                      onNavigateChapter={handleSelectChapter}
+                      category={glossaryCategory}
+                      onCategoryChange={setGlossaryCategory}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* ADAPTIVE SECTION RENDERING: Beginner vs Experienced ordering */}
             {experienceLevel === 'experienced' ? (
@@ -952,7 +1014,15 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                   )}
 
                   {/* Interactive Chapter Diagram Simulator */}
-                  <ChapterDiagram chapterId={activeChapter.id} />
+                  {activeChapter.id === 's15' ? (
+                    <GlossaryCategoryMap
+                      terms={GLOSSARY}
+                      activeCategory={glossaryCategory}
+                      onSelectCategory={handleSelectGlossaryCategory}
+                    />
+                  ) : (
+                    <ChapterDiagram chapterId={activeChapter.id} />
+                  )}
 
                   {/* Restored static-guide blocks placed inside the diagram section */}
                   {activeChapter.contentSections && (
