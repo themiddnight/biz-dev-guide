@@ -348,7 +348,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
         </div>
 
         {/* Global Progress Bar */}
-        <div className="mt-4 pt-3.5 border-t border-neutral-100 dark:border-[#262626] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs font-mono">
+        <div className="mt-4 pt-3.5 border-t border-neutral-100 dark:border-[#262626] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs">
           <div className="flex items-center gap-2 text-neutral-600 dark:text-[#a3a3a3] font-medium text-[11px] sm:text-xs">
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
             <span>ความคืบหน้าการอ่าน: อ่านจบแล้ว {readChapters.length} จาก {chapters.length} บท ({percentCompleted}%)</span>
@@ -374,14 +374,14 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                 <List className="w-4 h-4 text-neutral-900 dark:text-white" />
                 <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">สารบัญบทเรียน (15 บท)</h3>
               </div>
-              <span className="text-[11px] font-semibold text-neutral-500 dark:text-[#8e8e8e] font-mono">
+              <span className="text-[11px] font-semibold text-neutral-500 dark:text-[#8e8e8e]">
                 บทที่ {activeIndex + 1}/{chapters.length}
               </span>
             </div>
 
             <TrackPanel chapters={chapters} experienceLevel={experienceLevel} readChapters={readChapters} activeChapterId={activeChapterId} onSelectChapter={handleSelectChapter} onStartQuiz={onStartQuiz} />
 
-            <h3 data-all-chapters-heading className="text-xs font-bold text-neutral-500 dark:text-[#8e8e8e] font-mono">ทุกบท ({chapters.length})</h3>
+            <h3 data-all-chapters-heading className="text-xs font-bold text-neutral-500 dark:text-[#8e8e8e]">ทุกบท ({chapters.length})</h3>
 
             {/* Quick Search in Index */}
             <div className="relative">
@@ -438,7 +438,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                         : 'bg-neutral-50/50 dark:bg-[#141414]/60 border-neutral-200/60 dark:border-[#262626] hover:border-neutral-300 dark:hover:border-[#333333] hover:bg-neutral-100/70 dark:hover:bg-[#1a1a1a]'
                     }`}
                   >
-                    <div className={`w-6 h-6 rounded-lg text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 font-mono ${
+                    <div className={`w-6 h-6 rounded-lg text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 ${
                       isActive
                         ? 'bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] shadow-xs'
                         : isRead
@@ -461,7 +461,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                           <BookmarkCheck className="w-3.5 h-3.5 text-amber-500 shrink-0" />
                         )}
                       </div>
-                      <div className="flex items-center gap-1.5 mt-0.5 text-[10px] text-neutral-500 dark:text-[#737373] font-mono">
+                      <div className="flex items-center gap-1.5 mt-0.5 text-[10px] text-neutral-500 dark:text-[#737373]">
                         <span className="uppercase font-semibold">{chapter.roleTag}</span>
                         <span>•</span>
                         <span>{chapter.readTime}</span>
@@ -511,7 +511,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
               {/* Mobile Table of Contents Toggle */}
               <button
                 onClick={openIndex}
-                className="lg:hidden px-3 py-2 rounded-xl bg-neutral-100 dark:bg-[#1f1f1f] hover:bg-neutral-200 text-neutral-700 dark:text-[#d4d4d4] text-xs font-semibold flex items-center gap-1.5 cursor-pointer font-mono"
+                className="lg:hidden px-3 py-2 rounded-xl bg-neutral-100 dark:bg-[#1f1f1f] hover:bg-neutral-200 text-neutral-700 dark:text-[#d4d4d4] text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
               >
                 <List className="w-3.5 h-3.5" />
                 <span>สารบัญ ({activeChapter.num}/15)</span>
@@ -519,7 +519,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
 
               {/* Current Chapter Indicator on Desktop */}
               <div className="hidden lg:flex items-center gap-2 pl-2">
-                <span className="px-2.5 py-1 rounded-lg bg-neutral-100 dark:bg-[#1f1f1f] text-neutral-800 dark:text-[#d4d4d4] text-xs font-bold border border-neutral-200 dark:border-[#333333] font-mono">
+                <span className="px-2.5 py-1 rounded-lg bg-neutral-100 dark:bg-[#1f1f1f] text-neutral-800 dark:text-[#d4d4d4] text-xs font-bold border border-neutral-200 dark:border-[#333333]">
                   บทที่ {activeChapter.num} จาก {chapters.length}
                 </span>
                 <span className="text-xs text-neutral-600 dark:text-[#8e8e8e] font-medium truncate max-w-[200px]">
@@ -585,7 +585,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
             <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-2 sm:space-y-2.5">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div className="flex items-center gap-1.5 flex-wrap">
-                  <span className="text-xs font-bold text-neutral-800 dark:text-[#e5e5e5] flex items-center gap-1.5 font-mono">
+                  <span className="text-xs font-bold text-neutral-800 dark:text-[#e5e5e5] flex items-center gap-1.5">
                     <SlidersHorizontal className="w-3.5 h-3.5 text-neutral-600 dark:text-[#a3a3a3]" />
                     <span>Active Mode:</span>
                   </span>
@@ -676,7 +676,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                       if (trackNext.kind === 'next') handleSelectChapter(trackNext.chapterId);
                       else if (trackNext.kind === 'not-in-track' && nextChapter) handleSelectChapter(nextChapter.id);
                     }}
-                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer font-mono"
+                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer"
                   >
                     <CheckCircle2 className="w-4 h-4" />
                     <span>
@@ -697,7 +697,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                     onClick={() => handleSelectChapter(prevChapter.id)}
                     className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-neutral-200 dark:border-[#262626] hover:border-neutral-400 dark:hover:border-[#404040] text-left transition-all cursor-pointer bg-neutral-50/70 dark:bg-[#181818] group"
                   >
-                    <div className="flex items-center gap-1 text-[11px] text-neutral-500 dark:text-[#737373] group-hover:text-neutral-900 dark:group-hover:text-white transition-colors font-mono">
+                    <div className="flex items-center gap-1 text-[11px] text-neutral-500 dark:text-[#737373] group-hover:text-neutral-900 dark:group-hover:text-white transition-colors">
                       <ArrowLeft className="w-3.5 h-3.5" />
                       <span>บทก่อนหน้า</span>
                     </div>
@@ -717,7 +717,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                       onClick={() => handleSelectChapter(nextChapter.id)}
                       className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-neutral-200 dark:border-[#262626] hover:border-neutral-400 dark:hover:border-[#404040] text-right transition-all cursor-pointer bg-neutral-50/70 dark:bg-[#181818] group"
                     >
-                      <div className="flex items-center justify-end gap-1 text-[11px] text-neutral-900 dark:text-white font-semibold font-mono">
+                      <div className="flex items-center justify-end gap-1 text-[11px] text-neutral-900 dark:text-white font-semibold">
                         <span>บทถัดไป</span>
                         <ArrowRight className="w-3.5 h-3.5" />
                       </div>
@@ -746,7 +746,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                   <List className="w-4 h-4 text-neutral-600 dark:text-[#a3a3a3]" />
                   <span>สารบัญทั้ง 15 บท</span>
                 </h3>
-                <p className="text-xs text-neutral-500 dark:text-[#8e8e8e] mt-0.5 font-mono">
+                <p className="text-xs text-neutral-500 dark:text-[#8e8e8e] mt-0.5">
                   อ่านแล้ว {readChapters.length}/{chapters.length} บท • เลือกเพื่อกระโดดข้ามทันที
                 </p>
               </div>
@@ -762,7 +762,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
             <div className="p-4 border-b border-neutral-100 dark:border-[#262626] space-y-3 bg-neutral-50 dark:bg-[#181818]">
               <TrackPanel chapters={chapters} experienceLevel={experienceLevel} readChapters={readChapters} activeChapterId={activeChapterId} onSelectChapter={handleSelectChapter} onStartQuiz={onStartQuiz} />
 
-              <h3 data-all-chapters-heading className="text-xs font-bold text-neutral-500 dark:text-[#8e8e8e] font-mono">ทุกบท ({chapters.length})</h3>
+              <h3 data-all-chapters-heading className="text-xs font-bold text-neutral-500 dark:text-[#8e8e8e]">ทุกบท ({chapters.length})</h3>
 
               <div className="relative">
                 <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-[#737373]" />
@@ -789,7 +789,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                   <button
                     key={role.id}
                     onClick={() => setSelectedRole(role.id)}
-                    className={`px-3 py-1 rounded-lg font-medium whitespace-nowrap transition-all cursor-pointer font-mono text-[11px] ${
+                    className={`px-3 py-1 rounded-lg font-medium whitespace-nowrap transition-all cursor-pointer text-[11px] ${
                       selectedRole === role.id
                         ? 'bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] font-bold'
                         : 'bg-neutral-200/80 dark:bg-[#262626] text-neutral-700 dark:text-[#a3a3a3] hover:bg-neutral-300 dark:hover:bg-[#333333]'
@@ -818,7 +818,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                         : 'hover:bg-neutral-50 dark:hover:bg-[#181818]'
                     }`}
                   >
-                    <div className={`w-7 h-7 rounded-lg text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 font-mono ${
+                    <div className={`w-7 h-7 rounded-lg text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 ${
                       isActive
                         ? 'bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a]'
                         : isRead
@@ -842,7 +842,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                       <p className="text-[11px] text-neutral-500 dark:text-[#8e8e8e] line-clamp-1 font-normal">
                         {chapter.subtitle}
                       </p>
-                      <div className="flex items-center gap-2 pt-1 text-[10px] text-neutral-500 dark:text-[#737373] font-normal font-mono">
+                      <div className="flex items-center gap-2 pt-1 text-[10px] text-neutral-500 dark:text-[#737373] font-normal">
                         <span className="px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-[#262626] uppercase text-neutral-700 dark:text-[#a3a3a3]">
                           {chapter.roleTag}
                         </span>
@@ -859,7 +859,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
 
             {/* Drawer Footer */}
             <div className="p-4 border-t border-neutral-200 dark:border-[#262626] bg-neutral-50 dark:bg-[#181818] flex items-center justify-between text-xs">
-              <span className="text-neutral-500 dark:text-[#8e8e8e] font-mono text-[11px]">สะสม XP จากการอ่านและการทำควิซ</span>
+              <span className="text-neutral-500 dark:text-[#8e8e8e] text-[11px]">สะสม XP จากการอ่านและการทำควิซ</span>
               <button
                 onClick={closeIndex}
                 className="px-4 py-2 bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] font-semibold rounded-xl cursor-pointer"

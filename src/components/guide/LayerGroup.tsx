@@ -20,7 +20,7 @@ export const LayerGroupView: React.FC<LayerGroupViewProps> = ({ group, isExpande
       >
         <span className="text-sm sm:text-base font-extrabold text-neutral-900 dark:text-[#fafafa]">
           {LAYER_META[group.layer].name}
-          <span className="ml-2 text-xs font-medium text-neutral-500 dark:text-[#8e8e8e] font-mono">
+          <span className="ml-2 text-xs font-medium text-neutral-500 dark:text-[#8e8e8e]">
             · {group.sections.length} หัวข้อ · ≈ {group.minutes} นาที
           </span>
         </span>

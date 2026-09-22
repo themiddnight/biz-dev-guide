@@ -14,7 +14,7 @@ export const TrackNextCard: React.FC<{
   if (!chapter) return null;
   return (
     <button type="button" data-track-next={chapter.id} onClick={() => onSelectChapter(chapter.id)} className={`${cardClass} hover:border-neutral-400 dark:hover:border-[#404040] transition-all cursor-pointer group`}>
-      <div className="flex items-center justify-end gap-1 text-[11px] text-neutral-900 dark:text-white font-semibold font-mono">
+      <div className="flex items-center justify-end gap-1 text-[11px] text-neutral-900 dark:text-white font-semibold">
         <span>บทถัดไปใน track</span>
         <ArrowRight className="w-3.5 h-3.5" />
       </div>

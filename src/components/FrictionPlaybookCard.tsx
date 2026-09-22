@@ -194,7 +194,7 @@ export const FrictionPlaybookCard: React.FC<FrictionPlaybookCardProps> = ({
             <div className="overflow-x-auto -mx-1 sm:mx-0">
               <table className="w-full text-left border-collapse min-w-[500px]">
                 <thead>
-                  <tr className="border-b border-neutral-200 dark:border-[#262626] bg-neutral-50 dark:bg-[#1a1a1a] text-[10px] sm:text-[11px] font-bold text-neutral-600 dark:text-[#a3a3a3] uppercase tracking-wider font-mono">
+                  <tr className="border-b border-neutral-200 dark:border-[#262626] bg-neutral-50 dark:bg-[#1a1a1a] text-[10px] sm:text-[11px] font-bold text-neutral-600 dark:text-[#a3a3a3] uppercase tracking-wider">
                     <th className="py-2 px-2.5 sm:px-3">ถ้าคุณต้องการ (Need)</th>
                     <th className="py-2 px-2.5 sm:px-3">คุณต้องยอมแลกด้วย (Sacrifice)</th>
                     <th className="py-2 px-2.5 sm:px-3">ประโยคเสนอดีลเจรจา (How to Negotiate)</th>
@@ -270,7 +270,7 @@ export const FrictionPlaybookCard: React.FC<FrictionPlaybookCardProps> = ({
                   <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-500" />
                   <span>จำลองสถานการณ์จริงในห้องประชุม (Meeting Dilemma)</span>
                 </div>
-                <span className="text-[10px] sm:text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/25 font-mono">
+                <span className="text-[10px] sm:text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/25">
                   +20 XP เมื่อตอบถูก
                 </span>
               </div>

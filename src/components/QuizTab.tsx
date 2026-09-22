@@ -112,7 +112,7 @@ export const QuizTab: React.FC<QuizTabProps> = ({
           </div>
           <div className="space-y-1 border-l border-neutral-200 dark:border-[#262626] pl-4">
             <span className="text-xs text-neutral-500 dark:text-[#8e8e8e] font-medium">XP ที่ได้รับ</span>
-            <div className="text-3xl font-extrabold text-amber-500 dark:text-amber-400 flex items-center justify-center gap-1 font-mono">
+            <div className="text-3xl font-extrabold text-amber-500 dark:text-amber-400 flex items-center justify-center gap-1">
               <Zap className="w-6 h-6 fill-amber-500 text-amber-500" />
               <span>+{awardedXp}</span>
             </div>
@@ -151,7 +151,7 @@ export const QuizTab: React.FC<QuizTabProps> = ({
       {/* Quiz Top Progress */}
       <div className="flex items-center justify-between gap-4">
         <div>
-          <span className="text-[11px] font-bold text-neutral-500 dark:text-[#8e8e8e] uppercase tracking-wider font-mono">
+          <span className="text-[11px] font-bold text-neutral-500 dark:text-[#8e8e8e] uppercase tracking-wider">
             คำถามข้อที่ {currentIndex + 1} จาก {questions.length}
           </span>
           <h2 className="text-base sm:text-xl font-bold text-neutral-900 dark:text-[#fafafa]">
@@ -159,7 +159,7 @@ export const QuizTab: React.FC<QuizTabProps> = ({
           </h2>
         </div>
 
-        <div className="flex items-center gap-1.5 bg-amber-500/10 text-amber-700 dark:text-amber-400 px-3 py-1 rounded-full text-xs font-bold border border-amber-500/25 font-mono">
+        <div className="flex items-center gap-1.5 bg-amber-500/10 text-amber-700 dark:text-amber-400 px-3 py-1 rounded-full text-xs font-bold border border-amber-500/25">
           <Zap className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
           <span>+{currentQ.xp} XP</span>
         </div>
@@ -212,7 +212,7 @@ export const QuizTab: React.FC<QuizTabProps> = ({
               className={`w-full p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border text-left text-xs sm:text-sm font-medium transition-all flex items-start justify-between gap-3 cursor-pointer disabled:cursor-default ${btnStyle}`}
             >
               <div className="flex items-start gap-3">
-                <span className={`w-6 h-6 rounded-lg text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 font-mono ${
+                <span className={`w-6 h-6 rounded-lg text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 ${
                   isAnswered && option.isCorrect
                     ? 'bg-emerald-600 text-white'
                     : isAnswered && isSelected

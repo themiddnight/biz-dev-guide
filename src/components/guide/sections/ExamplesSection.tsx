@@ -35,7 +35,7 @@ export const ExamplesSection: React.FC<SectionProps> = ({ chapter, isOpen, onTog
             >
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <div className="font-bold text-xs sm:text-sm text-neutral-900 dark:text-[#fafafa] flex items-center gap-2">
-                  <span className="px-2 py-0.5 rounded-md bg-neutral-200 dark:bg-[#262626] text-neutral-800 dark:text-[#d4d4d4] text-[10px] font-mono font-bold">
+                  <span className="px-2 py-0.5 rounded-md bg-neutral-200 dark:bg-[#262626] text-neutral-800 dark:text-[#d4d4d4] text-[10px] font-bold">
                     {ex.companyOrIndustry}
                   </span>
                   <span>{ex.title}</span>

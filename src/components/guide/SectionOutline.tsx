@@ -39,7 +39,7 @@ export const SectionOutline: React.FC<SectionOutlineProps> = ({ chapter, layout,
       <div className="flex flex-nowrap sm:flex-wrap items-center gap-1.5 overflow-x-auto">
         {layout.filter(g => g.sections.length > 0).map(group => (
           <React.Fragment key={group.layer}>
-            <span data-outline-layer={group.layer} className="shrink-0 text-[10px] font-bold uppercase tracking-wider text-neutral-400 dark:text-[#737373] font-mono">
+            <span data-outline-layer={group.layer} className="shrink-0 text-[10px] font-bold uppercase tracking-wider text-neutral-400 dark:text-[#737373]">
               {LAYER_META[group.layer].short}
             </span>
             {group.sections.map(key => {

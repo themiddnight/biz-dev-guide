@@ -19,7 +19,7 @@ export const JargonSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggl
               <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
                 พจนานุกรมคำศัพท์จำเป็น (Jargon Buster)
               </h3>
-              <span className="px-2 py-0.5 rounded-full bg-neutral-200 dark:bg-[#262626] text-neutral-800 dark:text-[#d4d4d4] text-[10px] sm:text-[11px] font-semibold font-mono">
+              <span className="px-2 py-0.5 rounded-full bg-neutral-200 dark:bg-[#262626] text-neutral-800 dark:text-[#d4d4d4] text-[10px] sm:text-[11px] font-semibold">
                 {chapter.jargonList.length} คำ
               </span>
             </div>
@@ -43,10 +43,10 @@ export const JargonSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggl
               className="p-3.5 rounded-xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-2 text-xs sm:text-sm"
             >
               <div className="flex items-center justify-between gap-2">
-                <span className="font-bold text-neutral-900 dark:text-white text-xs sm:text-sm font-mono">
+                <span className="font-bold text-neutral-900 dark:text-white text-xs sm:text-sm">
                   {item.term}
                 </span>
-                <span className="px-2 py-0.5 rounded-md bg-neutral-200/80 dark:bg-[#262626] border border-neutral-300/60 dark:border-[#333333] text-neutral-700 dark:text-[#d4d4d4] text-[10px] font-semibold font-mono">
+                <span className="px-2 py-0.5 rounded-md bg-neutral-200/80 dark:bg-[#262626] border border-neutral-300/60 dark:border-[#333333] text-neutral-700 dark:text-[#d4d4d4] text-[10px] font-semibold">
                   Technical Term
                 </span>
               </div>

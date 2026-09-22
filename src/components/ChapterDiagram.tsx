@@ -138,7 +138,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
                   }`}
                 >
                   <div className="flex items-center justify-between text-[10px] mb-1">
-                    <span className="font-mono text-slate-400">สถานี {idx + 1}</span>
+                    <span className="text-slate-400">สถานี {idx + 1}</span>
                     {isCurrent && trainStatus === 'derailed' ? (
                       <span className="text-rose-500 font-bold">💥 รถไฟตกราง</span>
                     ) : isCurrent ? (
@@ -180,7 +180,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
           ) : (
             <div className="p-3 bg-slate-900 text-slate-200 rounded-xl text-xs flex items-center justify-between">
               <span>สถานีปัจจุบัน: <b>{stations[subwayStation].name}</b> ({stations[subwayStation].passText})</span>
-              <span className="text-[11px] text-indigo-400 font-mono">ความเสี่ยง: {stations[subwayStation].risk}</span>
+              <span className="text-[11px] text-indigo-400">ความเสี่ยง: {stations[subwayStation].risk}</span>
             </div>
           )}
         </div>
@@ -225,7 +225,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
             <span className="text-xs font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider">
               RICE Scoring (การคำนวณทางวิทยาศาสตร์)
             </span>
-            <div className="p-3 bg-slate-100 dark:bg-slate-800 rounded-xl font-mono text-center text-xs font-bold text-slate-900 dark:text-slate-100">
+            <div className="p-3 bg-slate-100 dark:bg-slate-800 rounded-xl text-center text-xs font-bold text-slate-900 dark:text-slate-100">
               Score = (Reach × Impact × Confidence) ÷ Effort
             </div>
             <div className="space-y-1.5 text-xs text-slate-600 dark:text-slate-300">
@@ -568,7 +568,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
           >
             <div className="flex justify-between items-center mb-1">
               <span className="font-bold text-xs text-rose-700 dark:text-rose-300">E2E / UI Tests (10%)</span>
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-rose-200 dark:bg-rose-900 text-rose-800 dark:text-rose-200 font-mono">ช้า &amp; แพง</span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-rose-200 dark:bg-rose-900 text-rose-800 dark:text-rose-200">ช้า &amp; แพง</span>
             </div>
             <p className="text-[11px] text-slate-500 dark:text-slate-400">จำลองเปิดเบราว์เซอร์คลิกเหมือนคนจริง พังง่ายเมื่อหน้าตาเปลี่ยน (Flaky)</p>
           </button>
@@ -581,7 +581,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
           >
             <div className="flex justify-between items-center mb-1">
               <span className="font-bold text-xs text-indigo-700 dark:text-indigo-300">Integration Tests (20%)</span>
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-200 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 font-mono">ปานกลาง</span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-200 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200">ปานกลาง</span>
             </div>
             <p className="text-[11px] text-slate-500 dark:text-slate-400">ทดสอบการเชื่อมต่อระหว่าง API กับ Database หรือ Service ภายนอก</p>
           </button>
@@ -594,7 +594,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
           >
             <div className="flex justify-between items-center mb-1">
               <span className="font-bold text-xs text-emerald-700 dark:text-emerald-300">Unit Tests (70%)</span>
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-200 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200 font-mono">เร็ว &amp; ถูก</span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-200 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200">เร็ว &amp; ถูก</span>
             </div>
             <p className="text-[11px] text-slate-500 dark:text-slate-400">ทดสอบฟังก์ชันคำนวณย่อยๆ ในโค้ด รันหลักพันข้อเสร็จในไม่กี่วินาที</p>
           </button>
@@ -618,7 +618,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
             <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
               Canary Release Simulator (ปล่อยผู้ใช้ทีละกลุ่ม)
             </span>
-            <span className="font-mono text-xs font-bold text-amber-500">
+            <span className="text-xs font-bold text-amber-500">
               {canaryPercent}% Traffic สู่เวอร์ชันใหม่
             </span>
           </div>
@@ -766,7 +766,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
             <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-1.5">
               <div className="flex justify-between items-center">
                 <span className="font-bold text-amber-600 dark:text-amber-400">1. Scope (ปริมาณฟีเจอร์)</span>
-                <span className="font-mono font-bold text-slate-700 dark:text-slate-200">{scopeVal}%</span>
+                <span className="font-bold text-slate-700 dark:text-slate-200">{scopeVal}%</span>
               </div>
               <input
                 type="range"
@@ -786,7 +786,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
             <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-1.5">
               <div className="flex justify-between items-center">
                 <span className="font-bold text-blue-600 dark:text-blue-400">2. Time (ระยะเวลาส่งมอบ)</span>
-                <span className="font-mono font-bold text-slate-700 dark:text-slate-200">{timeVal} เดือน</span>
+                <span className="font-bold text-slate-700 dark:text-slate-200">{timeVal} เดือน</span>
               </div>
               <input
                 type="range"
@@ -806,7 +806,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
             <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-1.5">
               <div className="flex justify-between items-center">
                 <span className="font-bold text-purple-600 dark:text-purple-400">3. Cost (คนและงบประมาณ)</span>
-                <span className="font-mono font-bold text-slate-700 dark:text-slate-200">{costVal} สเกล</span>
+                <span className="font-bold text-slate-700 dark:text-slate-200">{costVal} สเกล</span>
               </div>
               <input
                 type="range"
@@ -827,7 +827,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
           <div className="p-4 rounded-2xl bg-slate-950 text-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4 border border-slate-800">
             <div className="space-y-1.5 text-xs text-center sm:text-left">
               <div className="text-slate-400">อัตราความเสี่ยงการเกิดข้อผิดพลาด (Projected Defect Rate):</div>
-              <div className="text-2xl sm:text-3xl font-bold font-mono text-rose-400 flex items-center justify-center sm:justify-start gap-2">
+              <div className="text-2xl sm:text-3xl font-bold text-rose-400 flex items-center justify-center sm:justify-start gap-2">
                 <span>{defectRisk}%</span>
                 <span className="text-xs px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-normal">
                   ดัชนีแรงดึง: {tension} pts
@@ -934,14 +934,14 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
                   <Compass className="w-4 h-4" />
                   <span>วงโคจรที่ 1: Discovery Track (วิ่งล่วงหน้า N+1)</span>
                 </b>
-                <span className="text-[10px] px-2 py-0.5 rounded bg-pink-100 dark:bg-pink-900/50 text-pink-700 dark:text-pink-300 font-mono">
+                <span className="text-[10px] px-2 py-0.5 rounded bg-pink-100 dark:bg-pink-900/50 text-pink-700 dark:text-pink-300">
                   เน้นหาคำตอบ
                 </span>
               </div>
               <p className="text-[11px] text-slate-600 dark:text-slate-300 mb-2">
                 ทีม Product + Designer สัมภาษณ์ลูกค้า ทำ Figma Prototype ทดสอบสมมติฐานว่า "มีคนต้องการฟีเจอร์นี้จริงไหม"
               </p>
-              <div className="p-2 rounded-lg bg-white/80 dark:bg-slate-900/80 text-[10px] text-pink-600 dark:text-pink-300 font-mono">
+              <div className="p-2 rounded-lg bg-white/80 dark:bg-slate-900/80 text-[10px] text-pink-600 dark:text-pink-300">
                 เอาต์พุต: Validated Backlog + ชัดเจนเรื่อง Acceptance Criteria
               </div>
             </div>
@@ -956,14 +956,14 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
                   <FileCode2 className="w-4 h-4" />
                   <span>วงโคจรที่ 2: Delivery Track (สปรินต์ปัจจุบัน N)</span>
                 </b>
-                <span className="text-[10px] px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 font-mono">
+                <span className="text-[10px] px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300">
                   เน้นสร้างของจริง
                 </span>
               </div>
               <p className="text-[11px] text-slate-600 dark:text-slate-300 mb-2">
                 ทีม Developer + QA หยิบชิ้นงานที่ผ่าน Discovery แล้วมาสร้างโค้ดระดับ Production เขียน Automated Test และ Deploy
               </p>
-              <div className="p-2 rounded-lg bg-white/80 dark:bg-slate-900/80 text-[10px] text-blue-600 dark:text-blue-300 font-mono">
+              <div className="p-2 rounded-lg bg-white/80 dark:bg-slate-900/80 text-[10px] text-blue-600 dark:text-blue-300">
                 เอาต์พุต: Working Tested Software ไม่มีงานรื้อทิ้ง
               </div>
             </div>

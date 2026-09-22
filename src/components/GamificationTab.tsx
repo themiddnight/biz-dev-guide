@@ -60,7 +60,7 @@ export const GamificationTab: React.FC<GamificationTabProps> = ({
       <div className="p-5 sm:p-6 bg-white dark:bg-[#141414] rounded-2xl sm:rounded-3xl border border-neutral-200 dark:border-[#262626] shadow-2xs space-y-5">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] flex items-center justify-center font-mono font-extrabold text-xl sm:text-2xl shadow-xs">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] flex items-center justify-center font-extrabold text-xl sm:text-2xl shadow-xs">
               Lv.{currentTier.level}
             </div>
             <div>
@@ -75,7 +75,7 @@ export const GamificationTab: React.FC<GamificationTabProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center gap-2 px-3.5 py-1.5 sm:px-4 sm:py-2 bg-amber-500/10 text-amber-700 dark:text-amber-400 rounded-xl sm:rounded-2xl font-mono font-bold text-sm sm:text-base border border-amber-500/25">
+          <div className="flex items-center gap-2 px-3.5 py-1.5 sm:px-4 sm:py-2 bg-amber-500/10 text-amber-700 dark:text-amber-400 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base border border-amber-500/25">
             <Zap className="w-4 h-4 sm:w-5 sm:h-5 fill-amber-500 text-amber-500" />
             <span>{userStats.xp} Total XP</span>
           </div>
@@ -83,7 +83,7 @@ export const GamificationTab: React.FC<GamificationTabProps> = ({
 
         {/* Level Progression Bar */}
         <div className="space-y-2 pt-1">
-          <div className="flex items-center justify-between text-xs text-neutral-500 dark:text-[#8e8e8e] font-mono">
+          <div className="flex items-center justify-between text-xs text-neutral-500 dark:text-[#8e8e8e]">
             <span>ความคืบหน้าสู่ระดับถัดไป</span>
             {nextTier ? (
               <span>{userStats.xp} / {nextTier.minXp} XP (ขาดอีก {nextTier.minXp - userStats.xp} XP)</span>
@@ -107,10 +107,10 @@ export const GamificationTab: React.FC<GamificationTabProps> = ({
             <BookOpen className="w-3.5 h-3.5 text-neutral-700 dark:text-[#a3a3a3]" />
             <span>อ่านแล้ว</span>
           </div>
-          <div className="text-xl sm:text-2xl font-extrabold text-neutral-900 dark:text-[#fafafa] font-mono">
+          <div className="text-xl sm:text-2xl font-extrabold text-neutral-900 dark:text-[#fafafa]">
             {userStats.readChapters.length}/15
           </div>
-          <span className="text-[11px] text-neutral-400 dark:text-[#666666] font-mono">บุ๊กมาร์ก {userStats.bookmarks.length}</span>
+          <span className="text-[11px] text-neutral-400 dark:text-[#666666]">บุ๊กมาร์ก {userStats.bookmarks.length}</span>
         </div>
 
         <div className="p-3.5 sm:p-4 bg-white dark:bg-[#141414] rounded-xl sm:rounded-2xl border border-neutral-200 dark:border-[#262626] shadow-2xs space-y-1">
@@ -118,10 +118,10 @@ export const GamificationTab: React.FC<GamificationTabProps> = ({
             <Bot className="w-3.5 h-3.5 text-neutral-700 dark:text-[#a3a3a3]" />
             <span>คำถามที่ถาม AI</span>
           </div>
-          <div className="text-xl sm:text-2xl font-extrabold text-neutral-900 dark:text-[#fafafa] font-mono">
+          <div className="text-xl sm:text-2xl font-extrabold text-neutral-900 dark:text-[#fafafa]">
             {userStats.aiQuestionsAsked}
           </div>
-          <span className="text-[11px] text-neutral-400 dark:text-[#666666] font-mono">ครั้งที่ปรึกษา</span>
+          <span className="text-[11px] text-neutral-400 dark:text-[#666666]">ครั้งที่ปรึกษา</span>
         </div>
 
         <div className="p-3.5 sm:p-4 bg-white dark:bg-[#141414] rounded-xl sm:rounded-2xl border border-neutral-200 dark:border-[#262626] shadow-2xs space-y-1">
@@ -129,10 +129,10 @@ export const GamificationTab: React.FC<GamificationTabProps> = ({
             <Trophy className="w-3.5 h-3.5 text-amber-500" />
             <span>ควิซที่ตอบถูก</span>
           </div>
-          <div className="text-xl sm:text-2xl font-extrabold text-neutral-900 dark:text-[#fafafa] font-mono">
+          <div className="text-xl sm:text-2xl font-extrabold text-neutral-900 dark:text-[#fafafa]">
             {userStats.correctAnswers}
           </div>
-          <span className="text-[11px] text-neutral-400 dark:text-[#666666] font-mono">ข้อที่ตอบถูก</span>
+          <span className="text-[11px] text-neutral-400 dark:text-[#666666]">ข้อที่ตอบถูก</span>
         </div>
 
         <div className="p-3.5 sm:p-4 bg-white dark:bg-[#141414] rounded-xl sm:rounded-2xl border border-neutral-200 dark:border-[#262626] shadow-2xs space-y-1">
@@ -140,10 +140,10 @@ export const GamificationTab: React.FC<GamificationTabProps> = ({
             <Award className="w-3.5 h-3.5 text-emerald-500" />
             <span>เหรียญความสำเร็จ</span>
           </div>
-          <div className="text-xl sm:text-2xl font-extrabold text-neutral-900 dark:text-[#fafafa] font-mono">
+          <div className="text-xl sm:text-2xl font-extrabold text-neutral-900 dark:text-[#fafafa]">
             {unlockedCount} / {badges.length}
           </div>
-          <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold font-mono">{Math.round((unlockedCount / badges.length) * 100)}% สำเร็จ</span>
+          <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">{Math.round((unlockedCount / badges.length) * 100)}% สำเร็จ</span>
         </div>
       </div>
 
@@ -194,7 +194,7 @@ export const GamificationTab: React.FC<GamificationTabProps> = ({
                     {badge.description}
                   </p>
                   {badge.unlockedAt && (
-                    <span className="inline-block text-[10px] text-neutral-700 dark:text-[#a3a3a3] font-mono font-medium pt-0.5">
+                    <span className="inline-block text-[10px] text-neutral-700 dark:text-[#a3a3a3] font-medium pt-0.5">
                       ปลดล็อกแล้ว ({badge.unlockedAt})
                     </span>
                   )}

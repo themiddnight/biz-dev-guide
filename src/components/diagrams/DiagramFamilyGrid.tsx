@@ -20,7 +20,7 @@ const FamilyCardBody: React.FC<{ family: DiagramFamily }> = ({ family }) => {
       </div>
       <span className="text-sm font-bold text-neutral-900 dark:text-[#fafafa]">{family.name}</span>
       <span className="text-xs sm:text-[13px] text-neutral-700 dark:text-[#d4d4d4] leading-relaxed">{family.question}</span>
-      <span className="text-[11px] sm:text-xs font-mono text-neutral-500 dark:text-[#8e8e8e] leading-relaxed">
+      <span className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e] leading-relaxed">
         {family.examples}
       </span>
       {family.note && (

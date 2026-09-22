@@ -25,7 +25,7 @@ export const FirstVisitCard: React.FC<{
         >
           <div className="font-bold text-sm text-neutral-900 dark:text-[#fafafa]">{option.label}</div>
           <div className="text-xs text-neutral-600 dark:text-[#a3a3a3] leading-relaxed">{option.line}</div>
-          <div className="text-[11px] text-neutral-500 dark:text-[#8e8e8e] font-mono">
+          <div className="text-[11px] text-neutral-500 dark:text-[#8e8e8e]">
             เส้นทาง: บท {TRACK_CHAPTER_NUMS[option.level].join(' → ')} · ≈ {getTrackMinutes(resolveTrack(option.level, chapters), chapters)} นาที
           </div>
         </button>

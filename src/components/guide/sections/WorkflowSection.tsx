@@ -36,7 +36,7 @@ export const WorkflowSection: React.FC<SectionProps> = ({ chapter, isOpen, onTog
             >
               <div className="flex items-center justify-between gap-1">
                 <span className="font-bold text-neutral-900 dark:text-[#fafafa] text-xs sm:text-sm">{wf.step}</span>
-                <span className="px-2 py-0.5 rounded-md bg-neutral-200 dark:bg-[#262626] text-neutral-800 dark:text-[#d4d4d4] font-semibold text-[10px] sm:text-[11px] font-mono">
+                <span className="px-2 py-0.5 rounded-md bg-neutral-200 dark:bg-[#262626] text-neutral-800 dark:text-[#d4d4d4] font-semibold text-[10px] sm:text-[11px]">
                   {wf.role}
                 </span>
               </div>

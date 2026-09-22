@@ -42,7 +42,7 @@ export const GlossaryCategoryMap: React.FC<GlossaryCategoryMapProps> = ({ terms,
                   {cat.label}
                 </span>
                 <span
-                  className={`shrink-0 font-mono text-[11px] font-bold ${
+                  className={`shrink-0 text-[11px] font-bold ${
                     active ? 'opacity-80' : 'text-neutral-500 dark:text-[#8e8e8e]'
                   }`}
                 >

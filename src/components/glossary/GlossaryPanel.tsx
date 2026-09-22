@@ -132,7 +132,7 @@ export const GlossaryPanel: React.FC<GlossaryPanelProps> = ({
         ))}
       </div>
 
-      <p className="text-[11px] sm:text-xs font-mono text-neutral-500 dark:text-[#8e8e8e]" aria-live="polite">
+      <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e]" aria-live="polite">
         แสดง {results.length} จาก {terms.length} คำ
       </p>
 
@@ -183,7 +183,7 @@ export const GlossaryPanel: React.FC<GlossaryPanelProps> = ({
                       key={chId}
                       type="button"
                       onClick={() => onNavigateChapter(chId)}
-                      className="px-2 py-0.5 rounded-md bg-neutral-100 dark:bg-[#1f1f1f] border border-neutral-200 dark:border-[#262626] text-[10px] sm:text-[11px] font-mono font-semibold text-neutral-700 dark:text-[#d4d4d4] hover:bg-neutral-200 dark:hover:bg-[#262626] cursor-pointer transition-colors"
+                      className="px-2 py-0.5 rounded-md bg-neutral-100 dark:bg-[#1f1f1f] border border-neutral-200 dark:border-[#262626] text-[10px] sm:text-[11px] font-semibold text-neutral-700 dark:text-[#d4d4d4] hover:bg-neutral-200 dark:hover:bg-[#262626] cursor-pointer transition-colors"
                     >
                       บทที่ {chapterNum[chId] ?? chId.replace('s', '')}
                     </button>

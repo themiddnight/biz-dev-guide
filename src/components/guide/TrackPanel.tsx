@@ -22,10 +22,10 @@ export const TrackPanel: React.FC<TrackPanelProps> = ({ chapters, experienceLeve
     <div data-track-panel={experienceLevel} className="p-3 rounded-xl border border-neutral-200 dark:border-[#262626] bg-neutral-50 dark:bg-[#181818] space-y-2.5">
       <div className="flex items-baseline justify-between gap-2">
         <h3 className="text-sm font-extrabold text-neutral-900 dark:text-[#fafafa]">{TRACK_META[experienceLevel].title}</h3>
-        <span className="text-[11px] text-neutral-500 dark:text-[#8e8e8e] font-mono">≈ {minutes} นาที</span>
+        <span className="text-[11px] text-neutral-500 dark:text-[#8e8e8e]">≈ {minutes} นาที</span>
       </div>
       <div className="space-y-1">
-        <div className="text-[11px] text-neutral-600 dark:text-[#a3a3a3] font-mono" data-track-progress>อ่านแล้ว {read}/{total}</div>
+        <div className="text-[11px] text-neutral-600 dark:text-[#a3a3a3]" data-track-progress>อ่านแล้ว {read}/{total}</div>
         <div className="h-1 rounded-full bg-neutral-200 dark:bg-[#262626] overflow-hidden">
           <div className="h-full bg-emerald-500" style={{ width: `${pct}%` }} />
         </div>
@@ -47,7 +47,7 @@ export const TrackPanel: React.FC<TrackPanelProps> = ({ chapters, experienceLeve
                   isActive ? 'bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a]' : 'text-neutral-800 dark:text-[#d4d4d4] hover:bg-neutral-100 dark:hover:bg-[#1f1f1f]'
                 }`}
               >
-                <span className="w-5 shrink-0 font-mono text-[10px] opacity-70">{index + 1}</span>
+                <span className="w-5 shrink-0 text-[10px] opacity-70">{index + 1}</span>
                 <span className="flex-1 truncate">บทที่ {chapter.num}: {chapter.title}</span>
                 {isRead && <Check className="w-3.5 h-3.5 shrink-0 text-emerald-500" aria-label="อ่านแล้ว" />}
               </button>

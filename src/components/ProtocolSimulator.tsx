@@ -103,7 +103,7 @@ export const ProtocolSimulator: React.FC = () => {
               <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-blue-200 dark:border-blue-900 text-xs flex items-center justify-between">
                 <div>
                   <span className="text-slate-500">จำนวนคำขอที่ยิงไปเปลืองทรัพยากร: </span>
-                  <b className="font-mono text-base text-blue-600 dark:text-blue-400">{pollCount} ครั้ง</b>
+                  <b className="text-base text-blue-600 dark:text-blue-400">{pollCount} ครั้ง</b>
                 </div>
                 <span className="text-[11px] text-slate-400">
                   {pollCount > 0 ? 'ผลลัพธ์ส่วนใหญ่: "ยังไม่มีของมาถึง... ถามซ้ำ"' : 'กดปุ่มเพื่อเริ่มยิงจำลอง'}
@@ -139,7 +139,7 @@ export const ProtocolSimulator: React.FC = () => {
                   <span className="text-slate-400 text-[11px]">ยังไม่มีเหตุการณ์ — ระบบอยู่นิ่งๆ ไม่เปลืองเน็ต</span>
                 ) : (
                   webhookLogs.map((log, lIdx) => (
-                    <div key={lIdx} className="font-mono text-[11px] text-emerald-600 dark:text-emerald-400">
+                    <div key={lIdx} className="text-[11px] text-emerald-600 dark:text-emerald-400">
                       ⚡ {log}
                     </div>
                   ))
@@ -171,11 +171,11 @@ export const ProtocolSimulator: React.FC = () => {
               <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-amber-200 dark:border-amber-900 text-xs flex items-center justify-between">
                 <div>
                   <span className="text-slate-500">สถานะท่อข้อมูล: </span>
-                  <b className={`font-mono text-xs ${wsConnected ? 'text-emerald-500' : 'text-slate-400'}`}>
+                  <b className={`text-xs ${wsConnected ? 'text-emerald-500' : 'text-slate-400'}`}>
                     {wsConnected ? '🟢 OPEN (ต่อสายสด)' : '⚪ CLOSED'}
                   </b>
                 </div>
-                <div className="font-mono text-[11px] text-amber-600 dark:text-amber-400">
+                <div className="text-[11px] text-amber-600 dark:text-amber-400">
                   แพ็กเก็ตแบบเรียลไทม์: <b>{wsMessages} frames</b>
                 </div>
               </div>

@@ -81,12 +81,12 @@ export const FrictionFaqSection: React.FC<FrictionFaqSectionProps> = ({
           className="w-full p-3.5 flex items-start justify-between gap-3 text-left cursor-pointer select-none hover:bg-neutral-50 dark:hover:bg-[#181818] transition-colors"
         >
           <span className="flex items-start gap-2.5 font-bold text-xs sm:text-sm text-neutral-900 dark:text-[#fafafa] leading-relaxed">
-            <span className="shrink-0 mt-0.5 px-1.5 py-0.5 rounded-md bg-neutral-100 dark:bg-[#1f1f1f] border border-neutral-200 dark:border-[#333333] text-[10px] font-mono text-neutral-600 dark:text-[#a3a3a3]">
+            <span className="shrink-0 mt-0.5 px-1.5 py-0.5 rounded-md bg-neutral-100 dark:bg-[#1f1f1f] border border-neutral-200 dark:border-[#333333] text-[10px] text-neutral-600 dark:text-[#a3a3a3]">
               Q{num}
             </span>
             <span>{faq.question}</span>
           </span>
-          <span className="shrink-0 text-neutral-400 dark:text-[#737373] font-mono text-base leading-none mt-0.5" aria-hidden="true">
+          <span className="shrink-0 text-neutral-400 dark:text-[#737373] text-base leading-none mt-0.5" aria-hidden="true">
             {isOpen ? '−' : '+'}
           </span>
         </button>
@@ -215,7 +215,7 @@ export const FrictionFaqSection: React.FC<FrictionFaqSectionProps> = ({
               onClick={() => jumpTo(faq.id)}
               className={`${chipClass} cursor-pointer text-left bg-neutral-50 dark:bg-[#181818] border-neutral-200 dark:border-[#262626] text-neutral-700 dark:text-[#c4c4c4] hover:bg-neutral-100 dark:hover:bg-[#1f1f1f]`}
             >
-              <span className="font-mono text-neutral-400 dark:text-[#737373] mr-1">{idx + 1}.</span>
+              <span className="text-neutral-400 dark:text-[#737373] mr-1">{idx + 1}.</span>
               {faq.question}
             </button>
           ))}

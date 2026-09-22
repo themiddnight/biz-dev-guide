@@ -269,7 +269,7 @@ export default function App() {
     <div className="min-h-screen bg-[#fafafa] dark:bg-[#0a0a0a] text-neutral-900 dark:text-[#e5e5e5] font-sans antialiased transition-colors duration-200">
       {/* Toast Alert for XP / Badges */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 bg-neutral-950 dark:bg-[#141414] text-white rounded-[4px] shadow-2xl border border-neutral-800 dark:border-[#262626] animate-slideUp font-mono">
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 bg-neutral-950 dark:bg-[#141414] text-white rounded-[4px] shadow-2xl border border-neutral-800 dark:border-[#262626] animate-slideUp">
           <div className="w-7 h-7 rounded-[3px] bg-white text-neutral-950 flex items-center justify-center font-bold shrink-0 text-xs">
             <Zap className="w-3.5 h-3.5 fill-current" />
           </div>

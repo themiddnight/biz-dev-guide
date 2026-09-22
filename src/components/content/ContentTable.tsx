@@ -18,7 +18,7 @@ const introClass = 'text-xs sm:text-sm text-neutral-600 dark:text-[#a3a3a3] lead
 const footnoteClass =
   'text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e] leading-relaxed p-3 rounded-xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626]';
 const thClass =
-  'px-3 py-2 text-left align-bottom font-mono text-[10px] sm:text-[11px] tracking-wider uppercase font-semibold text-neutral-500 dark:text-[#8e8e8e] border-b border-neutral-300 dark:border-[#333333]';
+  'px-3 py-2 text-left align-bottom text-[10px] sm:text-[11px] tracking-wider uppercase font-semibold text-neutral-500 dark:text-[#8e8e8e] border-b border-neutral-300 dark:border-[#333333]';
 const tdClass =
   'px-3 py-2.5 align-top text-xs sm:text-sm text-neutral-700 dark:text-[#d4d4d4] leading-relaxed border-b border-neutral-200 dark:border-[#262626]';
 
@@ -104,7 +104,7 @@ export const ContentTable: React.FC<ContentTableProps> = ({ block, onNavigateCha
                 <dl className="space-y-1.5">
                   {restCols.map(col => (
                     <div key={col.key}>
-                      <dt className="font-mono text-[10px] tracking-wider uppercase font-semibold text-neutral-500 dark:text-[#8e8e8e]">
+                      <dt className="text-[10px] tracking-wider uppercase font-semibold text-neutral-500 dark:text-[#8e8e8e]">
                         {col.label}
                       </dt>
                       <dd className="text-xs text-neutral-700 dark:text-[#d4d4d4] leading-relaxed break-words">

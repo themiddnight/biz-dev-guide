@@ -45,7 +45,7 @@ export const DiagramSection: React.FC<SectionProps> = ({ chapter, isOpen, onTogg
                 >
                   <div className="flex items-center justify-between flex-wrap gap-2">
                     <div className="flex items-center gap-2.5">
-                      <span className="px-2.5 py-0.5 rounded-lg bg-neutral-100 dark:bg-[#1f1f1f] border border-neutral-200 dark:border-[#333333] text-neutral-800 dark:text-[#d4d4d4] font-semibold text-[11px] flex items-center gap-1.5 font-mono">
+                      <span className="px-2.5 py-0.5 rounded-lg bg-neutral-100 dark:bg-[#1f1f1f] border border-neutral-200 dark:border-[#333333] text-neutral-800 dark:text-[#d4d4d4] font-semibold text-[11px] flex items-center gap-1.5">
                         <span>🎨</span>
                         <span>Visual Architecture</span>
                       </span>
@@ -58,7 +58,7 @@ export const DiagramSection: React.FC<SectionProps> = ({ chapter, isOpen, onTogg
                         </p>
                       </div>
                     </div>
-                    <span className="px-2 py-0.5 rounded-md bg-neutral-100 dark:bg-[#1f1f1f] border border-neutral-200 dark:border-[#333333] text-neutral-700 dark:text-[#d4d4d4] text-[10px] font-mono font-semibold">
+                    <span className="px-2 py-0.5 rounded-md bg-neutral-100 dark:bg-[#1f1f1f] border border-neutral-200 dark:border-[#333333] text-neutral-700 dark:text-[#d4d4d4] text-[10px] font-semibold">
                       Type: {ill.svgType}
                     </span>
                   </div>
@@ -76,7 +76,7 @@ export const DiagramSection: React.FC<SectionProps> = ({ chapter, isOpen, onTogg
 
                   {/* Structured SVG Visual Blueprint Scene */}
                   <div className="p-3 rounded-xl bg-neutral-100/70 dark:bg-[#0a0a0a] border border-neutral-200 dark:border-[#262626] text-[11px] space-y-1">
-                    <span className="font-mono text-[10px] text-neutral-800 dark:text-[#d4d4d4] uppercase tracking-wider block font-bold">
+                    <span className="text-[10px] text-neutral-800 dark:text-[#d4d4d4] uppercase tracking-wider block font-bold">
                       📐 โครงสร้างแผนผังเชิงนามธรรม (Visual Blueprint Scene):
                     </span>
                     <p className="text-neutral-600 dark:text-[#8e8e8e] leading-relaxed font-normal">
@@ -87,7 +87,7 @@ export const DiagramSection: React.FC<SectionProps> = ({ chapter, isOpen, onTogg
                   {/* Visual Elements Matrix */}
                   {ill.elements && ill.elements.length > 0 && (
                     <div className="space-y-1.5 pt-1">
-                      <span className="text-[11px] font-bold text-neutral-800 dark:text-[#e5e5e5] block font-mono">
+                      <span className="text-[11px] font-bold text-neutral-800 dark:text-[#e5e5e5] block">
                         องค์ประกอบสำคัญในแผนภาพ ({ill.elements.length} ส่วน):
                       </span>
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 text-xs">
@@ -105,7 +105,7 @@ export const DiagramSection: React.FC<SectionProps> = ({ chapter, isOpen, onTogg
                                 style={{ backgroundColor: elem.color }}
                               />
                             </div>
-                            <div className="text-[10px] text-neutral-700 dark:text-[#d4d4d4] font-semibold font-mono">
+                            <div className="text-[10px] text-neutral-700 dark:text-[#d4d4d4] font-semibold">
                               {elem.role}
                             </div>
                             <div className="text-[10px] text-neutral-500 dark:text-[#8e8e8e] leading-normal font-normal">
@@ -180,7 +180,7 @@ export const DiagramSection: React.FC<SectionProps> = ({ chapter, isOpen, onTogg
                       type="button"
                       onClick={() => ctx.setC4Level(lvl)}
                       aria-pressed={ctx.c4Level === lvl}
-                      className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer font-mono ${
+                      className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                         ctx.c4Level === lvl
                           ? 'bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] shadow-xs'
                           : 'bg-neutral-100 dark:bg-[#1f1f1f] text-neutral-600 dark:text-[#a3a3a3] hover:bg-neutral-200 dark:hover:bg-[#262626]'
@@ -209,7 +209,7 @@ export const DiagramSection: React.FC<SectionProps> = ({ chapter, isOpen, onTogg
               <div className="p-3.5 bg-neutral-50 dark:bg-[#181818] rounded-xl border border-neutral-200 dark:border-[#262626] text-xs sm:text-sm space-y-1">
                 {ctx.c4Level === 1 && (
                   <div>
-                    <span className="font-bold text-neutral-900 dark:text-[#fafafa] font-mono">Level 1: System Context</span>
+                    <span className="font-bold text-neutral-900 dark:text-[#fafafa]">Level 1: System Context</span>
                     <p className="text-neutral-600 dark:text-[#a3a3a3] mt-1 leading-relaxed text-xs">
                       ซูมออกสุด เห็นระบบเป็นกล่องเดียวตรงกลาง ล้อมรอบด้วย Actor (ลูกค้า, ร้านค้า, ไรเดอร์) และระบบภายนอก (Payment Gateway, Map API) — <b>เหมาะที่สุดสำหรับ Business Stakeholders และผู้บริหาร</b>
                     </p>
@@ -220,7 +220,7 @@ export const DiagramSection: React.FC<SectionProps> = ({ chapter, isOpen, onTogg
                 )}
                 {ctx.c4Level === 2 && (
                   <div>
-                    <span className="font-bold text-neutral-900 dark:text-[#fafafa] font-mono">Level 2: Container Diagram</span>
+                    <span className="font-bold text-neutral-900 dark:text-[#fafafa]">Level 2: Container Diagram</span>
                     <p className="text-neutral-600 dark:text-[#a3a3a3] mt-1 leading-relaxed text-xs">
                       ซูมเข้ามา 1 ชั้น เห็นหน่วยที่ Deploy แยกกันได้ เช่น Single Page App, Mobile App, Backend API, Database — <b>เหมาะสำหรับ Tech Lead &amp; Software Architects</b>
                     </p>
@@ -231,7 +231,7 @@ export const DiagramSection: React.FC<SectionProps> = ({ chapter, isOpen, onTogg
                 )}
                 {ctx.c4Level === 3 && (
                   <div>
-                    <span className="font-bold text-neutral-900 dark:text-[#fafafa] font-mono">Level 3: Component Diagram</span>
+                    <span className="font-bold text-neutral-900 dark:text-[#fafafa]">Level 3: Component Diagram</span>
                     <p className="text-neutral-600 dark:text-[#a3a3a3] mt-1 leading-relaxed text-xs">
                       ซูมเข้าไปในหนึ่ง Container (เช่น Backend API) แสดงโมดูลย่อย เช่น OrderComponent, PaymentController, NotificationService — <b>เหมาะสำหรับทีม Developer ที่ Implement</b>
                     </p>
@@ -239,7 +239,7 @@ export const DiagramSection: React.FC<SectionProps> = ({ chapter, isOpen, onTogg
                 )}
                 {ctx.c4Level === 4 && (
                   <div>
-                    <span className="font-bold text-neutral-900 dark:text-[#fafafa] font-mono">Level 4: Code Diagram (UML Class)</span>
+                    <span className="font-bold text-neutral-900 dark:text-[#fafafa]">Level 4: Code Diagram (UML Class)</span>
                     <p className="text-neutral-600 dark:text-[#a3a3a3] mt-1 leading-relaxed text-xs">
                       ซูมระดับ Class / Functions ในโค้ดจริง — <i>คำแนะนำ:</i> มักไม่ต้องวาดมือเพราะโค้ดเปลี่ยนเร็ว ให้ IDE สร้างอัตโนมัติ
                     </p>

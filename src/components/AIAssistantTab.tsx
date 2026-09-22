@@ -149,7 +149,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
 
         {/* Perspective selector */}
         <div className="flex items-center gap-1 bg-neutral-100 dark:bg-[#1a1a1a] p-1 rounded-xl border border-neutral-200 dark:border-[#262626] shrink-0 shadow-2xs">
-          <span className="text-[11px] font-semibold text-neutral-500 dark:text-[#737373] px-2 font-mono">มุมมอง:</span>
+          <span className="text-[11px] font-semibold text-neutral-500 dark:text-[#737373] px-2">มุมมอง:</span>
           {(['both', 'business', 'engineer'] as const).map((r) => (
             <button
               key={r}
@@ -230,13 +230,13 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
                           const isInline = !String(children).includes('\n') && !className;
                           if (isInline) {
                             return (
-                              <code className="px-1.5 py-0.5 rounded bg-neutral-200 dark:bg-[#262626] text-neutral-900 dark:text-[#e5e5e5] font-mono text-[11px] sm:text-xs" {...props}>
+                              <code className="px-1.5 py-0.5 rounded bg-neutral-200 dark:bg-[#262626] text-neutral-900 dark:text-[#e5e5e5] text-[11px] sm:text-xs" {...props}>
                                 {children}
                               </code>
                             );
                           }
                           return (
-                            <div className="my-2.5 rounded-xl overflow-hidden border border-neutral-200 dark:border-[#262626] bg-[#0a0a0a] text-neutral-100 p-3 font-mono text-xs overflow-x-auto">
+                            <div className="my-2.5 rounded-xl overflow-hidden border border-neutral-200 dark:border-[#262626] bg-[#0a0a0a] text-neutral-100 p-3 text-xs overflow-x-auto">
                               <code {...props}>{children}</code>
                             </div>
                           );
@@ -261,7 +261,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
                 )}
 
                 {isAi && (
-                  <div className="flex items-center justify-between pt-2 border-t border-neutral-200/60 dark:border-[#262626] text-[11px] text-neutral-500 dark:text-[#8e8e8e] font-mono">
+                  <div className="flex items-center justify-between pt-2 border-t border-neutral-200/60 dark:border-[#262626] text-[11px] text-neutral-500 dark:text-[#8e8e8e]">
                     <span className="flex items-center gap-1">
                       {msg.source === 'gemini' ? (
                         <span className="text-amber-600 dark:text-amber-400 font-semibold">● Gemini Model</span>
