@@ -2,8 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Chapter, AudienceMode, ExperienceLevel } from '../types';
 import { ROLE_MINDSETS } from '../data/roleMindsets';
 import { FRICTION_PLAYBOOKS } from '../data/frictionPlaybooks';
-import { RoleMindsetCard } from './RoleMindsetCard';
-import { FrictionPlaybookCard } from './FrictionPlaybookCard';
 import { S5_JUMP_TARGET_IDS, DiagramJumpTarget } from '../data/diagramFamilies';
 import { GlossaryFilter } from './glossary/GlossaryPanel';
 import { GLOSSARY, GlossaryCategory } from '../data/glossary';
@@ -17,6 +15,10 @@ import { ExamplesSection } from './guide/sections/ExamplesSection';
 import { CoreConceptsSection } from './guide/sections/CoreConceptsSection';
 import { ReferenceSection } from './guide/sections/ReferenceSection';
 import { GlossarySection } from './guide/sections/GlossarySection';
+import { WorkflowSection } from './guide/sections/WorkflowSection';
+import { PitfallsSection } from './guide/sections/PitfallsSection';
+import { ChecklistSection } from './guide/sections/ChecklistSection';
+import { MindsetSection, FrictionSection } from './guide/sections/registry';
 import { 
   Search, 
   Bookmark, 
@@ -24,17 +26,12 @@ import {
   Bot, 
   Sparkles,
   Clock,
-  ChevronRight, 
+  ChevronRight,
   ChevronLeft,
-  ChevronDown, 
-  ChevronUp,
   Info,
   CheckCircle2,
-  CheckSquare,
-  Square,
   Workflow,
   BookOpen,
-  ShieldAlert,
   List,
   X,
   ArrowLeft,
@@ -89,8 +86,6 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   const [isIndexOpen, setIsIndexOpen] = useState(false);
   const [checkedChecklist, setCheckedChecklist] = useState<Record<string, boolean>>({});
   const [c4Level, setC4Level] = useState<number>(1);
-  const [mindsetSubTab, setMindsetSubTab] = useState<'business' | 'engineer'>('business');
-  const [dilemmaAnswers, setDilemmaAnswers] = useState<Record<string, string>>({});
   const [glossaryCategory, setGlossaryCategory] = useState<GlossaryFilter>('all');
   const [glossaryQuery, setGlossaryQuery] = useState('');
   const [pendingScrollId, setPendingScrollId] = useState<string | null>(null);
@@ -705,41 +700,37 @@ export const GuideTab: React.FC<GuideTabProps> = ({
             {experienceLevel === 'experienced' ? (
               <>
                 {/* 1. Friction & Negotiation Playbook (Prioritized in Experienced mode) */}
-                <FrictionPlaybookCard
-                  playbook={activeChapter.frictionPlaybook}
-                  chapterTitle={activeChapter.title}
-                  audienceMode={audienceMode}
+                <FrictionSection
+                  chapter={activeChapter}
                   isOpen={openSections.friction}
                   onToggle={() => toggleSection('friction')}
-                  onEarnXp={onEarnXp}
+                  ctx={sectionCtx}
                 />
 
                 {/* 2. Role Mindset & Empathy Guide */}
-                <RoleMindsetCard
-                  audienceMode={audienceMode}
-                  onSelectRole={onAudienceChange}
+                <MindsetSection
+                  chapter={activeChapter}
                   isOpen={openSections.mindset}
                   onToggle={() => toggleSection('mindset')}
+                  ctx={sectionCtx}
                 />
               </>
             ) : (
               <>
                 {/* 1. Role Mindset & Empathy Guide (Prioritized in Beginner mode) */}
-                <RoleMindsetCard
-                  audienceMode={audienceMode}
-                  onSelectRole={onAudienceChange}
+                <MindsetSection
+                  chapter={activeChapter}
                   isOpen={openSections.mindset}
                   onToggle={() => toggleSection('mindset')}
+                  ctx={sectionCtx}
                 />
 
                 {/* 2. Friction & Negotiation Playbook */}
-                <FrictionPlaybookCard
-                  playbook={activeChapter.frictionPlaybook}
-                  chapterTitle={activeChapter.title}
-                  audienceMode={audienceMode}
+                <FrictionSection
+                  chapter={activeChapter}
                   isOpen={openSections.friction}
                   onToggle={() => toggleSection('friction')}
-                  onEarnXp={onEarnXp}
+                  ctx={sectionCtx}
                 />
               </>
             )}
@@ -841,148 +832,26 @@ export const GuideTab: React.FC<GuideTabProps> = ({
               ctx={sectionCtx}
             />
 
-            {/* SECTION 6: ขั้นตอนการทำงานจริง (Real-World Workflow) */}
-            {activeChapter.realWorldWorkflow && activeChapter.realWorldWorkflow.length > 0 && (
-              <div className="border border-neutral-200 dark:border-[#262626] rounded-2xl overflow-hidden bg-white dark:bg-[#141414] shadow-2xs">
-                <button
-                  onClick={() => toggleSection('workflow')}
-                  className="w-full p-3.5 sm:p-4.5 flex items-center justify-between bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f] text-left cursor-pointer select-none transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-7 h-7 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
-                      🔄
-                    </div>
-                    <div>
-                      <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
-                        ขั้นตอนการทำงานจริงในองค์กร (Real-World Workflow)
-                      </h3>
-                      <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e]">
-                        ลำดับขั้นตอนส่งต่องานจริงระหว่างฝ่าย ({activeChapter.realWorldWorkflow.length} ขั้นตอน)
-                      </p>
-                    </div>
-                  </div>
-                  {openSections.workflow ? <ChevronUp className="w-4 h-4 text-neutral-600 dark:text-[#a3a3a3]" /> : <ChevronDown className="w-4 h-4 text-neutral-400 dark:text-[#737373]" />}
-                </button>
+            <WorkflowSection
+              chapter={activeChapter}
+              isOpen={openSections.workflow}
+              onToggle={() => toggleSection('workflow')}
+              ctx={sectionCtx}
+            />
 
-                {openSections.workflow && (
-                  <div className="p-3.5 sm:p-5 grid grid-cols-1 sm:grid-cols-2 gap-3 border-t border-neutral-100 dark:border-[#262626] bg-white dark:bg-[#141414]">
-                    {activeChapter.realWorldWorkflow.map((wf, wIdx) => (
-                      <div 
-                        key={wIdx}
-                        className="p-3.5 rounded-xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-1.5 text-xs"
-                      >
-                        <div className="flex items-center justify-between gap-1">
-                          <span className="font-bold text-neutral-900 dark:text-[#fafafa] text-xs sm:text-sm">{wf.step}</span>
-                          <span className="px-2 py-0.5 rounded-md bg-neutral-200 dark:bg-[#262626] text-neutral-800 dark:text-[#d4d4d4] font-semibold text-[10px] sm:text-[11px] font-mono">
-                            {wf.role}
-                          </span>
-                        </div>
-                        <p className="text-neutral-600 dark:text-[#a3a3a3] leading-relaxed font-normal">
-                          {wf.description}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
+            <PitfallsSection
+              chapter={activeChapter}
+              isOpen={openSections.pitfalls}
+              onToggle={() => toggleSection('pitfalls')}
+              ctx={sectionCtx}
+            />
 
-            {/* SECTION 7: กับดักที่เจอบ่อยและทางออก (Common Pitfalls & Solutions) */}
-            {activeChapter.commonPitfalls && activeChapter.commonPitfalls.length > 0 && (
-              <div className="border border-neutral-200 dark:border-[#262626] rounded-2xl overflow-hidden bg-white dark:bg-[#141414] shadow-2xs">
-                <button
-                  onClick={() => toggleSection('pitfalls')}
-                  className="w-full p-3.5 sm:p-4.5 flex items-center justify-between bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f] text-left cursor-pointer select-none transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-7 h-7 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
-                      ⚠️
-                    </div>
-                    <div>
-                      <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
-                        กับดักที่เจอบ่อยและทางออกที่แนะนำ (Pitfalls &amp; Solutions)
-                      </h3>
-                      <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e]">
-                        สิ่งที่มักทำให้โปรเจกต์ล่าช้าหรือล้มเหลว พร้อมวิธีป้องกัน
-                      </p>
-                    </div>
-                  </div>
-                  {openSections.pitfalls ? <ChevronUp className="w-4 h-4 text-neutral-600 dark:text-[#a3a3a3]" /> : <ChevronDown className="w-4 h-4 text-neutral-400 dark:text-[#737373]" />}
-                </button>
-
-                {openSections.pitfalls && (
-                  <div className="p-3.5 sm:p-5 space-y-3 border-t border-neutral-100 dark:border-[#262626] bg-white dark:bg-[#141414]">
-                    {activeChapter.commonPitfalls.map((cp, cpIdx) => (
-                      <div 
-                        key={cpIdx}
-                        className="p-3.5 rounded-xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200/70 dark:border-rose-900/40 space-y-1.5 text-xs sm:text-sm"
-                      >
-                        <div className="flex items-center gap-1.5 font-bold text-rose-900 dark:text-rose-300 text-xs">
-                          <ShieldAlert className="w-4 h-4 text-rose-500 shrink-0" />
-                          <span>กับดัก: {cp.pitfall}</span>
-                        </div>
-                        <div className="pl-5 text-neutral-700 dark:text-[#c4c4c4] leading-relaxed text-xs">
-                          <span className="font-bold text-emerald-800 dark:text-emerald-400">💡 ทางออกที่แนะนำ: </span>
-                          <span>{cp.solution}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* SECTION 8: Pre-flight Checklist */}
-            {activeChapter.checklist && activeChapter.checklist.length > 0 && (
-              <div className="border border-neutral-200 dark:border-[#262626] rounded-2xl overflow-hidden bg-white dark:bg-[#141414] shadow-2xs">
-                <button
-                  onClick={() => toggleSection('checklist')}
-                  className="w-full p-3.5 sm:p-4.5 flex items-center justify-between bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f] text-left cursor-pointer select-none transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-7 h-7 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
-                      ✅
-                    </div>
-                    <div>
-                      <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
-                        Pre-flight Checklist ก่อนเข้าประชุมหรือส่งต่องาน
-                      </h3>
-                      <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e]">
-                        เช็กลิสต์ตรวจความพร้อม ป้องกันการตกหล่นก่อนส่งต่องาน ({activeChapter.checklist.length} ข้อ)
-                      </p>
-                    </div>
-                  </div>
-                  {openSections.checklist ? <ChevronUp className="w-4 h-4 text-neutral-600 dark:text-[#a3a3a3]" /> : <ChevronDown className="w-4 h-4 text-neutral-400 dark:text-[#737373]" />}
-                </button>
-
-                {openSections.checklist && (
-                  <div className="p-3.5 sm:p-5 border-t border-neutral-100 dark:border-[#262626] bg-white dark:bg-[#141414] space-y-1.5 text-xs">
-                    {activeChapter.checklist.map((item, idx) => {
-                      const itemKey = `${activeChapter.id}_cl_${idx}`;
-                      const isChecked = !!checkedChecklist[itemKey];
-                      return (
-                        <div
-                          key={idx}
-                          onClick={() => toggleChecklistItem(itemKey)}
-                          className={`flex items-start gap-2.5 p-2.5 rounded-xl cursor-pointer transition-colors ${
-                            isChecked
-                              ? 'bg-neutral-100 dark:bg-[#1f1f1f] text-neutral-400 dark:text-[#666666] line-through opacity-80'
-                              : 'hover:bg-neutral-50 dark:hover:bg-[#181818] text-neutral-700 dark:text-[#d4d4d4]'
-                          }`}
-                        >
-                          {isChecked ? (
-                            <CheckSquare className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-                          ) : (
-                            <Square className="w-4 h-4 text-neutral-400 dark:text-[#737373] shrink-0 mt-0.5" />
-                          )}
-                          <span className="leading-relaxed font-normal">{item}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            )}
+            <ChecklistSection
+              chapter={activeChapter}
+              isOpen={openSections.checklist}
+              onToggle={() => toggleSection('checklist')}
+              ctx={sectionCtx}
+            />
 
             {/* Chapter Footer Actions */}
             <div className="pt-5 border-t border-neutral-100 dark:border-[#262626] space-y-3.5">

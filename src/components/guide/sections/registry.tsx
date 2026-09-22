@@ -1,8 +1,23 @@
-import type React from 'react';
+import React from 'react';
 import type { AudienceMode, Chapter } from '../../../types';
 import type { DiagramJumpTarget } from '../../../data/diagramFamilies';
 import type { GlossaryCategory } from '../../../data/glossary';
 import type { GlossaryFilter } from '../../glossary/GlossaryPanel';
+import { RoleMindsetCard } from '../../RoleMindsetCard';
+import { FrictionPlaybookCard } from '../../FrictionPlaybookCard';
+import type { SectionKey } from '../../../data/sectionLayers';
+import { PrimerSection } from './PrimerSection';
+import { JargonSection } from './JargonSection';
+import { DialogueSection } from './DialogueSection';
+import { DiagramSection } from './DiagramSection';
+import { FaqSection } from './FaqSection';
+import { ExamplesSection } from './ExamplesSection';
+import { CoreConceptsSection } from './CoreConceptsSection';
+import { ReferenceSection } from './ReferenceSection';
+import { GlossarySection } from './GlossarySection';
+import { WorkflowSection } from './WorkflowSection';
+import { PitfallsSection } from './PitfallsSection';
+import { ChecklistSection } from './ChecklistSection';
 
 export interface GuideSectionContext {
   chapters: Chapter[];                                      // GlossaryPanel needs the chapter list (not in spec §1.7; required by the glossary block)
@@ -21,3 +36,35 @@ export interface GuideSectionContext {
 }
 
 export interface SectionProps { chapter: Chapter; isOpen: boolean; onToggle: () => void; ctx: GuideSectionContext }
+
+export const MindsetSection: React.FC<SectionProps> = ({ isOpen, onToggle, ctx }) => (
+  <RoleMindsetCard audienceMode={ctx.audienceMode} onSelectRole={ctx.onAudienceChange} isOpen={isOpen} onToggle={onToggle} />
+);
+
+export const FrictionSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggle, ctx }) => (
+  <FrictionPlaybookCard
+    playbook={chapter.frictionPlaybook}
+    chapterTitle={chapter.title}
+    audienceMode={ctx.audienceMode}
+    isOpen={isOpen}
+    onToggle={onToggle}
+    onEarnXp={ctx.onEarnXp}
+  />
+);
+
+export const SECTION_COMPONENTS: Record<SectionKey, React.FC<SectionProps>> = {
+  mindset: MindsetSection,
+  friction: FrictionSection,
+  primer: PrimerSection,
+  jargon: JargonSection,
+  dialogue: DialogueSection,
+  diagram: DiagramSection,
+  faq: FaqSection,
+  examples: ExamplesSection,
+  coreConcepts: CoreConceptsSection,
+  reference: ReferenceSection,
+  glossary: GlossarySection,
+  workflow: WorkflowSection,
+  pitfalls: PitfallsSection,
+  checklist: ChecklistSection,
+};
