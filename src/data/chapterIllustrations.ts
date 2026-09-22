@@ -210,19 +210,25 @@ export const CHAPTER_ILLUSTRATIONS: Record<string, ChapterIllustration> = {
       { label: '4. Tech Design & ADR', role: 'บันทึกวิศวกรรม', color: '#10b981', detail: 'บันทึกเหตุผลว่าทำไมถึงเลือกเทคโนโลยีนี้ เพื่อคนรุ่นหลัง' }
     ],
     takeaway: 'ความชัดเจนในเอกสารเพียง 1 ประโยค ช่วยประหยัดเวลาการถกเถียงและเขียนโค้ดผิดพลาดได้นับร้อยชั่วโมง'
-  },
-  s15: {
-    id: 'ill-s15',
-    title: 'The Visual Communication Matrix (REST API vs Webhook vs WebSocket)',
-    subtitle: 'เปรียบเทียบ 3 โปรโตคอล: เลือกวิธีส่งข้อมูลให้ถูกงาน ประหยัดค่าเซิร์ฟเวอร์และลดอาการค้าง',
-    visualMetaphor: 'การติดตามพัสดุ: REST คือการโทรเช็คกับไปรษณีย์ทุกๆ 5 นาที (เหนื่อยและเปลือง), Webhook คือบุรุษไปรษณีย์มากดกริ่งหน้าบ้านเมื่อของถึง (ทันทีและประหยัด), WebSocket คือเปิดสายโทรศัพท์คุยสดตลอดเวลา (สำหรับเรื่องฉุกเฉิน)',
-    svgType: 'protocol-comparison',
-    svgDescription: 'ตารางเปรียบเทียบ Flow การทำงานของทั้ง 3 รูปแบบ: Client Polling (Request-Response ซ้ำๆ), Server Push Webhook (Event Triggered ส่งตรงเข้า Endpoint), และ Duplex WebSocket (ท่อข้อมูลเปิดค้างไว้สองทาง)',
-    elements: [
-      { label: 'REST API (Polling)', role: 'ถามซ้ำๆ เป็นรอบ', color: '#3b82f6', detail: 'Client ส่งคำขอไปถาม Server เหมาะสำหรับการดึงข้อมูลทั่วไป เช่น หน้ารายการสินค้า' },
-      { label: 'Webhook (Event-Driven)', role: 'กริ่งประตูดังทันที', color: '#10b981', detail: 'Server ต้นทางยิงข้อมูลมาบอกเมื่อเกิดเหตุการณ์ เช่น แจ้งเตือนเงินเข้าจากธนาคาร' },
-      { label: 'WebSocket (Real-Time)', role: 'ท่อสายตรงสองทาง', color: '#f59e0b', detail: 'เปิดการเชื่อมต่อค้างไว้ เหมาะสำหรับแอปแชท หุ้น และการติดตามพิกัดไรเดอร์' }
-    ],
-    takeaway: 'ไม่มีโปรโตคอลที่ดีที่สุดสำหรับทุกงาน มีแต่โปรโตคอลที่เหมาะสมที่สุดกับลักษณะการใช้งานและทรัพยากร'
   }
+};
+
+// Extra cards shown after a chapter's primary illustration.
+export const EXTRA_CHAPTER_ILLUSTRATIONS: Record<string, ChapterIllustration[]> = {
+  s5: [
+    {
+      id: 'ill-s5-protocols',
+      title: 'The Visual Communication Matrix (REST API vs Webhook vs WebSocket)',
+      subtitle: 'เปรียบเทียบ 3 โปรโตคอล: เลือกวิธีส่งข้อมูลให้ถูกงาน ประหยัดค่าเซิร์ฟเวอร์และลดอาการค้าง',
+      visualMetaphor: 'การติดตามพัสดุ: REST คือการโทรเช็คกับไปรษณีย์ทุกๆ 5 นาที (เหนื่อยและเปลือง), Webhook คือบุรุษไปรษณีย์มากดกริ่งหน้าบ้านเมื่อของถึง (ทันทีและประหยัด), WebSocket คือเปิดสายโทรศัพท์คุยสดตลอดเวลา (สำหรับเรื่องฉุกเฉิน)',
+      svgType: 'protocol-comparison',
+      svgDescription: 'ตารางเปรียบเทียบ Flow การทำงานของทั้ง 3 รูปแบบ: Client Polling (Request-Response ซ้ำๆ), Server Push Webhook (Event Triggered ส่งตรงเข้า Endpoint), และ Duplex WebSocket (ท่อข้อมูลเปิดค้างไว้สองทาง)',
+      elements: [
+        { label: 'REST API (Polling)', role: 'ถามซ้ำๆ เป็นรอบ', color: '#3b82f6', detail: 'Client ส่งคำขอไปถาม Server เหมาะสำหรับการดึงข้อมูลทั่วไป เช่น หน้ารายการสินค้า' },
+        { label: 'Webhook (Event-Driven)', role: 'กริ่งประตูดังทันที', color: '#10b981', detail: 'Server ต้นทางยิงข้อมูลมาบอกเมื่อเกิดเหตุการณ์ เช่น แจ้งเตือนเงินเข้าจากธนาคาร' },
+        { label: 'WebSocket (Real-Time)', role: 'ท่อสายตรงสองทาง', color: '#f59e0b', detail: 'เปิดการเชื่อมต่อค้างไว้ เหมาะสำหรับแอปแชท หุ้น และการติดตามพิกัดไรเดอร์' }
+      ],
+      takeaway: 'ไม่มีโปรโตคอลที่ดีที่สุดสำหรับทุกงาน มีแต่โปรโตคอลที่เหมาะสมที่สุดกับลักษณะการใช้งานและทรัพยากร'
+    }
+  ]
 };
