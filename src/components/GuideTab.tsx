@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Chapter, ExperienceLevel } from '../types';
+import { CHAPTER_START_ID, scrollToChapterStart } from '../lib/chapterScroll';
 import { S5_JUMP_TARGET_IDS, DiagramJumpTarget } from '../data/diagramFamilies';
 import { GlossaryFilter } from './glossary/GlossaryPanel';
 import { GLOSSARY, GlossaryCategory } from '../data/glossary';
@@ -205,11 +206,11 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   const isCurrentRead = readChapters.includes(activeChapter.id);
   const trackNext = getTrackNext(resolveTrack(experienceLevel, chapters), activeChapter.id);
 
-  // Scroll to top when active chapter changes
+  // Start the new chapter at its title (page top on desktop, reader card on mobile)
   const handleSelectChapter = (chapterId: string) => {
     onNavigateChapter(chapterId);
     setIsIndexOpen(false);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    scrollToChapterStart('smooth');
   };
 
   const handleFirstVisitChoice = (level: ExperienceLevel) => {
@@ -578,7 +579,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
           </div>
 
           {/* Chapter Main Content Reader Card */}
-          <div className="bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-7 shadow-2xs space-y-5 sm:space-y-6">
+          <div id={CHAPTER_START_ID} className="bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-7 shadow-2xs space-y-5 sm:space-y-6">
             
             <ChapterHero chapter={activeChapter} experienceLevel={experienceLevel} isRead={isCurrentRead} />
 

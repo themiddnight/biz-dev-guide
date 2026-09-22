@@ -11,6 +11,7 @@ import {
   type RequestedSection,
 } from '../lib/chapterRoute';
 import { readStorage, writeStorage } from '../lib/storage';
+import { scrollToChapterStart } from '../lib/chapterScroll';
 
 export interface ChapterRouteApi {
   activeChapterId: string;
@@ -82,10 +83,10 @@ export function useChapterRoute(chapters: Chapter[], opts: { onChapterRoute: () 
       }
       navigatedRef.current = true;
       dispatch({ type: 'pop', hash });
-      // A chapter change with no section target starts at the top, like handleSelectChapter.
+      // A chapter change with no section target starts at the chapter title, like handleSelectChapter.
       // Deferred a frame: the browser restores the entry's saved scroll after popstate fires.
       if (!route.section && route.chapterId !== activeRef.current) {
-        window.requestAnimationFrame(() => window.scrollTo({ top: 0 }));
+        window.requestAnimationFrame(() => scrollToChapterStart());
       }
       setActiveChapterId(route.chapterId);
       setRequestedSection(route.section ? { key: route.section, nonce: ++nonceRef.current } : null);
