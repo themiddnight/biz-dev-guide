@@ -114,8 +114,15 @@ const sectionsWhere = (layout: LayerGroup[], pick: (g: LayerGroup) => boolean) =
   return sections;
 };
 
-export function deriveOpenState(layout: LayerGroup[]): OpenState {
-  return { layers: { core: true, apply: false, deep: false }, sections: sectionsWhere(layout, g => g.layer === 'core') };
+/** Core sections that start closed for a chapter (visual-first pilot). Layer stays expanded. */
+export const CHAPTER_CORE_COLLAPSED: Readonly<Record<string, readonly SectionKey[]>> = { s3: ['jargon'] };
+
+export function deriveOpenState(layout: LayerGroup[], chapterId?: string): OpenState {
+  const sections = sectionsWhere(layout, g => g.layer === 'core');
+  for (const k of (chapterId && CHAPTER_CORE_COLLAPSED[chapterId]) || []) {
+    if (sections[k]) sections[k] = false;
+  }
+  return { layers: { core: true, apply: false, deep: false }, sections };
 }
 
 export function expandAll(layout: LayerGroup[]): OpenState {

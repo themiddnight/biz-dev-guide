@@ -115,6 +115,17 @@ describe('open state', () => {
     expect(s.layers).toEqual({ core: true, apply: false, deep: false });
     for (const k of present) expect(!!s.sections[k]).toBe(layout[0].sections.includes(k));
   });
+  it('deriveOpenState keeps a chapter\'s collapsed Core sections closed', () => {
+    const s3 = getChapterLayout('beginner', ch('s3'));
+    const s = deriveOpenState(s3, 's3');
+    expect(s.layers.core).toBe(true);
+    expect(s.sections.jargon).toBe(false);
+    expect(s.sections.primer).toBe(true);
+    expect(s.sections.diagram).toBe(true);
+    expect(deriveOpenState(layout, 's1')).toEqual(deriveOpenState(layout));
+    const exp = getChapterLayout('experienced', ch('s3'));
+    expect(deriveOpenState(exp, 's3')).toEqual(deriveOpenState(exp));
+  });
   it('collapseAll expands all layers, closes all sections', () => {
     const s = collapseAll(layout);
     expect(s.layers).toEqual({ core: true, apply: true, deep: true });

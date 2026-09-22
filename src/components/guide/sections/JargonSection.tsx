@@ -2,6 +2,9 @@ import React from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import type { SectionProps } from './registry';
 
+/** Term chips shown in the closed header; the rest collapse into "+n". */
+const MAX_CHIPS = 5;
+
 export const JargonSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggle }) => {
   if (!chapter.jargonList || chapter.jargonList.length === 0) return null;
   return (
@@ -26,6 +29,23 @@ export const JargonSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggl
             <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e] mt-0.5">
               ศัพท์เทคนิคประจำบท แปลเป็นภาษาคนแบบเห็นภาพชัดเจน
             </p>
+            {!isOpen && (
+              <div data-jargon-chips className="flex flex-wrap gap-1.5 mt-2">
+                {chapter.jargonList.slice(0, MAX_CHIPS).map((item) => (
+                  <span
+                    key={item.term}
+                    className="px-2 py-0.5 rounded-md bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#333333] text-neutral-700 dark:text-[#d4d4d4] text-[10px] sm:text-[11px] font-medium"
+                  >
+                    {item.term}
+                  </span>
+                ))}
+                {chapter.jargonList.length > MAX_CHIPS && (
+                  <span className="px-2 py-0.5 text-neutral-500 dark:text-[#8e8e8e] text-[10px] sm:text-[11px] font-medium">
+                    +{chapter.jargonList.length - MAX_CHIPS}
+                  </span>
+                )}
+              </div>
+            )}
           </div>
         </div>
         {isOpen ? (

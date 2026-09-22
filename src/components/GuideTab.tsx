@@ -162,11 +162,11 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   const activeIndex = chapters.findIndex(c => c.id === activeChapterId);
 
   const layout = useMemo(() => getChapterLayout(experienceLevel, activeChapter), [experienceLevel, activeChapter]);
-  const [openState, setOpenState] = useState<OpenState>(() => deriveOpenState(layout));
+  const [openState, setOpenState] = useState<OpenState>(() => deriveOpenState(layout, activeChapter.id));
 
   // Each chapter (and each level) opens at its Core (spec §1.4, D3).
   useEffect(() => {
-    setOpenState(deriveOpenState(layout));
+    setOpenState(deriveOpenState(layout, activeChapter.id));
   }, [layout]);
 
   // A requested section opens on top of the re-derived defaults. Declared after the
@@ -180,7 +180,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
       onReplaceSection(null);
       return;
     }
-    setOpenState(openSection(deriveOpenState(layout), layout, requestedSection.key));
+    setOpenState(openSection(deriveOpenState(layout, activeChapter.id), layout, requestedSection.key));
     setPendingScrollId(`sec-${requestedSection.key}`);
   }, [requestedSection?.nonce]);
 
