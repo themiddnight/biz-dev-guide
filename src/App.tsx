@@ -384,9 +384,8 @@ export default function App() {
             onReplaceSection={route.replaceSection}
             onRequestedSectionApplied={route.clearRequestedSection}
             loadedFromHash={route.loadedFromHash}
-            resumeCandidate={route.resumeCandidate}
-            resumeDismissed={route.resumeDismissed}
-            onDismissResume={route.dismissResume}
+            initialSource={route.initialSource}
+            hasNavigated={route.hasNavigated}
           />
         )}
 

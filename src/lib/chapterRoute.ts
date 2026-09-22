@@ -37,26 +37,36 @@ export const isBareHash = (hash: string): boolean => hash === '' || hash === '#'
 
 /**
  * Per-page-session routing facts that must outlive GuideTab (it unmounts on other tabs):
- * whether the URL carries a chapter hash the guide tab should restore, and whether the
- * resume banner is done for this session (spec §5.2, §5.4).
+ * whether the URL carries a chapter hash the guide tab should restore (spec §5.2).
  */
-export interface RouteSession { hashInUrl: boolean; resumeDismissed: boolean }
+export interface RouteSession { hashInUrl: boolean }
 export type RouteSessionEvent =
   | { type: 'navigate' }
-  | { type: 'pop'; hash: string }
-  | { type: 'dismissResume' };
+  | { type: 'pop'; hash: string };
 
 export function initRouteSession(hash: string): RouteSession {
-  return { hashInUrl: !isBareHash(hash), resumeDismissed: false };
+  return { hashInUrl: !isBareHash(hash) };
 }
 
 export function reduceRouteSession(state: RouteSession, event: RouteSessionEvent): RouteSession {
   switch (event.type) {
     case 'navigate':
-      return { hashInUrl: true, resumeDismissed: true };
+      return state.hashInUrl ? state : { hashInUrl: true };
     case 'pop':
-      return { hashInUrl: !isBareHash(event.hash), resumeDismissed: true };
-    case 'dismissResume':
-      return state.resumeDismissed ? state : { ...state, resumeDismissed: true };
+      return { hashInUrl: !isBareHash(event.hash) };
   }
+}
+
+/** Hash wins (a shared link), then the stored chapter (resume), then the default (round3 spec D2). */
+export function resolveInitialChapter(
+  route: ChapterRoute | null,
+  storedLast: string | null,
+  chapters: ChapterRef[],
+  fallback: string,
+): { chapterId: string; source: 'hash' | 'stored' | 'default' } {
+  if (route) return { chapterId: route.chapterId, source: 'hash' };
+  if (storedLast !== null && chapters.some(c => c.id === storedLast)) {
+    return { chapterId: storedLast, source: 'stored' };
+  }
+  return { chapterId: fallback, source: 'default' };
 }

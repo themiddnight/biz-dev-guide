@@ -1,7 +1,7 @@
 import React from 'react';
 import { Check } from 'lucide-react';
 import type { Chapter } from '../../types';
-import { TRACK_META, getTrackMinutes, getTrackProgress, resolveTrack, type TrackKey } from '../../data/readingTracks';
+import { TRACK_META, getTrackMinutes, getTrackProgress, resolveTrack, trackPrimaryLabel, type TrackKey } from '../../data/readingTracks';
 
 interface TrackPanelProps {
   chapters: Chapter[];
@@ -61,7 +61,7 @@ export const TrackPanel: React.FC<TrackPanelProps> = ({ chapters, trackKey, read
         onClick={() => (firstUnreadId === null ? onStartQuiz() : onSelectChapter(firstUnreadId))}
         className="w-full px-3 py-2 rounded-lg bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] text-xs font-bold cursor-pointer"
       >
-        {firstUnreadId === null ? 'จบเส้นทางแล้ว — ทำแบบทดสอบ' : read === 0 ? 'เริ่มอ่าน' : 'อ่านต่อ'}
+        {trackPrimaryLabel(read, firstUnreadId)}
       </button>
     </div>
   );

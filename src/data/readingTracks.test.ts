@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { CHAPTERS } from './chaptersData';
-import { resolveTrack, parseReadMinutes, getTrackMinutes, getTrackNext, getTrackProgress } from './readingTracks';
+import { resolveTrack, parseReadMinutes, getTrackMinutes, getTrackNext, getTrackProgress, trackPrimaryLabel } from './readingTracks';
 
 const BEGINNER = ['s1', 's2', 's3', 's4', 's6', 's7', 's11', 's14'];
 const EXPERIENCED = ['s11', 's1', 's6', 's9', 's12', 's13', 's14'];
@@ -86,5 +86,22 @@ describe('getTrackProgress', () => {
   });
   it('all read -> null', () => {
     expect(getTrackProgress(BEGINNER, BEGINNER)).toEqual({ read: 8, total: 8, firstUnreadId: null });
+  });
+});
+
+describe('trackPrimaryLabel', () => {
+  it('nothing read yet: invites the first chapter of the track', () => {
+    expect(trackPrimaryLabel(0, 's2')).toBe('เริ่มอ่านบทแรกของเส้นทาง');
+  });
+  it('part way through: names the next unread chapter, not "continue"', () => {
+    expect(trackPrimaryLabel(3, 's14')).toBe('ไปบทถัดไปที่ยังไม่อ่าน');
+  });
+  it('track finished: sends the reader to the quiz', () => {
+    expect(trackPrimaryLabel(8, null)).toBe('จบเส้นทางแล้ว — ทำแบบทดสอบ');
+  });
+  it('never says อ่านต่อ: that verb belongs to the restored chapter (D1)', () => {
+    for (const [read, id] of [[0, 's2'], [1, 's2'], [7, 's9'], [8, null]] as [number, string | null][]) {
+      expect(trackPrimaryLabel(read, id)).not.toContain('อ่านต่อ');
+    }
   });
 });

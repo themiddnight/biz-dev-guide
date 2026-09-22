@@ -32,7 +32,6 @@ import { getTrackNext, resolveTrack, type TrackKey } from '../data/readingTracks
 import { planChapterLevelChoice } from '../lib/rolePrefs';
 import { ROLE_META, otherRole, resolveChapterLevel, getActiveTrackKey, type LevelInputs, type Role } from '../data/rolePerspective';
 import { FirstVisitCard } from './guide/FirstVisitCard';
-import { ResumeBanner } from './guide/ResumeBanner';
 import { 
   Search, 
   Bookmark, 
@@ -63,9 +62,8 @@ interface GuideTabProps {
   showFirstVisit?: boolean;
   onChooseInitialLevel?: (level: ExperienceLevel) => void;
   loadedFromHash: boolean;
-  resumeCandidate: string | null;
-  resumeDismissed: boolean;
-  onDismissResume: () => void;
+  initialSource: 'hash' | 'stored' | 'default';
+  hasNavigated: boolean;
   bookmarks: string[];
   readChapters?: string[];
   onToggleBookmark: (chapterId: string) => void;
@@ -89,9 +87,8 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   showFirstVisit,
   onChooseInitialLevel,
   loadedFromHash,
-  resumeCandidate,
-  resumeDismissed,
-  onDismissResume,
+  initialSource,
+  hasNavigated,
   bookmarks,
   readChapters = [],
   onToggleBookmark,
@@ -256,8 +253,8 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   };
 
   // After a first-visit choice, jump to the chosen track's first chapter.
+  // An explicit first-visit choice wins over the loaded hash (round3 spec D4).
   const jumpToTrackStart = (key: TrackKey) => {
-    if (loadedFromHash) return; // a shared link wins over onboarding (spec §4.3, D5)
     const first = resolveTrack(key, chapters)[0];
     if (first) handleSelectChapter(first);
     if (!window.matchMedia('(min-width: 1024px)').matches) setIsIndexOpen(true);
@@ -272,10 +269,8 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   };
   const handleFirstVisitSkip = () => onChooseInitialLevel?.('beginner');
 
-  // resumeDismissed lives in useChapterRoute: any navigation or back/forward sets it, and it
-  // survives this component unmounting on other tabs (spec §5.4).
-  const resumeChapter = resumeCandidate ? chapters.find(c => c.id === resumeCandidate) : undefined;
-  const showResume = !loadedFromHash && !!resumeChapter && resumeChapter.id !== activeChapterId && !showFirstVisit && !resumeDismissed;
+  // The chapter was restored from storage: say so once, until the reader navigates (round3 spec D2).
+  const showResumedLine = initialSource === 'stored' && !hasNavigated && !showFirstVisit;
 
   // Category map tile (s15 diagram) -> filter the glossary panel and scroll to it
   const handleSelectGlossaryCategory = (category: GlossaryCategory) => {
@@ -530,97 +525,96 @@ export const GuideTab: React.FC<GuideTabProps> = ({
 
         {/* Right Column: Active Chapter Reader Card ("บทละหน้า") */}
         <div className="lg:col-span-8 space-y-4 sm:space-y-6">
-          {showResume && resumeChapter && (
-            <ResumeBanner
-              chapter={resumeChapter}
-              onResume={() => handleSelectChapter(resumeChapter.id)}
-              onDismiss={onDismissResume}
-            />
-          )}
-
           {/* Chapter Top Navigation Bar */}
-          <div className="bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-2xs flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2 min-w-0">
-              {/* Prev Chapter Button */}
-              <button
-                disabled={!prevChapter}
-                onClick={() => prevChapter && handleSelectChapter(prevChapter.id)}
-                className={`p-2 rounded-xl border flex items-center gap-1 text-xs font-semibold transition-all ${
-                  prevChapter
-                    ? 'border-neutral-200 dark:border-[#262626] hover:bg-neutral-100 dark:hover:bg-[#1f1f1f] text-neutral-700 dark:text-[#d4d4d4] cursor-pointer'
-                    : 'border-neutral-100 dark:border-[#1c1c1c] text-neutral-300 dark:text-[#444444] cursor-not-allowed'
-                }`}
-                title={prevChapter ? `บทก่อนหน้า: ${prevChapter.title}` : 'นี่คือบทแรก'}
-              >
-                <ChevronLeft className="w-4 h-4" />
-                <span className="hidden sm:inline">บทก่อนหน้า</span>
-              </button>
-
-              {/* Mobile Table of Contents Toggle */}
-              <button
-                onClick={openIndex}
-                className="lg:hidden px-3 py-2 rounded-xl bg-neutral-100 dark:bg-[#1f1f1f] hover:bg-neutral-200 text-neutral-700 dark:text-[#d4d4d4] text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
-              >
-                <List className="w-3.5 h-3.5" />
-                <span>สารบัญ ({activeChapter.num}/{chapters.length})</span>
-              </button>
-
-              {/* Current Chapter Indicator on Desktop */}
-              <div className="hidden lg:flex items-center gap-2 pl-2">
-                <span className="px-2.5 py-1 rounded-lg bg-neutral-100 dark:bg-[#1f1f1f] text-neutral-800 dark:text-[#d4d4d4] text-xs font-bold border border-neutral-200 dark:border-[#333333]">
-                  บทที่ {activeChapter.num} จาก {chapters.length}
-                </span>
-                <span className="text-xs text-neutral-600 dark:text-[#8e8e8e] font-medium truncate max-w-[200px]">
-                  {activeChapter.title}
-                </span>
-              </div>
-            </div>
-
-            {/* Next Chapter & Action Buttons */}
-            <div className="flex items-center gap-2 shrink-0">
-              {/* Mark as read toggle */}
-              {onToggleReadChapter && (
+          <div className="bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-2xs">
+            {showResumedLine && (
+              <p data-resumed className="mb-2 text-xs text-neutral-500 dark:text-[#8e8e8e] truncate">
+                อ่านต่อจากครั้งก่อน · บทที่ {activeChapter.num}
+              </p>
+            )}
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2 min-w-0">
+                {/* Prev Chapter Button */}
                 <button
-                  onClick={() => onToggleReadChapter(activeChapter.id)}
-                  className={`px-3 py-2 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
-                    isCurrentRead
-                      ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300'
-                      : 'bg-neutral-50 dark:bg-[#1a1a1a] border-neutral-200 dark:border-[#262626] text-neutral-700 dark:text-[#d4d4d4] hover:bg-neutral-100 dark:hover:bg-[#222222]'
+                  disabled={!prevChapter}
+                  onClick={() => prevChapter && handleSelectChapter(prevChapter.id)}
+                  className={`p-2 rounded-xl border flex items-center gap-1 text-xs font-semibold transition-all ${
+                    prevChapter
+                      ? 'border-neutral-200 dark:border-[#262626] hover:bg-neutral-100 dark:hover:bg-[#1f1f1f] text-neutral-700 dark:text-[#d4d4d4] cursor-pointer'
+                      : 'border-neutral-100 dark:border-[#1c1c1c] text-neutral-300 dark:text-[#444444] cursor-not-allowed'
                   }`}
-                  title="ทำเครื่องหมายว่าอ่านและเข้าใจบทนี้แล้ว (+30 XP)"
+                  title={prevChapter ? `บทก่อนหน้า: ${prevChapter.title}` : 'นี่คือบทแรก'}
                 >
-                  <CheckCircle2 className={`w-3.5 h-3.5 ${isCurrentRead ? 'text-emerald-600 dark:text-emerald-400' : 'text-neutral-400'}`} />
-                  <span className="hidden md:inline">{isCurrentRead ? 'อ่านแล้ว' : 'ทำเครื่องหมายว่าอ่านแล้ว'}</span>
+                  <ChevronLeft className="w-4 h-4" />
+                  <span className="hidden sm:inline">บทก่อนหน้า</span>
                 </button>
-              )}
 
-              {/* Bookmark Toggle */}
-              <button
-                onClick={() => onToggleBookmark(activeChapter.id)}
-                className={`p-2 rounded-xl border transition-all cursor-pointer ${
-                  isCurrentBookmarked
-                    ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-300 dark:border-amber-700 text-amber-600 dark:text-amber-400'
-                    : 'bg-neutral-50 dark:bg-[#1a1a1a] border-neutral-200 dark:border-[#262626] text-neutral-500 hover:text-neutral-800 dark:hover:text-[#fafafa]'
-                }`}
-                title={isCurrentBookmarked ? 'ลบบุ๊กมาร์ก' : 'บันทึกบทนี้ (+15 XP)'}
-              >
-                {isCurrentBookmarked ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
-              </button>
+                {/* Mobile Table of Contents Toggle */}
+                <button
+                  onClick={openIndex}
+                  className="lg:hidden px-3 py-2 rounded-xl bg-neutral-100 dark:bg-[#1f1f1f] hover:bg-neutral-200 text-neutral-700 dark:text-[#d4d4d4] text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
+                >
+                  <List className="w-3.5 h-3.5" />
+                  <span>สารบัญ ({activeChapter.num}/{chapters.length})</span>
+                </button>
 
-              {/* Next Chapter Button */}
-              <button
-                disabled={!nextChapter}
-                onClick={() => nextChapter && handleSelectChapter(nextChapter.id)}
-                className={`p-2 rounded-xl border flex items-center gap-1 text-xs font-semibold transition-all ${
-                  nextChapter
-                    ? 'border-neutral-200 dark:border-[#262626] bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] hover:opacity-90 cursor-pointer shadow-xs'
-                    : 'border-neutral-100 dark:border-[#1c1c1c] text-neutral-300 dark:text-[#444444] cursor-not-allowed'
-                }`}
-                title={nextChapter ? `บทถัดไป: ${nextChapter.title}` : 'นี่คือบทสุดท้าย'}
-              >
-                <span className="hidden sm:inline">บทถัดไป</span>
-                <ChevronRight className="w-4 h-4" />
-              </button>
+                {/* Current Chapter Indicator on Desktop */}
+                <div className="hidden lg:flex items-center gap-2 pl-2">
+                  <span className="px-2.5 py-1 rounded-lg bg-neutral-100 dark:bg-[#1f1f1f] text-neutral-800 dark:text-[#d4d4d4] text-xs font-bold border border-neutral-200 dark:border-[#333333]">
+                    บทที่ {activeChapter.num} จาก {chapters.length}
+                  </span>
+                  <span className="text-xs text-neutral-600 dark:text-[#8e8e8e] font-medium truncate max-w-[200px]">
+                    {activeChapter.title}
+                  </span>
+                </div>
+              </div>
+
+              {/* Next Chapter & Action Buttons */}
+              <div className="flex items-center gap-2 shrink-0">
+                {/* Mark as read toggle */}
+                {onToggleReadChapter && (
+                  <button
+                    onClick={() => onToggleReadChapter(activeChapter.id)}
+                    className={`px-3 py-2 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                      isCurrentRead
+                        ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300'
+                        : 'bg-neutral-50 dark:bg-[#1a1a1a] border-neutral-200 dark:border-[#262626] text-neutral-700 dark:text-[#d4d4d4] hover:bg-neutral-100 dark:hover:bg-[#222222]'
+                    }`}
+                    title="ทำเครื่องหมายว่าอ่านและเข้าใจบทนี้แล้ว (+30 XP)"
+                  >
+                    <CheckCircle2 className={`w-3.5 h-3.5 ${isCurrentRead ? 'text-emerald-600 dark:text-emerald-400' : 'text-neutral-400'}`} />
+                    <span className="hidden md:inline">{isCurrentRead ? 'อ่านแล้ว' : 'ทำเครื่องหมายว่าอ่านแล้ว'}</span>
+                  </button>
+                )}
+
+                {/* Bookmark Toggle */}
+                <button
+                  onClick={() => onToggleBookmark(activeChapter.id)}
+                  className={`p-2 rounded-xl border transition-all cursor-pointer ${
+                    isCurrentBookmarked
+                      ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-300 dark:border-amber-700 text-amber-600 dark:text-amber-400'
+                      : 'bg-neutral-50 dark:bg-[#1a1a1a] border-neutral-200 dark:border-[#262626] text-neutral-500 hover:text-neutral-800 dark:hover:text-[#fafafa]'
+                  }`}
+                  title={isCurrentBookmarked ? 'ลบบุ๊กมาร์ก' : 'บันทึกบทนี้ (+15 XP)'}
+                >
+                  {isCurrentBookmarked ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
+                </button>
+
+                {/* Next Chapter Button */}
+                <button
+                  disabled={!nextChapter}
+                  onClick={() => nextChapter && handleSelectChapter(nextChapter.id)}
+                  className={`p-2 rounded-xl border flex items-center gap-1 text-xs font-semibold transition-all ${
+                    nextChapter
+                      ? 'border-neutral-200 dark:border-[#262626] bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] hover:opacity-90 cursor-pointer shadow-xs'
+                      : 'border-neutral-100 dark:border-[#1c1c1c] text-neutral-300 dark:text-[#444444] cursor-not-allowed'
+                  }`}
+                  title={nextChapter ? `บทถัดไป: ${nextChapter.title}` : 'นี่คือบทสุดท้าย'}
+                >
+                  <span className="hidden sm:inline">บทถัดไป</span>
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           </div>
 

@@ -56,3 +56,13 @@ export function getTrackProgress(
     firstUnreadId: trackIds.find(id => !readChapters.includes(id)) ?? null,
   };
 }
+
+/**
+ * Literal label for the track card's primary button. It advances the track, so it never says
+ * `อ่านต่อ` — that verb is reserved for the app restoring the last read chapter (round3 spec D3).
+ */
+export function trackPrimaryLabel(read: number, firstUnreadId: string | null): string {
+  if (firstUnreadId === null) return 'จบเส้นทางแล้ว — ทำแบบทดสอบ';
+  if (read === 0) return 'เริ่มอ่านบทแรกของเส้นทาง';
+  return 'ไปบทถัดไปที่ยังไม่อ่าน';
+}
