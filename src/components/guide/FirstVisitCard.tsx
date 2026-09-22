@@ -4,7 +4,7 @@ import { TRACK_CHAPTER_NUMS, getTrackMinutes, resolveTrack } from '../../data/re
 import { ROLE_META, type Role } from '../../data/rolePerspective';
 
 const ROLE_OPTIONS: { role: Role; line: string }[] = [
-  { role: 'biz', line: 'บทฝั่ง Engineering จะเริ่มจากพื้นฐาน บทฝั่งคุณเริ่มจากแนวคิดหลัก' },
+  { role: 'biz', line: 'เริ่มจากบท PM ที่คุณคุ้น แล้วไปดูว่าทีม Engineering รับงานต่อยังไง' },
   { role: 'eng', line: 'บทฝั่ง Business จะเริ่มจากพื้นฐาน และขึ้นมาอยู่ต้นเส้นทาง' },
 ];
 

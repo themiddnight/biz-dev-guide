@@ -6,8 +6,8 @@ export type TrackKey = ExperienceLevel | Role;
 export const TRACK_CHAPTER_NUMS: Record<TrackKey, readonly number[]> = {
   beginner: [1, 2, 3, 4, 6, 7, 11, 14],
   experienced: [11, 1, 6, 9, 12, 13, 14],
-  biz: [1, 4, 5, 6, 9, 10, 11, 13], // 98 min: how software gets built, broken and fixed
-  eng: [1, 16, 2, 17, 18, 4, 11, 19, 9], // 100 min: money and deadlines before any engineering chapter
+  biz: [2, 1, 14, 4, 6, 9, 10, 11], // 94 min: start from the PM hand-off, follow the work through Engineering
+  eng: [16, 1, 2, 17, 18, 4, 11, 19, 9], // 100 min: money first, then the hand-off
 };
 
 export const TRACK_META: Record<TrackKey, { title: string; description: string }> = {

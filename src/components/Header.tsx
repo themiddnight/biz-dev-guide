@@ -129,7 +129,7 @@ export const Header: React.FC<HeaderProps> = ({
               data-header-level-mode="auto"
               aria-pressed={levelMode === 'auto'}
               onClick={() => onLevelModeChange('auto')}
-              title="บทฝั่งคุณเปิดแบบคุ้นงาน บทอีกฝั่งเปิดแบบมือใหม่"
+              title="บทฝั่งคุณเปิดแบบคุ้นงาน บทอื่นเปิดแบบมือใหม่"
               className={segmentClass(levelMode === 'auto')}
             >
               <span>ตามสายงาน</span>
