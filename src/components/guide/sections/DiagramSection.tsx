@@ -43,24 +43,13 @@ export const DiagramSection: React.FC<SectionProps> = ({ chapter, isOpen, onTogg
                   key={ill.id}
                   className="p-3.5 sm:p-5 rounded-2xl bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] shadow-2xs space-y-3"
                 >
-                  <div className="flex items-center justify-between flex-wrap gap-2">
-                    <div className="flex items-center gap-2.5">
-                      <span className="px-2.5 py-0.5 rounded-lg bg-neutral-100 dark:bg-[#1f1f1f] border border-neutral-200 dark:border-[#333333] text-neutral-800 dark:text-[#d4d4d4] font-semibold text-[11px] flex items-center gap-1.5">
-                        <span>🎨</span>
-                        <span>Visual Architecture</span>
-                      </span>
-                      <div>
-                        <h4 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
-                          {ill.title}
-                        </h4>
-                        <p className="text-[11px] text-neutral-500 dark:text-[#8e8e8e]">
-                          {ill.subtitle}
-                        </p>
-                      </div>
-                    </div>
-                    <span className="px-2 py-0.5 rounded-md bg-neutral-100 dark:bg-[#1f1f1f] border border-neutral-200 dark:border-[#333333] text-neutral-700 dark:text-[#d4d4d4] text-[10px] font-semibold">
-                      Type: {ill.svgType}
-                    </span>
+                  <div>
+                    <h4 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
+                      {ill.title}
+                    </h4>
+                    <p className="text-[11px] text-neutral-500 dark:text-[#8e8e8e]">
+                      {ill.subtitle}
+                    </p>
                   </div>
 
                   {/* Visual Analogy Metaphor */}
@@ -71,16 +60,6 @@ export const DiagramSection: React.FC<SectionProps> = ({ chapter, isOpen, onTogg
                     </div>
                     <p className="text-neutral-600 dark:text-[#a3a3a3] leading-relaxed text-[11px] sm:text-xs font-normal">
                       {ill.visualMetaphor}
-                    </p>
-                  </div>
-
-                  {/* Structured SVG Visual Blueprint Scene */}
-                  <div className="p-3 rounded-xl bg-neutral-100/70 dark:bg-[#0a0a0a] border border-neutral-200 dark:border-[#262626] text-[11px] space-y-1">
-                    <span className="text-[10px] text-neutral-800 dark:text-[#d4d4d4] uppercase tracking-wider block font-bold">
-                      📐 โครงสร้างแผนผังเชิงนามธรรม (Visual Blueprint Scene):
-                    </span>
-                    <p className="text-neutral-600 dark:text-[#8e8e8e] leading-relaxed font-normal">
-                      {ill.svgDescription}
                     </p>
                   </div>
 

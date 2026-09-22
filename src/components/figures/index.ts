@@ -14,6 +14,7 @@ import { FamilyScreenSig } from './FamilyScreenSig';
 import { FamilyStructureSig } from './FamilyStructureSig';
 import { FamilyThinkingSig } from './FamilyThinkingSig';
 import { GateTimeline } from './GateTimeline';
+import { RefundFidelity } from './RefundFidelity';
 import { RefundSequence } from './RefundSequence';
 import { RefundSwimlane } from './RefundSwimlane';
 import { TechDebtQuadrant } from './TechDebtQuadrant';
@@ -31,6 +32,7 @@ import { UncertaintySpectrum } from './UncertaintySpectrum';
  * - Make every `id` (markers, `url(#…)`, `aria-labelledby`) unique per instance with `useId()`.
  * - Wrap the root in `<div className="fig-scope">`; scale with `width: 100%; height: auto`,
  *   capped by the static per-figure `max-width`.
+ * - Figures may hold view-only UI state (e.g. mobile tabs); content stays static.
  */
 export interface FigureProps {
   className?: string;
@@ -54,6 +56,8 @@ export const FIGURES: Record<FigureKey, React.FC<FigureProps>> = {
   'c4-l4': C4L4,
   'refund-swimlane': RefundSwimlane,
   'refund-sequence': RefundSequence,
+  // s3 visual-first pilot hero (spec 2026-09-22 §2)
+  'refund-fidelity': RefundFidelity,
   // Appendix figures (spec §6)
   'translation-layers': TranslationLayers,
   'gate-timeline': GateTimeline,

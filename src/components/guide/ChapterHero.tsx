@@ -1,6 +1,7 @@
 import React from 'react';
 import { Clock, Check, Sparkles, Info, CheckCircle2 } from 'lucide-react';
 import type { Chapter, ExperienceLevel } from '../../types';
+import { HeroFigure } from './HeroFigure';
 
 interface ChapterHeroProps {
   chapter: Chapter;
@@ -56,6 +57,7 @@ export const ChapterHero: React.FC<ChapterHeroProps> = ({ chapter, experienceLev
         <p className="text-xs sm:text-sm text-neutral-500 dark:text-[#8e8e8e] leading-relaxed font-normal">
           {chapter.subtitle}
         </p>
+        {chapter.heroFigure && <HeroFigure figure={chapter.heroFigure} analogy={chapter.plainAnalogy} />}
         <p className="text-sm text-neutral-800 dark:text-[#d4d4d4] leading-relaxed" data-key-takeaway>
           <span className="font-semibold">สาระสำคัญของบทนี้:</span> {chapter.keyTakeaway}
         </p>
@@ -63,8 +65,8 @@ export const ChapterHero: React.FC<ChapterHeroProps> = ({ chapter, experienceLev
 
       {/* Quick Metaphor & Perspectives Box */}
       <div className="space-y-3">
-        {/* Plain Language Metaphor (เปรียบแบบบ้านๆ) */}
-        {experienceLevel === 'beginner' ? (
+        {/* Plain Language Metaphor (เปรียบแบบบ้านๆ); hero chapters show it as one line under the figure */}
+        {chapter.heroFigure ? null : experienceLevel === 'beginner' ? (
           <div className={analogyClassName} data-analogy>
             {analogyHeading}
             {analogyBody}

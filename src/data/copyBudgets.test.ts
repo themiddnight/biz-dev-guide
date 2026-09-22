@@ -27,6 +27,13 @@ describe('copy budgets', () => {
       over(v, at('subtitle'), ch.subtitle, 70);
       bannedOpener(v, at('subtitle'), ch.subtitle);
       over(v, at('plainAnalogy'), ch.plainAnalogy, 120);
+      if (ch.heroFigure) {
+        // Hero chapters show the caption and the analogy as single lines under the figure.
+        over(v, at('heroFigure.caption'), ch.heroFigure.caption, 60);
+        if (ch.heroFigure.caption.includes('\n')) v.push(`${at('heroFigure.caption')}: contains a newline`);
+        bannedOpener(v, at('heroFigure.caption'), ch.heroFigure.caption);
+        over(v, at('plainAnalogy (hero)'), ch.plainAnalogy, 80);
+      }
       over(v, at('keyTakeaway'), ch.keyTakeaway, 100);
       over(v, at('businessNote'), ch.businessNote, 100);
       over(v, at('engineerNote'), ch.engineerNote, 100);

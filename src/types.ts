@@ -31,7 +31,15 @@ export type FigureKey =
   | 'translation-layers'
   | 'gate-timeline'
   | 'env-flow'
-  | 'uncertainty-spectrum';
+  | 'uncertainty-spectrum'
+  | 'refund-fidelity';
+
+/** One figure shown right under a chapter's subtitle (visual-first pilot). */
+export interface ChapterHeroFigure {
+  figureKey: FigureKey;
+  /** One line, plain text (no RichText/links). Must make sense without the chapter body. */
+  caption: string;
+}
 
 export interface TableColumn {
   key: string;
@@ -121,8 +129,6 @@ export interface ChapterIllustration {
   title: string;
   subtitle: string;
   visualMetaphor: string; // อธิบายเปรียบเทียบภาพให้เข้าใจทันที
-  svgType: 'pipeline' | 'matrix' | 'triangle' | 'kitchen-architecture' | 'dual-orbit' | 'iceberg' | 'pyramid' | 'c4' | 'protocol-comparison' | 'custom';
-  svgDescription: string; // Structured description of visual scene
   elements: SvgVisualElement[];
   takeaway: string;
 }
@@ -198,6 +204,7 @@ export interface Chapter {
   checklist?: string[];
   commonPitfalls?: ChapterPitfall[];
   illustrations?: ChapterIllustration[];
+  heroFigure?: ChapterHeroFigure;
   frictionPlaybook?: FrictionPlaybook;
   contentSections?: ChapterContentSection[];
 }
