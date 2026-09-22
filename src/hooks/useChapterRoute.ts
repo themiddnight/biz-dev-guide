@@ -82,6 +82,8 @@ export function useChapterRoute(chapters: Chapter[], opts: { onChapterRoute: () 
       }
       navigatedRef.current = true;
       dispatch({ type: 'pop', hash });
+      // A chapter change with no section target starts at the top, like handleSelectChapter.
+      if (!route.section && route.chapterId !== activeRef.current) window.scrollTo({ top: 0 });
       setActiveChapterId(route.chapterId);
       setRequestedSection(route.section ? { key: route.section, nonce: ++nonceRef.current } : null);
       onRouteRef.current();
