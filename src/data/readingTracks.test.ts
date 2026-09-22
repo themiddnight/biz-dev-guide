@@ -4,11 +4,25 @@ import { resolveTrack, parseReadMinutes, getTrackMinutes, getTrackNext, getTrack
 
 const BEGINNER = ['s1', 's2', 's3', 's4', 's6', 's7', 's11', 's14'];
 const EXPERIENCED = ['s11', 's1', 's6', 's9', 's12', 's13', 's14'];
+const BIZ = ['s1', 's4', 's5', 's6', 's9', 's10', 's11', 's13'];
+const ENG = ['s1', 's2', 's3', 's4', 's12', 's11', 's14', 's9'];
 
 describe('resolveTrack', () => {
   it('maps nums to ids in config order', () => {
     expect(resolveTrack('beginner', CHAPTERS)).toEqual(BEGINNER);
     expect(resolveTrack('experienced', CHAPTERS)).toEqual(EXPERIENCED);
+  });
+  it('role tracks', () => {
+    expect(resolveTrack('biz', CHAPTERS)).toEqual(BIZ);
+    expect(resolveTrack('eng', CHAPTERS)).toEqual(ENG);
+  });
+  it('eng track puts every biz-home chapter before every eng-home chapter', () => {
+    const homeOf = (id: string) => CHAPTERS.find(c => c.id === id)?.home;
+    const bizIdx = ENG.flatMap((id, i) => (homeOf(id) === 'biz' ? [i] : []));
+    const engIdx = ENG.flatMap((id, i) => (homeOf(id) === 'eng' ? [i] : []));
+    expect(bizIdx.length).toBeGreaterThan(0);
+    expect(engIdx.length).toBeGreaterThan(0);
+    expect(Math.max(...bizIdx)).toBeLessThan(Math.min(...engIdx));
   });
   it('skips unknown nums', () => {
     expect(resolveTrack('beginner', CHAPTERS.filter(c => c.num !== 3))).toEqual(BEGINNER.filter(id => id !== 's3'));
@@ -24,6 +38,10 @@ describe('minutes', () => {
   it('track minutes 92 / 83', () => {
     expect(getTrackMinutes(BEGINNER, CHAPTERS)).toBe(92);
     expect(getTrackMinutes(EXPERIENCED, CHAPTERS)).toBe(83);
+  });
+  it('role track minutes 98 / 92', () => {
+    expect(getTrackMinutes(BIZ, CHAPTERS)).toBe(98);
+    expect(getTrackMinutes(ENG, CHAPTERS)).toBe(92);
   });
 });
 

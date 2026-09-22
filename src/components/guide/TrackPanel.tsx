@@ -1,27 +1,27 @@
 import React from 'react';
 import { Check } from 'lucide-react';
-import type { Chapter, ExperienceLevel } from '../../types';
-import { TRACK_META, getTrackMinutes, getTrackProgress, resolveTrack } from '../../data/readingTracks';
+import type { Chapter } from '../../types';
+import { TRACK_META, getTrackMinutes, getTrackProgress, resolveTrack, type TrackKey } from '../../data/readingTracks';
 
 interface TrackPanelProps {
   chapters: Chapter[];
-  experienceLevel: ExperienceLevel;
+  trackKey: TrackKey;
   readChapters: string[];
   activeChapterId: string;
   onSelectChapter: (id: string) => void;
   onStartQuiz: () => void;
 }
 
-export const TrackPanel: React.FC<TrackPanelProps> = ({ chapters, experienceLevel, readChapters, activeChapterId, onSelectChapter, onStartQuiz }) => {
-  const trackIds = resolveTrack(experienceLevel, chapters);
+export const TrackPanel: React.FC<TrackPanelProps> = ({ chapters, trackKey, readChapters, activeChapterId, onSelectChapter, onStartQuiz }) => {
+  const trackIds = resolveTrack(trackKey, chapters);
   const { read, total, firstUnreadId } = getTrackProgress(trackIds, readChapters);
   const minutes = getTrackMinutes(trackIds, chapters);
   const pct = total === 0 ? 0 : Math.round((read / total) * 100);
 
   return (
-    <div data-track-panel={experienceLevel} className="p-3 rounded-xl border border-neutral-200 dark:border-[#262626] bg-neutral-50 dark:bg-[#181818] space-y-2.5">
+    <div data-track-panel={trackKey} className="p-3 rounded-xl border border-neutral-200 dark:border-[#262626] bg-neutral-50 dark:bg-[#181818] space-y-2.5">
       <div className="flex items-baseline justify-between gap-2">
-        <h3 className="text-sm font-extrabold text-neutral-900 dark:text-[#fafafa]">{TRACK_META[experienceLevel].title}</h3>
+        <h3 className="text-sm font-extrabold text-neutral-900 dark:text-[#fafafa]">{TRACK_META[trackKey].title}</h3>
         <span className="text-[11px] text-neutral-500 dark:text-[#8e8e8e]">≈ {minutes} นาที</span>
       </div>
       <div className="space-y-1">

@@ -1,19 +1,26 @@
 import type { Chapter, ExperienceLevel } from '../types';
+import type { Role } from './rolePerspective';
 
-export const TRACK_CHAPTER_NUMS: Record<ExperienceLevel, readonly number[]> = {
+export type TrackKey = ExperienceLevel | Role;
+
+export const TRACK_CHAPTER_NUMS: Record<TrackKey, readonly number[]> = {
   beginner: [1, 2, 3, 4, 6, 7, 11, 14],
   experienced: [11, 1, 6, 9, 12, 13, 14],
+  biz: [1, 4, 5, 6, 9, 10, 11, 13], // 98 min: how software gets built, broken and fixed
+  eng: [1, 2, 3, 4, 12, 11, 14, 9], // 92 min: business-side chapters first
 };
 
-export const TRACK_META: Record<ExperienceLevel, { title: string; description: string }> = {
+export const TRACK_META: Record<TrackKey, { title: string; description: string }> = {
   beginner: { title: 'เส้นทางมือใหม่', description: 'ไล่ตั้งแต่ต้นน้ำถึงการทดสอบ แล้วปิดด้วยความขัดแย้งที่เจอบ่อย' },
   experienced: { title: 'เส้นทางคนทำงานข้ามทีม', description: 'เริ่มจากความขัดแย้งจริง แล้วลงลึกเรื่องด่านตรวจงาน หนี้เทคนิค และยุค AI' },
+  biz: { title: 'เส้นทางคนสาย Business', description: 'เข้าใจว่าทีม Engineering ทำงานยังไง ตั้งแต่สเปกถึงวันที่ระบบล่ม' },
+  eng: { title: 'เส้นทางคนสาย Engineering', description: 'เริ่มจากฝั่ง Business: ใครตัดสินใจ ทำไมต้องรีบ แล้วค่อยคุยเรื่องหนี้เทคนิค' },
 };
 
 export type ChapterRef = Pick<Chapter, 'id' | 'num' | 'readTime'>;
 
-export function resolveTrack(level: ExperienceLevel, chapters: ChapterRef[]): string[] {
-  return TRACK_CHAPTER_NUMS[level]
+export function resolveTrack(key: TrackKey, chapters: ChapterRef[]): string[] {
+  return TRACK_CHAPTER_NUMS[key]
     .map(num => chapters.find(c => c.num === num)?.id)
     .filter((id): id is string => id !== undefined);
 }

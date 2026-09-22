@@ -7,6 +7,7 @@ import {
   type SectionKey,
 } from './sectionLayers';
 import type { ExperienceLevel } from '../types';
+import { resolveChapterLevel } from './rolePerspective';
 
 const ch = (id: string) => {
   const c = CHAPTERS.find(x => x.id === id);
@@ -26,6 +27,17 @@ describe('LAYER_CONFIG', () => {
   it('isSectionKey accepts keys and rejects others', () => {
     expect(isSectionKey('diagram')).toBe(true);
     expect(isSectionKey('xyz')).toBe(false);
+  });
+});
+
+describe('role-resolved layout', () => {
+  const coreFor = (role: 'biz' | 'eng', id: string) => {
+    const level = resolveChapterLevel({ role, baseLevel: 'beginner', levelMode: 'auto', chapterLevels: {} }, ch(id)).level;
+    return getChapterLayout(level, ch(id)).find(g => g.layer === 'core')!.sections;
+  };
+  it('s6 opens as experienced for eng and beginner for biz', () => {
+    expect(coreFor('eng', 's6')).toEqual(['coreConcepts', 'pitfalls', 'diagram']);
+    expect(coreFor('biz', 's6')).toEqual(['primer', 'jargon', 'diagram']);
   });
 });
 

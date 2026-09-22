@@ -25,7 +25,8 @@ import { ChapterHero } from './guide/ChapterHero';
 import { SectionOutline } from './guide/SectionOutline';
 import { TrackPanel } from './guide/TrackPanel';
 import { TrackNextCard, TrackEndCard } from './guide/TrackFooter';
-import { getTrackNext, resolveTrack } from '../data/readingTracks';
+import { getTrackNext, resolveTrack, type TrackKey } from '../data/readingTracks';
+import { ROLE_META, otherRole, resolveChapterLevel, getActiveTrackKey, type LevelInputs, type LevelMode, type Role } from '../data/rolePerspective';
 import { FirstVisitCard } from './guide/FirstVisitCard';
 import { ResumeBanner } from './guide/ResumeBanner';
 import { 
@@ -48,8 +49,11 @@ import {
 
 interface GuideTabProps {
   chapters: Chapter[];
-  experienceLevel?: ExperienceLevel;
+  levelInputs: LevelInputs;
   onExperienceLevelChange?: (lvl: ExperienceLevel) => void;
+  onChooseRole?: (role: Role | null) => void;
+  onLevelModeChange?: (mode: LevelMode) => void;
+  onChapterLevelChange?: (chapterId: string, level: ExperienceLevel | null) => void;
   showFirstVisit?: boolean;
   onChooseInitialLevel?: (level: ExperienceLevel) => void;
   loadedFromHash: boolean;
@@ -72,8 +76,10 @@ interface GuideTabProps {
 
 export const GuideTab: React.FC<GuideTabProps> = ({
   chapters,
-  experienceLevel = 'beginner',
+  levelInputs,
   onExperienceLevelChange,
+  onChooseRole,
+  onChapterLevelChange,
   showFirstVisit,
   onChooseInitialLevel,
   loadedFromHash,
@@ -164,7 +170,10 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   const activeChapter = chapters.find(c => c.id === activeChapterId) || chapters[0];
   const activeIndex = chapters.findIndex(c => c.id === activeChapterId);
 
-  const layout = useMemo(() => getChapterLayout(experienceLevel, activeChapter), [experienceLevel, activeChapter]);
+  const { role } = levelInputs;
+  const { level: chapterLevel, source: levelSource } = resolveChapterLevel(levelInputs, activeChapter);
+  const trackKey = getActiveTrackKey(role, levelInputs.baseLevel);
+  const layout = useMemo(() => getChapterLayout(chapterLevel, activeChapter), [chapterLevel, activeChapter]);
   const [openState, setOpenState] = useState<OpenState>(() => deriveOpenState(layout, activeChapter.id));
 
   // Each chapter (and each level) opens at its Core (spec §1.4, D3).
@@ -206,7 +215,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
     el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
   const isCurrentRead = readChapters.includes(activeChapter.id);
-  const trackNext = getTrackNext(resolveTrack(experienceLevel, chapters), activeChapter.id);
+  const trackNext = getTrackNext(resolveTrack(trackKey, chapters), activeChapter.id);
 
   // Start the new chapter at its title (page top on desktop, reader card on mobile)
   const handleSelectChapter = (chapterId: string) => {
@@ -215,12 +224,20 @@ export const GuideTab: React.FC<GuideTabProps> = ({
     scrollToChapterStart('smooth');
   };
 
-  const handleFirstVisitChoice = (level: ExperienceLevel) => {
-    onChooseInitialLevel?.(level);
+  // After a first-visit choice, jump to the chosen track's first chapter.
+  const jumpToTrackStart = (key: TrackKey) => {
     if (loadedFromHash) return; // a shared link wins over onboarding (spec §4.3, D5)
-    const first = resolveTrack(level, chapters)[0];
+    const first = resolveTrack(key, chapters)[0];
     if (first) handleSelectChapter(first);
     if (!window.matchMedia('(min-width: 1024px)').matches) setIsIndexOpen(true);
+  };
+  const handleFirstVisitChoice = (level: ExperienceLevel) => {
+    onChooseInitialLevel?.(level);
+    jumpToTrackStart(level);
+  };
+  const handleFirstVisitRole = (chosen: Role) => {
+    onChooseRole?.(chosen);
+    jumpToTrackStart(chosen);
   };
   const handleFirstVisitSkip = () => onChooseInitialLevel?.('beginner');
 
@@ -305,7 +322,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
     <div className="space-y-6 pb-20">
       {/* Top Welcome & Quick Jump Banner */}
       {showFirstVisit ? (
-        <FirstVisitCard chapters={chapters} onChoose={handleFirstVisitChoice} onSkip={handleFirstVisitSkip} />
+        <FirstVisitCard chapters={chapters} onChooseRole={handleFirstVisitRole} onChoose={handleFirstVisitChoice} onSkip={handleFirstVisitSkip} />
       ) : (
       <div className="bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xs">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
@@ -383,7 +400,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
               </span>
             </div>
 
-            <TrackPanel chapters={chapters} experienceLevel={experienceLevel} readChapters={readChapters} activeChapterId={activeChapterId} onSelectChapter={handleSelectChapter} onStartQuiz={onStartQuiz} />
+            <TrackPanel chapters={chapters} trackKey={trackKey} readChapters={readChapters} activeChapterId={activeChapterId} onSelectChapter={handleSelectChapter} onStartQuiz={onStartQuiz} />
 
             <h3 data-all-chapters-heading className="text-xs font-bold text-neutral-500 dark:text-[#8e8e8e]">ทุกบท ({chapters.length})</h3>
 
@@ -583,48 +600,95 @@ export const GuideTab: React.FC<GuideTabProps> = ({
           {/* Chapter Main Content Reader Card */}
           <div id={CHAPTER_START_ID} className="bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-7 shadow-2xs space-y-5 sm:space-y-6">
             
-            <ChapterHero chapter={activeChapter} experienceLevel={experienceLevel} isRead={isCurrentRead} />
+            <ChapterHero chapter={activeChapter} experienceLevel={chapterLevel} isRead={isCurrentRead} />
 
             {/* ADAPTIVE LENS CONTROLLER BANNER */}
             <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-2 sm:space-y-2.5">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <span className="text-xs font-bold text-neutral-800 dark:text-[#e5e5e5] flex items-center gap-1.5">
-                    <SlidersHorizontal className="w-3.5 h-3.5 text-neutral-600 dark:text-[#a3a3a3]" />
-                    <span>Active Mode:</span>
-                  </span>
-                  <span className="text-[11px] sm:text-xs font-semibold px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300">
-                    {experienceLevel === 'beginner' ? '🌱 Beginner' : '⚡ Experienced'}
-                  </span>
-                </div>
+              {role === null ? (
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="text-xs font-bold text-neutral-800 dark:text-[#e5e5e5] flex items-center gap-1.5">
+                      <SlidersHorizontal className="w-3.5 h-3.5 text-neutral-600 dark:text-[#a3a3a3]" />
+                      <span>Active Mode:</span>
+                    </span>
+                    <span className="text-[11px] sm:text-xs font-semibold px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300">
+                      {chapterLevel === 'beginner' ? '🌱 Beginner' : '⚡ Experienced'}
+                    </span>
+                  </div>
 
-                {/* Quick Switch Buttons */}
-                <div className="flex items-center gap-1.5 self-start sm:self-auto">
-                  <button
-                    onClick={() => onExperienceLevelChange && onExperienceLevelChange('beginner')}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer transition-all ${
-                      experienceLevel === 'beginner'
-                        ? 'bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] shadow-xs font-bold'
-                        : 'bg-white dark:bg-[#1f1f1f] text-neutral-600 dark:text-[#a3a3a3] border border-neutral-200 dark:border-[#333333] hover:bg-neutral-100 dark:hover:bg-[#262626]'
-                    }`}
-                  >
-                    🌱 ใหม่กับเรื่องนี้
-                  </button>
-                  <button
-                    onClick={() => onExperienceLevelChange && onExperienceLevelChange('experienced')}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer transition-all ${
-                      experienceLevel === 'experienced'
-                        ? 'bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] shadow-xs font-bold'
-                        : 'bg-white dark:bg-[#1f1f1f] text-neutral-600 dark:text-[#a3a3a3] border border-neutral-200 dark:border-[#333333] hover:bg-neutral-100 dark:hover:bg-[#262626]'
-                    }`}
-                  >
-                    ⚡ ทำงานข้ามทีมมาแล้ว
-                  </button>
+                  {/* Quick Switch Buttons */}
+                  <div className="flex items-center gap-1.5 self-start sm:self-auto">
+                    <button
+                      onClick={() => onExperienceLevelChange && onExperienceLevelChange('beginner')}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer transition-all ${
+                        chapterLevel === 'beginner'
+                          ? 'bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] shadow-xs font-bold'
+                          : 'bg-white dark:bg-[#1f1f1f] text-neutral-600 dark:text-[#a3a3a3] border border-neutral-200 dark:border-[#333333] hover:bg-neutral-100 dark:hover:bg-[#262626]'
+                      }`}
+                    >
+                      🌱 ใหม่กับเรื่องนี้
+                    </button>
+                    <button
+                      onClick={() => onExperienceLevelChange && onExperienceLevelChange('experienced')}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer transition-all ${
+                        chapterLevel === 'experienced'
+                          ? 'bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] shadow-xs font-bold'
+                          : 'bg-white dark:bg-[#1f1f1f] text-neutral-600 dark:text-[#a3a3a3] border border-neutral-200 dark:border-[#333333] hover:bg-neutral-100 dark:hover:bg-[#262626]'
+                      }`}
+                    >
+                      ⚡ ทำงานข้ามทีมมาแล้ว
+                    </button>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div data-role-lens={role} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <p className="text-xs font-bold text-neutral-800 dark:text-[#e5e5e5] flex items-start gap-1.5" data-role-lens-status>
+                    <SlidersHorizontal className="w-3.5 h-3.5 mt-0.5 shrink-0 text-neutral-600 dark:text-[#a3a3a3]" />
+                    <span>
+                      {activeChapter.home === 'shared'
+                        ? 'บทนี้เป็นงานที่สองฝั่งทำร่วมกัน'
+                        : `บทนี้เป็นงาน${ROLE_META[activeChapter.home === role ? role : otherRole(role)].side}`}
+                      {' · '}
+                      {levelSource === 'global'
+                        ? 'ใช้ระดับเดียวกันทุกบท'
+                        : chapterLevel === 'experienced' ? 'เปิดแบบคุ้นงาน' : 'เปิดแบบมือใหม่'}
+                    </span>
+                  </p>
+
+                  {/* Per-chapter level switch (this chapter only) */}
+                  <div className="flex flex-wrap items-center gap-1.5 self-start sm:self-auto" role="group" aria-label="ระดับของบทนี้">
+                    {([['beginner', '🌱 มือใหม่'], ['experienced', '⚡ คุ้นงานแล้ว']] as const).map(([lvl, label]) => (
+                      <button
+                        key={lvl}
+                        type="button"
+                        data-chapter-level={lvl}
+                        aria-pressed={chapterLevel === lvl}
+                        onClick={() => onChapterLevelChange?.(activeChapter.id, lvl)}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer transition-all ${
+                          chapterLevel === lvl
+                            ? 'bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] shadow-xs font-bold'
+                            : 'bg-white dark:bg-[#1f1f1f] text-neutral-600 dark:text-[#a3a3a3] border border-neutral-200 dark:border-[#333333] hover:bg-neutral-100 dark:hover:bg-[#262626]'
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                    {levelSource === 'chapter' && (
+                      <button
+                        type="button"
+                        data-chapter-level-reset
+                        onClick={() => onChapterLevelChange?.(activeChapter.id, null)}
+                        className="text-xs font-semibold text-neutral-500 dark:text-[#8e8e8e] hover:underline cursor-pointer"
+                      >
+                        กลับไปใช้ค่าตามสายงาน
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
 
               <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e] leading-relaxed">
-                {experienceLevel === 'beginner'
+                {chapterLevel === 'beginner'
                   ? '💡 โหมดมือใหม่: เปิด จุดเริ่มต้น · ศัพท์จำเป็น · แผนภาพ ไว้ก่อน ส่วนอื่นพับไว้ในชั้น "นำไปใช้" และ "เจาะลึก"'
                   : '⚡ โหมดทำงานข้ามทีม: เปิด แนวคิดหลัก · กับดัก · แผนภาพ ไว้ก่อน วิธีรับมือ Friction อยู่ในชั้น "นำไปใช้"'}
               </p>
@@ -721,7 +785,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                 {trackNext.kind === 'next' ? (
                   <TrackNextCard next={trackNext} chapters={chapters} onSelectChapter={handleSelectChapter} />
                 ) : trackNext.kind === 'end' ? (
-                  <TrackEndCard experienceLevel={experienceLevel} onStartQuiz={onStartQuiz} onOpenIndex={openIndex} />
+                  <TrackEndCard trackKey={trackKey} onStartQuiz={onStartQuiz} onOpenIndex={openIndex} />
                 ) : (
                   nextChapter && (
                     <button
@@ -771,7 +835,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
 
             {/* Drawer Search & Filter */}
             <div className="p-4 border-b border-neutral-100 dark:border-[#262626] space-y-3 bg-neutral-50 dark:bg-[#181818]">
-              <TrackPanel chapters={chapters} experienceLevel={experienceLevel} readChapters={readChapters} activeChapterId={activeChapterId} onSelectChapter={handleSelectChapter} onStartQuiz={onStartQuiz} />
+              <TrackPanel chapters={chapters} trackKey={trackKey} readChapters={readChapters} activeChapterId={activeChapterId} onSelectChapter={handleSelectChapter} onStartQuiz={onStartQuiz} />
 
               <h3 data-all-chapters-heading className="text-xs font-bold text-neutral-500 dark:text-[#8e8e8e]">ทุกบท ({chapters.length})</h3>
 

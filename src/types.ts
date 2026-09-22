@@ -1,4 +1,5 @@
 import type { SectionKey } from './data/sectionLayers';
+import type { ChapterHome } from './data/rolePerspective';
 
 export type ExperienceLevel = 'beginner' | 'experienced';
 
@@ -197,6 +198,7 @@ export interface Chapter {
   enTerm?: string; // canonical English name, shown as a tag and matched by search
   subtitle: string;
   roleTag: 'all' | 'pm' | 'ux' | 'ba' | 'sa' | 'eng' | 'qa' | 'devops' | 'support' | 'friction' | 'ai';
+  home: ChapterHome; // which side does this work (role perspective, spec P1.1)
   businessNote: string;
   engineerNote: string;
   contentHtml?: string;

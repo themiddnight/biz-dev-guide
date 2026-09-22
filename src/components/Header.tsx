@@ -1,6 +1,7 @@
 import React from 'react';
 import { ExperienceLevel, TabType, UserStats } from '../types';
 import { LEVEL_TIERS } from '../data/badgesData';
+import { ROLE_META, type LevelMode, type Role } from '../data/rolePerspective';
 import {
   BookOpen,
   Bot,
@@ -15,11 +16,29 @@ import {
   Handshake
 } from 'lucide-react';
 
+const ROLE_OPTIONS: { value: Role | null; label: string; title?: string }[] = [
+  { value: 'biz', label: `${ROLE_META.biz.icon} Business`, title: ROLE_META.biz.origin },
+  { value: 'eng', label: `${ROLE_META.eng.icon} Engineering`, title: ROLE_META.eng.origin },
+  { value: null, label: 'ไม่ระบุ' },
+];
+
+// Segmented-control button, at least 32px tall (spec P1.4).
+const segmentClass = (active: boolean) =>
+  `flex items-center gap-1 px-2 py-1 min-h-8 rounded-[3px] text-xs transition-all cursor-pointer ${
+    active
+      ? 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 font-bold'
+      : 'text-neutral-600 dark:text-[#737373] hover:text-neutral-900 dark:hover:text-white font-medium'
+  }`;
+
 interface HeaderProps {
   activeTab: TabType;
   setActiveTab: (tab: TabType) => void;
   experienceLevel: ExperienceLevel;
   setExperienceLevel: (level: ExperienceLevel) => void;
+  role: Role | null;
+  onChooseRole: (role: Role | null) => void;
+  levelMode: LevelMode;
+  onLevelModeChange: (mode: LevelMode) => void;
   userStats: UserStats;
   theme?: 'light' | 'dark' | 'system';
   setTheme?: (theme: 'light' | 'dark' | 'system') => void;
@@ -30,6 +49,10 @@ export const Header: React.FC<HeaderProps> = ({
   setActiveTab,
   experienceLevel,
   setExperienceLevel,
+  role,
+  onChooseRole,
+  levelMode,
+  onLevelModeChange,
   userStats,
   theme = 'system',
   setTheme,
@@ -189,38 +212,94 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
         </nav>
 
-        {/* Controls: Experience Level */}
+        {/* Controls: Role + Experience Level (each group wraps onto its own row on narrow screens) */}
         <div className="flex flex-wrap items-center gap-2 shrink-0">
-          {/* Experience Level Switcher (Beginner vs Experienced) */}
+          {/* Role Switcher */}
+          <div
+            className="flex items-center p-0.5 bg-neutral-100 dark:bg-[#141414] rounded-[4px] border border-neutral-200 dark:border-[#262626]"
+            role="group"
+            aria-label="สายงานของคุณ"
+          >
+            {ROLE_OPTIONS.map(({ value, label, title }) => (
+              <button
+                key={value ?? 'none'}
+                type="button"
+                data-header-role={value ?? 'none'}
+                aria-pressed={role === value}
+                onClick={() => onChooseRole(value)}
+                title={title}
+                className={segmentClass(role === value)}
+              >
+                <span>{label}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Experience Level Switcher */}
           <div 
             className="flex items-center p-0.5 bg-neutral-100 dark:bg-[#141414] rounded-[4px] border border-neutral-200 dark:border-[#262626]"
             role="group"
             aria-label="Experience Level Switcher"
           >
-            <button
-              onClick={() => setExperienceLevel('beginner')}
-              title="สำหรับมือใหม่: เน้นเข้าใจ Mindset, Mental Model และคำศัพท์พื้นฐาน"
-              className={`flex items-center gap-1 px-2 py-1 rounded-[3px] text-xs transition-all cursor-pointer ${
-                experienceLevel === 'beginner'
-                  ? 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 font-bold'
-                  : 'text-neutral-600 dark:text-[#737373] hover:text-neutral-900 dark:hover:text-white font-medium'
-              }`}
-            >
-              <Sprout className="w-3.5 h-3.5" />
-              <span>Beginner</span>
-            </button>
-            <button
-              onClick={() => setExperienceLevel('experienced')}
-              title="สำหรับคนทำงานจริง: เน้นคู่มือรับมือ Friction, ห้องเจรจา และสคริปต์คำพูดจริง"
-              className={`flex items-center gap-1 px-2 py-1 rounded-[3px] text-xs transition-all cursor-pointer ${
-                experienceLevel === 'experienced'
-                  ? 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 font-bold'
-                  : 'text-neutral-600 dark:text-[#737373] hover:text-neutral-900 dark:hover:text-white font-medium'
-              }`}
-            >
-              <Handshake className="w-3.5 h-3.5" />
-              <span>Experienced</span>
-            </button>
+            {role === null ? (
+              <>
+                <button
+                  type="button"
+                  aria-pressed={experienceLevel === 'beginner'}
+                  onClick={() => setExperienceLevel('beginner')}
+                  title="สำหรับมือใหม่: เน้นเข้าใจ Mindset, Mental Model และคำศัพท์พื้นฐาน"
+                  className={segmentClass(experienceLevel === 'beginner')}
+                >
+                  <Sprout className="w-3.5 h-3.5" />
+                  <span>Beginner</span>
+                </button>
+                <button
+                  type="button"
+                  aria-pressed={experienceLevel === 'experienced'}
+                  onClick={() => setExperienceLevel('experienced')}
+                  title="สำหรับคนทำงานจริง: เน้นคู่มือรับมือ Friction, ห้องเจรจา และสคริปต์คำพูดจริง"
+                  className={segmentClass(experienceLevel === 'experienced')}
+                >
+                  <Handshake className="w-3.5 h-3.5" />
+                  <span>Experienced</span>
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  data-header-level-mode="auto"
+                  aria-pressed={levelMode === 'auto'}
+                  onClick={() => onLevelModeChange('auto')}
+                  title="บทฝั่งคุณเปิดแบบคุ้นงาน บทอีกฝั่งเปิดแบบมือใหม่"
+                  className={segmentClass(levelMode === 'auto')}
+                >
+                  <span>ตามสายงาน</span>
+                </button>
+                <button
+                  type="button"
+                  data-header-level-mode="beginner"
+                  aria-pressed={levelMode === 'beginner'}
+                  onClick={() => onLevelModeChange('beginner')}
+                  title="สำหรับมือใหม่: เน้นเข้าใจ Mindset, Mental Model และคำศัพท์พื้นฐาน"
+                  className={segmentClass(levelMode === 'beginner')}
+                >
+                  <Sprout className="w-3.5 h-3.5" />
+                  <span>Beginner</span>
+                </button>
+                <button
+                  type="button"
+                  data-header-level-mode="experienced"
+                  aria-pressed={levelMode === 'experienced'}
+                  onClick={() => onLevelModeChange('experienced')}
+                  title="สำหรับคนทำงานจริง: เน้นคู่มือรับมือ Friction, ห้องเจรจา และสคริปต์คำพูดจริง"
+                  className={segmentClass(levelMode === 'experienced')}
+                >
+                  <Handshake className="w-3.5 h-3.5" />
+                  <span>Experienced</span>
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>

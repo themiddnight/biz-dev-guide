@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ExperienceLevel, TabType, UserStats, Badge } from './types';
-import { readStorage, writeStorage } from './lib/storage';
+import { readStorage, writeStorage, removeStorage } from './lib/storage';
+import { parseRole, parseLevelMode, parseChapterLevels } from './lib/rolePrefs';
+import type { LevelInputs, LevelMode, Role } from './data/rolePerspective';
 import { CHAPTERS } from './data/chaptersData';
 import { formatChapterHash } from './lib/chapterRoute';
 import { useChapterRoute } from './hooks/useChapterRoute';
@@ -45,6 +47,44 @@ export default function App() {
     setExperienceLevel(level);
     writeStorage('be_guide_exp_level', level);
     setLevelChosen(true);
+  };
+
+  // Role perspective (spec P1.2). No role = today's behaviour (D2). None of these pay XP (D5).
+  const [role, setRole] = useState<Role | null>(() => parseRole(readStorage('be_guide_role')));
+  const [levelMode, setLevelMode] = useState<LevelMode>(() => parseLevelMode(readStorage('be_guide_level_mode')));
+  const [chapterLevels, setChapterLevels] = useState<Record<string, ExperienceLevel>>(() =>
+    parseChapterLevels(readStorage('be_guide_chapter_levels'), CHAPTERS.map(c => c.id))
+  );
+  const levelInputs: LevelInputs = { role, baseLevel: experienceLevel, levelMode, chapterLevels };
+
+  const persistChapterLevels = (next: Record<string, ExperienceLevel>) => {
+    setChapterLevels(next);
+    writeStorage('be_guide_chapter_levels', JSON.stringify(next));
+  };
+
+  // Changing role clears per-chapter overrides but keeps levelMode (D4).
+  const handleChooseRole = (next: Role | null) => {
+    setRole(next);
+    if (next === null) {
+      removeStorage('be_guide_role');
+      // An explicit "no role" is a choice too: without this the first-visit card would reappear.
+      if (!levelChosen) handleChooseInitialLevel(experienceLevel);
+    } else {
+      writeStorage('be_guide_role', next);
+    }
+    persistChapterLevels({});
+  };
+
+  const handleLevelModeChange = (mode: LevelMode) => {
+    setLevelMode(mode);
+    writeStorage('be_guide_level_mode', mode);
+  };
+
+  const handleChapterLevelChange = (chapterId: string, level: ExperienceLevel | null) => {
+    const next = { ...chapterLevels };
+    if (level === null) delete next[chapterId];
+    else next[chapterId] = level;
+    persistChapterLevels(next);
   };
 
   const [aiPromptPrefill, setAiPromptPrefill] = useState('');
@@ -297,6 +337,10 @@ export default function App() {
         setActiveTab={setActiveTab}
         experienceLevel={experienceLevel}
         setExperienceLevel={handleExperienceLevelChange}
+        role={role}
+        onChooseRole={handleChooseRole}
+        levelMode={levelMode}
+        onLevelModeChange={handleLevelModeChange}
         userStats={userStats}
         theme={theme}
         setTheme={setTheme}
@@ -307,9 +351,12 @@ export default function App() {
         {activeTab === 'guide' && (
           <GuideTab
             chapters={CHAPTERS}
-            experienceLevel={experienceLevel}
+            levelInputs={levelInputs}
             onExperienceLevelChange={handleExperienceLevelChange}
-            showFirstVisit={!levelChosen}
+            onChooseRole={handleChooseRole}
+            onLevelModeChange={handleLevelModeChange}
+            onChapterLevelChange={handleChapterLevelChange}
+            showFirstVisit={!levelChosen && role === null}
             onChooseInitialLevel={handleChooseInitialLevel}
             bookmarks={userStats.bookmarks}
             readChapters={userStats.readChapters}
