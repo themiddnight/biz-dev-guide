@@ -314,6 +314,7 @@ export default function App() {
           <p className="font-semibold text-slate-700 dark:text-slate-300">
             จุดที่ business กับ engineering มาเจอกัน — Interactive Knowledge &amp; Collaboration Platform
           </p>
+          <p>คู่มือกลาง แชร์ต่อได้ — ปรับปรุงเพิ่มเองได้ตามงานที่เจอจริง</p>
           <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
             ออกแบบเพื่อลดช่องว่างความเข้าใจผิดระหว่าง Business และ Engineering พร้อมเครื่องมือ AI และระบบ Interactive Gamification
           </p>
