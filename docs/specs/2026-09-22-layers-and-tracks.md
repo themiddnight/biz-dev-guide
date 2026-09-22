@@ -354,6 +354,11 @@ Section presence in that chapter is **not** checked here. It is checked at apply
     loadedFromHash: boolean;                 // true if the initial hash parsed to a chapter
     navigate(chapterId: string, section?: SectionKey): void;   // history.pushState
     replaceSection(section: SectionKey | null): void;          // history.replaceState, same chapter
+    resumeCandidate: string | null;          // §5.3
+    resumeDismissed: boolean;                // §5.4; set by navigate, popstate and dismissResume
+    hashInUrl: boolean;                      // a chapter hash existed at load or a navigation/popstate wrote one
+    dismissResume(): void;
+    clearRequestedSection(): void;           // GuideTab calls it once the request is applied
   }
   ```
 - **Init:** `route = parseChapterHash(location.hash, chapters)`.
@@ -368,7 +373,7 @@ Section presence in that chapter is **not** checked here. It is checked at apply
   - Any other `null` (invalid hash) → keep the state and `replaceState` the canonical hash.
   - This handler never pushes.
   - Browser back/forward therefore walks chapter visits. Manual hash edits also arrive as `popstate`.
-- **Tabs:** tabs are not routes (out of scope). When `activeTab !== 'guide'`, App calls `history.replaceState(null, '', location.pathname + location.search)`. When the guide tab becomes active again **after another tab**, it `replaceState`s `#/ch/{num}`. The hook never writes a hash on initial load without one, and never writes one before the first navigation. A plain visit keeps a bare URL, so a later visit is not mistaken for a deep link.
+- **Tabs:** tabs are not routes (out of scope). When `activeTab !== 'guide'`, App calls `history.replaceState(null, '', location.pathname + location.search)`. When the guide tab becomes active again **after another tab**, it `replaceState`s `#/ch/{num}` only if `hashInUrl` is true and the URL has no hash yet (a back/forward hash that brought the guide tab back is kept, section included). The hook never writes a hash on initial load without one, and never writes one before the first navigation. A plain visit keeps a bare URL, so a later visit is not mistaken for a deep link.
 - **GuideTab contract:**
   - It receives `activeChapterId`, `requestedSection`, `onNavigateChapter = navigate` and `onReplaceSection = replaceSection`.
   - All 11 call sites listed in §0 call `onNavigateChapter`. `handleSelectChapter` keeps closing the drawer and scrolling to the top.
@@ -390,7 +395,7 @@ Section presence in that chapter is **not** checked here. It is checked at apply
   - it has not been dismissed in this page session
 - **Placement:** above the chapter top navigation bar (`:495`).
 - **Copy:** `อ่านต่อจากครั้งก่อน? บทที่ {num}: {title}`, with a button `อ่านต่อบทที่ {num}` (navigate, push) and an icon button `ปิด` (`aria-label="ปิดแถบอ่านต่อ"`).
-- **Hides after** either button or any other navigation. Dismissal is session-only (component state); a later visit can show it again.
+- **Hides after** either button or any other navigation. Dismissal is session-only (held in `useChapterRoute`, so it survives GuideTab unmounting on other tabs); a later visit can show it again.
 
 ## 6. State and storage keys
 
