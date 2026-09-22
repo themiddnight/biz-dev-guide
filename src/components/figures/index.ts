@@ -6,16 +6,20 @@ import { C4L2 } from './C4L2';
 import { C4L3 } from './C4L3';
 import { C4L4 } from './C4L4';
 import { ConeOfUncertainty } from './ConeOfUncertainty';
+import { EnvFlow } from './EnvFlow';
 import { FamilyBehaviorSig } from './FamilyBehaviorSig';
 import { FamilyPlanSig } from './FamilyPlanSig';
 import { FamilyProcessSig } from './FamilyProcessSig';
 import { FamilyScreenSig } from './FamilyScreenSig';
 import { FamilyStructureSig } from './FamilyStructureSig';
 import { FamilyThinkingSig } from './FamilyThinkingSig';
+import { GateTimeline } from './GateTimeline';
 import { RefundSequence } from './RefundSequence';
 import { RefundSwimlane } from './RefundSwimlane';
 import { TechDebtQuadrant } from './TechDebtQuadrant';
 import { ThreeLenses } from './ThreeLenses';
+import { TranslationLayers } from './TranslationLayers';
+import { UncertaintySpectrum } from './UncertaintySpectrum';
 
 /**
  * Registry of static figures ported from the original HTML guide (SVG -> JSX).
@@ -50,4 +54,9 @@ export const FIGURES: Record<FigureKey, React.FC<FigureProps>> = {
   'c4-l4': C4L4,
   'refund-swimlane': RefundSwimlane,
   'refund-sequence': RefundSequence,
+  // Appendix figures (spec §6)
+  'translation-layers': TranslationLayers,
+  'gate-timeline': GateTimeline,
+  'env-flow': EnvFlow,
+  'uncertainty-spectrum': UncertaintySpectrum,
 };

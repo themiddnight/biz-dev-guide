@@ -159,6 +159,14 @@
   --fig-ok: #1a7a4c;
   --fig-ok-bg: #e9f8f0;
   --fig-ok-border: #b9e6cf;
+  /* Role colours (static --c-*), used by the uncertainty spectrum figure */
+  --fig-c-pm: hsl(18 70% 42%);
+  --fig-c-ux: hsl(300 55% 46%);
+  --fig-c-ba: hsl(50 75% 36%);
+  --fig-c-sa: hsl(205 75% 42%);
+  --fig-c-eng: hsl(170 65% 32%);
+  --fig-c-qa: hsl(135 55% 32%);
+  --fig-c-devops: hsl(280 55% 48%);
 }
 
 .dark .fig-scope {
@@ -177,4 +185,11 @@
   --fig-ok: #7fe0b3;
   --fig-ok-bg: #123324;
   --fig-ok-border: #1f5c3e;
+  --fig-c-pm: hsl(18 60% 72%);
+  --fig-c-ux: hsl(300 50% 78%);
+  --fig-c-ba: hsl(50 60% 68%);
+  --fig-c-sa: hsl(205 65% 75%);
+  --fig-c-eng: hsl(170 50% 68%);
+  --fig-c-qa: hsl(135 45% 68%);
+  --fig-c-devops: hsl(280 55% 80%);
 }

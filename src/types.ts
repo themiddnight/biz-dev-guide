@@ -29,7 +29,11 @@ export type FigureKey =
   | 'c4-l3'
   | 'c4-l4'
   | 'refund-swimlane'
-  | 'refund-sequence';
+  | 'refund-sequence'
+  | 'translation-layers'
+  | 'gate-timeline'
+  | 'env-flow'
+  | 'uncertainty-spectrum';
 
 export interface TableColumn {
   key: string;
