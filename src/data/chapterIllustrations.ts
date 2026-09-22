@@ -15,19 +15,6 @@ export const CHAPTER_ILLUSTRATIONS: Record<string, ChapterIllustration> = {
     ],
     takeaway: 'การส่งมอบซอฟต์แวร์ไม่ใช่การเสก แต่คือขบวนรถไฟที่มีด่านตรวจความถูกต้องทุกรอยต่อ'
   },
-  s2: {
-    id: 'ill-s2',
-    title: 'The 2x2 Scientific Prioritization Matrix (MoSCoW & RICE)',
-    subtitle: 'การคัดแยกฟีเจอร์ด้วยหลักวิทยาศาสตร์ ไม่ใช้อารมณ์หรือเสียงของคนที่ตำแหน่งสูงสุด',
-    visualMetaphor: 'เปรียบเหมือนการจัดกระเป๋าเดินป่าข้ามทวีป: Must Have คือน้ำดื่มและยาประจำตัว, Won\'t Have คือชุดราตรีและเครื่องประดับหรู',
-    elements: [
-      { label: 'Must Have (60%)', role: 'ขาดไม่ได้', color: '#ef4444', detail: 'หากไม่มีฟีเจอร์นี้ ระบบเปิดตัวไม่ได้หรือผิดกฎหมาย เช่น ชำระเงิน' },
-      { label: 'Should Have (20%)', role: 'จำเป็นมาก', color: '#f59e0b', detail: 'ฟังก์ชันสำคัญแต่ยังมีทางเลี่ยงชั่วคราวได้ในรอบแรก' },
-      { label: 'Could Have (20%)', role: 'ถ้ามีก็ดี', color: '#3b82f6', detail: 'ช่วยเพิ่มความประทับใจ แต่พร้อมตัดทิ้งเมื่อเวลาจวนตัว' },
-      { label: 'Won\'t Have (0%)', role: 'ตัดทิ้งเด็ดขาด', color: '#6b7280', detail: 'ตัดออกจากสปรินต์นี้เพื่อไม่ให้กินพลังงานและสมาธิทีม' }
-    ],
-    takeaway: 'การบอกปฏิเสธฟีเจอร์ที่ไม่จำเป็น คือวิธีเดียวที่จะทำให้ฟีเจอร์ที่สำคัญที่สุดส่งมอบได้ทันเวลา'
-  },
   s4: {
     id: 'ill-s4',
     title: 'The Requirement Iceberg (ภูเขาน้ำแข็งแห่งระบบ)',
@@ -40,19 +27,6 @@ export const CHAPTER_ILLUSTRATIONS: Record<string, ChapterIllustration> = {
       { label: 'Disaster Recovery (NFR)', role: 'ฐานลึกสุด', color: '#1e1b4b', detail: 'ระบบสำรองข้อมูลอัตโนมัติ กู้คืนระบบได้ใน 15 นาทีเมื่อคลาวด์ดับ' }
     ],
     takeaway: 'ฟีเจอร์ที่ไม่มี NFR รองรับ ก็เหมือนบ้านสวยงามที่สร้างอยู่บนเสาเข็มผุพัง'
-  },
-  s6: {
-    id: 'ill-s6',
-    title: 'The Two Quality Tollbooths: Definition of Ready vs Done',
-    subtitle: 'สองประตูกั้นคุณภาพ: DoR ป้องกันงานมั่วเข้าสปรินต์, DoD ป้องกันบั๊กหลุดสู่ลูกค้า',
-    visualMetaphor: 'ด่านตรวจคนเข้าเมือง: DoR ตรวจวีซ่าและเอกสารก่อนให้เข้าทำงาน, DoD ตรวจสินค้าและสัมภาระอย่างละเอียดก่อนปล่อยเครื่องบินขึ้นฟ้า',
-    elements: [
-      { label: 'Definition of Ready', role: 'ประตูปากทางเข้า', color: '#f59e0b', detail: 'เกณฑ์ว่าพร้อมทำ: ไม่เอางานครึ่งๆ กลางๆ เข้ามาสร้างความสับสนในสปรินต์' },
-      { label: 'Active Development', role: 'ภายในสปรินต์', color: '#3b82f6', detail: 'ทีมโฟกัสเขียนโค้ดและจับคู่ทำงานโดยไม่มีงานด่วนแทรกซ้อน' },
-      { label: 'Definition of Done', role: 'ประตูปากทางออก', color: '#10b981', detail: 'เกณฑ์ว่าเสร็จจริง: ผ่าน Code Review, Automation Test, และ Staging Sign-off' },
-      { label: 'Production Ready', role: 'ส่งมอบลูกค้า', color: '#059669', detail: 'ฟีเจอร์ขึ้นเซิร์ฟเวอร์อย่างสงบสุข ไม่ต้องตาม Hotfix ตอนดึก' }
-    ],
-    takeaway: 'อย่าปล่อยให้ความรีบร้อนพังประตูกั้นคุณภาพ เพราะต้นทุนการแก้งานทีหลังแพงกว่าเสมอ'
   },
   s7: {
     id: 'ill-s7',

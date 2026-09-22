@@ -5,8 +5,10 @@ import { FIGURES } from '../components/figures';
 
 const chapter = (id: string) => CHAPTERS.find((c) => c.id === id)!;
 const HERO_FIGURES: Record<string, string> = {
+  s2: 'refund-backlog-cut',
   s3: 'refund-fidelity',
   s5: 'refund-c4-impact',
+  s6: 'refund-story-gates',
   s14: 'refund-spec-stack',
 };
 const MONEY = /\$\s?\d/;

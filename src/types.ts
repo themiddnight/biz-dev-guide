@@ -36,7 +36,9 @@ export type FigureKey =
   | 'uncertainty-spectrum'
   | 'refund-fidelity'
   | 'refund-c4-impact'
-  | 'refund-spec-stack';
+  | 'refund-story-gates'
+  | 'refund-spec-stack'
+  | 'refund-backlog-cut';
 
 /** One figure shown right under a chapter's subtitle (visual-first pilot). */
 export interface ChapterHeroFigure {

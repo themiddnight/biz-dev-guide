@@ -14,10 +14,12 @@ import { FamilyScreenSig } from './FamilyScreenSig';
 import { FamilyStructureSig } from './FamilyStructureSig';
 import { FamilyThinkingSig } from './FamilyThinkingSig';
 import { GateTimeline } from './GateTimeline';
+import { RefundBacklogCut } from './RefundBacklogCut';
 import { RefundC4Impact } from './RefundC4Impact';
 import { RefundFidelity } from './RefundFidelity';
 import { RefundSequence } from './RefundSequence';
 import { RefundSpecStack } from './RefundSpecStack';
+import { RefundStoryGates } from './RefundStoryGates';
 import { RefundSwimlane } from './RefundSwimlane';
 import { TechDebtQuadrant } from './TechDebtQuadrant';
 import { ThreeLenses } from './ThreeLenses';
@@ -58,10 +60,14 @@ export const FIGURES: Record<FigureKey, React.FC<FigureProps>> = {
   'c4-l4': C4L4,
   'refund-swimlane': RefundSwimlane,
   'refund-sequence': RefundSequence,
+  // s2 hero (chapter figure briefs 2026-09-22, s2)
+  'refund-backlog-cut': RefundBacklogCut,
   // s3 visual-first pilot hero (spec 2026-09-22 §2)
   'refund-fidelity': RefundFidelity,
   // s5 hero (chapter figure briefs 2026-09-22, s5 option B)
   'refund-c4-impact': RefundC4Impact,
+  // s6 hero (chapter figure briefs 2026-09-22, s6)
+  'refund-story-gates': RefundStoryGates,
   // s14 hero (chapter figure briefs 2026-09-22, s14)
   'refund-spec-stack': RefundSpecStack,
   // Appendix figures (spec §6)

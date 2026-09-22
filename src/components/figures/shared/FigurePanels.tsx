@@ -38,8 +38,6 @@ export interface FigurePanelsProps {
   footer?: React.ReactNode;
   /** Narrow-only "ขั้น n จาก N" line under each panel. */
   stepCounter?: boolean;
-  /** Classes for the drawing wrapper; limits the drawing's width in narrow mode. */
-  screenClassName?: string;
   className?: string;
 }
 
@@ -56,6 +54,15 @@ const TAB_GRID: Record<FigurePanelsProps['columns'], string> = {
   4: 'grid grid-cols-4',
 };
 
+/**
+ * Narrow-mode cap on the drawing: 150-wide panels stop at 260px, 300-wide panels at 360px,
+ * so text never renders below 10px and never balloons in a wide stacked column.
+ */
+const SCREEN_CLASS: Record<FigurePanelsProps['columns'], string> = {
+  4: 'max-w-[260px] mx-auto @min-[640px]:max-w-none',
+  2: 'max-w-[360px] mx-auto @min-[640px]:max-w-none',
+};
+
 export const FigurePanels: React.FC<FigurePanelsProps> = ({
   panels,
   columns,
@@ -63,7 +70,6 @@ export const FigurePanels: React.FC<FigurePanelsProps> = ({
   tablistLabel,
   footer,
   stepCounter = false,
-  screenClassName = 'max-w-[260px] mx-auto @min-[640px]:max-w-none',
   className,
 }) => {
   const uid = useId();
@@ -136,7 +142,7 @@ export const FigurePanels: React.FC<FigurePanelsProps> = ({
               >
                 {panel.label}
               </p>
-              <div className={screenClassName}>
+              <div className={SCREEN_CLASS[columns]}>
                 <svg
                   viewBox={panel.viewBox}
                   role="img"
