@@ -25,6 +25,7 @@ import { SectionOutline } from './guide/SectionOutline';
 import { TrackPanel } from './guide/TrackPanel';
 import { TrackNextCard, TrackEndCard } from './guide/TrackFooter';
 import { getTrackNext, resolveTrack } from '../data/readingTracks';
+import { FirstVisitCard } from './guide/FirstVisitCard';
 import { 
   Search, 
   Bookmark, 
@@ -60,6 +61,9 @@ interface GuideTabProps {
   audienceMode: AudienceMode;
   experienceLevel?: ExperienceLevel;
   onExperienceLevelChange?: (lvl: ExperienceLevel) => void;
+  showFirstVisit?: boolean;
+  onChooseInitialLevel?: (level: ExperienceLevel) => void;
+  loadedFromHash?: boolean;
   onAudienceChange?: (mode: AudienceMode) => void;
   bookmarks: string[];
   readChapters?: string[];
@@ -76,6 +80,9 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   audienceMode,
   experienceLevel = 'beginner',
   onExperienceLevelChange,
+  showFirstVisit,
+  onChooseInitialLevel,
+  loadedFromHash = false,
   onAudienceChange,
   bookmarks,
   readChapters = [],
@@ -205,6 +212,15 @@ export const GuideTab: React.FC<GuideTabProps> = ({
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleFirstVisitChoice = (level: ExperienceLevel) => {
+    onChooseInitialLevel?.(level);
+    if (loadedFromHash) return; // a shared link wins over onboarding (spec §4.3, D5)
+    const first = resolveTrack(level, chapters)[0];
+    if (first) handleSelectChapter(first);
+    if (!window.matchMedia('(min-width: 1024px)').matches) setIsIndexOpen(true);
+  };
+  const handleFirstVisitSkip = () => onChooseInitialLevel?.('beginner');
+
   // Category map tile (s15 diagram) -> filter the glossary panel and scroll to it
   const handleSelectGlossaryCategory = (category: GlossaryCategory) => {
     setGlossaryCategory(category);
@@ -283,6 +299,9 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   return (
     <div className="space-y-6 pb-20">
       {/* Top Welcome & Quick Jump Banner */}
+      {showFirstVisit ? (
+        <FirstVisitCard chapters={chapters} onChoose={handleFirstVisitChoice} onSkip={handleFirstVisitSkip} />
+      ) : (
       <div className="bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xs">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="space-y-1.5 max-w-2xl">
@@ -341,6 +360,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
           </div>
         </div>
       </div>
+      )}
 
       {/* Main Layout: Desktop Sidebar Index + Chapter Reader Card */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-start">

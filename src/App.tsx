@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AudienceMode, ExperienceLevel, TabType, UserStats, Badge } from './types';
+import { readStorage, writeStorage } from './lib/storage';
 import { CHAPTERS } from './data/chaptersData';
 import { QUIZ_QUESTIONS } from './data/quizQuestions';
 import { INITIAL_BADGES, LEVEL_TIERS } from './data/badgesData';
@@ -14,9 +15,18 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<TabType>('guide');
   const [audienceMode, setAudienceMode] = useState<AudienceMode>('both');
   const [experienceLevel, setExperienceLevel] = useState<ExperienceLevel>(() => {
-    const saved = localStorage.getItem('be_guide_exp_level') as ExperienceLevel | null;
+    const saved = readStorage('be_guide_exp_level') as ExperienceLevel | null;
     return saved || 'beginner';
   });
+  const [levelChosen, setLevelChosen] = useState(() => readStorage('be_guide_exp_level') !== null);
+
+  // First-visit choice or skip: set and persist the level, no XP (spec §4.1).
+  const handleChooseInitialLevel = (level: ExperienceLevel) => {
+    setExperienceLevel(level);
+    writeStorage('be_guide_exp_level', level);
+    setLevelChosen(true);
+  };
+
   const [aiPromptPrefill, setAiPromptPrefill] = useState('');
   const [toastMessage, setToastMessage] = useState<{ title: string; subtitle: string } | null>(null);
 
@@ -145,9 +155,10 @@ export default function App() {
 
   // Experience level toggle handler
   const handleExperienceLevelChange = (level: ExperienceLevel) => {
+    writeStorage('be_guide_exp_level', level);
+    setLevelChosen(true);
     if (level === experienceLevel) return;
     setExperienceLevel(level);
-    localStorage.setItem('be_guide_exp_level', level);
     if (level === 'experienced') {
       addXp(15, 'เปิดโหมด Experienced: ศึกษาคัมภีร์รับมือ Friction');
     } else {
@@ -275,6 +286,8 @@ export default function App() {
             audienceMode={audienceMode}
             experienceLevel={experienceLevel}
             onExperienceLevelChange={handleExperienceLevelChange}
+            showFirstVisit={!levelChosen}
+            onChooseInitialLevel={handleChooseInitialLevel}
             onAudienceChange={handleAudienceChange}
             bookmarks={userStats.bookmarks}
             readChapters={userStats.readChapters}
