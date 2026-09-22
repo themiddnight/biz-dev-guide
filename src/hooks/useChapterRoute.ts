@@ -2,16 +2,19 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 import type { Chapter } from '../types';
 import type { SectionKey } from '../data/sectionLayers';
 import { formatChapterHash, parseChapterHash, type RequestedSection } from '../lib/chapterRoute';
+import { readStorage, writeStorage } from '../lib/storage';
 
 export interface ChapterRouteApi {
   activeChapterId: string;
   requestedSection: RequestedSection | null;
   loadedFromHash: boolean;
+  resumeCandidate: string | null;
   navigate: (chapterId: string, section?: SectionKey) => void;
   replaceSection: (section: SectionKey | null) => void;
 }
 
 const DEFAULT_CHAPTER = 's1';
+const LAST_CHAPTER_KEY = 'be_guide_last_chapter';
 
 export function useChapterRoute(chapters: Chapter[], opts: { onChapterRoute: () => void }): ChapterRouteApi {
   const [init] = useState(() => {
@@ -22,11 +25,19 @@ export function useChapterRoute(chapters: Chapter[], opts: { onChapterRoute: () 
   const [requestedSection, setRequestedSection] = useState<RequestedSection | null>(
     init.route?.section ? { key: init.route.section, nonce: 1 } : null,
   );
+  const [resumeCandidate] = useState(() => readStorage(LAST_CHAPTER_KEY));
+  const navigatedRef = useRef(false);
   const nonceRef = useRef(1);
   const activeRef = useRef(activeChapterId);
   activeRef.current = activeChapterId;
   const onRouteRef = useRef(opts.onChapterRoute);
   onRouteRef.current = opts.onChapterRoute;
+
+  // Persist only after a real navigation (or a hash load) so the untouched default 's1'
+  // never overwrites the stored chapter before the resume banner can use it (spec §5.3).
+  useEffect(() => {
+    if (navigatedRef.current || init.route !== null) writeStorage(LAST_CHAPTER_KEY, activeChapterId);
+  }, [activeChapterId, init]);
 
   const numOf = useCallback((id: string) => chapters.find(c => c.id === id)?.num, [chapters]);
 
@@ -48,6 +59,7 @@ export function useChapterRoute(chapters: Chapter[], opts: { onChapterRoute: () 
       const { hash } = window.location;
       if (hash === '' || hash === '#') {
         // The bare entry is the untouched initial page, which shows the default chapter.
+        navigatedRef.current = true;
         setActiveChapterId(DEFAULT_CHAPTER);
         setRequestedSection(null);
         onRouteRef.current();
@@ -59,6 +71,7 @@ export function useChapterRoute(chapters: Chapter[], opts: { onChapterRoute: () 
         if (num !== undefined) window.history.replaceState(null, '', formatChapterHash(num));
         return;
       }
+      navigatedRef.current = true;
       setActiveChapterId(route.chapterId);
       setRequestedSection(route.section ? { key: route.section, nonce: ++nonceRef.current } : null);
       onRouteRef.current();
@@ -68,6 +81,7 @@ export function useChapterRoute(chapters: Chapter[], opts: { onChapterRoute: () 
   }, [chapters, numOf]);
 
   const navigate = useCallback((chapterId: string, section?: SectionKey) => {
+    navigatedRef.current = true;
     const num = numOf(chapterId);
     if (num === undefined) return;
     setActiveChapterId(chapterId);
@@ -82,5 +96,12 @@ export function useChapterRoute(chapters: Chapter[], opts: { onChapterRoute: () 
     window.history.replaceState(null, '', formatChapterHash(num, section ?? undefined));
   }, [numOf]);
 
-  return { activeChapterId, requestedSection, loadedFromHash: init.route !== null, navigate, replaceSection };
+  return {
+    activeChapterId,
+    requestedSection,
+    loadedFromHash: init.route !== null,
+    resumeCandidate,
+    navigate,
+    replaceSection,
+  };
 }

@@ -26,6 +26,7 @@ import { TrackPanel } from './guide/TrackPanel';
 import { TrackNextCard, TrackEndCard } from './guide/TrackFooter';
 import { getTrackNext, resolveTrack } from '../data/readingTracks';
 import { FirstVisitCard } from './guide/FirstVisitCard';
+import { ResumeBanner } from './guide/ResumeBanner';
 import { 
   Search, 
   Bookmark, 
@@ -64,6 +65,7 @@ interface GuideTabProps {
   showFirstVisit?: boolean;
   onChooseInitialLevel?: (level: ExperienceLevel) => void;
   loadedFromHash: boolean;
+  resumeCandidate: string | null;
   onAudienceChange?: (mode: AudienceMode) => void;
   bookmarks: string[];
   readChapters?: string[];
@@ -86,6 +88,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   showFirstVisit,
   onChooseInitialLevel,
   loadedFromHash,
+  resumeCandidate,
   onAudienceChange,
   bookmarks,
   readChapters = [],
@@ -226,6 +229,15 @@ export const GuideTab: React.FC<GuideTabProps> = ({
     if (!window.matchMedia('(min-width: 1024px)').matches) setIsIndexOpen(true);
   };
   const handleFirstVisitSkip = () => onChooseInitialLevel?.('beginner');
+
+  const [resumeDismissed, setResumeDismissed] = useState(false);
+  const initialChapterRef = useRef(activeChapterId);
+  // Any navigation away from the initial chapter hides the banner for this page session.
+  useEffect(() => {
+    if (activeChapterId !== initialChapterRef.current) setResumeDismissed(true);
+  }, [activeChapterId]);
+  const resumeChapter = resumeCandidate ? chapters.find(c => c.id === resumeCandidate) : undefined;
+  const showResume = !loadedFromHash && !!resumeChapter && resumeChapter.id !== activeChapterId && !showFirstVisit && !resumeDismissed;
 
   // Category map tile (s15 diagram) -> filter the glossary panel and scroll to it
   const handleSelectGlossaryCategory = (category: GlossaryCategory) => {
@@ -485,6 +497,14 @@ export const GuideTab: React.FC<GuideTabProps> = ({
 
         {/* Right Column: Active Chapter Reader Card ("บทละหน้า") */}
         <div className="lg:col-span-8 space-y-4 sm:space-y-6">
+          {showResume && resumeChapter && (
+            <ResumeBanner
+              chapter={resumeChapter}
+              onResume={() => { setResumeDismissed(true); handleSelectChapter(resumeChapter.id); }}
+              onDismiss={() => setResumeDismissed(true)}
+            />
+          )}
+
           {/* Chapter Top Navigation Bar */}
           <div className="bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-2xs flex items-center justify-between gap-3">
             <div className="flex items-center gap-2 min-w-0">

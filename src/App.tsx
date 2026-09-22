@@ -319,6 +319,7 @@ export default function App() {
             onNavigateChapter={route.navigate}
             onReplaceSection={route.replaceSection}
             loadedFromHash={route.loadedFromHash}
+            resumeCandidate={route.resumeCandidate}
           />
         )}
 
