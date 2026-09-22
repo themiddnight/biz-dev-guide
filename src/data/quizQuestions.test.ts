@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { QUIZ_QUESTIONS } from './quizQuestions';
 import { CHAPTERS } from './chaptersData';
+import { getQuizRound } from './quizRounds';
+import type { QuizQuestion } from '../types';
 
 const chapterIds = new Set(CHAPTERS.map((c) => c.id));
 const chaptersFor = (role: 'eng' | 'biz') =>
@@ -58,5 +60,33 @@ describe('quiz questions', () => {
       q.options.filter((o) => [...o.explanation].length > 160).map((o) => `q${q.id}: ${[...o.explanation].length}`),
     );
     expect(long).toEqual([]);
+  });
+});
+
+describe('option length does not reveal the answer (I-05)', () => {
+  const len = (s: string) => [...s].length;
+  const correctOf = (q: QuizQuestion) => q.options.find(o => o.isCorrect)!;
+  const correctIsLongest = (q: QuizQuestion) => {
+    const c = correctOf(q);
+    return q.options.every(o => o === c || len(c.text) > len(o.text));
+  };
+
+  it.each(['basics', 'biz', 'eng'] as const)('%s round: the correct option is not always the longest', round => {
+    const qs = getQuizRound(QUIZ_QUESTIONS, round);
+    expect(qs.filter(correctIsLongest).length).toBeLessThan(qs.length);
+  });
+
+  it.each(['biz', 'eng'] as const)('%s round: the correct option is the longest in at most 2 questions', round => {
+    expect(getQuizRound(QUIZ_QUESTIONS, round).filter(correctIsLongest).length).toBeLessThanOrEqual(2);
+  });
+
+  it('role-round correct options are at most 1.1× the longest distractor', () => {
+    const over = QUIZ_QUESTIONS.filter(q => q.id >= 9 && q.id <= 20).flatMap(q => {
+      const c = correctOf(q);
+      const longest = Math.max(...q.options.filter(o => o !== c).map(o => len(o.text)));
+      const ratio = len(c.text) / longest;
+      return ratio > 1.1 ? [`q${q.id}: ${ratio.toFixed(2)}`] : [];
+    });
+    expect(over, over.join(', ')).toEqual([]);
   });
 });
