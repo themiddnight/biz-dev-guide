@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Chapter } from '../../../types';
+import type { Chapter, ExperienceLevel } from '../../../types';
 import type { DiagramJumpTarget } from '../../../data/diagramFamilies';
 import type { GlossaryCategory } from '../../../data/glossary';
 import type { GlossaryFilter } from '../../glossary/GlossaryPanel';
@@ -37,6 +37,7 @@ export interface GuideSectionContext {
   c4Level: number; setC4Level: (n: number) => void;
   checkedChecklist: Record<string, boolean>; onToggleChecklistItem: (key: string) => void;
   role: Role | null;
+  chapterLevel: ExperienceLevel;                            // resolved level of the open chapter; beginners see core concepts compact
   otherSideView: OtherSideView; setOtherSideView: (v: OtherSideView) => void;
 }
 

@@ -19,7 +19,7 @@ function ctx(role: Role | null, otherSideView: OtherSideView): GuideSectionConte
     glossaryQuery: '', setGlossaryQuery: noop,
     c4Level: 1, setC4Level: noop,
     checkedChecklist: {}, onToggleChecklistItem: noop,
-    role, otherSideView, setOtherSideView: noop,
+    role, chapterLevel: 'beginner', otherSideView, setOtherSideView: noop,
   };
 }
 

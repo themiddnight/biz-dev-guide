@@ -322,6 +322,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
     c4Level, setC4Level,
     checkedChecklist, onToggleChecklistItem: toggleChecklistItem,
     role,
+    chapterLevel,
     otherSideView, setOtherSideView,
   };
 

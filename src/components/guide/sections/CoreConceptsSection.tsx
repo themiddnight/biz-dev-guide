@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { getInlineSectionsAt } from '../../../data/sectionLayers';
 import { InlineSections } from '../InlineSections';
 import type { SectionProps } from './registry';
 
 export const CoreConceptsSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggle, ctx }) => {
+  // Beginners see each concept compact (heading + detail); bullets and inline sections sit behind a toggle.
+  const [moreOpen, setMoreOpen] = useState<Record<number, boolean>>({});
   if (!chapter.coreConcepts || chapter.coreConcepts.length === 0) return null;
+  const compact = ctx.chapterLevel === 'beginner';
   return (
     <div className="border border-neutral-200 dark:border-[#262626] rounded-2xl overflow-hidden bg-white dark:bg-[#141414] shadow-2xs">
       <button
@@ -30,7 +33,12 @@ export const CoreConceptsSection: React.FC<SectionProps> = ({ chapter, isOpen, o
 
       {isOpen && (
         <div className="p-3.5 sm:p-5 space-y-3.5 border-t border-neutral-100 dark:border-[#262626] bg-white dark:bg-[#141414]">
-          {chapter.coreConcepts.map((concept, cIdx) => (
+          {chapter.coreConcepts.map((concept, cIdx) => {
+            const inline = getInlineSectionsAt(chapter, 'coreConcepts', cIdx);
+            const bulletCount = concept.bulletPoints?.length ?? 0;
+            const hasMore = bulletCount > 0 || inline.length > 0;
+            const showMore = !compact || !!moreOpen[cIdx];
+            return (
             <React.Fragment key={cIdx}>
               <div
                 className="p-3.5 sm:p-4 rounded-xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-2"
@@ -42,7 +50,18 @@ export const CoreConceptsSection: React.FC<SectionProps> = ({ chapter, isOpen, o
                 <p className="text-xs sm:text-sm text-neutral-600 dark:text-[#a3a3a3] leading-relaxed pl-3 font-normal">
                   {concept.detail}
                 </p>
-                {concept.bulletPoints && concept.bulletPoints.length > 0 && (
+                {compact && hasMore && (
+                  <button
+                    type="button"
+                    data-concept-more={cIdx}
+                    aria-expanded={!!moreOpen[cIdx]}
+                    onClick={() => setMoreOpen(prev => ({ ...prev, [cIdx]: !prev[cIdx] }))}
+                    className="ml-3 inline-flex items-center gap-1 text-[11px] sm:text-xs font-semibold text-neutral-700 dark:text-[#d4d4d4] underline underline-offset-2 hover:text-neutral-900 dark:hover:text-white cursor-pointer"
+                  >
+                    {moreOpen[cIdx] ? 'ซ่อนรายละเอียด' : bulletCount > 0 ? `ดูรายละเอียด (${bulletCount} ข้อ)` : 'ดูรายละเอียด'}
+                  </button>
+                )}
+                {showMore && concept.bulletPoints && concept.bulletPoints.length > 0 && (
                   <ul className="pt-1 pl-7 space-y-1.5 list-disc text-xs sm:text-sm text-neutral-600 dark:text-[#a3a3a3] font-normal">
                     {concept.bulletPoints.map((bp, bpIdx) => (
                       <li key={bpIdx} className="leading-relaxed">{bp}</li>
@@ -50,12 +69,15 @@ export const CoreConceptsSection: React.FC<SectionProps> = ({ chapter, isOpen, o
                   </ul>
                 )}
               </div>
-              <InlineSections
-                sections={getInlineSectionsAt(chapter, 'coreConcepts', cIdx)}
-                onNavigateChapter={ctx.onNavigateChapter}
-              />
+              {showMore && (
+                <InlineSections
+                  sections={inline}
+                  onNavigateChapter={ctx.onNavigateChapter}
+                />
+              )}
             </React.Fragment>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { CHAPTERS } from './chaptersData';
 import {
-  LAYERS, SECTION_KEYS, LAYER_CONFIG, SECTION_META,
+  LAYERS, SECTION_KEYS, LAYER_CONFIG, SECTION_META, sectionMinutes,
   getLayerOf, getChapterLayout, deriveOpenState, expandAll, collapseAll,
   openSection, toggleSection, toggleLayer, isSectionPresent, isSectionKey, sectionHasTool,
   type SectionKey,
@@ -29,7 +29,9 @@ describe('LAYER_CONFIG', () => {
     expect(isSectionKey('xyz')).toBe(false);
   });
   it('core puts otherSide after the primer for beginners and first for experienced (P2.2)', () => {
-    expect(LAYER_CONFIG.beginner.core).toEqual(['primer', 'otherSide', 'jargon', 'diagram']);
+    expect(LAYER_CONFIG.beginner.core).toEqual(['primer', 'otherSide', 'coreConcepts', 'jargon', 'diagram']);
+    expect(LAYER_CONFIG.beginner.apply).toContain('pitfalls');
+    expect(LAYER_CONFIG.beginner.deep).toEqual(['reference', 'glossary', 'mindset']);
     expect(LAYER_CONFIG.experienced.core).toEqual(['otherSide', 'coreConcepts', 'pitfalls', 'diagram']);
     expect(SECTION_META.otherSide).toEqual({ chip: 'อีกฝั่งมองยังไง', minutes: 2 });
   });
@@ -42,7 +44,7 @@ describe('role-resolved layout', () => {
   };
   it('s6 opens as experienced for eng and beginner for biz', () => {
     expect(coreFor('eng', 's6')).toEqual(['otherSide', 'coreConcepts', 'pitfalls', 'diagram']);
-    expect(coreFor('biz', 's6')).toEqual(['primer', 'otherSide', 'jargon', 'diagram']);
+    expect(coreFor('biz', 's6')).toEqual(['primer', 'otherSide', 'coreConcepts', 'jargon', 'diagram']);
   });
 });
 
@@ -51,6 +53,8 @@ describe('getLayerOf', () => {
     expect(getLayerOf('beginner', 'jargon', 's1')).toBe('core');
     expect(getLayerOf('beginner', 'friction', 's1')).toBe('apply');
     expect(getLayerOf('beginner', 'mindset', 's1')).toBe('deep');
+    expect(getLayerOf('beginner', 'coreConcepts', 's1')).toBe('core');
+    expect(getLayerOf('beginner', 'pitfalls', 's1')).toBe('apply');
   });
   it('experienced samples', () => {
     expect(getLayerOf('experienced', 'pitfalls', 's1')).toBe('core');
@@ -66,7 +70,7 @@ describe('getLayerOf', () => {
 
 describe('getChapterLayout', () => {
   it('beginner s1 core', () => {
-    expect(core('beginner', 's1')).toEqual(['primer', 'otherSide', 'jargon']);
+    expect(core('beginner', 's1')).toEqual(['primer', 'otherSide', 'coreConcepts', 'jargon']);
   });
   it('experienced s1 core', () => {
     expect(core('experienced', 's1')).toEqual(['otherSide', 'coreConcepts', 'pitfalls']);
@@ -77,7 +81,7 @@ describe('getChapterLayout', () => {
     }
   });
   it('s15 has no jargon; glossary leads core for both levels', () => {
-    expect(core('beginner', 's15')).toEqual(['glossary', 'primer', 'otherSide', 'diagram']);
+    expect(core('beginner', 's15')).toEqual(['glossary', 'primer', 'otherSide', 'coreConcepts', 'diagram']);
     expect(core('experienced', 's15')).toEqual(['glossary', 'otherSide', 'coreConcepts', 'pitfalls', 'diagram']);
     for (const level of LEVELS) {
       const keys = getChapterLayout(level, ch('s15')).flatMap(g => g.sections);
@@ -92,13 +96,21 @@ describe('getChapterLayout', () => {
       expect(rest('s11')).not.toContain('faq');
       expect(rest('s15')).not.toContain('glossary');
     }
-    expect(core('beginner', 's11')).toEqual(['faq', 'primer', 'otherSide', 'jargon', 'diagram']);
+    expect(core('beginner', 's11')).toEqual(['faq', 'primer', 'otherSide', 'coreConcepts', 'jargon', 'diagram']);
   });
-  it('layer minutes = sum of SECTION_META minutes', () => {
-    for (const g of getChapterLayout('beginner', ch('s1'))) {
-      expect(g.minutes).toBe(g.sections.reduce((s, k) => s + SECTION_META[k].minutes, 0));
+  it('layer minutes = sum of sectionMinutes', () => {
+    for (const level of LEVELS) for (const g of getChapterLayout(level, ch('s1'))) {
+      expect(g.minutes).toBe(g.sections.reduce((s, k) => s + sectionMinutes(level, k), 0));
     }
-    expect(getChapterLayout('beginner', ch('s1'))[0].minutes).toBe(6); // primer + otherSide + jargon; s1 has no Diagram section after Q4
+    expect(getChapterLayout('beginner', ch('s1'))[0].minutes).toBe(7); // primer + otherSide + coreConcepts (1) + jargon; s1 has no Diagram section after Q4
+  });
+  it('sectionMinutes: compact core concepts count 1 minute for beginners only', () => {
+    expect(sectionMinutes('beginner', 'coreConcepts')).toBe(1);
+    expect(sectionMinutes('experienced', 'coreConcepts')).toBe(3);
+    expect(sectionMinutes('beginner', 'primer')).toBe(SECTION_META.primer.minutes);
+  });
+  it('every chapter has coreConcepts in the beginner Core layer', () => {
+    for (const c of CHAPTERS) expect(core('beginner', c.id)).toContain('coreConcepts');
   });
 });
 

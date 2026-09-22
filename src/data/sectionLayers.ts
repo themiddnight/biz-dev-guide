@@ -15,9 +15,9 @@ export const SECTION_KEYS: readonly SectionKey[] = [
 
 export const LAYER_CONFIG: Record<ExperienceLevel, Record<Layer, readonly SectionKey[]>> = {
   beginner: {
-    core: ['primer', 'otherSide', 'jargon', 'diagram'],
-    apply: ['dialogue', 'examples', 'workflow', 'checklist', 'faq', 'friction'],
-    deep: ['coreConcepts', 'pitfalls', 'reference', 'glossary', 'mindset'],
+    core: ['primer', 'otherSide', 'coreConcepts', 'jargon', 'diagram'],
+    apply: ['dialogue', 'examples', 'workflow', 'checklist', 'pitfalls', 'faq', 'friction'],
+    deep: ['reference', 'glossary', 'mindset'],
   },
   experienced: {
     core: ['otherSide', 'coreConcepts', 'pitfalls', 'diagram'],
@@ -49,6 +49,15 @@ export const SECTION_META: Record<SectionKey, { chip: string; minutes: number }>
   mindset: { chip: 'วิธีคิดแต่ละบทบาท', minutes: 2 },
   otherSide: { chip: 'อีกฝั่งมองยังไง', minutes: 2 },
 };
+
+/**
+ * Reading minutes of one section at a level. Beginners see core concepts compact
+ * (heading + detail only), so they count 1 minute instead of 3 (role UX fixes D3).
+ */
+export function sectionMinutes(level: ExperienceLevel, key: SectionKey): number {
+  if (level === 'beginner' && key === 'coreConcepts') return 1;
+  return SECTION_META[key].minutes;
+}
 
 /** Layer header name (spec §2.3) and short outline label (spec §2.1). */
 export const LAYER_META: Record<Layer, { name: string; short: string }> = {
@@ -141,7 +150,7 @@ export function getLayerOf(level: ExperienceLevel, key: SectionKey, chapterId: s
 export function getChapterLayout(level: ExperienceLevel, chapter: Chapter): LayerGroup[] {
   return LAYERS.map(layer => {
     const sections = layerKeys(level, layer, chapter.id).filter(k => isSectionPresent(chapter, k));
-    return { layer, sections, minutes: sections.reduce((sum, k) => sum + SECTION_META[k].minutes, 0) };
+    return { layer, sections, minutes: sections.reduce((sum, k) => sum + sectionMinutes(level, k), 0) };
   });
 }
 
