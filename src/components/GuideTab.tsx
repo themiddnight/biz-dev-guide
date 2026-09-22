@@ -14,11 +14,13 @@ import {
   toggleSection,
   toggleLayer,
   isSectionPresent,
+  getInlineSectionsAt,
   type OpenState,
   type SectionKey,
 } from '../data/sectionLayers';
 import type { RequestedSection } from '../lib/chapterRoute';
 import { LayerGroupView } from './guide/LayerGroup';
+import { InlineSections } from './guide/InlineSections';
 import { ChapterHero } from './guide/ChapterHero';
 import { SectionOutline } from './guide/SectionOutline';
 import { TrackPanel } from './guide/TrackPanel';
@@ -654,6 +656,13 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                         onToggle={() => setOpenState(prev => toggleSection(prev, key))}
                         ctx={sectionCtx}
                       />
+                      {openState.sections[key] && (
+                        <InlineSections
+                          className="mt-3.5"
+                          sections={getInlineSectionsAt(activeChapter, key)}
+                          onNavigateChapter={sectionCtx.onNavigateChapter}
+                        />
+                      )}
                     </section>
                   );
                 })}

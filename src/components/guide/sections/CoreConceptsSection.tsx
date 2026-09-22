@@ -1,8 +1,10 @@
 import React from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import { getInlineSectionsAt } from '../../../data/sectionLayers';
+import { InlineSections } from '../InlineSections';
 import type { SectionProps } from './registry';
 
-export const CoreConceptsSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggle }) => {
+export const CoreConceptsSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggle, ctx }) => {
   if (!chapter.coreConcepts || chapter.coreConcepts.length === 0) return null;
   return (
     <div className="border border-neutral-200 dark:border-[#262626] rounded-2xl overflow-hidden bg-white dark:bg-[#141414] shadow-2xs">
@@ -29,25 +31,30 @@ export const CoreConceptsSection: React.FC<SectionProps> = ({ chapter, isOpen, o
       {isOpen && (
         <div className="p-3.5 sm:p-5 space-y-3.5 border-t border-neutral-100 dark:border-[#262626] bg-white dark:bg-[#141414]">
           {chapter.coreConcepts.map((concept, cIdx) => (
-            <div
-              key={cIdx}
-              className="p-3.5 sm:p-4 rounded-xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-2"
-            >
-              <div className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa] flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-neutral-900 dark:bg-white inline-block"></span>
-                <span>{concept.heading}</span>
+            <React.Fragment key={cIdx}>
+              <div
+                className="p-3.5 sm:p-4 rounded-xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-2"
+              >
+                <div className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa] flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-neutral-900 dark:bg-white inline-block"></span>
+                  <span>{concept.heading}</span>
+                </div>
+                <p className="text-xs sm:text-sm text-neutral-600 dark:text-[#a3a3a3] leading-relaxed pl-3 font-normal">
+                  {concept.detail}
+                </p>
+                {concept.bulletPoints && concept.bulletPoints.length > 0 && (
+                  <ul className="pt-1 pl-7 space-y-1.5 list-disc text-xs sm:text-sm text-neutral-600 dark:text-[#a3a3a3] font-normal">
+                    {concept.bulletPoints.map((bp, bpIdx) => (
+                      <li key={bpIdx} className="leading-relaxed">{bp}</li>
+                    ))}
+                  </ul>
+                )}
               </div>
-              <p className="text-xs sm:text-sm text-neutral-600 dark:text-[#a3a3a3] leading-relaxed pl-3 font-normal">
-                {concept.detail}
-              </p>
-              {concept.bulletPoints && concept.bulletPoints.length > 0 && (
-                <ul className="pt-1 pl-7 space-y-1.5 list-disc text-xs sm:text-sm text-neutral-600 dark:text-[#a3a3a3] font-normal">
-                  {concept.bulletPoints.map((bp, bpIdx) => (
-                    <li key={bpIdx} className="leading-relaxed">{bp}</li>
-                  ))}
-                </ul>
-              )}
-            </div>
+              <InlineSections
+                sections={getInlineSectionsAt(chapter, 'coreConcepts', cIdx)}
+                onNavigateChapter={ctx.onNavigateChapter}
+              />
+            </React.Fragment>
           ))}
         </div>
       )}

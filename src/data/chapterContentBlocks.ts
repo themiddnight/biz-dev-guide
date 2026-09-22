@@ -83,7 +83,7 @@ export const CHAPTER_CONTENT: Record<string, ChapterContentSection[]> = {
     },
   ],
 
-  // Static s5 lines 757–925 (T1 in the Diagram section; 5.2 and 5.3 in Reference)
+  // Static s5 lines 757–925 (T1 in the Diagram section; fig 4 inline after core concept 1; 5.2 and 5.3 in Reference)
   s5: [
     {
       placement: 'diagram',
@@ -121,7 +121,10 @@ export const CHAPTER_CONTENT: Record<string, ChapterContentSection[]> = {
       ],
     },
     {
-      heading: '5.2 สามมุมมองที่ใช้ในงาน solution design',
+      // Inline after core concept 1 "C4 Model ทั้ง 4 ระดับ" (figure briefs s5)
+      placement: 'inline',
+      after: 'coreConcepts',
+      conceptIndex: 0,
       blocks: [
         {
           kind: 'figure',
@@ -130,6 +133,11 @@ export const CHAPTER_CONTENT: Record<string, ChapterContentSection[]> = {
           title: 'ระบบเดียวกัน มองด้วยเลนส์สามแบบ ได้คนละภาพ',
           caption: 'สองมุมแรกบอกว่า "มีอะไรอยู่" มุมที่สามเท่านั้นที่บอกเรื่อง "เวลา" — ระบบที่มีชิ้นส่วนครบทุกอย่างยังพังได้ ถ้าลำดับการเรียกผิด',
         },
+      ],
+    },
+    {
+      heading: '5.2 สามมุมมองที่ใช้ในงาน solution design',
+      blocks: [
         {
           kind: 'table',
           id: 's5-three-views',
@@ -191,13 +199,6 @@ export const CHAPTER_CONTENT: Record<string, ChapterContentSection[]> = {
           id: 's5-standards-note',
           tone: 'info',
           body: 'UML กับ BPMN ดูแลโดยองค์กรเดียวกัน (OMG) แต่คนละจุดเน้น — UML มองจากมุมซอฟต์แวร์ BPMN มองจากมุม process ธุรกิจ ส่วน C4 เป็น convention ที่ได้รับความนิยมจนกลายเป็นมาตรฐานโดยพฤตินัย ไม่ใช่มาตรฐานทางการของ OMG',
-        },
-        {
-          kind: 'figure',
-          id: 's5-c4-l1-hero',
-          figureKey: 'c4-l1-hero',
-          title: 'ถ้าจะอ่านออกแค่ภาพเดียวในชีวิต ให้เป็นภาพนี้ (C4 level 1)',
-          caption: 'ใช้เวลาเรียนไม่ถึง 10 นาที และเป็นภาพที่คุ้มที่สุดสำหรับคนฝั่ง business — เพราะทุกครั้งที่คุณขอฟีเจอร์ใหม่ คำถามแรกคือมันไปแตะกล่องไหนบ้าง ดูอีก 3 ระดับที่ลึกลงไปได้ที่ Interactive C4 Model Explorer ในส่วนแผนภาพด้านบน',
         },
       ],
     },

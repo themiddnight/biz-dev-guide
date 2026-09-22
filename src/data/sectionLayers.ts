@@ -1,4 +1,4 @@
-import type { Chapter, ChapterContentSection, ExperienceLevel } from '../types';
+import type { Chapter, ChapterContentSection, ContentPlacement, ExperienceLevel } from '../types';
 
 export type Layer = 'core' | 'apply' | 'deep';
 export const LAYERS: readonly Layer[] = ['core', 'apply', 'deep'];
@@ -62,8 +62,29 @@ export function isSectionKey(value: string): value is SectionKey {
   return (SECTION_KEYS as readonly string[]).includes(value);
 }
 
+/** A section's effective placement; unset means Reference. */
+export function placementOf(section: ChapterContentSection): ContentPlacement {
+  return section.placement ?? 'reference';
+}
+
 export function getReferenceSections(chapter: Chapter): ChapterContentSection[] {
-  return (chapter.contentSections ?? []).filter(section => section.placement !== 'diagram');
+  return (chapter.contentSections ?? []).filter(section => placementOf(section) === 'reference');
+}
+
+export type InlineContentSection = Extract<ChapterContentSection, { placement: 'inline' }>;
+
+export function getInlineSections(chapter: Chapter): InlineContentSection[] {
+  return (chapter.contentSections ?? []).filter(
+    (section): section is InlineContentSection => section.placement === 'inline',
+  );
+}
+
+/**
+ * Inline sections anchored after `key`. With `conceptIndex` omitted, returns those that
+ * follow the whole section body; with a number, those that follow that core concept.
+ */
+export function getInlineSectionsAt(chapter: Chapter, key: SectionKey, conceptIndex?: number): InlineContentSection[] {
+  return getInlineSections(chapter).filter(s => s.after === key && s.conceptIndex === conceptIndex);
 }
 
 /** Mirrors the pre-refactor render guards in GuideTab exactly (spec §1.3). */

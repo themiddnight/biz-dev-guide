@@ -14,6 +14,7 @@ import { FamilyScreenSig } from './FamilyScreenSig';
 import { FamilyStructureSig } from './FamilyStructureSig';
 import { FamilyThinkingSig } from './FamilyThinkingSig';
 import { GateTimeline } from './GateTimeline';
+import { RefundC4Impact } from './RefundC4Impact';
 import { RefundFidelity } from './RefundFidelity';
 import { RefundSequence } from './RefundSequence';
 import { RefundSwimlane } from './RefundSwimlane';
@@ -58,6 +59,8 @@ export const FIGURES: Record<FigureKey, React.FC<FigureProps>> = {
   'refund-sequence': RefundSequence,
   // s3 visual-first pilot hero (spec 2026-09-22 §2)
   'refund-fidelity': RefundFidelity,
+  // s5 hero (chapter figure briefs 2026-09-22, s5 option B)
+  'refund-c4-impact': RefundC4Impact,
   // Appendix figures (spec §6)
   'translation-layers': TranslationLayers,
   'gate-timeline': GateTimeline,

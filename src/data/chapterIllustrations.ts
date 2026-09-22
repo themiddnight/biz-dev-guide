@@ -41,19 +41,6 @@ export const CHAPTER_ILLUSTRATIONS: Record<string, ChapterIllustration> = {
     ],
     takeaway: 'ฟีเจอร์ที่ไม่มี NFR รองรับ ก็เหมือนบ้านสวยงามที่สร้างอยู่บนเสาเข็มผุพัง'
   },
-  s5: {
-    id: 'ill-s5',
-    title: 'The Kitchen Metaphor: Monolith vs Microservices & Gateway',
-    subtitle: 'ครัวรวมศูนย์ชะงักงัน vs ครัวสถานีแยกพร้อม Maitre d\' API Gateway',
-    visualMetaphor: 'ครัวเดี่ยวที่เชฟคนเดียวทำทุกอย่าง (Monolith) ถ้ากระทะไหม้ทั้งร้านต้องหยุด เทียบกับครัวโรงแรมหรู (Microservices) ที่แยกสถานีซุป สเต็ก ขนมหวาน โดยมีหัวหน้าบริกร (API Gateway) คอยจัดคิว',
-    elements: [
-      { label: 'API Gateway', role: 'หัวหน้าบริกร', color: '#8b5cf6', detail: 'จุดรับคำขอเดียว ตรวจสิทธิ์ Rate Limiting และแจกจ่ายงาน' },
-      { label: 'User Service', role: 'สถานีสมาชิก', color: '#3b82f6', detail: 'ดูแลบัญชีและโปรไฟล์ ข้อมูลไม่ปะปนกับบริการอื่น' },
-      { label: 'Order & Payment', role: 'สถานีเงินสด', color: '#10b981', detail: 'ประมวลผลคำสั่งซื้อและตัดบัตร มีความมั่นคงปลอดภัยสูงสุด' },
-      { label: 'Inventory Service', role: 'สถานีคลังสินค้า', color: '#f59e0b', detail: 'ตัดสต็อกแบบเรียลไทม์ พร้อมระบบสำรองป้องกันของหมด' }
-    ],
-    takeaway: 'เลือก Monolith สำหรับความเร็วในการเริ่มต้น และแยกเป็น Microservices เมื่อขนาดทีมและโหลดของระบบต้องการความอิสระ'
-  },
   s6: {
     id: 'ill-s6',
     title: 'The Two Quality Tollbooths: Definition of Ready vs Done',
@@ -170,22 +157,4 @@ export const CHAPTER_ILLUSTRATIONS: Record<string, ChapterIllustration> = {
     ],
     takeaway: 'ความชัดเจนในเอกสารเพียง 1 ประโยค ช่วยประหยัดเวลาการถกเถียงและเขียนโค้ดผิดพลาดได้นับร้อยชั่วโมง'
   }
-};
-
-// Extra cards shown after a chapter's primary illustration.
-export const EXTRA_CHAPTER_ILLUSTRATIONS: Record<string, ChapterIllustration[]> = {
-  s5: [
-    {
-      id: 'ill-s5-protocols',
-      title: 'The Visual Communication Matrix (REST API vs Webhook vs WebSocket)',
-      subtitle: 'เปรียบเทียบ 3 โปรโตคอล: เลือกวิธีส่งข้อมูลให้ถูกงาน ประหยัดค่าเซิร์ฟเวอร์และลดอาการค้าง',
-      visualMetaphor: 'การติดตามพัสดุ: REST คือการโทรเช็คกับไปรษณีย์ทุกๆ 5 นาที (เหนื่อยและเปลือง), Webhook คือบุรุษไปรษณีย์มากดกริ่งหน้าบ้านเมื่อของถึง (ทันทีและประหยัด), WebSocket คือเปิดสายโทรศัพท์คุยสดตลอดเวลา (สำหรับเรื่องฉุกเฉิน)',
-      elements: [
-        { label: 'REST API (Polling)', role: 'ถามซ้ำๆ เป็นรอบ', color: '#3b82f6', detail: 'Client ส่งคำขอไปถาม Server เหมาะสำหรับการดึงข้อมูลทั่วไป เช่น หน้ารายการสินค้า' },
-        { label: 'Webhook (Event-Driven)', role: 'กริ่งประตูดังทันที', color: '#10b981', detail: 'Server ต้นทางยิงข้อมูลมาบอกเมื่อเกิดเหตุการณ์ เช่น แจ้งเตือนเงินเข้าจากธนาคาร' },
-        { label: 'WebSocket (Real-Time)', role: 'ท่อสายตรงสองทาง', color: '#f59e0b', detail: 'เปิดการเชื่อมต่อค้างไว้ เหมาะสำหรับแอปแชท หุ้น และการติดตามพิกัดไรเดอร์' }
-      ],
-      takeaway: 'ไม่มีโปรโตคอลที่ดีที่สุดสำหรับทุกงาน มีแต่โปรโตคอลที่เหมาะสมที่สุดกับลักษณะการใช้งานและทรัพยากร'
-    }
-  ]
 };

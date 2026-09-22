@@ -1,13 +1,13 @@
 import React from 'react';
 import { ChevronDown, ExternalLink } from 'lucide-react';
-import { ChapterContentSection, ContentBlock, FigureKey } from '../../types';
+import { ChapterContentSection, ContentBlock, ContentPlacement, FigureKey } from '../../types';
 import { FIGURES, FigureProps } from '../figures';
 import { ContentTable } from './ContentTable';
 import { RichText } from './RichText';
 
 interface ContentBlocksProps {
   sections: ChapterContentSection[];
-  placement: 'reference' | 'diagram';
+  placement: ContentPlacement;
   onNavigateChapter?: (chapterId: string) => void;
 }
 
@@ -35,7 +35,6 @@ const getFigure = (key: FigureKey): React.FC<FigureProps> | undefined => FIGURES
 
 // Figures drawn ≥600 units wide: keep labels legible on narrow screens by scrolling inside the figure only.
 const WIDE_FIGURES: ReadonlySet<FigureKey> = new Set<FigureKey>([
-  'three-lenses',
   'c4-l1-hero',
   'translation-layers',
   'gate-timeline',
@@ -165,9 +164,8 @@ const Block: React.FC<BlockProps> = ({ block, onNavigateChapter }) => {
 };
 
 export const ContentBlocks: React.FC<ContentBlocksProps> = ({ sections, placement, onNavigateChapter }) => {
-  const visible = sections.filter(section =>
-    placement === 'diagram' ? section.placement === 'diagram' : section.placement !== 'diagram'
-  );
+  // Unset placement means Reference; 'diagram' and 'inline' sections render only where asked for.
+  const visible = sections.filter(section => (section.placement ?? 'reference') === placement);
 
   if (visible.length === 0) return null;
 

@@ -579,7 +579,7 @@ export const chapters1_5: Chapter[] = [
     businessNote: 'ขอดูแผนผัง Level 1 (System Context) ให้เข้าใจว่าระบบเราคุยกับใคร และเงินกับข้อมูลวิ่งไปทางไหน',
     engineerNote: 'ใช้ C4 Model และเขียนกำกับทุกกล่องทุกเส้น ให้ตั้งแต่เด็กฝึกงานถึงผู้บริหารดูภาพเดียวกันรู้เรื่อง',
     keyTakeaway: 'แผนผังที่ดีคือแผนผังที่คนนอกทีมดูแล้วชี้ได้ว่า ถ้าเซิร์ฟเวอร์ตัวนี้พัง ลูกค้ากลุ่มไหนโดนผลกระทบ',
-    plainAnalogy: 'เหมือนซูม Google Maps: L1 เห็นทั้งประเทศ, L2 เห็นถนนสายหลัก, L3 เห็นตึกแต่ละหลัง, L4 เห็นสายไฟและท่อน้ำในบ้าน',
+    plainAnalogy: 'เหมือนซูม Google Maps: L1 ทั้งประเทศ, L2 ถนนหลัก, L3 ตึก, L4 สายไฟในบ้าน',
     readTime: '13 นาที',
     diagramTitle: 'Interactive C4 Architecture Model (การซูม 4 ระดับ)',
     diagramDescription: 'เครื่องมือจำลองการซูมแผนผังระบบ: Level 1 (Context), Level 2 (Containers), Level 3 (Components), และ Level 4 (Code/Classes)',

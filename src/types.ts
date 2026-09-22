@@ -1,3 +1,5 @@
+import type { SectionKey } from './data/sectionLayers';
+
 export type ExperienceLevel = 'beginner' | 'experienced';
 
 /**
@@ -32,7 +34,8 @@ export type FigureKey =
   | 'gate-timeline'
   | 'env-flow'
   | 'uncertainty-spectrum'
-  | 'refund-fidelity';
+  | 'refund-fidelity'
+  | 'refund-c4-impact';
 
 /** One figure shown right under a chapter's subtitle (visual-first pilot). */
 export interface ChapterHeroFigure {
@@ -69,11 +72,21 @@ export type ContentBlock =
   | { kind: 'details'; id: string; summary: string; body: ContentBlock[] }
   | { kind: 'sources'; id: string; title?: string; items: { label: string; url?: string }[]; caveat?: RichText };
 
-export interface ChapterContentSection {
+interface ContentSectionBase {
   heading?: string;
-  placement?: 'reference' | 'diagram';
   blocks: ContentBlock[];
 }
+
+/**
+ * Where a content section renders. Default (`undefined`) is the Reference section.
+ * `'inline'` renders right after the anchor section's body (or after core concept
+ * `conceptIndex` when `after` is `'coreConcepts'`), inside the anchor's open state.
+ */
+export type ChapterContentSection =
+  | (ContentSectionBase & { placement?: 'reference' | 'diagram' })
+  | (ContentSectionBase & { placement: 'inline'; after: SectionKey; conceptIndex?: number });
+
+export type ContentPlacement = NonNullable<ChapterContentSection['placement']>;
 
 export type TabType = 'guide' | 'ai' | 'quiz' | 'gamification' | 'simulator';
 
