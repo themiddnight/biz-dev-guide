@@ -1,7 +1,21 @@
 import type React from 'react';
 import type { FigureKey } from '../../types';
+import { C4L1 } from './C4L1';
+import { C4L1Hero } from './C4L1Hero';
+import { C4L2 } from './C4L2';
+import { C4L3 } from './C4L3';
+import { C4L4 } from './C4L4';
 import { ConeOfUncertainty } from './ConeOfUncertainty';
+import { FamilyBehaviorSig } from './FamilyBehaviorSig';
+import { FamilyPlanSig } from './FamilyPlanSig';
+import { FamilyProcessSig } from './FamilyProcessSig';
+import { FamilyScreenSig } from './FamilyScreenSig';
+import { FamilyStructureSig } from './FamilyStructureSig';
+import { FamilyThinkingSig } from './FamilyThinkingSig';
+import { RefundSequence } from './RefundSequence';
+import { RefundSwimlane } from './RefundSwimlane';
 import { TechDebtQuadrant } from './TechDebtQuadrant';
+import { ThreeLenses } from './ThreeLenses';
 
 /**
  * Registry of static figures ported from the original HTML guide (SVG -> JSX).
@@ -21,4 +35,19 @@ export interface FigureProps {
 export const FIGURES: Record<FigureKey, React.FC<FigureProps>> = {
   'tech-debt-quadrant': TechDebtQuadrant,
   'cone-of-uncertainty': ConeOfUncertainty,
+  // s5 diagram literacy (spec §3.3)
+  'family-structure': FamilyStructureSig,
+  'family-behavior': FamilyBehaviorSig,
+  'family-process': FamilyProcessSig,
+  'family-screen': FamilyScreenSig,
+  'family-thinking': FamilyThinkingSig,
+  'family-plan': FamilyPlanSig,
+  'three-lenses': ThreeLenses,
+  'c4-l1-hero': C4L1Hero,
+  'c4-l1': C4L1,
+  'c4-l2': C4L2,
+  'c4-l3': C4L3,
+  'c4-l4': C4L4,
+  'refund-swimlane': RefundSwimlane,
+  'refund-sequence': RefundSequence,
 };
