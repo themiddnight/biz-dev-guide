@@ -151,7 +151,7 @@ export const chapters6_10: Chapter[] = [
     businessNote: 'ลงทุนเทสต์อัตโนมัติให้ปล่อยงานเร็วขึ้น และมอง QA เป็นคนปกป้องความเชื่อมั่นแบรนด์ ไม่ใช่คนจับผิด Dev',
     engineerNote: 'เขียน Unit Test ก่อนส่งงานให้ QA เพราะเป็นหน้าที่ของ Dev ไม่ใช่ของ QA',
     keyTakeaway: 'เทสต์ส่วนใหญ่ควรเป็น Unit Test ที่เร็วและถูก ส่วน E2E ที่ช้าและแพงมีแค่ยอดพีระมิด (ราว 70/20/10)',
-    plainAnalogy: 'เหมือนสร้างรถ: Unit Test คือตรวจน็อตทีละตัว, Integration Test คือต่อเครื่องกับเกียร์ลองหมุน ส่วน E2E คือขับทั้งคันบนถนน',
+    plainAnalogy: 'เหมือนสร้างรถ: Unit ตรวจน็อต Integration ต่อเครื่องกับเกียร์ E2E ขับทั้งคันบนถนน',
     readTime: '12 นาที',
     diagramTitle: 'Agile Testing Pyramid & Bug Severity Matrix',
     diagramDescription: 'สัดส่วนพีระมิดการทดสอบ Unit (70%), Integration (20%), E2E (10%) พร้อมตารางจำแนกความรุนแรงของบั๊ก (Critical, High, Medium, Low)',
@@ -190,7 +190,7 @@ export const chapters6_10: Chapter[] = [
     ],
     realWorldExamples: [
       {
-        title: 'Knight Capital: $440M ใน 45 นาที',
+        title: 'Knight Capital: 440 ล้านดอลลาร์',
         companyOrIndustry: 'Knight Capital Group (Financial Trading)',
         situation: 'ปี 2012 มาร์เก็ตเมกเกอร์รายใหญ่ของตลาดหุ้นสหรัฐฯ (สำนักงานใหญ่ที่ Jersey City) เตรียมเปิดใช้โค้ดซื้อขายตัวใหม่',
         whatHappened: 'ทีมขึ้นโค้ดใหม่บนเซิร์ฟเวอร์ 7 เครื่อง แต่ลืมเครื่องที่ 8 โค้ดเก่าในเครื่องนั้นตีความข้อมูลผิด แล้วยิงคำสั่งซื้อขายออกไปนับล้านคำสั่งใน 45 นาที ขาดทุน 440 ล้านดอลลาร์ จนต้องรับเงินช่วยเหลือฉุกเฉิน และถูกควบรวมในปีถัดมา',
@@ -431,7 +431,7 @@ export const chapters6_10: Chapter[] = [
     businessNote: 'กันเวลาจ่ายหนี้ทางเทคนิคทุกรอบ: กู้เพื่อให้ทันตลาดได้ แต่ถ้าไม่จ่าย ดอกเบี้ยจะทำให้ทีมช้าลงเรื่อยๆ',
     engineerNote: 'อธิบายหนี้ทางเทคนิคเป็นผลทางธุรกิจ เช่น "ถ้าไม่แก้ ฟีเจอร์ถัดไปจะช้าลงมาก" ไม่ใช่ "โค้ดไม่สวย"',
     keyTakeaway: 'หนี้ทางเทคนิคคิดดอกเบี้ยทุกครั้งที่แก้โค้ด กันเวลาจ่ายหนี้ทุก Sprint ก่อนงานจะช้าลงเรื่อยๆ',
-    plainAnalogy: 'เหมือนทำกับข้าวแล้วไม่ล้างกระทะ วันแรกเร็วขึ้น แต่สิบวันต่อมาคราบเต็มครัวจนทำอะไรไม่ได้ ส่วนการล้างครัวคือ Refactoring',
+    plainAnalogy: 'เหมือนไม่ล้างกระทะ: วันแรกเร็ว วันที่สิบคราบเต็มครัว Refactoring คือการล้างครัว',
     readTime: '12 นาที',
     diagramTitle: 'Barry Boehm\'s Cost of Change Curve & Tech Debt Quadrant',
     diagramDescription: 'กราฟแสดงว่ายิ่งเจอบั๊กช้า ต้นทุนการแก้ยิ่งสูง คู่กับตาราง 4 ช่องของ Martin Fowler: หนี้โดยตั้งใจ vs ไม่ตั้งใจ และ รอบคอบ vs ประมาท',

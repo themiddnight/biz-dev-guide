@@ -35,10 +35,13 @@ export type FigureKey =
   | 'env-flow'
   | 'uncertainty-spectrum'
   | 'refund-fidelity'
+  | 'refund-nfr-spec'
   | 'refund-c4-impact'
   | 'refund-story-gates'
+  | 'refund-test-report'
   | 'refund-spec-stack'
-  | 'refund-backlog-cut';
+  | 'refund-backlog-cut'
+  | 'refund-debt-diff';
 
 /** One figure shown right under a chapter's subtitle (visual-first pilot). */
 export interface ChapterHeroFigure {

@@ -437,7 +437,7 @@ export const chapters1_5: Chapter[] = [
     businessNote: 'ระบุว่าระบบต้องเร็วแค่ไหน รับคนพร้อมกันเท่าไร และข้อมูลต้องปลอดภัยแค่ไหน ไม่ใช่ระบุแค่ว่าทำอะไรได้',
     engineerNote: 'ช่วย Business ถามถึงกฎธุรกิจและEdge Case ก่อนเริ่มคิดตารางฐานข้อมูล',
     keyTakeaway: 'ระบบล่มวันเปิดตัวมักไม่ใช่เพราะคำนวณผิด แต่เพราะไม่มีใครคุยเรื่อง Non-Functional Requirements ก่อน',
-    plainAnalogy: 'เหมือนสั่งทำรถ: วิ่งได้ มีเบรก คือสิ่งที่เห็น ส่วนถุงลมพองทันและห้องโดยสารไม่ยุบ คือสิ่งที่มองไม่เห็นแต่ชี้เป็นชี้ตาย',
+    plainAnalogy: 'เหมือนสั่งทำรถ: วิ่งได้มีเบรกคือสิ่งที่เห็น ถุงลมกับโครงรถคือสิ่งที่ชี้ชะตา',
     readTime: '12 นาที',
     diagramTitle: 'The Requirement Iceberg (ภูเขาน้ำแข็งแห่งความต้องการ)',
     diagramDescription: 'เปรียบเทียบ Functional Requirements (10% บนผิวน้ำ) กับ Non-Functional Requirements (90% ใต้น้ำ เช่น Performance, Security, Scalability, Disaster Recovery)',
