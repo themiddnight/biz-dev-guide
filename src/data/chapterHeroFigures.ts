@@ -23,11 +23,11 @@ export const CHAPTER_HERO_FIGURES: Readonly<Record<string, ChapterHeroFigure>> =
   },
   s6: {
     figureKey: 'refund-story-gates',
-    caption: 'ข้าม DoR/DoD ไม่ได้เร็วขึ้น บั๊กแค่ย้ายไปโผล่ Sprint หน้า',
+    caption: 'ข้าม DoR/DoD ไม่ได้เร็วขึ้น บั๊กหลุดถึงลูกค้า ต้อง Hotfix',
   },
   s7: {
     figureKey: 'refund-test-report',
-    caption: 'เทสต์ชุดเดียวกัน จัดเป็นพีระมิด รันเร็วกว่าและล้มมั่วน้อยลง',
+    caption: 'ฟีเจอร์เดียวกัน จัดเทสต์เป็นพีระมิด รันเร็วขึ้น ล้มมั่วน้อย',
   },
   s8: {
     figureKey: 'refund-deploy-log',

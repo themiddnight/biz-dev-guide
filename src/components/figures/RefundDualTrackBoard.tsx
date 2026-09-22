@@ -82,8 +82,8 @@ export const RefundDualTrackBoard: React.FC<FigureProps> = ({ className }) => {
         >
           <title id={titleId}>บอร์ดทีมสองแถว Discovery และ Delivery ของฟีเจอร์คืนเงิน</title>
           <desc id={descId}>
-            บอร์ดทีมมีแถว Discovery สำรวจของ Sprint หน้าที่มีการทดลองสามใบ คือสัมภาษณ์ลูกค้า 5 คนซึ่งผ่านเพราะของไม่ถึงคือปัญหาอันดับ 1
-            และถูกส่งต่อไปเป็นงานขอคืนเงินเมื่อของไม่ถึงที่ติดป้ายผ่านการสำรวจแล้วในแถว Delivery ของ Sprint นี้
+            บอร์ดทีมมีแถว Discovery ที่สำรวจใน Sprint นี้มีการทดลองสามใบ คือสัมภาษณ์ลูกค้า 5 คนซึ่งผ่านเพราะของไม่ถึงคือปัญหาอันดับ 1
+            และถูกส่งต่อไปเป็นงานขอคืนเงินเมื่อของไม่ถึงที่ติดป้ายผ่านการสำรวจแล้วในแถว Delivery ของ Sprint หน้า
             ต้นแบบคืนเป็นเครดิตที่คนเลือกแค่ส่วนน้อยจึงถูกทิ้งก่อนเขียนโค้ด และหน้าเว็บจำลองประกันของหายที่ยังรอผล
             ส่วนแถว Delivery ยังมีงานแนบรูปหลักฐานอีกหนึ่งใบ
           </desc>
@@ -96,8 +96,8 @@ export const RefundDualTrackBoard: React.FC<FigureProps> = ({ className }) => {
             </marker>
           </defs>
 
-          {/* Lane 1: Discovery (next sprint) */}
-          <Lane y={2} h={180} title="Discovery · สำรวจ (Sprint หน้า)" color="var(--fig-accent)" />
+          {/* Lane 1: Discovery (this sprint) */}
+          <Lane y={2} h={180} title="Discovery · สำรวจ (Sprint นี้)" color="var(--fig-accent)" />
 
           <Card y={30} h={52} stroke="var(--fig-ok-border)">
             <Title y={45}>สัมภาษณ์ลูกค้า 5 คน</Title>
@@ -137,8 +137,8 @@ export const RefundDualTrackBoard: React.FC<FigureProps> = ({ className }) => {
             ก่อนเขียนโค้ด
           </text>
 
-          {/* Lane 2: Delivery (this sprint) */}
-          <Lane y={204} h={122} title="Delivery · สร้างจริง (Sprint นี้)" color="var(--fig-text)" />
+          {/* Lane 2: Delivery (next sprint): only validated work lands here */}
+          <Lane y={204} h={122} title="Delivery · สร้างจริง (Sprint หน้า)" color="var(--fig-text)" />
 
           <Card y={230} h={52}>
             <Title y={245}>ขอคืนเงินเมื่อของไม่ถึง</Title>

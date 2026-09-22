@@ -28,7 +28,7 @@ export const EnvFlow: React.FC<FigureProps> = ({ className }) => {
 
         <rect x="176" y="70" width="120" height="60" rx="8" fill="var(--fig-surface-2)" stroke="var(--fig-border)" />
         <text x="236" y="96" textAnchor="middle" fontSize="12" fill="var(--fig-text)">Staging</text>
-        <text x="236" y="112" textAnchor="middle" fontSize="9.5" fill="var(--fig-text-muted)">ทดสอบขั้นสุดท้าย</text>
+        <text x="236" y="112" textAnchor="middle" fontSize="9.5" fill="var(--fig-text-muted)">ทดสอบรวมระบบ (QA)</text>
 
         <rect x="328" y="70" width="120" height="60" rx="8" fill="var(--fig-surface-2)" stroke="var(--fig-border)" />
         <text x="388" y="96" textAnchor="middle" fontSize="12" fill="var(--fig-text)">UAT</text>

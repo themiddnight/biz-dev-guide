@@ -117,7 +117,7 @@ const ManyNamesChat: React.FC = () => (
     <rect x={8} y={150} width={W - 16} height={56} rx={5} fill="var(--fig-warn-bg)" stroke="var(--fig-warn-border)" />
     <WarnBang cx={22} cy={169} r={6} />
     <text x={34} y={173} fontSize="10" fontWeight="700" fill="var(--fig-warn)">
-      Dev ทำระบบให้ธนาคารดึงเงินคืน
+      Dev ทำหน้ารับเรื่องโต้แย้งจากธนาคาร
     </text>
     <text x={34} y={193} fontSize="10" fill="var(--fig-text)">
       ไม่ใช่ร้านโอนคืน
@@ -157,7 +157,7 @@ const PANELS: FigurePanel[] = [
     label: 'ต่างคนต่างเรียก',
     note: '3 คำ 3 ความหมาย',
     title: 'แชททีมที่เรียกเรื่องเดียวกันต่างกัน',
-    desc: 'แชท #ทีมคืนเงิน ที่ PM เรียกว่า Refund ทีม support เรียกว่ายกเลิกออเดอร์ และ Dev เรียกว่า Chargeback แต่ละคำอยู่ในกรอบต่างกัน ท้ายแชทเตือนว่า Dev ทำระบบให้ธนาคารดึงเงินคืน ไม่ใช่ร้านโอนคืน',
+    desc: 'แชท #ทีมคืนเงิน ที่ PM เรียกว่า Refund ทีม support เรียกว่ายกเลิกออเดอร์ และ Dev เรียกว่า Chargeback แต่ละคำอยู่ในกรอบต่างกัน ท้ายแชทเตือนว่า Dev ทำหน้ารับเรื่องโต้แย้งจากธนาคาร ไม่ใช่ร้านโอนคืน',
     viewBox: '0 0 300 240',
     Screen: ManyNamesChat,
   },

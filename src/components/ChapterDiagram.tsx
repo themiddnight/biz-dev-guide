@@ -200,21 +200,24 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
             <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
               MoSCoW Framework (จัดกลุ่มตามความจำเป็น)
             </span>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400">
+              ไม่มีโควตาตายตัว แต่ Must ไม่ควรเกิน ~60% ของงานรอบนี้ ที่เหลือคือกันชนไว้ตัดเมื่องานบานปลาย
+            </p>
             <div className="grid grid-cols-2 gap-2 text-xs">
               <div className="p-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/50">
-                <span className="font-bold text-rose-700 dark:text-rose-400 block mb-1">M - Must Have (60%)</span>
+                <span className="font-bold text-rose-700 dark:text-rose-400 block mb-1">M - Must Have</span>
                 <p className="text-[11px] text-slate-600 dark:text-slate-400">ขาดแล้วระบบใช้งานไม่ได้เลย หรือผิดกฎหมาย เช่น ชำระเงิน</p>
               </div>
               <div className="p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50">
-                <span className="font-bold text-amber-700 dark:text-amber-400 block mb-1">S - Should Have (20%)</span>
+                <span className="font-bold text-amber-700 dark:text-amber-400 block mb-1">S - Should Have</span>
                 <p className="text-[11px] text-slate-600 dark:text-slate-400">สำคัญมาก แต่ยังมีทางเลี่ยงชั่วคราวได้ เช่น ใบเสร็จ PDF</p>
               </div>
               <div className="p-2.5 rounded-xl bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900/50">
-                <span className="font-bold text-blue-700 dark:text-blue-400 block mb-1">C - Could Have (20%)</span>
+                <span className="font-bold text-blue-700 dark:text-blue-400 block mb-1">C - Could Have</span>
                 <p className="text-[11px] text-slate-600 dark:text-slate-400">ถ้ามีเวลาเหลือจะทำ ช่วยเพิ่มความประทับใจ เช่น Dark mode</p>
               </div>
               <div className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                <span className="font-bold text-slate-600 dark:text-slate-400 block mb-1">W - Won't Have (0%)</span>
+                <span className="font-bold text-slate-600 dark:text-slate-400 block mb-1">W - Won't Have</span>
                 <p className="text-[11px] text-slate-500 dark:text-slate-400">ตัดทิ้งชัดเจนในรอบนี้ ไม่นำมาเปลืองสมาธิทีม</p>
               </div>
             </div>
@@ -223,7 +226,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
           {/* RICE Scoring Formula */}
           <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-3">
             <span className="text-xs font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider">
-              RICE Scoring (การคำนวณทางวิทยาศาสตร์)
+              RICE Scoring (การให้คะแนนอย่างมีโครงสร้าง)
             </span>
             <div className="p-3 bg-slate-100 dark:bg-slate-800 rounded-xl text-center text-xs font-bold text-slate-900 dark:text-slate-100">
               Score = (Reach × Impact × Confidence) ÷ Effort
@@ -290,7 +293,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-sky-600 dark:text-sky-400 flex items-center gap-1.5">
                 <Eye className="w-4 h-4" />
-                <span>เหนือผิวน้ำ (10%): Functional Requirements (FR)</span>
+                <span>ส่วนที่มองเห็น: Functional Requirements (FR)</span>
               </span>
               <span className="text-[10px] px-2 py-0.5 rounded bg-sky-100 dark:bg-sky-900/50 text-sky-700 dark:text-sky-300 font-bold">สิ่งที่ตาเห็น</span>
             </div>
@@ -308,7 +311,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-indigo-700 dark:text-indigo-300 flex items-center gap-1.5">
                 <Shield className="w-4 h-4" />
-                <span>ใต้ผิวน้ำ (90%): Non-Functional Requirements (NFR)</span>
+                <span>ส่วนใต้น้ำ: Non-Functional Requirements (NFR)</span>
               </span>
               <span className="text-[10px] px-2 py-0.5 rounded bg-rose-100 dark:bg-rose-900/50 text-rose-700 dark:text-rose-300 font-bold">สิ่งที่ทำให้ระบบไม่ล่ม</span>
             </div>
@@ -544,7 +547,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
                 <span>Gate 2: Definition of Done (DoD)</span>
               </div>
               <p className="text-[11px] text-slate-600 dark:text-slate-300">
-                <b>"เสร็จจริงไม่ใช่แค่โค้ดเสร็จ":</b> ผ่าน Code Review, Unit Test ผ่าน 80%+, Deploy บน Staging ตรวจแล้ว, และเอกสารถูกอัปเดต
+                <b>"เสร็จจริงไม่ใช่แค่โค้ดเสร็จ":</b> ผ่าน Code Review, เทสต์ผ่านทั้งหมด + Coverage ตามเกณฑ์ทีม, Deploy บน Staging ตรวจแล้ว, และเอกสารถูกอัปเดต
               </p>
             </div>
           </div>
@@ -570,7 +573,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
               <span className="font-bold text-xs text-rose-700 dark:text-rose-300">E2E / UI Tests (10%)</span>
               <span className="text-[10px] px-1.5 py-0.5 rounded bg-rose-200 dark:bg-rose-900 text-rose-800 dark:text-rose-200">ช้า &amp; แพง</span>
             </div>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400">จำลองเปิดเบราว์เซอร์คลิกเหมือนคนจริง พังง่ายเมื่อหน้าตาเปลี่ยน (Flaky)</p>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400">จำลองเปิดเบราว์เซอร์คลิกเหมือนคนจริง เปราะ พังง่ายเมื่อ UI เปลี่ยน</p>
           </button>
 
           <button

@@ -148,6 +148,9 @@ export const ProtocolSimulator: React.FC = () => {
               <p className="text-[11px] text-slate-500">
                 💡 <b>คำอธิบาย:</b> เหมือนบุรุษไปรษณีย์มากดกริ่งหน้าบ้านเฉพาะตอนพัสดุมาถึง ประหยัดเน็ต ประหยัดเซิร์ฟเวอร์ และทำงานได้ทันที
               </p>
+              <p className="text-[11px] text-slate-500">
+                ⚠️ <b>ระวัง:</b> Webhook อาจส่งไม่ถึงหรือส่งซ้ำ งานรับเงินจึงต้องมี Retry และกระทบยอดกับธนาคาร (Reconciliation) เป็นประจำ
+              </p>
             </div>
           )}
 

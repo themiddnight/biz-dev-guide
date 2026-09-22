@@ -97,7 +97,7 @@ const Footer: React.FC<FooterProps> = ({ ok, children }) => (
   </g>
 );
 
-const DEBT_FILES = ['app/refund-form.ts', 'backoffice/refund.ts', 'email/refund.html', 'report/export.ts', 'api/v1/refund.ts'];
+const DEBT_FILES = ['app/refund-form.ts', 'backoffice/refund.ts', 'report/export.ts', 'api/v1/refund.ts', 'api/v2/refund.ts'];
 
 const DebtDiff: React.FC = () => (
   <>
@@ -105,7 +105,7 @@ const DebtDiff: React.FC = () => (
     {DEBT_FILES.map((path, i) => (
       <FileRow key={path} i={i} path={path} />
     ))}
-    <FileRow i={DEBT_FILES.length} path="api/v2/refund.ts" missed />
+    <FileRow i={DEBT_FILES.length} path="email/refund.html" missed />
     <Footer ok={false}>อีเมลแจ้งลูกค้าแสดงเหตุผลว่าง</Footer>
   </>
 );
@@ -126,7 +126,7 @@ const PANELS: FigurePanel[] = [
     label: 'โค้ดที่มีหนี้',
     note: 'งานเล็ก แต่ต้องตามแก้ทุกที่',
     title: 'รายการไฟล์ที่ต้องแก้ในโค้ดที่มีหนี้',
-    desc: 'PR #212 เพิ่มเหตุผล สินค้าชำรุด แก้ 6 ไฟล์ ห้าไฟล์เพิ่มหนึ่งบรรทัด ไฟล์ api/v2/refund.ts ลืมแก้ ผลคืออีเมลแจ้งลูกค้าแสดงเหตุผลว่าง',
+    desc: 'PR #212 เพิ่มเหตุผล สินค้าชำรุด แก้ 6 ไฟล์ ห้าไฟล์เพิ่มหนึ่งบรรทัด ไฟล์ email/refund.html ลืมแก้ ผลคืออีเมลแจ้งลูกค้าแสดงเหตุผลว่าง',
     viewBox: '0 0 300 240',
     Screen: DebtDiff,
   },

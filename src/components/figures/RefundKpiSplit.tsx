@@ -244,7 +244,7 @@ export const RefundKpiSplit: React.FC<FigureProps> = ({ className }) => (
         <OkTick x={0} y={0} size={10} />
       </svg>
       <span>
-        <span className="font-semibold">ตอบว่า "ได้ ถ้า...":</span> ได้ภายในศุกร์ ถ้ารอบแรกคืนเป็นเครดิตร้านก่อน
+        <span className="font-semibold">ตอบว่า "ได้ ถ้า...":</span> ได้ภายในศุกร์ ถ้ารอบแรกรับเฉพาะออเดอร์ที่ยังไม่จัดส่ง
       </span>
     </p>
   </div>

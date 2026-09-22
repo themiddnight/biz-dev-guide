@@ -112,7 +112,7 @@ const Flow: React.FC<{ outcome: Outcome }> = ({ outcome }) => {
         {skip ? 'BUG-131 คืนเงินซ้ำ 2 ครั้ง' : 'ปล่อยแล้ว'}
       </text>
       <text x={27} y={RESULT_Y + 51} fontSize="10" fill="var(--fig-text-2)">
-        {skip ? 'ย้ายไป Sprint หน้า' : 'ไม่มีงานย้อนกลับ'}
+        {skip ? 'ต้อง Hotfix ด่วน แทรกเข้า Sprint' : 'ไม่มีงานย้อนกลับ'}
       </text>
     </>
   );
@@ -126,7 +126,7 @@ const PANELS: FigurePanel[] = [
     label: 'ข้ามด่าน',
     note: 'เร็วขึ้นแค่ในวันนี้',
     title: 'ใบงานที่ข้ามด่าน DoR และ DoD',
-    desc: 'ใบงาน REF-118 ขอคืนเงินเมื่อของไม่ถึง ผ่านด่าน DoR ที่ติ๊กแค่มี Acceptance Criteria และด่าน DoD ที่ติ๊กแค่โค้ดเสร็จ ลูกศรข้ามไปก่อนทั้งสองด่าน หลังปล่อยเกิด BUG-131 คืนเงินซ้ำ 2 ครั้ง ย้ายไป Sprint หน้า',
+    desc: 'ใบงาน REF-118 ขอคืนเงินเมื่อของไม่ถึง ผ่านด่าน DoR ที่ติ๊กแค่มี Acceptance Criteria และด่าน DoD ที่ติ๊กแค่โค้ดเสร็จ ลูกศรข้ามไปก่อนทั้งสองด่าน หลังปล่อยเกิด BUG-131 คืนเงินซ้ำ 2 ครั้ง ต้อง Hotfix ด่วน แทรกเข้า Sprint',
     viewBox: '0 0 300 300',
     Screen: SkippedFlow,
   },
