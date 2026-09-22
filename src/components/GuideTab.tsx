@@ -175,6 +175,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
 
   // A requested section opens on top of the re-derived defaults. Declared after the
   // re-derive effect so that, when both fire in one commit, this update wins.
+  // Keyed on the nonce alone on purpose: it fires once per request, not on layout/level changes.
   useEffect(() => {
     if (!requestedSection) return;
     // Consume the request so a remount (Quiz -> Guide) never re-opens and re-scrolls to it.
