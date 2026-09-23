@@ -1,11 +1,26 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
-import {defineConfig} from 'vite';
+import {defineConfig, type Plugin} from 'vite';
+
+// On Vercel the page is a static file that server.ts never touches, so __SITE_URL__ is filled at
+// build time from the production domain. Elsewhere it stays for server.ts to fill per request.
+const vercelDomain = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+const vercelSiteUrl: Plugin | null = vercelDomain
+  ? {
+      name: 'site-url',
+      apply: 'build',
+      transformIndexHtml: (html) => html.replaceAll('__SITE_URL__', `https://${vercelDomain}`),
+    }
+  : null;
 
 export default defineConfig(() => {
   return {
-    plugins: [react(), tailwindcss()],
+    plugins: [
+      react(),
+      tailwindcss(),
+      vercelSiteUrl,
+    ],
     resolve: {
       alias: {
         '@': path.resolve(import.meta.dirname, '.'),
