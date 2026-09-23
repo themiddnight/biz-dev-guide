@@ -24,6 +24,13 @@ interface AIAssistantTabProps {
   initialPrompt?: string;
 }
 
+// Footer label for an answer: the provider, plus the exact model when the server reported one.
+export function answerSourceLabel(source?: ChatMessage['source'], model?: string): string {
+  if (source === 'groq') return model ? `Groq · ${model}` : 'Groq AI';
+  if (source === 'gemini') return model ? `Gemini · ${model}` : 'Gemini Model';
+  return source ? 'คลังความรู้ผู้เชี่ยวชาญ' : 'Expert Assistant';
+}
+
 export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
   initialPrompt = '',
 }) => {
@@ -92,6 +99,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
         content: data.answer,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         source: data.source,
+        model: data.model,
       };
 
       setMessages((prev) => [...prev, aiMsg]);
@@ -258,20 +266,23 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
                 )}
 
                 {isAi && (
-                  <div className="flex items-center justify-between pt-2 border-t border-base-border text-[11px] text-base-content-muted">
-                    <span className="flex items-center gap-1">
-                      {msg.source === 'groq' ? (
-                        <span className="text-success font-semibold">● Groq AI</span>
-                      ) : msg.source === 'gemini' ? (
-                        <span className="text-warning font-semibold">● Gemini Model</span>
-                      ) : (
-                        <span>{msg.source ? '● คลังความรู้ผู้เชี่ยวชาญ' : '● Expert Assistant'}</span>
-                      )}
+                  <div className="flex flex-wrap items-center justify-between gap-x-2 pt-2 border-t border-base-border text-[11px] text-base-content-muted">
+                    {/* Model ids are long; let the label and time wrap as units instead of mid-phrase on phones */}
+                    <span className="flex flex-wrap items-center gap-x-1 whitespace-nowrap">
+                      <span
+                        className={
+                          msg.source === 'groq' ? 'text-success font-semibold'
+                          : msg.source === 'gemini' ? 'text-warning font-semibold'
+                          : undefined
+                        }
+                      >
+                        ● {answerSourceLabel(msg.source, msg.model)}
+                      </span>
                       <span>• {msg.timestamp}</span>
                     </span>
                     <button
                       onClick={() => copyToClipboard(msg.content, msg.id)}
-                      className={`${TAP} hover:text-base-content flex items-center gap-1 cursor-pointer transition-colors`}
+                      className={`${TAP} hover:text-base-content flex items-center gap-1 whitespace-nowrap cursor-pointer transition-colors`}
                     >
                       {copiedId === msg.id ? (
                         <>

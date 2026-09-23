@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { AIAssistantTab } from './AIAssistantTab';
+import { AIAssistantTab, answerSourceLabel } from './AIAssistantTab';
 
 describe('AIAssistantTab hierarchy (spec §10.1, §10.3, §10.5)', () => {
   const html = renderToStaticMarkup(<AIAssistantTab />);
@@ -15,5 +15,18 @@ describe('AIAssistantTab hierarchy (spec §10.1, §10.3, §10.5)', () => {
   it('avatars are soft decorative badges; the send button is the only primary fill', () => {
     expect(html.match(/(?<![\w:/-])bg-primary(?![\w/-])/g)).toHaveLength(1);
     expect(html).toMatch(/<span class="[^"]*bg-base-300[^"]*w-7 h-7[^"]*" aria-hidden="true">/);
+  });
+});
+
+describe('answerSourceLabel', () => {
+  it('names the model that answered', () => {
+    expect(answerSourceLabel('groq', 'qwen/qwen3.8-27b')).toBe('Groq · qwen/qwen3.8-27b');
+    expect(answerSourceLabel('gemini', 'gemini-3.8-flash')).toBe('Gemini · gemini-3.8-flash');
+  });
+  it('falls back to the provider name for answers saved before the model was reported', () => {
+    expect(answerSourceLabel('groq')).toBe('Groq AI');
+    expect(answerSourceLabel('gemini')).toBe('Gemini Model');
+    expect(answerSourceLabel('fallback')).toBe('คลังความรู้ผู้เชี่ยวชาญ');
+    expect(answerSourceLabel()).toBe('Expert Assistant');
   });
 });

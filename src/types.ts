@@ -273,4 +273,6 @@ export interface ChatMessage {
   content: string;
   timestamp: string;
   source?: 'groq' | 'gemini' | 'fallback';
+  /** The model that wrote the answer, e.g. "qwen/qwen3.8-27b"; absent for fallback answers. */
+  model?: string;
 }

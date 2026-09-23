@@ -54,7 +54,11 @@ const GROQ_MAX_TOKENS = 4096;
 const GROQ_TIMEOUT_MS = 20_000;
 
 // Helper for Groq Cloud API
-async function callGroq(question: string, role: string, context?: string): Promise<string | null> {
+async function callGroq(
+  question: string,
+  role: string,
+  context?: string,
+): Promise<{ text: string; model: string } | null> {
   const apiKey = process.env.GROQ_API_KEY?.trim();
   if (!apiKey) return null;
 
@@ -98,7 +102,8 @@ async function callGroq(question: string, role: string, context?: string): Promi
         const text = choice?.message?.content?.trim();
         if (text) {
           // Say so rather than end on a dangling "3. **"
-          return choice.finish_reason === "length" ? `${text}\n\n_(คำตอบยาวเกินกำหนด เลยถูกตัดตรงนี้)_` : text;
+          const answer = choice.finish_reason === "length" ? `${text}\n\n_(คำตอบยาวเกินกำหนด เลยถูกตัดตรงนี้)_` : text;
+          return { text: answer, model };
         }
       } else {
         const err = await res.text().catch(() => "");
@@ -124,7 +129,7 @@ export async function askAi(input: unknown): Promise<AskAiResult> {
       try {
         const groqAnswer = await callGroq(question, role, context);
         if (groqAnswer) {
-          return { status: 200, body: { answer: groqAnswer, source: "groq" } };
+          return { status: 200, body: { answer: groqAnswer.text, source: "groq", model: groqAnswer.model } };
         }
       } catch (err: any) {
         console.warn("[AI Bridge] Groq invocation failed, trying next provider:", err?.message || err);
@@ -146,6 +151,7 @@ ${context ? `[บริบทเพิ่มเติม]: ${context}` : ''}
 
         const candidateModels = ["gemini-3.8-flash", "gemini-3.1-flash-lite"];
         let response: any = null;
+        let answeredBy = "";
 
         const callWithTimeout = async (model: string, timeoutMs: number) => {
           try {
@@ -161,13 +167,14 @@ ${context ? `[บริบทเพิ่มเติม]: ${context}` : ''}
           const res: any = await callWithTimeout(model, 3500);
           if (res && res.text) {
             response = res;
+            answeredBy = model;
             break;
           }
         }
 
         if (response && response.text) {
           const answer = response.text || "ขออภัย ยังตอบไม่ได้ ลองใหม่อีกครั้ง";
-          return { status: 200, body: { answer, source: "gemini" } };
+          return { status: 200, body: { answer, source: "gemini", model: answeredBy } };
         }
       } catch (_geminiError: any) {
         console.log("[AI Bridge] Gemini call failed or unavailable");

@@ -55,7 +55,7 @@ describe('POST /api/ask-ai with Groq', () => {
     vi.stubGlobal('fetch', fetchMock);
 
     const data = await (await post(JSON.stringify({ question: 'q' }))).json();
-    expect(data).toMatchObject({ answer: 'คำตอบ', source: 'groq' });
+    expect(data).toMatchObject({ answer: 'คำตอบ', source: 'groq', model: 'openai/gpt-oss-120b' });
     expect(triedModels(fetchMock)).toEqual(['qwen/qwen3.8-27b', 'openai/gpt-oss-120b']);
   });
 
