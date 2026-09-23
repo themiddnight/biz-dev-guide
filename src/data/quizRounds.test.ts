@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { QUIZ_QUESTIONS } from './quizQuestions';
-import { getQuizRound, defaultQuizRound, QUIZ_ROUND_META } from './quizRounds';
+import { getQuizRound, defaultQuizRound, initialQuizRound, parseQuizRound, QUIZ_ROUND_META } from './quizRounds';
 
 describe('quiz rounds', () => {
   it('basics is the original 8 questions in order', () => {
@@ -29,9 +29,43 @@ describe('quiz rounds', () => {
   });
 
   it('has Thai labels for each round', () => {
-    expect(QUIZ_ROUND_META.basics.label).toBe('พื้นฐาน');
+    expect(QUIZ_ROUND_META.basics.label).toBe('พื้นฐาน (ทุกสาย)');
     expect(QUIZ_ROUND_META.eng.label).toBe('สาย Engineering');
     expect(QUIZ_ROUND_META.biz.label).toBe('สาย Business');
     expect(QUIZ_ROUND_META.all.label).toBe('ทั้งหมด');
+  });
+});
+
+describe('parseQuizRound', () => {
+  it('the four stored values round-trip', () => {
+    for (const r of ['basics', 'eng', 'biz', 'all'] as const) expect(parseQuizRound(r)).toBe(r);
+  });
+  it('anything else is ignored, not repaired', () => {
+    for (const raw of [null, '', 'pm', 'BASICS', 'eng ']) expect(parseQuizRound(raw)).toBeNull();
+  });
+});
+
+describe('initialQuizRound', () => {
+  it('an explicit past choice wins over the role default', () => {
+    expect(initialQuizRound('basics', 'biz')).toBe('basics');
+    expect(initialQuizRound('all', 'eng')).toBe('all');
+  });
+  it('with nothing stored the reader gets their own round', () => {
+    expect(initialQuizRound(null, 'biz')).toBe('biz');
+    expect(initialQuizRound(null, 'eng')).toBe('eng');
+  });
+  it('no role and nothing stored opens basics', () => {
+    expect(initialQuizRound(null, null)).toBe('basics');
+  });
+  it('a garbage value falls back to the role default', () => {
+    expect(initialQuizRound('garbage', 'eng')).toBe('eng');
+    expect(initialQuizRound('garbage', null)).toBe('basics');
+  });
+});
+
+describe('round sizes are unchanged', () => {
+  it('8 / 6 / 6 / 20', () => {
+    const sizes = (['basics', 'eng', 'biz', 'all'] as const).map((r) => getQuizRound(QUIZ_QUESTIONS, r).length);
+    expect(sizes).toEqual([8, 6, 6, 20]);
   });
 });

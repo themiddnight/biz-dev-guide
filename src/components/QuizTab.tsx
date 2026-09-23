@@ -1,7 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import { QuizQuestion } from '../types';
 import type { Role } from '../data/rolePerspective';
-import { QUIZ_ROUNDS, QUIZ_ROUND_META, QuizRound, defaultQuizRound, getQuizRound } from '../data/quizRounds';
+import { QUIZ_ROUNDS, QUIZ_ROUND_META, QuizRound, defaultQuizRound, getQuizRound, initialQuizRound } from '../data/quizRounds';
+import { readStorage, removeStorage, writeStorage } from '../lib/storage';
 import { missedItems, type QuizAnswer } from '../lib/quizResult';
 import { QuizResultScreen } from './quiz/QuizResultScreen';
 import { 
@@ -48,6 +49,8 @@ const shuffleOptions = (questions: QuizQuestion[]): QuizQuestion['options'][] =>
     return opts;
   });
 
+const ROUND_KEY = 'be_guide_quiz_round';
+
 // Round chips (spec P5.3). The run below is keyed by round, so switching rounds
 // restarts index, score and shuffled options with no confirmation (D12).
 export const QuizTab: React.FC<QuizTabProps> = ({
@@ -58,7 +61,7 @@ export const QuizTab: React.FC<QuizTabProps> = ({
   onAskAIWithPrompt,
   onOpenChapter,
 }) => {
-  const [round, setRound] = useState<QuizRound>(() => defaultQuizRound(role));
+  const [round, setRound] = useState<QuizRound>(() => initialQuizRound(readStorage(ROUND_KEY), role));
   const [roundRole, setRoundRole] = useState(role);
   // True once a question in the current run has been answered.
   const [runStarted, setRunStarted] = useState(false);
@@ -66,10 +69,14 @@ export const QuizTab: React.FC<QuizTabProps> = ({
     // A role change elsewhere moves the reader to their new default round, but never
     // abandons a run they have already started answering.
     setRoundRole(role);
+    // A role change is not a round choice: drop the stored one so the new role's
+    // default is what the tab offers next time (round3 spec D13).
+    removeStorage(ROUND_KEY);
     if (!runStarted) setRound(defaultQuizRound(role));
   }
   const chooseRound = (r: QuizRound) => {
     if (r === round) return;
+    writeStorage(ROUND_KEY, r);
     setRound(r);
     setRunStarted(false);
   };
