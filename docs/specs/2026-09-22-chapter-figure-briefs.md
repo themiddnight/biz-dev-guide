@@ -98,7 +98,7 @@ Panel tables use: **Label** (HTML above the panel), **SVG content** (literal str
 | 3 | `ใบงาน (Ticket)` | Ticket card: id `REF-112`, title `เพิ่มปุ่มคืนเงิน`, field rows `ที่: หน้าออเดอร์`, `ใคร: ทุกออเดอร์` (the value `ทุกออเดอร์` in `--fig-warn`), status pill `พร้อมทำ`. | `กลายเป็น "ทุกออเดอร์"` |
 | 4 | `ของที่ส่ง (Production)` | Phone screen `ออเดอร์ของฉัน`: two order rows. Row 1 `#A1024 หูฟังไร้สาย`, status `ส่งถึงแล้ว`, button `คืนเงิน` (warn border + "!"). Row 2 `#A1031 สายชาร์จ`, status `กำลังส่ง`, button `คืนเงิน`. | `กดคืนได้แม้ของถึงแล้ว` |
 
-- **HTML fix row** under the grid (both modes, full width, `--fig-ok*` left border): `ทางแก้: ให้ Dev อ่านข้อความแรกพร้อมกัน (Three Amigos) ไม่ใช่เขียนเอกสารเพิ่ม`.
+- **HTML fix row** under the grid (both modes, full width, `--fig-ok*` left border): `ทางแก้: ให้ Business, Dev และ QA อ่านข้อความแรกพร้อมกัน (Three Amigos) ไม่ใช่เขียนเอกสารเพิ่ม`.
 - Fits: bubble lines ≤ 17 chars in a 120-unit bubble; `ไม่มีเงื่อนไข "ของไม่ถึง"` needs ≈ 140 units → chip spans x 6–144 (text starts after the "!" glyph at x 22; shorten to `เงื่อนไข "ของไม่ถึง" หาย` if it overflows).
 - `<title>` per panel: `ทอดที่ {n} {label}`.
 - **Caption (56):** `ข้อความลูกค้าประโยคเดียว ส่งต่อ 4 มือ เงื่อนไขสำคัญหายไป`

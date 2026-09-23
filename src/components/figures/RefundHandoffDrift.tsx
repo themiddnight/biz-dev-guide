@@ -200,7 +200,7 @@ export const RefundHandoffDrift: React.FC<FigureProps> = ({ className }) => (
         <OkTick x={0} y={0} size={10} />
       </svg>
       <span>
-        <span className="font-semibold">ทางแก้:</span> ให้ Dev อ่านข้อความแรกพร้อมกัน (Three Amigos) ไม่ใช่เขียนเอกสารเพิ่ม
+        <span className="font-semibold">ทางแก้:</span> ให้ Business, Dev และ QA อ่านข้อความแรกพร้อมกัน (Three Amigos) ไม่ใช่เขียนเอกสารเพิ่ม
       </span>
     </p>
   </div>
