@@ -33,6 +33,11 @@ describe('FirstVisitCard', () => {
     expect(html).toContain('ยังไม่เลือกสาย อ่านแบบมือใหม่ไปก่อน');
     expect(html.match(/data-first-visit-skip/g)).toHaveLength(1);
   });
+  it('labels role panels as groups with role and origin', () => {
+    expect(html).toContain('role="group"');
+    expect(html).toContain('aria-label="ฉันมาจากสาย Business"');
+    expect(html).toContain('aria-label="ฉันมาจากสาย Engineering"');
+  });
 });
 
 describe('TrackPanel', () => {

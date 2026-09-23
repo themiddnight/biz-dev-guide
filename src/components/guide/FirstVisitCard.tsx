@@ -29,7 +29,7 @@ export const FirstVisitCard: React.FC<{
     </div>
     <div className="grid gap-3 sm:grid-cols-2">
       {ROLES.map(role => (
-        <div key={role} data-first-visit-role={role} className="p-4 rounded-xl border border-neutral-200 dark:border-[#333333] space-y-1.5">
+        <div key={role} data-first-visit-role={role} role="group" aria-label={ROLE_META[role].origin} className="p-4 rounded-xl border border-neutral-200 dark:border-[#333333] space-y-1.5">
           <div className="font-bold text-sm text-neutral-900 dark:text-[#fafafa]">{ROLE_META[role].icon} {ROLE_META[role].origin}</div>
           <div className="text-xs text-neutral-600 dark:text-[#a3a3a3] leading-relaxed">{ROLE_LINE[role]}</div>
           <div className="text-[11px] text-neutral-500 dark:text-[#8e8e8e]">
