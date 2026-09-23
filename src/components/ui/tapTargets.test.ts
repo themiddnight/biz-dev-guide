@@ -65,6 +65,8 @@ function interactiveTags(src: string, pattern: RegExp = INTERACTIVE): { line: nu
 const TAP_REF = /\$\{(TAP|TAP_Y|TAP_POSITIONED|TAP_GAP\[\d+\])\}/;
 // The text-only padding pattern (CoreConceptsSection, InlineTerm) and a control already 44px tall.
 const LITERAL_OK = /-my-3\.5 py-3\.5 sm:my-0 sm:py-0|min-h-\[44px\]/;
+// The ui/ class builders: each always includes a ring (ui/*.test.tsx prove it for every combination).
+const UI_BUILDER = /\b(?:buttonClass|chipClass|tapClass)\(/;
 
 /** The class helpers (`segmentClass(…)`) a tag uses, as the source right after their definition. */
 function helperBodies(tag: string, src: string): string[] {
@@ -77,7 +79,7 @@ function helperBodies(tag: string, src: string): string[] {
 
 /** A tag is covered directly, or through a class helper defined in the file with a ring. */
 function covered(tag: string, src: string): boolean {
-  if (TAP_REF.test(tag) || LITERAL_OK.test(tag)) return true;
+  if (TAP_REF.test(tag) || LITERAL_OK.test(tag) || UI_BUILDER.test(tag)) return true;
   return helperBodies(tag, src).some(body => TAP_REF.test(body));
 }
 
@@ -159,6 +161,14 @@ describe('mobile tap targets', () => {
     const second = interactiveTags(src).filter(t => t.text.startsWith('<button'))[1];
     expect(rowGap(second, src)).toEqual({ gap: 4, line: 1 });
     expect(declaredGaps('<div className="gap-1.5 max-sm:gap-4 gap-x-2">')).toEqual([6, 8]);
+  });
+
+  it('counts a tag built by a ui/ class builder as covered, and nothing else by name alone', () => {
+    expect(covered('<button className={cn(buttonClass({ size }), className)}>', '')).toBe(true);
+    expect(covered('<button className={chipClass({ selected, tap })}>', '')).toBe(true);
+    expect(covered('<a className={`${tapClass(tap)} x`}>', '')).toBe(true);
+    expect(covered('<button className={myButtonClass}>', '')).toBe(false);
+    expect(covered('<button className="px-3 py-1">', '')).toBe(false);
   });
 
   it('the rings only exist below sm, so the desktop layout is untouched', () => {
