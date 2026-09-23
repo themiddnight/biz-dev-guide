@@ -371,6 +371,7 @@ export default function App() {
             onChapterLevelChange={handleChapterLevelChange}
             showFirstVisit={!levelChosen && role === null}
             onChooseInitialLevel={handleChooseInitialLevel}
+            onLevelModeChange={handleLevelModeChange}
             bookmarks={userStats.bookmarks}
             readChapters={userStats.readChapters}
             onToggleBookmark={handleToggleBookmark}

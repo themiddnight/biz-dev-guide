@@ -31,8 +31,8 @@ import { chapterLevelResetLabel, chapterLevelScopeLabel } from './guide/rolePers
 import { TrackNextCard, TrackEndCard } from './guide/TrackFooter';
 import { getTrackNext, resolveTrack, type TrackKey } from '../data/readingTracks';
 import { planChapterLevelChoice } from '../lib/rolePrefs';
-import { ROLE_META, otherRole, resolveChapterLevel, getActiveTrackKey, type LevelInputs, type Role } from '../data/rolePerspective';
-import { FirstVisitCard } from './guide/FirstVisitCard';
+import { ROLE_META, otherRole, resolveChapterLevel, getActiveTrackKey, type LevelInputs, type LevelMode, type Role } from '../data/rolePerspective';
+import { FirstVisitCard, type FirstVisitMode } from './guide/FirstVisitCard';
 import { 
   Search, 
   Bookmark, 
@@ -63,6 +63,8 @@ interface GuideTabProps {
   onChapterLevelChange?: (chapterId: string, level: ExperienceLevel | null) => void;
   showFirstVisit?: boolean;
   onChooseInitialLevel?: (level: ExperienceLevel) => void;
+  /** First-visit card: the level that goes with the chosen role (spec 2026-09-23-first-visit-role-and-level). */
+  onLevelModeChange?: (mode: LevelMode) => void;
   loadedFromHash: boolean;
   initialSource: 'hash' | 'stored' | 'default';
   hasNavigated: boolean;
@@ -88,6 +90,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   onChapterLevelChange,
   showFirstVisit,
   onChooseInitialLevel,
+  onLevelModeChange,
   loadedFromHash,
   initialSource,
   hasNavigated,
@@ -261,12 +264,9 @@ export const GuideTab: React.FC<GuideTabProps> = ({
     if (first) handleSelectChapter(first);
     if (!window.matchMedia('(min-width: 1024px)').matches) setIsIndexOpen(true);
   };
-  const handleFirstVisitChoice = (level: ExperienceLevel) => {
-    onChooseInitialLevel?.(level);
-    jumpToTrackStart(level);
-  };
-  const handleFirstVisitRole = (chosen: Role) => {
+  const handleFirstVisitChoice = (chosen: Role, mode: FirstVisitMode) => {
     onChooseRole?.(chosen);
+    onLevelModeChange?.(mode); // always written, so a stale stored mode never survives the choice
     jumpToTrackStart(chosen);
   };
   const handleFirstVisitSkip = () => onChooseInitialLevel?.('beginner');
@@ -344,7 +344,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
     <div className="space-y-6 pb-20">
       {/* Top Welcome & Quick Jump Banner */}
       {showFirstVisit ? (
-        <FirstVisitCard chapters={chapters} onChooseRole={handleFirstVisitRole} onChoose={handleFirstVisitChoice} onSkip={handleFirstVisitSkip} />
+        <FirstVisitCard chapters={chapters} onChoose={handleFirstVisitChoice} onSkip={handleFirstVisitSkip} />
       ) : (
       <div className="bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xs">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
