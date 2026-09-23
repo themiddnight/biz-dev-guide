@@ -43,45 +43,15 @@ const SYSTEM_INSTRUCTION = `คุณคือ "AI Bridge Specialist" ผู้�
 - ใช้ภาษาไทยที่เป็นมิตร ชัดเจน ตรงประเด็น และกระชับ
 - ใช้ภาษาพูดง่ายๆ แบบคนอธิบายให้ฟัง ไม่ใช่ภาษาตำรา`;
 
-// Cache available Groq models to prevent hardcoding issues when models change
-let cachedGroqModels: { models: string[]; fetchedAt: number } = { models: [], fetchedAt: 0 };
+// Models tried in order, all checked to answer Thai well. Groq's /models list is not usable
+// here: it is unordered and led by allam-2-7b (an Arabic model that answers Thai with gibberish)
+// and text-to-speech models. A model Groq retires just fails and the next one is tried.
+const GROQ_MODELS = ["qwen/qwen3.8-27b", "openai/gpt-oss-120b", "openai/gpt-oss-20b"];
 
-async function getAvailableGroqModels(apiKey: string): Promise<string[]> {
-  const now = Date.now();
-  // Cache for 30 minutes
-  if (cachedGroqModels.models.length > 0 && now - cachedGroqModels.fetchedAt < 30 * 60 * 1000) {
-    return cachedGroqModels.models;
-  }
-
-  try {
-    const res = await fetch("https://api.groq.com/openai/v1/models", {
-      headers: { Authorization: `Bearer ${apiKey}` },
-    });
-    if (res.ok) {
-      const data: any = await res.json();
-      if (Array.isArray(data?.data)) {
-        // Exclude audio/guard models, prioritize chat/text models
-        const textModels = data.data
-          .map((m: any) => m.id as string)
-          .filter((id: string) => !id.includes("whisper") && !id.includes("guard") && !id.includes("safeguard"));
-        if (textModels.length > 0) {
-          cachedGroqModels = { models: textModels, fetchedAt: now };
-          return textModels;
-        }
-      }
-    }
-  } catch (_e) {
-    // Ignore and use fallback list below
-  }
-
-  // Fallback candidate list if list API is unreachable
-  return [
-    "qwen/qwen3.8-27b",
-    "openai/gpt-oss-120b",
-    "openai/gpt-oss-20b",
-    "llama-3.3-70b-versatile",
-  ];
-}
+// Thai costs several tokens per word; a full answer runs ~1,400 tokens, so 1,024 cut answers mid-list.
+const GROQ_MAX_TOKENS = 4096;
+// A full answer takes 2-5 s; leave room before giving up on a model and trying the next.
+const GROQ_TIMEOUT_MS = 20_000;
 
 // Helper for Groq Cloud API
 async function callGroq(question: string, role: string, context?: string): Promise<string | null> {
@@ -91,17 +61,16 @@ async function callGroq(question: string, role: string, context?: string): Promi
   const userRoleText = role === 'business' ? 'ฝั่ง Business' : role === 'engineer' ? 'ฝั่ง Engineer' : 'ทั้งสองฝั่ง';
   const userContent = `[ผู้ใช้งานระบุมุมมอง: ${userRoleText}]\n${context ? `[บริบทเพิ่มเติม]: ${context}\n` : ''}\n[คำถาม]: ${question}\n\nตอบให้ชัด แบ่งเป็นข้อคิดกับวิธีแก้ที่ใช้ได้จริงในที่ทำงาน:`;
 
-  // 1. If user explicitly specified GROQ_MODEL in env, prioritize it
+  // GROQ_MODEL, when set, goes first
   const envModel = process.env.GROQ_MODEL?.trim();
-  const availableModels = await getAvailableGroqModels(apiKey);
-  const candidateModels = envModel 
-    ? [envModel, ...availableModels.filter((m) => m !== envModel)]
-    : availableModels;
+  const candidateModels = envModel
+    ? [envModel, ...GROQ_MODELS.filter((m) => m !== envModel)]
+    : GROQ_MODELS;
 
   for (const model of candidateModels) {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 7000);
+      const timeoutId = setTimeout(() => controller.abort(), GROQ_TIMEOUT_MS);
 
       const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
         method: "POST",
@@ -116,7 +85,7 @@ async function callGroq(question: string, role: string, context?: string): Promi
             { role: "user", content: userContent },
           ],
           temperature: 0.6,
-          max_tokens: 1024,
+          max_tokens: GROQ_MAX_TOKENS,
         }),
         signal: controller.signal,
       });
@@ -125,9 +94,11 @@ async function callGroq(question: string, role: string, context?: string): Promi
 
       if (res.ok) {
         const data: any = await res.json();
-        const text = data?.choices?.[0]?.message?.content?.trim();
+        const choice = data?.choices?.[0];
+        const text = choice?.message?.content?.trim();
         if (text) {
-          return text;
+          // Say so rather than end on a dangling "3. **"
+          return choice.finish_reason === "length" ? `${text}\n\n_(คำตอบยาวเกินกำหนด เลยถูกตัดตรงนี้)_` : text;
         }
       } else {
         const err = await res.text().catch(() => "");
