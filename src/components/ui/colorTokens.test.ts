@@ -53,19 +53,7 @@ export function violations(src: string): { line: number; text: string }[] {
  */
 const BASELINE: Record<string, number> = {
   'components/ChapterDiagram.tsx': 669,
-  'components/FrictionFaqSection.tsx': 120,
-  'components/FrictionPlaybookCard.tsx': 204,
   'components/ProtocolSimulator.tsx': 103,
-  'components/RoleMindsetCard.tsx': 106,
-  'components/content/ContentBlocks.tsx': 54,
-  'components/content/ContentTable.tsx': 48,
-  'components/content/InlineTerm.tsx': 20,
-  'components/content/RichText.tsx': 8,
-  'components/diagrams/DiagramFamilyGrid.tsx': 20,
-  'components/diagrams/SwimlaneVsSequence.tsx': 26,
-  'components/figures/shared/FigurePanels.tsx': 2,
-  'components/glossary/GlossaryCategoryMap.tsx': 24,
-  'components/glossary/GlossaryPanel.tsx': 48,
 };
 
 describe('colour tokens only', () => {

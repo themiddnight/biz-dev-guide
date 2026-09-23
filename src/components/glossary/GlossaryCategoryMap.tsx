@@ -19,8 +19,8 @@ export const GlossaryCategoryMap: React.FC<GlossaryCategoryMapProps> = ({ terms,
   }, [terms]);
 
   return (
-    <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] space-y-3">
-      <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e]">
+    <div className="p-4 sm:p-5 rounded-2xl bg-base-100 border border-base-border space-y-3">
+      <p className="text-[11px] sm:text-xs text-base-content-muted">
         {GLOSSARY_CATEGORIES.length} หมวด รวม {terms.length} คำ — กดหมวดเพื่อกรองคำศัพท์
       </p>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
@@ -34,17 +34,17 @@ export const GlossaryCategoryMap: React.FC<GlossaryCategoryMapProps> = ({ terms,
               aria-pressed={active}
               className={`${TAP} p-3 rounded-xl border text-left transition-all cursor-pointer min-w-0 ${
                 active
-                  ? 'bg-neutral-900 border-neutral-900 text-white dark:bg-white dark:border-white dark:text-[#0a0a0a]'
-                  : 'bg-neutral-50 dark:bg-[#181818] border-neutral-200 dark:border-[#262626] hover:border-neutral-400 dark:hover:border-[#404040]'
+                  ? 'bg-primary border-primary text-primary-content'
+                  : 'bg-base-300 border-base-border hover:border-base-border-strong'
               }`}
             >
               <div className="flex items-start justify-between gap-2">
-                <span className={`text-xs font-bold leading-snug ${active ? '' : 'text-neutral-900 dark:text-[#fafafa]'}`}>
+                <span className={`text-xs font-bold leading-snug ${active ? '' : 'text-base-content'}`}>
                   {cat.label}
                 </span>
                 <span
                   className={`shrink-0 text-[11px] font-bold ${
-                    active ? 'opacity-80' : 'text-neutral-500 dark:text-[#8e8e8e]'
+                    active ? 'opacity-80' : 'text-base-content-muted'
                   }`}
                 >
                   {counts[cat.key]}
@@ -52,7 +52,7 @@ export const GlossaryCategoryMap: React.FC<GlossaryCategoryMapProps> = ({ terms,
               </div>
               <div
                 className={`mt-1 text-[10px] sm:text-[11px] leading-snug break-words ${
-                  active ? 'opacity-80' : 'text-neutral-500 dark:text-[#8e8e8e]'
+                  active ? 'opacity-80' : 'text-base-content-muted'
                 }`}
               >
                 {cat.labelTh}

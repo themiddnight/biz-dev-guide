@@ -15,19 +15,19 @@ interface ContentBlocksProps {
 type NoteTone = Extract<ContentBlock, { kind: 'note' }>['tone'];
 
 const NOTE_TONES: Record<NoteTone, string> = {
-  info: 'bg-neutral-50 dark:bg-[#181818] border-neutral-200 dark:border-[#262626] text-neutral-700 dark:text-[#d4d4d4]',
-  warn: 'bg-amber-50 dark:bg-amber-950/30 border-amber-500/25 text-amber-900 dark:text-amber-200',
-  ok: 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-500/25 text-emerald-900 dark:text-emerald-200',
+  info: 'bg-base-300 border-base-border text-base-content-body',
+  warn: 'bg-warning/10 border-warning/25 text-warning',
+  ok: 'bg-success/10 border-success/25 text-success',
 };
 
-const blockTitleClass = 'text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]';
-const introClass = 'text-xs sm:text-sm text-neutral-600 dark:text-[#a3a3a3] leading-relaxed';
+const blockTitleClass = 'text-xs sm:text-sm font-bold text-base-content';
+const introClass = 'text-xs sm:text-sm text-base-content-secondary leading-relaxed';
 const detailsClass =
-  'group rounded-xl border border-neutral-200 dark:border-[#262626] bg-white dark:bg-[#141414] overflow-hidden';
-const summaryClass = `${TAP_Y} flex items-center justify-between gap-2 p-3 sm:p-3.5 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f] transition-colors`;
+  'group rounded-xl border border-base-border bg-base-100 overflow-hidden';
+const summaryClass = `${TAP_Y} flex items-center justify-between gap-2 p-3 sm:p-3.5 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden bg-base-300 hover:bg-base-300 transition-colors`;
 
 const SummaryChevron = () => (
-  <ChevronDown className="w-4 h-4 shrink-0 text-neutral-400 dark:text-[#737373] transition-transform group-open:rotate-180" />
+  <ChevronDown className="w-4 h-4 shrink-0 text-base-content-muted transition-transform group-open:rotate-180" />
 );
 
 // Guards against keys missing at runtime (e.g. stale data) even though FIGURES is typed as complete.
@@ -77,7 +77,7 @@ const Block: React.FC<BlockProps> = ({ block, onNavigateChapter }) => {
             <Figure className="w-full h-auto" />
           )}
           {block.caption && (
-            <figcaption className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e] leading-relaxed">
+            <figcaption className="text-[11px] sm:text-xs text-base-content-muted leading-relaxed">
               {rich(block.caption)}
             </figcaption>
           )}
@@ -94,12 +94,12 @@ const Block: React.FC<BlockProps> = ({ block, onNavigateChapter }) => {
             {block.cards.map((card, idx) => (
               <div
                 key={idx}
-                className="p-3.5 rounded-xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-1.5"
+                className="p-3.5 rounded-xl bg-base-300 border border-base-border space-y-1.5"
               >
-                <div className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa] leading-snug">
+                <div className="text-xs sm:text-sm font-bold text-base-content leading-snug">
                   {card.term}
                 </div>
-                <p className="text-xs sm:text-sm text-neutral-600 dark:text-[#a3a3a3] leading-relaxed">
+                <p className="text-xs sm:text-sm text-base-content-secondary leading-relaxed">
                   {rich(card.def)}
                 </p>
               </div>
@@ -115,7 +115,7 @@ const Block: React.FC<BlockProps> = ({ block, onNavigateChapter }) => {
             <span className={blockTitleClass}>{block.summary}</span>
             <SummaryChevron />
           </summary>
-          <div className="p-3 sm:p-4 space-y-4 border-t border-neutral-100 dark:border-[#262626]">
+          <div className="p-3 sm:p-4 space-y-4 border-t border-base-border">
             {block.body.map(child => (
               <Block key={child.id} block={child} onNavigateChapter={onNavigateChapter} />
             ))}
@@ -130,8 +130,8 @@ const Block: React.FC<BlockProps> = ({ block, onNavigateChapter }) => {
             <span className={blockTitleClass}>{block.title ?? 'แหล่งอ้างอิง'}</span>
             <SummaryChevron />
           </summary>
-          <div className="p-3 sm:p-4 space-y-3 border-t border-neutral-100 dark:border-[#262626]">
-            <ul className="pl-5 space-y-1 list-disc text-xs sm:text-sm text-neutral-700 dark:text-[#d4d4d4]">
+          <div className="p-3 sm:p-4 space-y-3 border-t border-base-border">
+            <ul className="pl-5 space-y-1 list-disc text-xs sm:text-sm text-base-content-body">
               {block.items.map((item, idx) => (
                 <li key={idx} className="leading-relaxed">
                   {item.url ? (
@@ -139,7 +139,7 @@ const Block: React.FC<BlockProps> = ({ block, onNavigateChapter }) => {
                       href={item.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`${TAP} inline-flex items-center gap-1 underline decoration-neutral-400 dark:decoration-[#525252] underline-offset-2 hover:decoration-neutral-900 dark:hover:decoration-white`}
+                      className={`${TAP} inline-flex items-center gap-1 underline decoration-base-content-subtle underline-offset-2 hover:decoration-base-content`}
                     >
                       {item.label}
                       <ExternalLink className="w-3 h-3" />
@@ -173,8 +173,8 @@ export const ContentBlocks: React.FC<ContentBlocksProps> = ({ sections, placemen
       {visible.map((section, sIdx) => (
         <section key={sIdx} className="space-y-4">
           {section.heading && (
-            <h3 className="text-sm sm:text-base font-bold text-neutral-900 dark:text-[#fafafa] flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-neutral-900 dark:bg-white inline-block"></span>
+            <h3 className="text-sm sm:text-base font-bold text-base-content flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary inline-block"></span>
               <span>{section.heading}</span>
             </h3>
           )}

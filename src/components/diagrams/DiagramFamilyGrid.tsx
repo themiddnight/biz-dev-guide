@@ -8,9 +8,9 @@ interface DiagramFamilyGridProps {
 }
 
 const cardBase =
-  'h-full w-full p-3.5 rounded-xl bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] flex flex-col gap-1.5 text-left';
+  'h-full w-full p-3.5 rounded-xl bg-base-100 border border-base-border flex flex-col gap-1.5 text-left';
 const jumpClass =
-  'cursor-pointer transition-colors hover:border-neutral-400 dark:hover:border-[#525252] hover:bg-neutral-50 dark:hover:bg-[#181818] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 dark:focus-visible:ring-white';
+  'cursor-pointer transition-colors hover:border-base-border-strong hover:bg-base-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary';
 
 const FamilyCardBody: React.FC<{ family: DiagramFamily }> = ({ family }) => {
   const Figure = FIGURES[family.figureKey];
@@ -19,16 +19,16 @@ const FamilyCardBody: React.FC<{ family: DiagramFamily }> = ({ family }) => {
       <div className="mb-1 py-1" aria-hidden="true">
         <Figure className="w-full" />
       </div>
-      <span className="text-sm font-bold text-neutral-900 dark:text-[#fafafa]">{family.name}</span>
-      <span className="text-xs sm:text-[13px] text-neutral-700 dark:text-[#d4d4d4] leading-relaxed">{family.question}</span>
-      <span className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e] leading-relaxed">
+      <span className="text-sm font-bold text-base-content">{family.name}</span>
+      <span className="text-xs sm:text-[13px] text-base-content-body leading-relaxed">{family.question}</span>
+      <span className="text-[11px] sm:text-xs text-base-content-muted leading-relaxed">
         {family.examples}
       </span>
       {family.note && (
-        <span className="text-[11px] sm:text-xs text-neutral-600 dark:text-[#a3a3a3] leading-relaxed">{family.note}</span>
+        <span className="text-[11px] sm:text-xs text-base-content-secondary leading-relaxed">{family.note}</span>
       )}
       {family.jumpLabel && (
-        <span className="mt-auto pt-1 text-[11px] sm:text-xs font-semibold text-neutral-900 dark:text-[#fafafa]">
+        <span className="mt-auto pt-1 text-[11px] sm:text-xs font-semibold text-base-content">
           {family.jumpLabel}
         </span>
       )}

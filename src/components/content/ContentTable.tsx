@@ -14,14 +14,14 @@ interface ContentTableProps {
 const widthClass = (hint?: 'narrow' | 'wide') =>
   hint === 'narrow' ? 'w-[18%]' : hint === 'wide' ? 'w-[40%]' : '';
 
-const titleClass = 'text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]';
-const introClass = 'text-xs sm:text-sm text-neutral-600 dark:text-[#a3a3a3] leading-relaxed';
+const titleClass = 'text-xs sm:text-sm font-bold text-base-content';
+const introClass = 'text-xs sm:text-sm text-base-content-secondary leading-relaxed';
 const footnoteClass =
-  'text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e] leading-relaxed p-3 rounded-xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626]';
+  'text-[11px] sm:text-xs text-base-content-muted leading-relaxed p-3 rounded-xl bg-base-300 border border-base-border';
 const thClass =
-  'px-3 py-2 text-left align-bottom text-[10px] sm:text-[11px] tracking-wider uppercase font-semibold text-neutral-500 dark:text-[#8e8e8e] border-b border-neutral-300 dark:border-[#333333]';
+  'px-3 py-2 text-left align-bottom text-[10px] sm:text-[11px] tracking-wider uppercase font-semibold text-base-content-muted border-b border-base-border-strong';
 const tdClass =
-  'px-3 py-2.5 align-top text-xs sm:text-sm text-neutral-700 dark:text-[#d4d4d4] leading-relaxed border-b border-neutral-200 dark:border-[#262626]';
+  'px-3 py-2.5 align-top text-xs sm:text-sm text-base-content-body leading-relaxed border-b border-base-border';
 
 export const ContentTable: React.FC<ContentTableProps> = ({ block, onNavigateChapter }) => {
   const mode = block.mobile ?? 'stack';
@@ -42,7 +42,7 @@ export const ContentTable: React.FC<ContentTableProps> = ({ block, onNavigateCha
               key={col.key}
               scope="col"
               className={`${thClass} ${widthClass(col.widthHint)} ${
-                mode === 'scroll' && cIdx === 0 ? 'sticky left-0 z-10 bg-white dark:bg-[#141414]' : ''
+                mode === 'scroll' && cIdx === 0 ? 'sticky left-0 z-10 bg-base-100' : ''
               }`}
             >
               {col.label}
@@ -57,8 +57,8 @@ export const ContentTable: React.FC<ContentTableProps> = ({ block, onNavigateCha
               <td
                 key={col.key}
                 className={`${tdClass} ${
-                  cIdx === 0 ? 'font-medium text-neutral-900 dark:text-[#e5e5e5]' : ''
-                } ${mode === 'scroll' && cIdx === 0 ? 'sticky left-0 z-10 bg-white dark:bg-[#141414]' : ''}`}
+                  cIdx === 0 ? 'font-medium text-base-content' : ''
+                } ${mode === 'scroll' && cIdx === 0 ? 'sticky left-0 z-10 bg-base-100' : ''}`}
               >
                 {renderCell(row.cells[col.key])}
               </td>
@@ -82,7 +82,7 @@ export const ContentTable: React.FC<ContentTableProps> = ({ block, onNavigateCha
           <div className="overflow-x-auto">{desktopTable}</div>
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-y-0 right-0 w-6 bg-linear-to-l from-white dark:from-[#141414] to-transparent sm:hidden"
+            className="pointer-events-none absolute inset-y-0 right-0 w-6 bg-linear-to-l from-base-100 to-transparent sm:hidden"
           />
         </div>
       ) : (
@@ -95,20 +95,20 @@ export const ContentTable: React.FC<ContentTableProps> = ({ block, onNavigateCha
             {block.rows.map((row, rIdx) => (
               <div
                 key={rIdx}
-                className="p-3 rounded-xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-2"
+                className="p-3 rounded-xl bg-base-300 border border-base-border space-y-2"
               >
                 {firstCol && (
-                  <div className="text-xs font-bold text-neutral-900 dark:text-[#fafafa] leading-snug">
+                  <div className="text-xs font-bold text-base-content leading-snug">
                     {renderCell(row.cells[firstCol.key])}
                   </div>
                 )}
                 <dl className="space-y-1.5">
                   {restCols.map(col => (
                     <div key={col.key}>
-                      <dt className="text-[10px] tracking-wider uppercase font-semibold text-neutral-500 dark:text-[#8e8e8e]">
+                      <dt className="text-[10px] tracking-wider uppercase font-semibold text-base-content-muted">
                         {col.label}
                       </dt>
-                      <dd className="text-xs text-neutral-700 dark:text-[#d4d4d4] leading-relaxed break-words">
+                      <dd className="text-xs text-base-content-body leading-relaxed break-words">
                         {renderCell(row.cells[col.key])}
                       </dd>
                     </div>
@@ -130,12 +130,12 @@ export const ContentTable: React.FC<ContentTableProps> = ({ block, onNavigateCha
 
   if (block.collapsed) {
     return (
-      <details className="group rounded-xl border border-neutral-200 dark:border-[#262626] bg-white dark:bg-[#141414] overflow-hidden">
-        <summary className={`${TAP_Y} flex items-center justify-between gap-2 p-3 sm:p-3.5 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f] transition-colors`}>
+      <details className="group rounded-xl border border-base-border bg-base-100 overflow-hidden">
+        <summary className={`${TAP_Y} flex items-center justify-between gap-2 p-3 sm:p-3.5 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden bg-base-300 hover:bg-base-300 transition-colors`}>
           <span className={titleClass}>{block.title ?? 'ตาราง'}</span>
-          <ChevronDown className="w-4 h-4 shrink-0 text-neutral-400 dark:text-[#737373] transition-transform group-open:rotate-180" />
+          <ChevronDown className="w-4 h-4 shrink-0 text-base-content-muted transition-transform group-open:rotate-180" />
         </summary>
-        <div className="p-3 sm:p-4 border-t border-neutral-100 dark:border-[#262626]">{body}</div>
+        <div className="p-3 sm:p-4 border-t border-base-border">{body}</div>
       </details>
     );
   }

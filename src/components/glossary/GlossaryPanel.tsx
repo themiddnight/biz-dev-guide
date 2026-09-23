@@ -33,8 +33,8 @@ interface GlossaryPanelProps {
 const chipClass = (active: boolean) =>
   `${TAP_GAP[6]} shrink-0 px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
     active
-      ? 'bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] shadow-xs'
-      : 'bg-neutral-100 dark:bg-[#1f1f1f] text-neutral-600 dark:text-[#a3a3a3] hover:bg-neutral-200 dark:hover:bg-[#262626]'
+      ? 'bg-primary text-primary-content shadow-xs'
+      : 'bg-base-300 text-base-content-secondary hover:bg-base-border'
   }`;
 
 export const GlossaryPanel: React.FC<GlossaryPanelProps> = ({
@@ -107,7 +107,7 @@ export const GlossaryPanel: React.FC<GlossaryPanelProps> = ({
     <div id="glossary-panel" className="space-y-4 scroll-mt-24">
       {/* Search */}
       <div className="relative">
-        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-[#737373] pointer-events-none" />
+        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-base-content-muted pointer-events-none" />
         <input
           type="search"
           value={query}
@@ -121,7 +121,7 @@ export const GlossaryPanel: React.FC<GlossaryPanelProps> = ({
             type="button"
             onClick={() => setQuery('')}
             aria-label="ล้างคำค้นหา"
-            className={`${TAP_POSITIONED} absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-md text-neutral-400 hover:text-neutral-700 dark:text-[#737373] dark:hover:text-[#d4d4d4] cursor-pointer`}
+            className={`${TAP_POSITIONED} absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-md text-base-content-muted hover:text-base-content-body cursor-pointer`}
           >
             <X className="w-3.5 h-3.5" />
           </button>
@@ -163,17 +163,17 @@ export const GlossaryPanel: React.FC<GlossaryPanelProps> = ({
         ))}
       </div>
 
-      <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e]" aria-live="polite">
+      <p className="text-[11px] sm:text-xs text-base-content-muted" aria-live="polite">
         แสดง {results.length} จาก {terms.length} คำ
       </p>
 
       {results.length === 0 ? (
-        <div className="p-6 rounded-xl border border-dashed border-neutral-300 dark:border-[#333333] text-center space-y-3">
-          <p className="text-xs sm:text-sm text-neutral-600 dark:text-[#a3a3a3]">ไม่พบคำที่ค้นหา</p>
+        <div className="p-6 rounded-xl border border-dashed border-base-border-strong text-center space-y-3">
+          <p className="text-xs sm:text-sm text-base-content-secondary">ไม่พบคำที่ค้นหา</p>
           <button
             type="button"
             onClick={clearFilters}
-            className={`${TAP} inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] text-xs font-bold cursor-pointer`}
+            className={`${TAP} inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-primary-content text-xs font-bold cursor-pointer`}
           >
             ล้างตัวกรอง
           </button>
@@ -183,26 +183,26 @@ export const GlossaryPanel: React.FC<GlossaryPanelProps> = ({
           {results.map(term => (
             <div
               key={term.id}
-              className="p-3.5 sm:p-4 rounded-xl bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] space-y-2 min-w-0"
+              className="p-3.5 sm:p-4 rounded-xl bg-base-100 border border-base-border space-y-2 min-w-0"
             >
-              <div className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa] leading-snug break-words">
+              <div className="text-xs sm:text-sm font-bold text-base-content leading-snug break-words">
                 {term.term}
               </div>
-              <p className="text-xs sm:text-sm text-neutral-600 dark:text-[#a3a3a3] leading-relaxed break-words">
+              <p className="text-xs sm:text-sm text-base-content-secondary leading-relaxed break-words">
                 <RichText text={term.definition} onNavigateChapter={onNavigateChapter} />
               </p>
 
               {term.plain && (
                 <div className={`p-2.5 rounded-lg border ${tokens.colors.accent.business.bg} ${tokens.colors.accent.business.border}`}>
                   <div className={`text-[10px] font-bold mb-0.5 ${tokens.colors.accent.business.text}`}>พูดแบบบ้านๆ</div>
-                  <p className="text-xs text-neutral-700 dark:text-[#d4d4d4] leading-relaxed">
+                  <p className="text-xs text-base-content-body leading-relaxed">
                     <RichText text={term.plain} onNavigateChapter={onNavigateChapter} />
                   </p>
                 </div>
               )}
 
               {term.example && (
-                <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e] leading-relaxed italic border-l-2 border-neutral-300 dark:border-[#333333] pl-2.5">
+                <p className="text-[11px] sm:text-xs text-base-content-muted leading-relaxed italic border-l-2 border-base-border-strong pl-2.5">
                   {term.example}
                 </p>
               )}
@@ -214,7 +214,7 @@ export const GlossaryPanel: React.FC<GlossaryPanelProps> = ({
                       key={chId}
                       type="button"
                       onClick={() => onNavigateChapter(chId)}
-                      className={`${TAP_GAP[6]} px-2 py-0.5 rounded-md bg-neutral-100 dark:bg-[#1f1f1f] border border-neutral-200 dark:border-[#262626] text-[10px] sm:text-[11px] font-semibold text-neutral-700 dark:text-[#d4d4d4] hover:bg-neutral-200 dark:hover:bg-[#262626] cursor-pointer transition-colors`}
+                      className={`${TAP_GAP[6]} px-2 py-0.5 rounded-md bg-base-300 border border-base-border text-[10px] sm:text-[11px] font-semibold text-base-content-body hover:bg-base-border cursor-pointer transition-colors`}
                     >
                       บทที่ {chapterNum[chId] ?? chId.replace('s', '')}
                     </button>

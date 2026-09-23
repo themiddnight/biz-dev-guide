@@ -72,22 +72,22 @@ export const FrictionFaqSection: React.FC<FrictionFaqSectionProps> = ({
       <div
         key={faq.id}
         id={faq.id}
-        className="anchor-target bg-white dark:bg-[#141414] rounded-xl border border-neutral-200 dark:border-[#262626] overflow-hidden"
+        className="anchor-target bg-base-100 rounded-xl border border-base-border overflow-hidden"
       >
         <button
           type="button"
           onClick={() => toggleItem(faq.id)}
           aria-expanded={isOpen}
           aria-controls={panelId}
-          className={`${TAP} w-full p-3.5 flex items-start justify-between gap-3 text-left cursor-pointer select-none hover:bg-neutral-50 dark:hover:bg-[#181818] transition-colors`}
+          className={`${TAP} w-full p-3.5 flex items-start justify-between gap-3 text-left cursor-pointer select-none hover:bg-base-300 transition-colors`}
         >
-          <span className="flex items-start gap-2.5 font-bold text-xs sm:text-sm text-neutral-900 dark:text-[#fafafa] leading-relaxed">
-            <span className="shrink-0 mt-0.5 px-1.5 py-0.5 rounded-md bg-neutral-100 dark:bg-[#1f1f1f] border border-neutral-200 dark:border-[#333333] text-[10px] text-neutral-600 dark:text-[#a3a3a3]">
+          <span className="flex items-start gap-2.5 font-bold text-xs sm:text-sm text-base-content leading-relaxed">
+            <span className="shrink-0 mt-0.5 px-1.5 py-0.5 rounded-md bg-base-300 border border-base-border text-[10px] text-base-content-secondary">
               Q{num}
             </span>
             <span>{faq.question}</span>
           </span>
-          <span className="shrink-0 text-neutral-400 dark:text-[#737373] text-base leading-none mt-0.5" aria-hidden="true">
+          <span className="shrink-0 text-base-content-muted text-base leading-none mt-0.5" aria-hidden="true">
             {isOpen ? '−' : '+'}
           </span>
         </button>
@@ -95,34 +95,34 @@ export const FrictionFaqSection: React.FC<FrictionFaqSectionProps> = ({
         {isOpen && (
           <div
             id={panelId}
-            className="px-3.5 pb-3.5 pt-3 border-t border-neutral-100 dark:border-[#262626] space-y-3 text-xs sm:text-sm"
+            className="px-3.5 pb-3.5 pt-3 border-t border-base-border space-y-3 text-xs sm:text-sm"
           >
-            <p className="text-neutral-700 dark:text-[#c4c4c4] leading-relaxed">
+            <p className="text-base-content-body leading-relaxed">
               <RichText text={faq.real} onNavigateChapter={onNavigateChapter} />
             </p>
 
             {faq.figure && Figure && (
-              <figure className="p-3 rounded-xl bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] space-y-2">
-                <p className="text-[11px] sm:text-xs font-bold text-neutral-900 dark:text-[#fafafa]">{faq.figure.title}</p>
+              <figure className="p-3 rounded-xl bg-base-100 border border-base-border space-y-2">
+                <p className="text-[11px] sm:text-xs font-bold text-base-content">{faq.figure.title}</p>
                 <div className="overflow-x-auto">
                   <Figure className="min-w-[480px] max-w-[560px] mx-auto" />
                 </div>
                 {faq.figure.caption && (
-                  <figcaption className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e] leading-relaxed">
+                  <figcaption className="text-[11px] sm:text-xs text-base-content-muted leading-relaxed">
                     <RichText text={faq.figure.caption} onNavigateChapter={onNavigateChapter} />
                   </figcaption>
                 )}
                 {faq.figure.note && (
-                  <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e] leading-relaxed">
+                  <p className="text-[11px] sm:text-xs text-base-content-muted leading-relaxed">
                     <RichText text={faq.figure.note} onNavigateChapter={onNavigateChapter} />
                   </p>
                 )}
               </figure>
             )}
 
-            <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-500/20 space-y-1.5">
-              <div className="font-bold text-emerald-900 dark:text-emerald-200">ทางออกที่ใช้ได้</div>
-              <ul className="pl-4 space-y-1 list-disc text-emerald-900 dark:text-emerald-100/90 leading-relaxed marker:text-emerald-600 dark:marker:text-emerald-400">
+            <div className="p-3 rounded-xl bg-success/10 border border-success/25 space-y-1.5">
+              <div className="font-bold text-success">ทางออกที่ใช้ได้</div>
+              <ul className="pl-4 space-y-1 list-disc text-success leading-relaxed marker:text-success">
                 {faq.fixes.map((fix, idx) => (
                   <li key={idx}>
                     <RichText text={fix} onNavigateChapter={onNavigateChapter} />
@@ -132,7 +132,7 @@ export const FrictionFaqSection: React.FC<FrictionFaqSectionProps> = ({
             </div>
 
             <div className="flex flex-wrap items-center gap-1.5">
-              <span className="text-[11px] text-neutral-500 dark:text-[#8e8e8e]">แนวคิดที่เกี่ยวข้อง:</span>
+              <span className="text-[11px] text-base-content-muted">แนวคิดที่เกี่ยวข้อง:</span>
               {faq.concepts.map(concept =>
                 GLOSSARY_KEYS.has(concept.toLowerCase()) ? (
                   <button
@@ -140,14 +140,14 @@ export const FrictionFaqSection: React.FC<FrictionFaqSectionProps> = ({
                     type="button"
                     onClick={() => onSearchGlossary(concept)}
                     title={`ค้นหา "${concept}" ในหน้ารวมคำศัพท์ (บทที่ 15)`}
-                    className={`${TAP_GAP[6]} ${chipClass} cursor-pointer bg-neutral-100 dark:bg-[#1f1f1f] border-neutral-200 dark:border-[#333333] text-neutral-800 dark:text-[#d4d4d4] hover:bg-neutral-200 dark:hover:bg-[#262626] underline decoration-dotted decoration-neutral-400 dark:decoration-[#525252] underline-offset-2`}
+                    className={`${TAP_GAP[6]} ${chipClass} cursor-pointer bg-base-300 border-base-border text-base-content-body hover:bg-base-border underline decoration-dotted decoration-base-content-subtle underline-offset-2`}
                   >
                     {concept}
                   </button>
                 ) : (
                   <span
                     key={concept}
-                    className={`${chipClass} bg-neutral-50 dark:bg-[#181818] border-neutral-200 dark:border-[#262626] text-neutral-600 dark:text-[#a3a3a3]`}
+                    className={`${chipClass} bg-base-300 border-base-border text-base-content-secondary`}
                   >
                     {concept}
                   </span>
@@ -159,7 +159,7 @@ export const FrictionFaqSection: React.FC<FrictionFaqSectionProps> = ({
               <button
                 type="button"
                 onClick={() => onScrollToPlaybook(faq.relatedPlaybookChapterId as string)}
-                className={`${TAP} inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-900 dark:text-white underline decoration-neutral-400 dark:decoration-[#525252] underline-offset-2 hover:decoration-neutral-900 dark:hover:decoration-white cursor-pointer`}
+                className={`${TAP} inline-flex items-center gap-1.5 text-xs font-semibold text-base-content underline decoration-base-content-subtle underline-offset-2 hover:decoration-base-content cursor-pointer`}
               >
                 {faq.relatedPlaybookChapterId === 's11'
                   ? 'ดู Iron Triangle ด้านบน'
@@ -176,15 +176,15 @@ export const FrictionFaqSection: React.FC<FrictionFaqSectionProps> = ({
   return (
     <div className="space-y-5">
       {/* Audience callouts (static .aud-callout) — both shown together */}
-      <div className="p-3 sm:p-3.5 rounded-xl border bg-neutral-50 dark:bg-[#181818] border-neutral-200 dark:border-[#262626] text-xs sm:text-sm text-neutral-700 dark:text-[#d4d4d4] leading-relaxed space-y-2.5">
+      <div className="p-3 sm:p-3.5 rounded-xl border bg-base-300 border-base-border text-xs sm:text-sm text-base-content-body leading-relaxed space-y-2.5">
         <div>
-          <span className="block font-bold text-neutral-900 dark:text-[#fafafa] mb-0.5">
+          <span className="block font-bold text-base-content mb-0.5">
             {FAQ_AUDIENCE_CALLOUTS.business.who}
           </span>
           {FAQ_AUDIENCE_CALLOUTS.business.body}
         </div>
         <div>
-          <span className="block font-bold text-neutral-900 dark:text-[#fafafa] mb-0.5">
+          <span className="block font-bold text-base-content mb-0.5">
             {FAQ_AUDIENCE_CALLOUTS.engineer.who}
           </span>
           {FAQ_AUDIENCE_CALLOUTS.engineer.body}
@@ -192,7 +192,7 @@ export const FrictionFaqSection: React.FC<FrictionFaqSectionProps> = ({
       </div>
 
       {/* Quick jump chips (collapsible on mobile) */}
-      <nav aria-label="สารบัญคำถามในบทนี้" className="p-3 rounded-xl bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] space-y-2">
+      <nav aria-label="สารบัญคำถามในบทนี้" className="p-3 rounded-xl bg-base-100 border border-base-border space-y-2">
         <button
           type="button"
           onClick={() => setIsJumpOpen(prev => !prev)}
@@ -200,12 +200,12 @@ export const FrictionFaqSection: React.FC<FrictionFaqSectionProps> = ({
           aria-controls="s11-faq-jump"
           className={`${TAP} w-full flex items-center justify-between gap-2 text-left sm:cursor-default cursor-pointer`}
         >
-          <span className="flex items-center gap-2 text-[11px] sm:text-xs font-bold text-neutral-900 dark:text-[#fafafa]">
-            <ListOrdered className="w-4 h-4 text-neutral-500 dark:text-[#a3a3a3]" />
+          <span className="flex items-center gap-2 text-[11px] sm:text-xs font-bold text-base-content">
+            <ListOrdered className="w-4 h-4 text-base-content-muted" />
             {FAQ_QUICK_JUMP_TITLE}
           </span>
           <span className="sm:hidden">
-            {isJumpOpen ? <ChevronUp className="w-4 h-4 text-neutral-500" /> : <ChevronDown className="w-4 h-4 text-neutral-400" />}
+            {isJumpOpen ? <ChevronUp className="w-4 h-4 text-base-content-muted" /> : <ChevronDown className="w-4 h-4 text-base-content-muted" />}
           </span>
         </button>
         <div id="s11-faq-jump" className={`${isJumpOpen ? 'flex' : 'hidden'} sm:flex flex-wrap gap-1.5`}>
@@ -214,9 +214,9 @@ export const FrictionFaqSection: React.FC<FrictionFaqSectionProps> = ({
               key={faq.id}
               type="button"
               onClick={() => jumpTo(faq.id)}
-              className={`${TAP_GAP[6]} ${chipClass} cursor-pointer text-left bg-neutral-50 dark:bg-[#181818] border-neutral-200 dark:border-[#262626] text-neutral-700 dark:text-[#c4c4c4] hover:bg-neutral-100 dark:hover:bg-[#1f1f1f]`}
+              className={`${TAP_GAP[6]} ${chipClass} cursor-pointer text-left bg-base-300 border-base-border text-base-content-body hover:bg-base-300`}
             >
-              <span className="text-neutral-400 dark:text-[#737373] mr-1">{idx + 1}.</span>
+              <span className="text-base-content-muted mr-1">{idx + 1}.</span>
               {faq.question}
             </button>
           ))}
@@ -227,8 +227,8 @@ export const FrictionFaqSection: React.FC<FrictionFaqSectionProps> = ({
       {FAQ_GROUPS.map(group => (
         <section key={group.key} className="space-y-2.5">
           <div>
-            <h4 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">{group.title}</h4>
-            <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e]">{group.subtitle}</p>
+            <h4 className="text-xs sm:text-sm font-bold text-base-content">{group.title}</h4>
+            <p className="text-[11px] sm:text-xs text-base-content-muted">{group.subtitle}</p>
           </div>
           {FRICTION_FAQS.filter(faq => faq.group === group.key).map(renderItem)}
         </section>
@@ -236,37 +236,37 @@ export const FrictionFaqSection: React.FC<FrictionFaqSectionProps> = ({
 
       {/* Closing principles, caveat and sources */}
       <section className="space-y-3">
-        <h4 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">{FAQ_PRINCIPLES_TITLE}</h4>
+        <h4 className="text-xs sm:text-sm font-bold text-base-content">{FAQ_PRINCIPLES_TITLE}</h4>
         <ol className="space-y-2">
           {FAQ_PRINCIPLES.map((principle, idx) => (
             <li
               key={idx}
-              className="p-3 rounded-xl bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] text-xs sm:text-sm space-y-1"
+              className="p-3 rounded-xl bg-base-100 border border-base-border text-xs sm:text-sm space-y-1"
             >
-              <div className="font-bold text-neutral-900 dark:text-[#fafafa]">
+              <div className="font-bold text-base-content">
                 {idx + 1}. {principle.title}
               </div>
-              <p className="text-neutral-600 dark:text-[#a3a3a3] leading-relaxed">
+              <p className="text-base-content-secondary leading-relaxed">
                 <RichText text={principle.body} onNavigateChapter={onNavigateChapter} />
               </p>
             </li>
           ))}
         </ol>
 
-        <div className="p-3 sm:p-3.5 rounded-xl border text-xs sm:text-sm leading-relaxed bg-amber-50 dark:bg-amber-950/30 border-amber-500/25 text-amber-900 dark:text-amber-200">
+        <div className="p-3 sm:p-3.5 rounded-xl border text-xs sm:text-sm leading-relaxed bg-warning/10 border-warning/25 text-warning">
           <RichText text={FAQ_CAVEAT} onNavigateChapter={onNavigateChapter} />
         </div>
 
         <div className="space-y-1.5">
-          <div className="text-[11px] sm:text-xs font-bold text-neutral-700 dark:text-[#c4c4c4]">ที่มาของแนวคิดในบทที่ 11</div>
-          <ul className="pl-5 space-y-1 list-disc text-xs sm:text-sm text-neutral-700 dark:text-[#d4d4d4]">
+          <div className="text-[11px] sm:text-xs font-bold text-base-content-body">ที่มาของแนวคิดในบทที่ 11</div>
+          <ul className="pl-5 space-y-1 list-disc text-xs sm:text-sm text-base-content-body">
             {FAQ_SOURCES.map(source => (
               <li key={source.url} className="leading-relaxed">
                 <a
                   href={source.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`${TAP} inline-flex items-center gap-1 underline decoration-neutral-400 dark:decoration-[#525252] underline-offset-2 hover:decoration-neutral-900 dark:hover:decoration-white`}
+                  className={`${TAP} inline-flex items-center gap-1 underline decoration-base-content-subtle underline-offset-2 hover:decoration-base-content`}
                 >
                   {source.label}
                   <ExternalLink className="w-3 h-3" />

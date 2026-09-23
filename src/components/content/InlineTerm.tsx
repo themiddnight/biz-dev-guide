@@ -30,7 +30,7 @@ export const InlineTermTrigger: React.FC<InlineTermTriggerProps> = ({ termId, la
     aria-expanded={open}
     aria-controls={open ? panelId : undefined}
     onClick={onToggle}
-    className="inline-block -my-3.5 py-3.5 sm:my-0 sm:py-0 font-medium text-neutral-900 dark:text-[#f5f5f5] underline decoration-dotted decoration-neutral-500 dark:decoration-[#8e8e8e] underline-offset-[3px] hover:decoration-neutral-900 dark:hover:decoration-white cursor-pointer"
+    className="inline-block -my-3.5 py-3.5 sm:my-0 sm:py-0 font-medium text-base-content underline decoration-dotted decoration-base-content-subtle underline-offset-[3px] hover:decoration-base-content cursor-pointer"
   >
     {label}
   </button>
@@ -53,14 +53,14 @@ export const InlineTermPanel: React.FC<InlineTermPanelProps> = ({ term, panelId,
     role="region"
     aria-label={term.term}
     data-inline-term-panel={term.id}
-    className="block my-2 p-3 rounded-lg border border-neutral-200 dark:border-[#333333] bg-white dark:bg-[#141414] text-xs sm:text-sm leading-relaxed text-neutral-700 dark:text-[#c4c4c4] not-italic font-normal"
+    className="block my-2 p-3 rounded-lg border border-base-border bg-base-100 text-xs sm:text-sm leading-relaxed text-base-content-body not-italic font-normal"
   >
-    <span className="block font-semibold text-neutral-900 dark:text-[#fafafa]">{term.term}</span>
+    <span className="block font-semibold text-base-content">{term.term}</span>
     <span className="block mt-1">
       <RichText text={term.definition} onNavigateChapter={onNavigateChapter} />
     </span>
     {term.plain && (
-      <span className="block mt-1 text-neutral-500 dark:text-[#8e8e8e]">
+      <span className="block mt-1 text-base-content-muted">
         <RichText text={term.plain} onNavigateChapter={onNavigateChapter} />
       </span>
     )}
@@ -69,7 +69,7 @@ export const InlineTermPanel: React.FC<InlineTermPanelProps> = ({ term, panelId,
         <button
           type="button"
           onClick={() => onSearchGlossary(term.term)}
-          className="inline-block -my-3.5 py-3.5 sm:my-0 sm:py-0 text-[11px] sm:text-xs font-semibold text-neutral-700 dark:text-[#d4d4d4] underline underline-offset-2 hover:text-neutral-900 dark:hover:text-white cursor-pointer"
+          className="inline-block -my-3.5 py-3.5 sm:my-0 sm:py-0 text-[11px] sm:text-xs font-semibold text-base-content-body underline underline-offset-2 hover:text-base-content cursor-pointer"
         >
           ดูในหน้ารวมคำศัพท์
         </button>
