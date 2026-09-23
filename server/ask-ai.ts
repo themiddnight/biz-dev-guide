@@ -1,7 +1,6 @@
 // The /api/ask-ai logic, shared by the Express server (local dev, Cloud Run) and the Vercel
-// function in api/ask-ai.ts, which is what serves the route on Vercel.
-import { GoogleGenAI } from "@google/genai";
-
+// function in api/ask-ai.ts, which is what serves the route on Vercel. Answers come from Groq;
+// without a key, or when every Groq model fails, a built-in knowledge base answers instead.
 interface AskAiInput {
   question?: unknown;
   role?: string;
@@ -11,26 +10,6 @@ interface AskAiInput {
 interface AskAiResult {
   status: number;
   body: Record<string, unknown>;
-}
-
-// Lazy-initialize Gemini API
-let geminiClient: GoogleGenAI | null = null;
-function getGeminiClient(): GoogleGenAI {
-  if (!geminiClient) {
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      throw new Error("GEMINI_API_KEY is not configured.");
-    }
-    geminiClient = new GoogleGenAI({
-      apiKey,
-      httpOptions: {
-        headers: {
-          "User-Agent": "aistudio-build",
-        },
-      },
-    });
-  }
-  return geminiClient;
 }
 
 // Knowledge base summary for contextual grounding
@@ -132,58 +111,13 @@ export async function askAi(input: unknown): Promise<AskAiResult> {
           return { status: 200, body: { answer: groqAnswer.text, source: "groq", model: groqAnswer.model } };
         }
       } catch (err: any) {
-        console.warn("[AI Bridge] Groq invocation failed, trying next provider:", err?.message || err);
-      }
-    }
-
-    // 2. Attempt Gemini call if GEMINI_API_KEY is configured
-    if (process.env.GEMINI_API_KEY?.trim()) {
-      try {
-        const ai = getGeminiClient();
-        const prompt = `${SYSTEM_INSTRUCTION}
-
-[ผู้ใช้งานระบุมุมมอง: ${role === 'business' ? 'ฝั่ง Business' : role === 'engineer' ? 'ฝั่ง Engineer' : 'ทั้งสองฝั่ง'}]
-${context ? `[บริบทเพิ่มเติม]: ${context}` : ''}
-
-[คำถาม]: ${question}
-
-ตอบให้ชัด แบ่งเป็นข้อคิดกับวิธีแก้ที่ใช้ได้จริงในที่ทำงาน:`;
-
-        const candidateModels = ["gemini-3.8-flash", "gemini-3.1-flash-lite"];
-        let response: any = null;
-        let answeredBy = "";
-
-        const callWithTimeout = async (model: string, timeoutMs: number) => {
-          try {
-            const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), timeoutMs));
-            const apiPromise = ai.models.generateContent({ model, contents: prompt });
-            return await Promise.race([apiPromise, timeoutPromise]);
-          } catch (_err) {
-            return null;
-          }
-        };
-
-        for (const model of candidateModels) {
-          const res: any = await callWithTimeout(model, 3500);
-          if (res && res.text) {
-            response = res;
-            answeredBy = model;
-            break;
-          }
-        }
-
-        if (response && response.text) {
-          const answer = response.text || "ขออภัย ยังตอบไม่ได้ ลองใหม่อีกครั้ง";
-          return { status: 200, body: { answer, source: "gemini", model: answeredBy } };
-        }
-      } catch (_geminiError: any) {
-        console.log("[AI Bridge] Gemini call failed or unavailable");
+        console.warn("[AI Bridge] Groq invocation failed, using the knowledge base:", err?.message || err);
       }
     }
 
     console.log("[AI Bridge] Serving request via expert knowledge base fallback");
     
-    // 3. Fallback expert rule-based responses
+    // 2. Fallback expert rule-based responses
       const lower = question.toLowerCase();
       let fallbackAnswer = "";
 

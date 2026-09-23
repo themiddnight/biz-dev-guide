@@ -8,7 +8,6 @@ describe('POST /api/ask-ai (Vercel function)', () => {
   // No provider keys: the handler must answer from the built-in knowledge base without network.
   beforeEach(() => {
     vi.stubEnv('GROQ_API_KEY', '');
-    vi.stubEnv('GEMINI_API_KEY', '');
   });
   afterEach(() => vi.unstubAllEnvs());
 
@@ -41,7 +40,6 @@ describe('POST /api/ask-ai with Groq', () => {
   beforeEach(() => {
     vi.stubEnv('GROQ_API_KEY', 'gsk_test');
     vi.stubEnv('GROQ_MODEL', '');
-    vi.stubEnv('GEMINI_API_KEY', '');
   });
   afterEach(() => {
     vi.unstubAllEnvs();

@@ -27,7 +27,6 @@ interface AIAssistantTabProps {
 // Footer label for an answer: the provider, plus the exact model when the server reported one.
 export function answerSourceLabel(source?: ChatMessage['source'], model?: string): string {
   if (source === 'groq') return model ? `Groq · ${model}` : 'Groq AI';
-  if (source === 'gemini') return model ? `Gemini · ${model}` : 'Gemini Model';
   return source ? 'คลังความรู้ผู้เชี่ยวชาญ' : 'Expert Assistant';
 }
 
@@ -117,9 +116,9 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
     }
   };
 
-  // Source of the most recent server answer ('groq' | 'gemini' | 'fallback' | undefined before any answer).
+  // Source of the most recent server answer ('groq' | 'fallback' | undefined before any answer).
   const lastSource = [...messages].reverse().find((m) => m.role === 'assistant' && m.source)?.source;
-  const isOffline = lastSource !== undefined && lastSource !== 'gemini' && lastSource !== 'groq';
+  const isOffline = lastSource === 'fallback';
 
   const copyToClipboard = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
@@ -145,8 +144,6 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
             <span>
               {lastSource === 'groq'
                 ? 'AI Bridge Assistant Powered by Groq'
-                : lastSource === 'gemini'
-                ? 'AI Bridge Assistant Powered by Gemini'
                 : 'AI Bridge Assistant'}
             </span>
           </div>
@@ -270,11 +267,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
                     {/* Model ids are long; let the label and time wrap as units instead of mid-phrase on phones */}
                     <span className="flex flex-wrap items-center gap-x-1 whitespace-nowrap">
                       <span
-                        className={
-                          msg.source === 'groq' ? 'text-success font-semibold'
-                          : msg.source === 'gemini' ? 'text-warning font-semibold'
-                          : undefined
-                        }
+                        className={msg.source === 'groq' ? 'text-success font-semibold' : undefined}
                       >
                         ● {answerSourceLabel(msg.source, msg.model)}
                       </span>

@@ -21,11 +21,9 @@ describe('AIAssistantTab hierarchy (spec §10.1, §10.3, §10.5)', () => {
 describe('answerSourceLabel', () => {
   it('names the model that answered', () => {
     expect(answerSourceLabel('groq', 'qwen/qwen3.8-27b')).toBe('Groq · qwen/qwen3.8-27b');
-    expect(answerSourceLabel('gemini', 'gemini-3.8-flash')).toBe('Gemini · gemini-3.8-flash');
   });
   it('falls back to the provider name for answers saved before the model was reported', () => {
     expect(answerSourceLabel('groq')).toBe('Groq AI');
-    expect(answerSourceLabel('gemini')).toBe('Gemini Model');
     expect(answerSourceLabel('fallback')).toBe('คลังความรู้ผู้เชี่ยวชาญ');
     expect(answerSourceLabel()).toBe('Expert Assistant');
   });
