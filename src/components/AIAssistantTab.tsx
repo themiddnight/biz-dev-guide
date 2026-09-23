@@ -15,7 +15,10 @@ import {
   RefreshCw,
   WifiOff
 } from 'lucide-react';
-import { TAP, TAP_GAP, TAP_POSITIONED } from './ui/tapTarget';
+import { TAP, TAP_GAP } from './ui/tapTarget';
+import { Button } from './ui/Button';
+import { IconBadge } from './ui/IconBadge';
+import { Alert } from './ui/Alert';
 
 interface AIAssistantTabProps {
   initialPrompt?: string;
@@ -120,21 +123,17 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-5 sm:space-y-6 pb-16">
+    <div className="max-w-4xl mx-auto space-y-section pb-16">
       {isOffline && (
-        <div
-          role="status"
-          className="flex items-start gap-2.5 p-4 rounded-2xl border border-warning/25 bg-warning/10 text-warning text-xs sm:text-sm"
-        >
-          <WifiOff className="w-4 h-4 mt-0.5 shrink-0" aria-hidden="true" />
+        <Alert color="warning" live icon={<WifiOff className="w-4 h-4" />}>
           <p>
             <strong className="font-semibold">โหมดออฟไลน์:</strong> ยังไม่ได้เชื่อมต่อ AI จริง คำตอบเป็นคำแนะนำทั่วไป
           </p>
-        </div>
+        </Alert>
       )}
 
       {/* Header Info */}
-      <div className="bg-base-100 p-5 sm:p-6 rounded-2xl sm:rounded-3xl border border-base-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-2xs">
+      <div className="bg-base-100 p-box-spacious rounded-box border border-base-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-2xs">
         <div className="space-y-1">
           <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-base-300 text-base-content-body text-[11px] sm:text-xs font-semibold border border-base-border">
             <Sparkles className="w-3 h-3 text-warning" />
@@ -187,7 +186,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
       </div>
 
       {/* Chat Conversation Thread */}
-      <div className="bg-base-100 border border-base-border rounded-2xl sm:rounded-3xl p-4 sm:p-6 min-h-[420px] max-h-[600px] overflow-y-auto space-y-4 shadow-2xs">
+      <div className="bg-base-100 border border-base-border rounded-box p-box-spacious min-h-[420px] max-h-[600px] overflow-y-auto space-y-4 shadow-2xs">
         {messages.map((msg) => {
           const isAi = msg.role === 'assistant';
           return (
@@ -195,19 +194,13 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
               key={msg.id}
               className={`flex items-start gap-3 ${isAi ? '' : 'flex-row-reverse'}`}
             >
-              <div
-                className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
-                  isAi ? 'bg-primary text-primary-content' : 'bg-secondary text-secondary-content'
-                }`}
-              >
-                {isAi ? <Bot className="w-4 h-4" /> : <User className="w-4 h-4" />}
-              </div>
+              <IconBadge size="md">{isAi ? <Bot className="w-4 h-4" /> : <User className="w-4 h-4" />}</IconBadge>
 
               <div
-                className={`max-w-[85%] sm:max-w-[75%] rounded-2xl p-4 text-xs sm:text-sm leading-relaxed space-y-2 ${
+                className={`max-w-[85%] sm:max-w-[75%] rounded-box p-4 text-xs sm:text-sm leading-relaxed space-y-2 ${
                   isAi
                     ? 'bg-base-300 border border-base-border text-base-content'
-                    : 'bg-primary text-primary-content shadow-xs'
+                    : 'bg-base-300 text-base-content border border-base-border'
                 }`}
               >
                 {isAi ? (
@@ -296,10 +289,8 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
 
         {isLoading && (
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center text-primary-content shrink-0">
-              <Bot className="w-4 h-4" />
-            </div>
-            <div className="p-3 rounded-2xl bg-base-300 border border-base-border text-xs text-base-content-secondary flex items-center gap-2">
+            <IconBadge size="md"><Bot className="w-4 h-4" /></IconBadge>
+            <div className="p-3 rounded-box bg-base-300 border border-base-border text-xs text-base-content-secondary flex items-center gap-2">
               <Loader2 className="w-4 h-4 animate-spin text-base-content-muted" />
               <span>กำลังคิดคำตอบ...</span>
             </div>
@@ -321,12 +312,15 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
           onChange={(e) => setInputQuestion(e.target.value)}
           placeholder="พิมพ์คำถามของคุณ เช่น 'ทำไม Dev ถึงบ่นเรื่อง Flaky test?' หรือ 'วิธีเขียน User story ที่ดี'..."
           disabled={isLoading}
-          className="w-full pl-4 sm:pl-5 pr-28 py-3.5 bg-base-100 border border-base-border rounded-xl sm:rounded-2xl text-xs sm:text-sm text-base-content placeholder-base-content-subtle focus:outline-none focus:ring-1 focus:ring-base-border-strong shadow-2xs"
+          className="w-full pl-4 sm:pl-5 pr-28 py-3.5 bg-base-100 border border-base-border rounded-box text-xs sm:text-sm text-base-content placeholder-base-content-subtle focus:outline-none focus:ring-1 focus:ring-base-border-strong shadow-2xs"
         />
-        <button
+        <Button
           type="submit"
+          color="primary" variant="solid"
+          size="sm"
+          tap="positioned"
           disabled={!inputQuestion.trim() || isLoading}
-          className={`${TAP_POSITIONED} absolute right-2 px-3.5 py-2 bg-primary hover:bg-primary/90 text-primary-content disabled:opacity-40 rounded-lg sm:rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer disabled:cursor-not-allowed`}
+          className="absolute right-2"
         >
           {isLoading ? (
             <Loader2 className="w-4 h-4 animate-spin" />
@@ -336,7 +330,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
               <Send className="w-3.5 h-3.5" />
             </>
           )}
-        </button>
+        </Button>
       </form>
     </div>
   );
