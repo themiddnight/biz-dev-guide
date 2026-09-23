@@ -263,49 +263,49 @@ export const Header: React.FC<HeaderProps> = ({
           <nav className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 max-sm:-mt-2.5 max-sm:pt-2.5 max-sm:-mb-2.5 max-sm:pb-3.5 scrollbar-none" aria-label="Main Navigation">
             <button
               onClick={() => setActiveTab('guide')}
-              className={`${TAP} flex items-center gap-1.5 px-3 py-1 rounded-[4px] text-xs font-semibold uppercase tracking-wider transition-all shrink-0 cursor-pointer border ${
+              className={`${TAP} flex items-center gap-1.5 px-2 sm:px-3 py-1 rounded-[4px] text-xs font-semibold uppercase tracking-wider transition-all shrink-0 cursor-pointer border ${
                 activeTab === 'guide'
                   ? 'bg-neutral-950 text-white dark:bg-white dark:text-neutral-950 border-neutral-950 dark:border-white'
                   : 'border-neutral-200 dark:border-[#262626] text-neutral-600 dark:text-[#a3a3a3] hover:bg-neutral-100 dark:hover:bg-[#1a1a1a] hover:text-neutral-900 dark:hover:text-white'
               }`}
             >
-              <BookOpen className="w-3.5 h-3.5" />
+              <BookOpen className="max-sm:hidden w-3.5 h-3.5" />
               <span>Guide [{chapterCount}]</span>
             </button>
 
             <button
               onClick={() => setActiveTab('ai')}
-              className={`${TAP} flex items-center gap-1.5 px-3 py-1 rounded-[4px] text-xs font-semibold uppercase tracking-wider transition-all shrink-0 cursor-pointer border ${
+              className={`${TAP} flex items-center gap-1.5 px-2 sm:px-3 py-1 rounded-[4px] text-xs font-semibold uppercase tracking-wider transition-all shrink-0 cursor-pointer border ${
                 activeTab === 'ai'
                   ? 'bg-neutral-950 text-white dark:bg-white dark:text-neutral-950 border-neutral-950 dark:border-white'
                   : 'border-neutral-200 dark:border-[#262626] text-neutral-600 dark:text-[#a3a3a3] hover:bg-neutral-100 dark:hover:bg-[#1a1a1a] hover:text-neutral-900 dark:hover:text-white'
               }`}
             >
-              <Bot className="w-3.5 h-3.5" />
+              <Bot className="max-sm:hidden w-3.5 h-3.5" />
               <span>AI Bridge</span>
             </button>
 
             <button
               onClick={() => setActiveTab('quiz')}
-              className={`${TAP} flex items-center gap-1.5 px-3 py-1 rounded-[4px] text-xs font-semibold uppercase tracking-wider transition-all shrink-0 cursor-pointer border ${
+              className={`${TAP} flex items-center gap-1.5 px-2 sm:px-3 py-1 rounded-[4px] text-xs font-semibold uppercase tracking-wider transition-all shrink-0 cursor-pointer border ${
                 activeTab === 'quiz'
                   ? 'bg-neutral-950 text-white dark:bg-white dark:text-neutral-950 border-neutral-950 dark:border-white'
                   : 'border-neutral-200 dark:border-[#262626] text-neutral-600 dark:text-[#a3a3a3] hover:bg-neutral-100 dark:hover:bg-[#1a1a1a] hover:text-neutral-900 dark:hover:text-white'
               }`}
             >
-              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+              <Sparkles className="max-sm:hidden w-3.5 h-3.5 text-amber-500" />
               <span>Quiz</span>
             </button>
 
             <button
               onClick={() => setActiveTab('gamification')}
-              className={`${TAP} flex items-center gap-1.5 px-3 py-1 rounded-[4px] text-xs font-semibold uppercase tracking-wider transition-all shrink-0 cursor-pointer border ${
+              className={`${TAP} flex items-center gap-1.5 px-2 sm:px-3 py-1 rounded-[4px] text-xs font-semibold uppercase tracking-wider transition-all shrink-0 cursor-pointer border ${
                 activeTab === 'gamification'
                   ? 'bg-neutral-950 text-white dark:bg-white dark:text-neutral-950 border-neutral-950 dark:border-white'
                   : 'border-neutral-200 dark:border-[#262626] text-neutral-600 dark:text-[#a3a3a3] hover:bg-neutral-100 dark:hover:bg-[#1a1a1a] hover:text-neutral-900 dark:hover:text-white'
               }`}
             >
-              <Trophy className="w-3.5 h-3.5" />
+              <Trophy className="max-sm:hidden w-3.5 h-3.5" />
               <span>Dashboard</span>
             </button>
           </nav>
