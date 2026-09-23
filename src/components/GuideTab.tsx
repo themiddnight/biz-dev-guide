@@ -447,10 +447,14 @@ export const GuideTab: React.FC<GuideTabProps> = ({
               </span>
             </div>
 
+            {/* One scroll region below the header: TrackPanel can be taller than the card, so the chapter list must not be the only scroller */}
+            <div data-sidebar-scroll className="flex-1 min-h-0 overflow-y-auto pr-1 space-y-3.5 scrollbar-thin">
             <TrackPanel chapters={chapters} trackKey={trackKey} readChapters={readChapters} activeChapterId={activeChapterId} onSelectChapter={handleSelectChapter} onStartQuiz={onStartQuiz} />
 
             <h3 data-all-chapters-heading className="text-xs font-bold text-base-content-muted">ทุกบท ({chapters.length})</h3>
 
+            {/* Search + role filter stay pinned while the chapter list scrolls beneath them */}
+            <div data-sidebar-controls className="sticky top-0 z-10 bg-base-100 pb-2 space-y-3.5">
             {/* Quick Search in Index */}
             <div className="relative">
               <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-base-content-muted" />
@@ -474,9 +478,10 @@ export const GuideTab: React.FC<GuideTabProps> = ({
               onChange={setSelectedRole}
               className="shrink-0"
             />
+            </div>
 
             {/* Chapter List Scrollable */}
-            <div className="space-y-1.5 overflow-y-auto pr-1 flex-1 scrollbar-thin">
+            <div className="space-y-1.5">
               {indexEmpty}
               {filteredChapters.map((chapter) => {
                 const isActive = chapter.id === activeChapterId;
@@ -531,6 +536,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                   </button>
                 );
               })}
+            </div>
             </div>
           </div>
         </div>
