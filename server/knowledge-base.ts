@@ -1,14 +1,14 @@
 // The answers /api/ask-ai gives when Groq cannot: hand-written answers to the questions people ask
 // most, then the chapter the user was reading, then guide chapters that name what the question
 // names, and last a general answer.
-import { chapters1_5 } from "../src/data/chapters/chapters1_5";
-import { chapters6_10 } from "../src/data/chapters/chapters6_10";
-import { chapters11_15 } from "../src/data/chapters/chapters11_15";
-import { chapters16_19 } from "../src/data/chapters/chapters16_19";
-import { GLOSSARY } from "../src/data/glossary";
-import { clip, plainText } from "../src/lib/chapterContext";
-import { formatChapterHash } from "../src/lib/chapterRoute";
-import { mentions, suggestChapters } from "../src/lib/chapterSuggest";
+import { chapters1_5 } from "../src/data/chapters/chapters1_5.js";
+import { chapters6_10 } from "../src/data/chapters/chapters6_10.js";
+import { chapters11_15 } from "../src/data/chapters/chapters11_15.js";
+import { chapters16_19 } from "../src/data/chapters/chapters16_19.js";
+import { GLOSSARY } from "../src/data/glossary.js";
+import { clip, plainText } from "../src/lib/chapterContext.js";
+import { formatChapterHash } from "../src/lib/chapterRoute.js";
+import { mentions, suggestChapters } from "../src/lib/chapterSuggest.js";
 
 // The chapter files alone, not CHAPTERS: matching reads titles, jargon and takeaways, and the
 // content blocks, figures and playbooks CHAPTERS adds would grow build/server.cjs by a further

@@ -1,5 +1,5 @@
 import type { Chapter, ChapterContentSection, ContentPlacement, ExperienceLevel } from '../types';
-import { DIAGRAM_WIDGET_CHAPTERS, GLOSSARY_MAP_CHAPTER } from './diagramWidgets';
+import { DIAGRAM_WIDGET_CHAPTERS, GLOSSARY_MAP_CHAPTER } from './diagramWidgets.js';
 
 export type Layer = 'core' | 'apply' | 'deep';
 export const LAYERS: readonly Layer[] = ['core', 'apply', 'deep'];

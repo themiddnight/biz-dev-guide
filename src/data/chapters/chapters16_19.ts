@@ -1,4 +1,4 @@
-import { Chapter } from '../../types';
+import type { Chapter } from '../../types';
 
 /**
  * Business-side chapters for engineers (spec 2026-09-22-role-perspective.md P4.1).

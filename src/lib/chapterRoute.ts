@@ -1,5 +1,5 @@
 import type { Chapter } from '../types';
-import { isSectionKey, type SectionKey } from '../data/sectionLayers';
+import { isSectionKey, type SectionKey } from '../data/sectionLayers.js';
 
 export interface ChapterRoute { chapterId: string; section?: SectionKey }
 export interface RequestedSection { key: SectionKey; nonce: number }

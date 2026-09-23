@@ -1,4 +1,4 @@
-import { RichText } from '../types';
+import type { RichText } from '../types';
 import type { Role } from './rolePerspective';
 
 /**

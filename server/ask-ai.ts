@@ -1,8 +1,8 @@
 // The /api/ask-ai logic, shared by the Express server (local dev, Cloud Run) and the Vercel
 // function in api/ask-ai.ts, which is what serves the route on Vercel. Answers come from Groq;
 // without a key, or when every Groq model fails, a built-in knowledge base answers instead.
-import { HISTORY_TURNS, type ChatHistoryItem } from "../src/lib/chatHistory";
-import { fallbackAnswer } from "./knowledge-base";
+import { HISTORY_TURNS, type ChatHistoryItem } from "../src/lib/chatHistory.js";
+import { fallbackAnswer } from "./knowledge-base.js";
 
 interface AskAiInput {
   question?: unknown;
