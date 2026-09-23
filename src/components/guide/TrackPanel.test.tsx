@@ -44,15 +44,17 @@ describe('TrackPanel hierarchy (spec §10.1, §10.2)', () => {
     expect(activeRow).not.toMatch(/(?<![\w:/-])bg-primary(?![\w/-])/);
   });
 
-  it('the track button is a soft full-width button, not a primary fill', () => {
-    expect(primary).toContain('bg-base-300');
+  it('the track button is an outline full-width button, not a primary fill', () => {
+    expect(primary).toContain('border-base-border-strong');
     expect(primary).toContain('w-full');
     expect(primary).not.toMatch(/(?<![\w:/-])bg-primary(?![\w/-])/);
   });
 
-  it('the panel sits on bg-base-100 so the soft (bg-base-300) button and active row keep a visible boundary', () => {
+  it('the panel is a bg-base-300 inset surface nested in the sidebar card (box-dense)', () => {
     const panel = html.match(/<div[^>]*data-track-panel[^>]*>/)![0];
-    expect(panel).toMatch(/(?<![\w:/-])bg-base-100(?![\w/-])/);
-    expect(panel).not.toMatch(/(?<![\w:/-])bg-base-300(?![\w/-])/);
+    expect(panel).toMatch(/(?<![\w:/-])bg-base-300(?![\w/-])/);
+    expect(panel).not.toMatch(/(?<![\w:/-])bg-base-100(?![\w/-])/);
+    expect(panel).toContain('p-box-dense');
+    expect(panel).toContain('rounded-box');
   });
 });

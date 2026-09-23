@@ -436,7 +436,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
         
         {/* Left Column: Persistent Sticky Index on Desktop (Hidden on smaller screens, accessed via drawer/modal) */}
         <div className="hidden lg:block lg:col-span-4 sticky top-20 space-y-4">
-          <div className="space-y-3.5 max-h-[calc(100vh-6rem)] overflow-hidden flex flex-col">
+          <div className="bg-base-100 border border-base-border rounded-box p-3.5 shadow-2xs space-y-3.5 max-h-[calc(100vh-6rem)] overflow-hidden flex flex-col">
             <div className="flex items-center justify-between pb-2 border-b border-base-border">
               <div className="flex items-center gap-2">
                 <List className="w-4 h-4 text-base-content" />
