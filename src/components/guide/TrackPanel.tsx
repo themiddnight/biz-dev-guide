@@ -21,7 +21,7 @@ export const TrackPanel: React.FC<TrackPanelProps> = ({ chapters, trackKey, read
   const pct = total === 0 ? 0 : Math.round((read / total) * 100);
 
   return (
-    <div data-track-panel={trackKey} className="p-3 rounded-xl border border-base-border bg-base-100 space-y-2.5">
+    <div data-track-panel={trackKey} className="p-box rounded-box border border-base-border bg-base-100 space-y-2.5">
       <div className="flex items-baseline justify-between gap-2">
         <h3 className="text-sm font-extrabold text-base-content">{TRACK_META[trackKey].title}</h3>
         <span className="text-[11px] text-base-content-muted">≈ {minutes} นาที</span>

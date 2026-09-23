@@ -29,7 +29,7 @@ import { SectionOutline } from './guide/SectionOutline';
 import { TrackPanel } from './guide/TrackPanel';
 import { chapterLevelResetLabel, chapterLevelScopeLabel } from './guide/rolePerspectiveUi';
 import { TrackNextCard, TrackEndCard } from './guide/TrackFooter';
-import { getTrackNext, resolveTrack, type TrackKey } from '../data/readingTracks';
+import { getTrackNext, resolveTrack, type TrackKey, type TrackNext } from '../data/readingTracks';
 import { planChapterLevelChoice } from '../lib/rolePrefs';
 import { ROLE_META, otherRole, resolveChapterLevel, getActiveTrackKey, type LevelInputs, type LevelMode, type Role } from '../data/rolePerspective';
 import { FirstVisitCard, type FirstVisitMode } from './guide/FirstVisitCard';
@@ -95,6 +95,19 @@ interface GuideTabProps {
   onNavigateChapter: (chapterId: string, section?: SectionKey) => void;
   onReplaceSection: (section: SectionKey | null) => void;
   onRequestedSectionApplied: () => void;
+}
+
+/**
+ * The "next chapter" button beside the reader is the one place GuideTab picks a Button
+ * color/variant conditionally (spec §9/§10.1): on a track's last chapter it must not be a
+ * second primary solid beside TrackEndCard. Extracted so the choice is unit-testable without a
+ * full GuideTab render (the static literal-props guard in hierarchy.test.ts cannot see a
+ * conditional color/variant).
+ */
+export function nextChapterButtonStyle(kind: TrackNext['kind']): { color: 'primary' | 'neutral'; variant: 'solid' | 'outline' } {
+  return kind === 'end'
+    ? { color: 'neutral', variant: 'outline' }
+    : { color: 'primary', variant: 'solid' };
 }
 
 export const GuideTab: React.FC<GuideTabProps> = ({
@@ -423,7 +436,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
         
         {/* Left Column: Persistent Sticky Index on Desktop (Hidden on smaller screens, accessed via drawer/modal) */}
         <div className="hidden lg:block lg:col-span-4 sticky top-20 space-y-4">
-          <div className="bg-base-100 border border-base-border rounded-box p-3.5 shadow-2xs space-y-3.5 max-h-[calc(100vh-6rem)] overflow-hidden flex flex-col">
+          <div className="space-y-3.5 max-h-[calc(100vh-6rem)] overflow-hidden flex flex-col">
             <div className="flex items-center justify-between pb-2 border-b border-base-border">
               <div className="flex items-center gap-2">
                 <List className="w-4 h-4 text-base-content" />
@@ -601,8 +614,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
 
                 {/* Next Chapter Button */}
                 <Button
-                  color={trackNext.kind === 'end' ? 'neutral' : 'primary'}
-                  variant={trackNext.kind === 'end' ? 'outline' : 'solid'}
+                  {...nextChapterButtonStyle(trackNext.kind)}
                   size="sm"
                   disabled={!nextChapter}
                   onClick={() => nextChapter && handleSelectChapter(nextChapter.id)}
