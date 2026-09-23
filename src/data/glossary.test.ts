@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { CHAPTERS } from './chaptersData';
-import { CATEGORY_SIDE, GLOSSARY, GLOSSARY_CATEGORIES, sortTermsForRole, termSide } from './glossary';
-import { glossaryKeys } from './termInventory';
+import { CATEGORY_SIDE, GLOSSARY, GLOSSARY_CATEGORIES, sortTermsForRole, termSide, type GlossaryTerm } from './glossary';
+import { beginnerVisibleTexts, glossaryKeys, namesTerm } from './termInventory';
 
 /** The abbreviations the term-definitions spec added in Phase 2 (P2.1). */
 const PHASE2_TERM_IDS = [
@@ -11,12 +11,37 @@ const PHASE2_TERM_IDS = [
 ];
 
 /**
- * Attributions the chapters teach without ever writing the term (D19's untestable half):
+ * Attributions the cited chapter teaches without ever writing the term (D19's untestable half):
  * s10 covers customer retention in Thai only (s4's "Retention" is data retention, a different
- * thing), and s18/s9 argue about return on investment without writing `ROI`. Every other
- * entry must cite a chapter that names it.
+ * thing), s18/s9 argue about return on investment without writing `ROI`, and s7 is the QA chapter
+ * `UAT` belongs to although only s12's role table writes the abbreviation. Every other entry must
+ * cite a chapter that names it.
  */
-const TOPICAL_ATTRIBUTIONS = ['retention -> s10', 'roi -> s18', 'roi -> s9'];
+const TOPICAL_ATTRIBUTIONS = ['retention -> s10', 'roi -> s18', 'roi -> s9', 'uat -> s7'];
+
+/**
+ * Attributions whose chapter does name the term, but only outside beginner-visible content —
+ * an Apply/Deep block, a process-flow row, a pitfall. The chip is still correct (the chapter is
+ * where the term lives) yet a beginner lands on a screen the term is not on, so the set is pinned
+ * here: it may shrink when the copy pulls a term into the primer or a jargon card, and a new pair
+ * has to be added deliberately. See `review-round3-fixes.md` issue 3.
+ */
+const BEGINNER_INVISIBLE_ATTRIBUTIONS = [
+  'elicitation -> s14', 'sow-scope-agreement -> s14', 'stakeholder -> s11', 'change-request -> s14',
+  'module-function-mapping -> s5', 'use-case-diagram -> s5', 'sequence-diagram -> s5',
+  'roadmap -> s2', 'backlog -> s2', 'over-engineering -> s14', 'babok -> s14', 'pmbok-pmp -> s14',
+  'togaf -> s14', 'adr -> s6', 'rfc -> s6', 'trunk-based-development -> s6', 'pull-request -> s6',
+  'test-plan -> s7', 'test-coverage -> s7', 'environment -> s8', 'design-handoff -> s3',
+  'webhook -> s15', 'idempotency -> s15', 'ba -> s14', 'sa -> s5',
+];
+
+/** What a beginner sees in a chapter (`termInventory.ts` field list) — the scope D19 names. */
+const BEGINNER_CONTENT = new Map(CHAPTERS.map(c => [c.id, beginnerVisibleTexts(c).map(o => o.text).join('\n')]));
+/** Everything in the chapter object, beginner-visible or not. */
+const WHOLE_CONTENT = new Map(CHAPTERS.map(c => [c.id, JSON.stringify(c)]));
+
+/** Whole-word, so a 2-3 letter key cannot be "named" by `backlog`, `based` or `usability`. */
+const namesEntry = (text: string, term: GlossaryTerm) => glossaryKeys(term).some(k => namesTerm(text, k));
 
 const BUSINESS_TERM_IDS = [
   'revenue',
@@ -74,32 +99,41 @@ describe('glossary data', () => {
     }
   });
 
-  it('no entry cites a chapter that does not contain the term (D19, round-3 I-10)', () => {
-    const content = new Map(CHAPTERS.map(c => [c.id, JSON.stringify(c).toLowerCase()]));
+  it('no entry cites a chapter whose beginner-visible content does not name it (D19, round-3 I-10)', () => {
     const wrong: string[] = [];
     for (const term of GLOSSARY) {
-      const keys = glossaryKeys(term);
-      const named = [...content].filter(([, text]) => keys.some(k => text.includes(k))).map(([id]) => id);
-      if (named.length === 0) continue; // no chapter writes it: the attribution is topical only
+      // A term no chapter writes anywhere can only be attributed topically: nothing to check.
+      if (!CHAPTERS.some(c => namesEntry(WHOLE_CONTENT.get(c.id)!, term))) continue;
       for (const chapterId of term.relatedChapterIds) {
         const pair = `${term.id} -> ${chapterId}`;
-        if (!named.includes(chapterId) && !TOPICAL_ATTRIBUTIONS.includes(pair)) {
-          wrong.push(`${pair} (named in: ${named.join(' ')})`);
-        }
+        if (namesEntry(BEGINNER_CONTENT.get(chapterId) ?? '', term)) continue;
+        if (TOPICAL_ATTRIBUTIONS.includes(pair) || BEGINNER_INVISIBLE_ATTRIBUTIONS.includes(pair)) continue;
+        const named = CHAPTERS.filter(c => namesEntry(BEGINNER_CONTENT.get(c.id)!, term)).map(c => c.id);
+        wrong.push(`${pair} (beginner-visible in: ${named.join(' ') || 'no chapter'})`);
       }
     }
     expect(wrong).toEqual([]);
   });
 
-  it('every topical attribution is still one the chapters really do not name', () => {
-    const content = new Map(CHAPTERS.map(c => [c.id, JSON.stringify(c).toLowerCase()]));
+  it('every topical attribution is still one the chapter really does not name', () => {
     for (const pair of TOPICAL_ATTRIBUTIONS) {
       const [id, chapterId] = pair.split(' -> ');
       const term = GLOSSARY.find(t => t.id === id);
       expect(term, id).toBeDefined();
       expect(term!.relatedChapterIds, pair).toContain(chapterId);
-      const text = content.get(chapterId) ?? '';
-      expect(glossaryKeys(term!).some(k => text.includes(k)), pair).toBe(false);
+      expect(namesEntry(WHOLE_CONTENT.get(chapterId) ?? '', term!), pair).toBe(false);
+    }
+  });
+
+  it('every beginner-invisible attribution is still exactly that: named, but not where a beginner looks', () => {
+    for (const pair of BEGINNER_INVISIBLE_ATTRIBUTIONS) {
+      const [id, chapterId] = pair.split(' -> ');
+      const term = GLOSSARY.find(t => t.id === id);
+      expect(term, id).toBeDefined();
+      expect(term!.relatedChapterIds, pair).toContain(chapterId);
+      expect(namesEntry(WHOLE_CONTENT.get(chapterId) ?? '', term!), `${pair} named in chapter`).toBe(true);
+      expect(namesEntry(BEGINNER_CONTENT.get(chapterId) ?? '', term!), `${pair} beginner-visible`).toBe(false);
+      expect(TOPICAL_ATTRIBUTIONS, pair).not.toContain(pair);
     }
   });
 

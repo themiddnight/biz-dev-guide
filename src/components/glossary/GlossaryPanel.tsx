@@ -5,6 +5,7 @@ import { GLOSSARY_CATEGORIES, GlossaryCategory, GlossaryTerm, sortTermsForRole, 
 import { ROLES, type Role } from '../../data/rolePerspective';
 import { tokens } from '../../styles/tokens';
 import { RichText } from '../content/RichText';
+import { searchGlossaryTerms } from '../../lib/glossarySearch';
 
 export type GlossaryFilter = GlossaryCategory | 'all';
 
@@ -33,9 +34,6 @@ const chipClass = (active: boolean) =>
       ? 'bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] shadow-xs'
       : 'bg-neutral-100 dark:bg-[#1f1f1f] text-neutral-600 dark:text-[#a3a3a3] hover:bg-neutral-200 dark:hover:bg-[#262626]'
   }`;
-
-/** Search text for a RichText string: chapter-link markup reduced to its label, bold markers removed. */
-const plainText = (text: string) => text.replace(/\[\[s\d+\|([^\]]+)\]\]/g, '$1').replace(/\*\*/g, '');
 
 export const GlossaryPanel: React.FC<GlossaryPanelProps> = ({
   terms,
@@ -91,17 +89,9 @@ export const GlossaryPanel: React.FC<GlossaryPanelProps> = ({
   }, [chapters]);
 
   const needle = query.trim().toLowerCase();
+  // Filter and ranking live in `lib/glossarySearch` so the acceptance test asserts the panel's own order.
   const results = useMemo(
-    () =>
-      orderedTerms.filter(term => {
-        if (side !== 'all' && termSide(term) !== side) return false;
-        if (activeCategory !== 'all' && term.category !== activeCategory) return false;
-        if (!needle) return true;
-        const haystack = [term.term, ...(term.aliases ?? []), plainText(term.definition), term.plain ? plainText(term.plain) : '']
-          .join('\n')
-          .toLowerCase();
-        return haystack.includes(needle);
-      }),
+    () => searchGlossaryTerms(orderedTerms, { query: needle, side, category: activeCategory }),
     [orderedTerms, side, activeCategory, needle]
   );
 

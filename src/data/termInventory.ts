@@ -113,7 +113,11 @@ export const KNOWN_NON_TERMS: ReadonlySet<string> = new Set([
   // Vendors, products and brands
   'GOOGLE', 'AWS', 'GCP', 'AZURE', 'FIGMA', 'JIRA', 'SLACK', 'GITHUB', 'GITLAB', 'LINE', 'IOS',
   'ANDROID', 'EXCEL', 'NOTION', 'CONFLUENCE', 'ZOOM', 'TRELLO', 'ASANA', 'MIRO',
-  // Proper nouns, notation and role titles the copy explains in place or never needs to define
+  // Proper nouns, notation and role titles the copy explains in place or never needs to define.
+  // The four the term-definitions spec P2.2 lists and this guide deliberately does not own:
+  // `CTO` and `PO` are job titles, not concepts to look up; `AI` and `CPU` are general computing
+  // literacy the chapters use only as background; `PDPA` is Thai law the copy explains where it
+  // cites it. Adding an entry for any of them would be glossary padding (review issue 4).
   'A1024', 'CPU', 'PDPA', 'AI', 'CTO', 'PO', 'P0', 'P1', 'P2', 'P3', 'L4',
   // Ordinary English words or fragments that appear in caps inside copy
   'AND', 'OR', 'NOT', 'YES', 'NO', 'THE', 'FOR', 'ALL', 'NEW', 'OLD', 'WHY', 'HOW', 'WHAT',
@@ -163,13 +167,28 @@ export function extractTrackedTerms(text: string): string[] {
 }
 
 /**
- * The strings a reader could type to mean this entry: the visible label with its parenthetical
- * expansions removed (split on `/`, so `SLA / SLO` yields both), plus every alias. Lower-cased.
+ * The strings a reader could type to mean this entry's **visible label**: the label with its
+ * parenthetical expansions removed (split on `/`, so `SLA / SLO` yields both). Lower-cased.
  */
-export function glossaryKeys(entry: GlossaryTerm): string[] {
+export function termLabelKeys(entry: Pick<GlossaryTerm, 'term'>): string[] {
   const label = entry.term.replace(/\([^)]*\)/g, ' ');
-  const parts = [...label.split('/').map(s => s.trim()).filter(Boolean), label.trim(), ...(entry.aliases ?? [])];
+  const parts = [...label.split('/').map(s => s.trim()).filter(Boolean), label.trim()];
   return [...new Set(parts.map(s => s.toLowerCase()))];
+}
+
+/** The strings a reader could type to mean this entry: its label keys plus every alias. Lower-cased. */
+export function glossaryKeys(entry: GlossaryTerm): string[] {
+  return [...new Set([...termLabelKeys(entry), ...(entry.aliases ?? []).map(a => a.toLowerCase())])];
+}
+
+/**
+ * `key` occurs in `text` as a whole word, case-insensitively: no letter or digit may sit on
+ * either side, so `ba` does not match `backlog` or `based`. An English plural `s` still counts, so
+ * a chapter writing `Stakeholders` names `Stakeholder`. Shared with the D19 attribution guard — a
+ * plain substring test makes that guard vacuous for every 2-3 letter abbreviation.
+ */
+export function namesTerm(text: string, key: string): boolean {
+  return new RegExp(`(?<![A-Za-z0-9])${escapeRe(key)}s?(?![A-Za-z0-9])`, 'i').test(text);
 }
 
 /** Lower-cased key -> ids of the entries that answer to it. A key with 2+ ids is ambiguous. */

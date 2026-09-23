@@ -2,10 +2,11 @@ import { RichText } from '../types';
 import type { Role } from './rolePerspective';
 
 /**
- * 139 terms: the glossary restored from the static guide (`#glossary-grid`, static lines 1882–1975,
+ * 141 terms: the glossary restored from the static guide (`#glossary-grid`, static lines 1882–1975,
  * 94 terms, static order kept), the 5 former chapter-15 jargon terms, and 14 business & money terms
  * for engineers (role-perspective spec P4.4), and 26 abbreviations the chapters use but the
- * glossary could not find (term-definitions spec P2.1). Everything but the static group has
+ * glossary could not find (term-definitions spec P2.1), plus `RTO / RPO` and `Protocol`, the two
+ * P2.2 dead ends that had no entry to alias (round-3 fixes, review issue 4). Everything but the static group has
  * `origin: 'app'`.
  * `category` and `relatedChapterIds` are derived (spec §2.3), not part of the static source.
  * `plain` stays empty for static terms in phase 1 (owner decision Q6).
@@ -1373,6 +1374,28 @@ export const GLOSSARY: GlossaryTerm[] = [
     category: 'architecture',
     relatedChapterIds: ['s1', 's5'],
     aliases: ['SA', 'Systems Analyst', 'System Analyst', 'Solution Architect'],
+    origin: 'app',
+  },
+  {
+    id: 'rto-rpo',
+    term: 'RTO / RPO (Recovery Time / Recovery Point Objective)',
+    definition: 'เป้าหมายตอนระบบล่ม: **RTO** คือกู้ระบบกลับมาให้ได้ภายในกี่นาที **RPO** คือยอมให้ข้อมูลหายย้อนหลังได้กี่นาที ทั้งคู่เป็นตัวเลขที่ธุรกิจตกลง ไม่ใช่ทีมเทคเลือกเอง',
+    plain: 'RTO = ร้านปิดได้นานแค่ไหน, RPO = ยอมเสียออเดอร์ย้อนหลังได้กี่นาที',
+    example: '"RPO = 0 ข้อมูลห้ามหายสักรายการ ส่วน RTO ไม่เกิน 15 นาทีครับ"',
+    category: 'operations',
+    relatedChapterIds: ['s4'],
+    aliases: ['RTO', 'RPO', 'Recovery Time Objective', 'Recovery Point Objective'],
+    origin: 'app',
+  },
+  {
+    id: 'protocol',
+    term: 'Protocol',
+    definition: 'ภาษากลางที่สองระบบตกลงกันว่าจะคุยกันด้วยวิธีไหน เช่น HTTP/HTTPS สำหรับเว็บ ไดอะแกรมระดับ Container มักเขียนกำกับเส้นว่าคุยกันด้วยโปรโตคอลอะไร',
+    plain: 'เหมือนตกลงกันว่าจะคุยภาษาไทยหรืออังกฤษ ก่อนจะเริ่มคุยเรื่องงาน',
+    example: '"เส้นนี้คุยกันด้วยโปรโตคอลอะไรครับ HTTPS หรือคิวข้อความ"',
+    category: 'architecture',
+    relatedChapterIds: ['s5'],
+    aliases: ['โปรโตคอล'],
     origin: 'app',
   },
 ];

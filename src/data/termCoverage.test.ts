@@ -2,8 +2,9 @@ import { describe, it, expect } from 'vitest';
 import { CHAPTERS } from './chaptersData';
 import { GLOSSARY } from './glossary';
 import {
-  beginnerVisibleTexts, extractAbbreviations, extractTrackedTerms, glossaryKeys, resolveTerm,
+  beginnerVisibleTexts, extractAbbreviations, extractTrackedTerms, glossaryKeys, namesTerm, resolveTerm,
 } from './termInventory';
+import { searchGlossaryTerms } from '../lib/glossarySearch';
 
 /**
  * The owner's guard (term-definitions spec D11), v1: the weaker "a definition exists at all"
@@ -13,31 +14,36 @@ import {
  * that walks each reading track in order.
  */
 
-/** term -> `chapter/field` of its first beginner-visible appearance, in chapter order. */
+/** term -> `{ chapterId, field }` of its first beginner-visible appearance, in chapter order. */
 const firstSeen = (() => {
-  const seen = new Map<string, string>();
+  const seen = new Map<string, { chapterId: string; field: string }>();
   for (const chapter of CHAPTERS) {
     for (const occurrence of beginnerVisibleTexts(chapter)) {
       const terms = [...extractAbbreviations(occurrence.text), ...extractTrackedTerms(occurrence.text)];
       for (const term of terms) {
-        if (!seen.has(term)) seen.set(term, `${occurrence.chapterId}/${occurrence.field}`);
+        if (!seen.has(term)) seen.set(term, { chapterId: occurrence.chapterId, field: occurrence.field });
       }
     }
   }
   return seen;
 })();
 
-const JARGON_CARD_TERMS = CHAPTERS.flatMap(c => (c.jargonList ?? []).map(j => j.term));
-const BEGINNER_TEXTS = CHAPTERS.flatMap(c => beginnerVisibleTexts(c).map(o => o.text));
+const escapeRe = (term: string) => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-const wordBoundary = (term: string) => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
-/** Defined where it is used: the subject of a jargon card, or expanded in parentheses. */
-const definedInPlace = (term: string) => {
-  const t = wordBoundary(term);
-  if (JARGON_CARD_TERMS.some(card => new RegExp(`(?<![A-Za-z0-9])${t}(?![A-Za-z0-9])`).test(card))) return true;
+/**
+ * Defined where it is used, scoped to the chapter that uses it (review issue 5: the comment above
+ * claimed per chapter, the code checked the whole guide — the check is now the narrower one the
+ * comment describes): the subject of a jargon card in *that* chapter, or expanded in parentheses in
+ * one of *that* chapter's beginner-visible strings. A term expanded once in ch.19 no longer excuses
+ * its bare first use in ch.2.
+ */
+const definedInPlace = (term: string, chapterId: string) => {
+  const chapter = CHAPTERS.find(c => c.id === chapterId);
+  if (!chapter) return false;
+  const t = escapeRe(term);
+  if ((chapter.jargonList ?? []).some(card => namesTerm(card.term, term))) return true;
   const expanded = new RegExp(`(?<![A-Za-z0-9])${t}\\s*\\(|\\(\\s*${t}\\s*\\)`);
-  return BEGINNER_TEXTS.some(text => expanded.test(text));
+  return beginnerVisibleTexts(chapter).some(o => expanded.test(o.text));
 };
 
 /**
@@ -86,11 +92,58 @@ describe('glossary resolution', () => {
   });
 });
 
+/**
+ * Acceptance 1 and 7 are about the *panel's* order, not the exact-key index: these run the
+ * function `GlossaryPanel` itself calls, so a filter that finds the entry but buries it fails here.
+ */
+describe('glossary panel search order', () => {
+  const firstHit = (query: string) => searchGlossaryTerms(GLOSSARY, { query })[0]?.id;
+  const hits = (query: string) => searchGlossaryTerms(GLOSSARY, { query }).map(t => t.id);
+
+  it('every term the acceptance list names is the first hit, not just a hit (acceptance 1, 7)', () => {
+    const misranked = AUDIT_TERMS
+      .map(term => [term, resolveTerm(term)[0], firstHit(term)] as const)
+      .filter(([, expected, actual]) => expected !== actual)
+      .map(([term, expected, actual]) => `${term}: first hit ${actual ?? 'none'}, expected ${expected}`);
+    expect(misranked).toEqual([]);
+  });
+
+  it('the abbreviations the readers typed beat the entries that merely mention them', () => {
+    expect(firstHit('SLO')).toBe('slo');
+    expect(firstHit('Sprint')).toBe('sprint'); // was `velocity`
+    expect(firstHit('KR')).toBe('kr'); // was `okr-kpi`
+    expect(firstHit('BA')).toBe('ba'); // was `backlog`, first of 9
+    expect(firstHit('SA')).toBe('sa'); // was `usability-testing`
+  });
+
+  it('the Thai labels the readers typed find their entry first (acceptance 3)', () => {
+    for (const [label, id] of THAI_LABELS) expect(firstHit(label), label).toBe(id);
+    expect(firstHit('โปรโตคอล')).toBe('protocol'); // §0.1's dead end in ch.5
+    expect(firstHit('RTO')).toBe('rto-rpo'); // P2.2's unreachable abbreviation
+  });
+
+  it('a name match beats an alias match, and an alias match beats a definition match', () => {
+    const order = hits('sprint');
+    expect(order.indexOf('sprint')).toBeLessThan(order.indexOf('velocity'));
+    expect(order.length).toBeGreaterThan(1); // ranking must not drop results
+  });
+
+  it('ranking keeps the category and side filters, and the result count', () => {
+    const all = searchGlossaryTerms(GLOSSARY, { query: 'sprint' });
+    const qaOnly = searchGlossaryTerms(GLOSSARY, { query: 'sprint', category: 'qa' });
+    expect(qaOnly.every(t => t.category === 'qa')).toBe(true);
+    expect(qaOnly.length).toBeLessThanOrEqual(all.length);
+    const biz = searchGlossaryTerms(GLOSSARY, { side: 'biz' });
+    expect(biz).toEqual(GLOSSARY.filter(t => biz.includes(t)));
+    expect(searchGlossaryTerms(GLOSSARY, {})).toHaveLength(GLOSSARY.length);
+  });
+});
+
 describe('beginner-visible abbreviation coverage', () => {
   it('every abbreviation a beginner meets has a definition it can reach', () => {
     const undefinedTerms = [...firstSeen]
-      .filter(([term]) => new Set(resolveTerm(term)).size !== 1 && !definedInPlace(term))
-      .map(([term, where]) => `${term} -> ${where}`);
+      .filter(([term, where]) => new Set(resolveTerm(term)).size !== 1 && !definedInPlace(term, where.chapterId))
+      .map(([term, where]) => `${term} -> ${where.chapterId}/${where.field}`);
     expect(undefinedTerms).toEqual([]);
   });
 
