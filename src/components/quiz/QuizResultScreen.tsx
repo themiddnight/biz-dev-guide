@@ -33,7 +33,7 @@ export const QuizResultScreen: React.FC<QuizResultScreenProps> = ({
   return (
     <div data-quiz-result={band} className="max-w-2xl mx-auto py-12 px-4 text-center space-y-6">
       <div
-        className={`w-20 h-20 mx-auto rounded-3xl bg-amber-500/10 text-amber-500 flex items-center justify-center border-2 border-amber-500/20 shadow-lg shadow-amber-500/10 ${
+        className={`w-20 h-20 mx-auto rounded-3xl bg-warning/10 text-warning flex items-center justify-center border-2 border-warning/25 shadow-lg shadow-warning/10 ${
           band === 'strong' ? 'animate-bounce' : ''
         }`}
       >
@@ -41,30 +41,30 @@ export const QuizResultScreen: React.FC<QuizResultScreenProps> = ({
       </div>
 
       <div className="space-y-2">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-xs font-semibold border border-emerald-500/20">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-success/10 text-success text-xs font-semibold border border-success/25">
           <Sparkles className="w-3.5 h-3.5" />
           <span>ทำครบแล้ว! บันทึกผลแล้ว</span>
         </div>
-        <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-50">{heading}</h2>
-        <p className="text-slate-600 dark:text-slate-400 text-sm">{subtitle}</p>
+        <h2 className="text-2xl sm:text-3xl font-extrabold text-base-content">{heading}</h2>
+        <p className="text-base-content-secondary text-sm">{subtitle}</p>
       </div>
 
       {/* Score & XP Card */}
-      <div className="grid grid-cols-2 gap-4 max-w-md mx-auto p-6 bg-white dark:bg-[#141414] rounded-2xl sm:rounded-3xl border border-neutral-200 dark:border-[#262626] shadow-2xs">
+      <div className="grid grid-cols-2 gap-4 max-w-md mx-auto p-6 bg-base-100 rounded-2xl sm:rounded-3xl border border-base-border shadow-2xs">
         <div className="space-y-1">
-          <span className="text-xs text-neutral-500 dark:text-[#8e8e8e] font-medium">คะแนนที่ได้</span>
-          <div className="text-3xl font-extrabold text-neutral-900 dark:text-[#fafafa]">
-            {score} <span className="text-lg text-neutral-400 dark:text-[#666666] font-normal">/ {total}</span>
+          <span className="text-xs text-base-content-muted font-medium">คะแนนที่ได้</span>
+          <div className="text-3xl font-extrabold text-base-content">
+            {score} <span className="text-lg text-base-content-muted font-normal">/ {total}</span>
           </div>
-          <span className="text-xs text-neutral-600 dark:text-[#a3a3a3] font-medium">{percentage}% ถูกต้อง</span>
+          <span className="text-xs text-base-content-secondary font-medium">{percentage}% ถูกต้อง</span>
         </div>
-        <div className="space-y-1 border-l border-neutral-200 dark:border-[#262626] pl-4">
-          <span className="text-xs text-neutral-500 dark:text-[#8e8e8e] font-medium">XP ที่ได้รับ</span>
-          <div className="text-3xl font-extrabold text-amber-500 dark:text-amber-400 flex items-center justify-center gap-1">
-            <Zap className="w-6 h-6 fill-amber-500 text-amber-500" />
+        <div className="space-y-1 border-l border-base-border pl-4">
+          <span className="text-xs text-base-content-muted font-medium">XP ที่ได้รับ</span>
+          <div className="text-3xl font-extrabold text-warning flex items-center justify-center gap-1">
+            <Zap className="w-6 h-6 fill-warning text-warning" />
             <span>+{awardedXp}</span>
           </div>
-          <span className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold">
+          <span className="text-xs text-success font-semibold">
             {awardedXp > 0 ? 'สะสมเข้าโปรไฟล์แล้ว' : 'ข้อที่ตอบถูกเคยได้รับ XP ไปแล้ว'}
           </span>
         </div>
@@ -72,10 +72,10 @@ export const QuizResultScreen: React.FC<QuizResultScreenProps> = ({
 
       {/* Review of the wrong answers (round3 spec P2.4) */}
       {missed.length === 0 ? (
-        <p className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">ตอบถูกทุกข้อ</p>
+        <p className="text-sm font-semibold text-success">ตอบถูกทุกข้อ</p>
       ) : (
         <div data-quiz-review className="space-y-3 text-left">
-          <h3 className="text-sm font-extrabold text-neutral-900 dark:text-[#fafafa]">
+          <h3 className="text-sm font-extrabold text-base-content">
             ข้อที่ตอบผิด ({missed.length} ข้อ)
           </h3>
           {missed.map((item) => {
@@ -83,18 +83,18 @@ export const QuizResultScreen: React.FC<QuizResultScreenProps> = ({
             return (
               <div
                 key={item.question.id}
-                className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] space-y-2 shadow-2xs"
+                className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-base-100 border border-base-border space-y-2 shadow-2xs"
               >
-                <p className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa] break-words">
+                <p className="text-xs sm:text-sm font-bold text-base-content break-words">
                   {item.question.question}
                 </p>
-                <p className="text-xs text-neutral-600 dark:text-[#a3a3a3] break-words">
+                <p className="text-xs text-base-content-secondary break-words">
                   คุณตอบ: {item.chosenText}
                 </p>
-                <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 break-words">
+                <p className="text-xs font-semibold text-success break-words">
                   คำตอบที่ถูก: {item.correctText}
                 </p>
-                <p className="text-xs text-neutral-700 dark:text-[#c4c4c4] leading-relaxed break-words">
+                <p className="text-xs text-base-content-body leading-relaxed break-words">
                   {item.explanation}
                 </p>
                 {chapter && (
@@ -102,7 +102,7 @@ export const QuizResultScreen: React.FC<QuizResultScreenProps> = ({
                     type="button"
                     data-quiz-review-chapter={chapter.id}
                     onClick={() => onOpenChapter(chapter.id)}
-                    className={`${TAP} inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-neutral-100 dark:bg-[#1a1a1a] text-neutral-900 dark:text-[#e5e5e5] border border-neutral-200 dark:border-[#262626] text-xs font-semibold hover:bg-neutral-200/70 dark:hover:bg-[#222222] transition-all cursor-pointer max-w-full`}
+                    className={`${TAP} inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-base-300 text-base-content border border-base-border text-xs font-semibold hover:bg-base-border transition-all cursor-pointer max-w-full`}
                   >
                     <BookOpen className="w-4 h-4 shrink-0" />
                     <span className="truncate">อ่านบทที่ {chapter.num}: {chapter.title}</span>
@@ -118,7 +118,7 @@ export const QuizResultScreen: React.FC<QuizResultScreenProps> = ({
       <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
         <button
           onClick={onRestart}
-          className={`${TAP} w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl sm:rounded-2xl bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] text-xs sm:text-sm font-semibold hover:opacity-90 transition-all cursor-pointer shadow-xs`}
+          className={`${TAP} w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl sm:rounded-2xl bg-primary text-primary-content text-xs sm:text-sm font-semibold hover:opacity-90 transition-all cursor-pointer shadow-xs`}
         >
           <RotateCcw className="w-4 h-4" />
           <span>ทำแบบทดสอบอีกครั้ง</span>
@@ -126,7 +126,7 @@ export const QuizResultScreen: React.FC<QuizResultScreenProps> = ({
 
         <button
           onClick={onAskAI}
-          className={`${TAP} w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl sm:rounded-2xl bg-neutral-100 dark:bg-[#1a1a1a] text-neutral-900 dark:text-[#e5e5e5] border border-neutral-200 dark:border-[#262626] text-xs sm:text-sm font-semibold hover:bg-neutral-200/70 dark:hover:bg-[#222222] transition-all cursor-pointer`}
+          className={`${TAP} w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl sm:rounded-2xl bg-base-300 text-base-content border border-base-border text-xs sm:text-sm font-semibold hover:bg-base-border transition-all cursor-pointer`}
         >
           <Bot className="w-4 h-4" />
           <span>ถาม AI ทบทวนข้อที่ยังไม่แม่น</span>

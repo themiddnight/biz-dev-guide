@@ -52,9 +52,9 @@ export const INITIAL_BADGES: Badge[] = [
 ];
 
 export const LEVEL_TIERS = [
-  { level: 1, minXp: 0, title: 'Novice Observer (มือใหม่หัดสังเกต)', color: 'text-slate-600 dark:text-slate-400' },
-  { level: 2, minXp: 100, title: 'Bridge Apprentice (นักเชื่อมฝึกหัด)', color: 'text-blue-600 dark:text-blue-400' },
-  { level: 3, minXp: 250, title: 'Solution Navigator (นักนำทางโซลูชัน)', color: 'text-indigo-600 dark:text-indigo-400' },
-  { level: 4, minXp: 500, title: 'Cross-Functional Architect (สถาปนิกข้ามสายงาน)', color: 'text-emerald-600 dark:text-emerald-400' },
-  { level: 5, minXp: 1000, title: 'Product & Tech Whisperer (กูรูที่เข้าใจทั้งสองฝั่ง)', color: 'text-amber-500 dark:text-amber-400' },
+  { level: 1, minXp: 0, title: 'Novice Observer (มือใหม่หัดสังเกต)', color: 'text-base-content-secondary' },
+  { level: 2, minXp: 100, title: 'Bridge Apprentice (นักเชื่อมฝึกหัด)', color: 'text-data-1' },
+  { level: 3, minXp: 250, title: 'Solution Navigator (นักนำทางโซลูชัน)', color: 'text-engineer' },
+  { level: 4, minXp: 500, title: 'Cross-Functional Architect (สถาปนิกข้ามสายงาน)', color: 'text-success' },
+  { level: 5, minXp: 1000, title: 'Product & Tech Whisperer (กูรูที่เข้าใจทั้งสองฝั่ง)', color: 'text-warning' },
 ];

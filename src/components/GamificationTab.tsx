@@ -61,43 +61,43 @@ export const GamificationTab: React.FC<GamificationTabProps> = ({
   return (
     <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8 pb-16">
       {/* Profile & Level Card */}
-      <div className="p-5 sm:p-6 bg-white dark:bg-[#141414] rounded-2xl sm:rounded-3xl border border-neutral-200 dark:border-[#262626] shadow-2xs space-y-5">
+      <div className="p-5 sm:p-6 bg-base-100 rounded-2xl sm:rounded-3xl border border-base-border shadow-2xs space-y-5">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] flex items-center justify-center font-extrabold text-xl sm:text-2xl shadow-xs">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-primary text-primary-content flex items-center justify-center font-extrabold text-xl sm:text-2xl shadow-xs">
               Lv.{currentTier.level}
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-lg sm:text-2xl font-bold text-neutral-900 dark:text-[#fafafa]">
+                <h2 className="text-lg sm:text-2xl font-bold text-base-content">
                   {currentTier.title}
                 </h2>
               </div>
-              <p className="text-xs sm:text-sm text-neutral-500 dark:text-[#8e8e8e] mt-0.5">
+              <p className="text-xs sm:text-sm text-base-content-muted mt-0.5">
                 ระดับของคุณในการทำงานข้าม Business ↔ Engineering
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 px-3.5 py-1.5 sm:px-4 sm:py-2 bg-amber-500/10 text-amber-700 dark:text-amber-400 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base border border-amber-500/25">
-            <Zap className="w-4 h-4 sm:w-5 sm:h-5 fill-amber-500 text-amber-500" />
+          <div className="flex items-center gap-2 px-3.5 py-1.5 sm:px-4 sm:py-2 bg-warning/10 text-warning rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base border border-warning/25">
+            <Zap className="w-4 h-4 sm:w-5 sm:h-5 fill-warning text-warning" />
             <span>{userStats.xp} Total XP</span>
           </div>
         </div>
 
         {/* Level Progression Bar */}
         <div className="space-y-2 pt-1">
-          <div className="flex items-center justify-between text-xs text-neutral-500 dark:text-[#8e8e8e]">
+          <div className="flex items-center justify-between text-xs text-base-content-muted">
             <span>อีกเท่าไรถึงระดับถัดไป</span>
             {nextTier ? (
               <span>{userStats.xp} / {nextTier.minXp} XP (ขาดอีก {nextTier.minXp - userStats.xp} XP)</span>
             ) : (
-              <span className="text-amber-600 dark:text-amber-400 font-bold">ระดับสูงสุดแล้ว!</span>
+              <span className="text-warning font-bold">ระดับสูงสุดแล้ว!</span>
             )}
           </div>
-          <div className="w-full bg-neutral-100 dark:bg-[#262626] h-2.5 sm:h-3 rounded-full overflow-hidden p-0.5 border border-neutral-200 dark:border-[#333333]">
+          <div className="w-full bg-base-300 h-2.5 sm:h-3 rounded-full overflow-hidden p-0.5 border border-base-border">
             <div 
-              className="bg-neutral-900 dark:bg-white h-full rounded-full transition-all duration-500"
+              className="bg-primary h-full rounded-full transition-all duration-500"
               style={{ width: `${xpProgress}%` }}
             />
           </div>
@@ -106,58 +106,58 @@ export const GamificationTab: React.FC<GamificationTabProps> = ({
 
       {/* Stats Quick Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-        <div className="p-3.5 sm:p-4 bg-white dark:bg-[#141414] rounded-xl sm:rounded-2xl border border-neutral-200 dark:border-[#262626] shadow-2xs space-y-1">
-          <div className="flex items-center gap-1.5 text-neutral-500 dark:text-[#8e8e8e] text-xs font-medium">
-            <BookOpen className="w-3.5 h-3.5 text-neutral-700 dark:text-[#a3a3a3]" />
+        <div className="p-3.5 sm:p-4 bg-base-100 rounded-xl sm:rounded-2xl border border-base-border shadow-2xs space-y-1">
+          <div className="flex items-center gap-1.5 text-base-content-muted text-xs font-medium">
+            <BookOpen className="w-3.5 h-3.5 text-base-content-secondary" />
             <span>อ่านแล้ว</span>
           </div>
-          <div className="text-xl sm:text-2xl font-extrabold text-neutral-900 dark:text-[#fafafa]">
+          <div className="text-xl sm:text-2xl font-extrabold text-base-content">
             {userStats.readChapters.length}/{chapterCount}
           </div>
-          <span className="text-[11px] text-neutral-400 dark:text-[#666666]">บุ๊กมาร์ก {userStats.bookmarks.length}</span>
+          <span className="text-[11px] text-base-content-muted">บุ๊กมาร์ก {userStats.bookmarks.length}</span>
         </div>
 
-        <div className="p-3.5 sm:p-4 bg-white dark:bg-[#141414] rounded-xl sm:rounded-2xl border border-neutral-200 dark:border-[#262626] shadow-2xs space-y-1">
-          <div className="flex items-center gap-1.5 text-neutral-500 dark:text-[#8e8e8e] text-xs font-medium">
-            <Bot className="w-3.5 h-3.5 text-neutral-700 dark:text-[#a3a3a3]" />
+        <div className="p-3.5 sm:p-4 bg-base-100 rounded-xl sm:rounded-2xl border border-base-border shadow-2xs space-y-1">
+          <div className="flex items-center gap-1.5 text-base-content-muted text-xs font-medium">
+            <Bot className="w-3.5 h-3.5 text-base-content-secondary" />
             <span>คำถามที่ถาม AI</span>
           </div>
-          <div className="text-xl sm:text-2xl font-extrabold text-neutral-900 dark:text-[#fafafa]">
+          <div className="text-xl sm:text-2xl font-extrabold text-base-content">
             {userStats.aiQuestionsAsked}
           </div>
-          <span className="text-[11px] text-neutral-400 dark:text-[#666666]">ครั้งที่ปรึกษา</span>
+          <span className="text-[11px] text-base-content-muted">ครั้งที่ปรึกษา</span>
         </div>
 
-        <div className="p-3.5 sm:p-4 bg-white dark:bg-[#141414] rounded-xl sm:rounded-2xl border border-neutral-200 dark:border-[#262626] shadow-2xs space-y-1">
-          <div className="flex items-center gap-1.5 text-neutral-500 dark:text-[#8e8e8e] text-xs font-medium">
-            <Trophy className="w-3.5 h-3.5 text-amber-500" />
+        <div className="p-3.5 sm:p-4 bg-base-100 rounded-xl sm:rounded-2xl border border-base-border shadow-2xs space-y-1">
+          <div className="flex items-center gap-1.5 text-base-content-muted text-xs font-medium">
+            <Trophy className="w-3.5 h-3.5 text-warning" />
             <span>ควิซที่ตอบถูก</span>
           </div>
-          <div className="text-xl sm:text-2xl font-extrabold text-neutral-900 dark:text-[#fafafa]">
+          <div className="text-xl sm:text-2xl font-extrabold text-base-content">
             {userStats.correctAnswers}
           </div>
-          <span className="text-[11px] text-neutral-400 dark:text-[#666666]">ข้อที่ตอบถูก</span>
+          <span className="text-[11px] text-base-content-muted">ข้อที่ตอบถูก</span>
         </div>
 
-        <div className="p-3.5 sm:p-4 bg-white dark:bg-[#141414] rounded-xl sm:rounded-2xl border border-neutral-200 dark:border-[#262626] shadow-2xs space-y-1">
-          <div className="flex items-center gap-1.5 text-neutral-500 dark:text-[#8e8e8e] text-xs font-medium">
-            <Award className="w-3.5 h-3.5 text-emerald-500" />
+        <div className="p-3.5 sm:p-4 bg-base-100 rounded-xl sm:rounded-2xl border border-base-border shadow-2xs space-y-1">
+          <div className="flex items-center gap-1.5 text-base-content-muted text-xs font-medium">
+            <Award className="w-3.5 h-3.5 text-success" />
             <span>เหรียญความสำเร็จ</span>
           </div>
-          <div className="text-xl sm:text-2xl font-extrabold text-neutral-900 dark:text-[#fafafa]">
+          <div className="text-xl sm:text-2xl font-extrabold text-base-content">
             {unlockedCount} / {badges.length}
           </div>
-          <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">{Math.round((unlockedCount / badges.length) * 100)}% สำเร็จ</span>
+          <span className="text-[11px] text-success font-semibold">{Math.round((unlockedCount / badges.length) * 100)}% สำเร็จ</span>
         </div>
       </div>
 
       {/* Badges Showcase */}
       <div className="space-y-3 sm:space-y-4">
         <div>
-          <h3 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-[#fafafa]">
+          <h3 className="text-base sm:text-lg font-bold text-base-content">
             เหรียญที่สะสมได้ (Badges &amp; Achievements)
           </h3>
-          <p className="text-xs text-neutral-500 dark:text-[#8e8e8e]">
+          <p className="text-xs text-base-content-muted">
             ปลดล็อกได้จากการอ่านคู่มือ ถาม AI และทำควิซ
           </p>
         </div>
@@ -169,15 +169,15 @@ export const GamificationTab: React.FC<GamificationTabProps> = ({
                 key={badge.id}
                 className={`p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border transition-all flex items-start gap-3 ${
                   badge.unlocked
-                    ? 'bg-white dark:bg-[#141414] border-neutral-300 dark:border-[#333333] shadow-xs'
-                    : 'bg-neutral-50/70 dark:bg-[#141414]/60 border-neutral-200/80 dark:border-[#262626]'
+                    ? 'bg-base-100 border-base-border-strong shadow-xs'
+                    : 'bg-base-100 border-base-border'
                 }`}
               >
                 <div
                   className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0 ${
                     badge.unlocked
-                      ? 'bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] shadow-xs'
-                      : 'bg-neutral-200 dark:bg-[#262626] text-neutral-400 dark:text-[#666666]'
+                      ? 'bg-primary text-primary-content shadow-xs'
+                      : 'bg-base-border text-base-content-muted'
                   }`}
                 >
                   {badge.unlocked ? getIcon(badge.icon) : <Lock className="w-4 h-4 sm:w-5 sm:h-5" />}
@@ -186,19 +186,19 @@ export const GamificationTab: React.FC<GamificationTabProps> = ({
                 <div className="min-w-0 space-y-1">
                   <div className="flex items-center justify-between gap-2">
                     <h4 className={`text-xs sm:text-sm font-bold truncate ${
-                      badge.unlocked ? 'text-neutral-900 dark:text-[#fafafa]' : 'text-neutral-600 dark:text-[#737373]'
+                      badge.unlocked ? 'text-base-content' : 'text-base-content-secondary'
                     }`}>
                       {badge.title}
                     </h4>
                     {badge.unlocked && (
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-success shrink-0" />
                     )}
                   </div>
-                  <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e] leading-snug">
+                  <p className="text-[11px] sm:text-xs text-base-content-muted leading-snug">
                     {badge.description}
                   </p>
                   {badge.unlockedAt && (
-                    <span className="inline-block text-[10px] text-neutral-700 dark:text-[#a3a3a3] font-medium pt-0.5">
+                    <span className="inline-block text-[10px] text-base-content-secondary font-medium pt-0.5">
                       ปลดล็อกแล้ว ({badge.unlockedAt})
                     </span>
                   )}
@@ -210,23 +210,23 @@ export const GamificationTab: React.FC<GamificationTabProps> = ({
       </div>
 
       {/* Action CTA */}
-      <div className="p-5 sm:p-6 bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] rounded-2xl sm:rounded-3xl flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
+      <div className="p-5 sm:p-6 bg-primary text-primary-content rounded-2xl sm:rounded-3xl flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
         <div className="space-y-1 text-center sm:text-left">
           <h3 className="text-base sm:text-lg font-bold">ต้องการเพิ่ม XP และปลดล็อกเหรียญที่เหลือ?</h3>
-          <p className="text-xs sm:text-sm text-neutral-300 dark:text-neutral-600">
+          <p className="text-xs sm:text-sm text-primary-content/70">
             ลองทำแบบทดสอบจำลองสถานการณ์ หรือถามคำถามใหม่กับ AI เพื่อสะสม XP
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={onStartQuiz}
-            className={`${TAP} px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-white dark:bg-[#0a0a0a] text-neutral-900 dark:text-white text-xs sm:text-sm font-bold shadow-xs hover:opacity-90 transition-all cursor-pointer`}
+            className={`${TAP} px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-base-100 text-base-content text-xs sm:text-sm font-bold shadow-xs hover:opacity-90 transition-all cursor-pointer`}
           >
             ไปทำควิซ (+XP)
           </button>
           <button
             onClick={onGoToGuide}
-            className={`${TAP} px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl border border-neutral-700 dark:border-neutral-300 text-neutral-200 dark:text-neutral-800 text-xs sm:text-sm font-semibold hover:bg-neutral-800 dark:hover:bg-neutral-100 transition-all cursor-pointer`}
+            className={`${TAP} px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl border border-primary-content/30 text-primary-content text-xs sm:text-sm font-semibold hover:bg-primary-content/10 transition-all cursor-pointer`}
           >
             อ่านคู่มือต่อ
           </button>

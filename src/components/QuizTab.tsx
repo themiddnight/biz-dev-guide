@@ -102,8 +102,8 @@ export const QuizTab: React.FC<QuizTabProps> = ({
               onClick={() => chooseRound(r)}
               className={`${TAP_GAP[8]} px-3 py-1.5 rounded-full border text-xs font-semibold transition-colors cursor-pointer ${
                 selected
-                  ? 'bg-neutral-900 text-white border-neutral-900 dark:bg-white dark:text-[#0a0a0a] dark:border-white'
-                  : 'bg-white dark:bg-[#141414] text-neutral-700 dark:text-[#c4c4c4] border-neutral-200 dark:border-[#262626] hover:border-neutral-400 dark:hover:border-[#404040]'
+                  ? 'bg-primary text-primary-content border-primary'
+                  : 'bg-base-100 text-base-content-body border-base-border hover:border-base-border-strong'
               }`}
             >
               {QUIZ_ROUND_META[r].label}{r === role ? ' (สายคุณ)' : ''} · {count} ข้อ
@@ -201,39 +201,39 @@ const QuizRun: React.FC<QuizRunProps> = ({
       {/* Quiz Top Progress */}
       <div className="flex items-center justify-between gap-4">
         <div>
-          <span className="text-[11px] font-bold text-neutral-500 dark:text-[#8e8e8e] uppercase tracking-wider">
+          <span className="text-[11px] font-bold text-base-content-muted uppercase tracking-wider">
             คำถามข้อที่ {currentIndex + 1} จาก {questions.length}
           </span>
-          <h2 className="text-base sm:text-xl font-bold text-neutral-900 dark:text-[#fafafa]">
+          <h2 className="text-base sm:text-xl font-bold text-base-content">
             {currentQ.category}
           </h2>
         </div>
 
-        <div className="flex items-center gap-1.5 bg-amber-500/10 text-amber-700 dark:text-amber-400 px-3 py-1 rounded-full text-xs font-bold border border-amber-500/25">
-          <Zap className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
+        <div className="flex items-center gap-1.5 bg-warning/10 text-warning px-3 py-1 rounded-full text-xs font-bold border border-warning/25">
+          <Zap className="w-3.5 h-3.5 fill-warning text-warning" />
           <span>+{currentQ.xp} XP</span>
         </div>
       </div>
 
       {/* Progress Line */}
-      <div className="w-full bg-neutral-200 dark:bg-[#262626] h-1.5 sm:h-2 rounded-full overflow-hidden">
+      <div className="w-full bg-base-border h-1.5 sm:h-2 rounded-full overflow-hidden">
         <div 
-          className="bg-neutral-900 dark:bg-white h-full rounded-full transition-all duration-300"
+          className="bg-primary h-full rounded-full transition-all duration-300"
           style={{ width: `${((currentIndex + 1) / questions.length) * 100}%` }}
         />
       </div>
 
       {/* Scenario Card */}
-      <div className="p-4 sm:p-6 bg-white dark:bg-[#141414] rounded-2xl sm:rounded-3xl border border-neutral-200 dark:border-[#262626] shadow-2xs space-y-3">
+      <div className="p-4 sm:p-6 bg-base-100 rounded-2xl sm:rounded-3xl border border-base-border shadow-2xs space-y-3">
         <div className="flex items-center gap-2">
-          <span className="px-2.5 py-0.5 rounded-full bg-neutral-100 dark:bg-[#1f1f1f] text-neutral-800 dark:text-[#d4d4d4] text-[11px] sm:text-xs font-semibold border border-neutral-200 dark:border-[#333333]">
+          <span className="px-2.5 py-0.5 rounded-full bg-base-300 text-base-content-body text-[11px] sm:text-xs font-semibold border border-base-border">
             สถานการณ์จำลอง (Role: {currentQ.role})
           </span>
         </div>
-        <p className="text-xs sm:text-sm text-neutral-700 dark:text-[#c4c4c4] italic bg-neutral-50 dark:bg-[#1a1a1a] p-3 sm:p-3.5 rounded-xl border border-neutral-200 dark:border-[#262626] leading-relaxed">
+        <p className="text-xs sm:text-sm text-base-content-body italic bg-base-300 p-3 sm:p-3.5 rounded-xl border border-base-border leading-relaxed">
           &ldquo;{currentQ.scenario}&rdquo;
         </p>
-        <h3 className="text-xs sm:text-base font-bold text-neutral-900 dark:text-[#fafafa] pt-1">
+        <h3 className="text-xs sm:text-base font-bold text-base-content pt-1">
           {currentQ.question}
         </h3>
       </div>
@@ -242,15 +242,15 @@ const QuizRun: React.FC<QuizRunProps> = ({
       <div className="space-y-2.5 sm:space-y-3">
         {currentOptions.map((option, idx) => {
           const isSelected = selectedOptionIndex === idx;
-          let btnStyle = 'border-neutral-200 dark:border-[#262626] bg-white dark:bg-[#141414] text-neutral-800 dark:text-[#e5e5e5] hover:border-neutral-400 dark:hover:border-[#404040]';
+          let btnStyle = 'border-base-border bg-base-100 text-base-content hover:border-base-border-strong';
 
           if (isAnswered) {
             if (option.isCorrect) {
-              btnStyle = 'border-emerald-500 bg-emerald-500/10 dark:bg-emerald-950/40 text-emerald-950 dark:text-emerald-100 ring-1 ring-emerald-500 font-semibold';
+              btnStyle = 'border-success bg-success/10 text-success ring-1 ring-success font-semibold';
             } else if (isSelected) {
-              btnStyle = 'border-rose-500 bg-rose-500/10 dark:bg-rose-950/40 text-rose-950 dark:text-rose-100 ring-1 ring-rose-500 font-semibold';
+              btnStyle = 'border-error bg-error/10 text-error ring-1 ring-error font-semibold';
             } else {
-              btnStyle = 'border-neutral-200/80 dark:border-[#262626]/80 bg-neutral-50/70 dark:bg-[#141414]/60 text-neutral-400 dark:text-[#666666]';
+              btnStyle = 'border-base-border bg-base-100 text-base-content-muted';
             }
           }
 
@@ -264,10 +264,10 @@ const QuizRun: React.FC<QuizRunProps> = ({
               <div className="flex items-start gap-3">
                 <span className={`w-6 h-6 rounded-lg text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 ${
                   isAnswered && option.isCorrect
-                    ? 'bg-emerald-600 text-white'
+                    ? 'bg-success text-success-content'
                     : isAnswered && isSelected
-                    ? 'bg-rose-600 text-white'
-                    : 'bg-neutral-100 dark:bg-[#262626] text-neutral-700 dark:text-[#a3a3a3]'
+                    ? 'bg-error text-error-content'
+                    : 'bg-base-300 text-base-content-secondary'
                 }`}>
                   {String.fromCharCode(65 + idx)}
                 </span>
@@ -277,9 +277,9 @@ const QuizRun: React.FC<QuizRunProps> = ({
               {isAnswered && (
                 <div className="shrink-0 mt-0.5">
                   {option.isCorrect ? (
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                    <CheckCircle2 className="w-5 h-5 text-success" />
                   ) : isSelected ? (
-                    <XCircle className="w-5 h-5 text-rose-600 dark:text-rose-400" />
+                    <XCircle className="w-5 h-5 text-error" />
                   ) : null}
                 </div>
               )}
@@ -290,12 +290,12 @@ const QuizRun: React.FC<QuizRunProps> = ({
 
       {/* Explanation Box after answer */}
       {isAnswered && (
-        <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-neutral-50 dark:bg-[#1a1a1a] border border-neutral-200 dark:border-[#262626] space-y-1.5 animate-fadeIn">
-          <div className="flex items-center gap-1.5 text-xs font-bold text-neutral-900 dark:text-[#e5e5e5]">
-            <HelpCircle className="w-4 h-4 text-indigo-500" />
+        <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-base-300 border border-base-border space-y-1.5 animate-fadeIn">
+          <div className="flex items-center gap-1.5 text-xs font-bold text-base-content">
+            <HelpCircle className="w-4 h-4 text-engineer" />
             <span>เฉลย:</span>
           </div>
-          <p className="text-xs sm:text-sm text-neutral-700 dark:text-[#c4c4c4] leading-relaxed font-normal">
+          <p className="text-xs sm:text-sm text-base-content-body leading-relaxed font-normal">
             {currentOptions[selectedOptionIndex].explanation}
           </p>
         </div>
@@ -309,7 +309,7 @@ const QuizRun: React.FC<QuizRunProps> = ({
               type="button"
               data-quiz-chapter={currentQ.chapterId}
               onClick={() => onOpenChapter(currentQ.chapterId!)}
-              className={`${TAP} inline-flex items-center gap-2 px-4 py-3 rounded-xl sm:rounded-2xl bg-neutral-100 dark:bg-[#1a1a1a] text-neutral-900 dark:text-[#e5e5e5] border border-neutral-200 dark:border-[#262626] text-xs sm:text-sm font-semibold hover:bg-neutral-200/70 dark:hover:bg-[#222222] transition-all cursor-pointer`}
+              className={`${TAP} inline-flex items-center gap-2 px-4 py-3 rounded-xl sm:rounded-2xl bg-base-300 text-base-content border border-base-border text-xs sm:text-sm font-semibold hover:bg-base-border transition-all cursor-pointer`}
             >
               <BookOpen className="w-4 h-4" />
               <span>อ่านบทที่เกี่ยวข้อง</span>
@@ -317,7 +317,7 @@ const QuizRun: React.FC<QuizRunProps> = ({
           )}
           <button
             onClick={handleNext}
-            className={`${TAP} inline-flex items-center gap-2 px-6 py-3 rounded-xl sm:rounded-2xl bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:hover:bg-neutral-200 dark:text-[#0a0a0a] text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer`}
+            className={`${TAP} inline-flex items-center gap-2 px-6 py-3 rounded-xl sm:rounded-2xl bg-primary hover:bg-primary/90 text-primary-content text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer`}
           >
             <span>{currentIndex + 1 === questions.length ? 'ดูผล' : 'คำถามข้อถัดไป'}</span>
             <ArrowRight className="w-4 h-4" />

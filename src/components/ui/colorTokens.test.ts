@@ -52,13 +52,10 @@ export function violations(src: string): { line: number; text: string }[] {
  * fixes a file and deletes its line here in the same commit; a count that drifts either way fails.
  */
 const BASELINE: Record<string, number> = {
-  'components/AIAssistantTab.tsx': 149,
   'components/ChapterDiagram.tsx': 669,
   'components/FrictionFaqSection.tsx': 120,
   'components/FrictionPlaybookCard.tsx': 204,
-  'components/GamificationTab.tsx': 120,
   'components/ProtocolSimulator.tsx': 103,
-  'components/QuizTab.tsx': 107,
   'components/RoleMindsetCard.tsx': 106,
   'components/content/ContentBlocks.tsx': 54,
   'components/content/ContentTable.tsx': 48,
@@ -69,7 +66,6 @@ const BASELINE: Record<string, number> = {
   'components/figures/shared/FigurePanels.tsx': 2,
   'components/glossary/GlossaryCategoryMap.tsx': 24,
   'components/glossary/GlossaryPanel.tsx': 48,
-  'components/quiz/QuizResultScreen.tsx': 71,
 };
 
 describe('colour tokens only', () => {
