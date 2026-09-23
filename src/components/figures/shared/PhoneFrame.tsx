@@ -6,7 +6,7 @@ import React from 'react';
  * Content below the header starts at y ≈ 36 by convention (see RefundFidelity).
  */
 
-export const HEADER_PATH = 'M0.5,28 V10.5 A10,10 0 0 1 10.5,0.5 H139.5 A10,10 0 0 1 149.5,10.5 V28 Z';
+const HEADER_PATH = 'M0.5,28 V10.5 A10,10 0 0 1 10.5,0.5 H139.5 A10,10 0 0 1 149.5,10.5 V28 Z';
 
 export type PhoneFrameTone = 'accent' | 'neutral';
 

@@ -42,11 +42,11 @@ export interface GuideSectionContext {
 
 export interface SectionProps { chapter: Chapter; isOpen: boolean; onToggle: () => void; ctx: GuideSectionContext }
 
-export const MindsetSection: React.FC<SectionProps> = ({ isOpen, onToggle }) => (
+const MindsetSection: React.FC<SectionProps> = ({ isOpen, onToggle }) => (
   <RoleMindsetCard isOpen={isOpen} onToggle={onToggle} />
 );
 
-export const FrictionSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggle, ctx }) => (
+const FrictionSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggle, ctx }) => (
   <FrictionPlaybookCard
     playbook={chapter.frictionPlaybook}
     chapterTitle={chapter.title}

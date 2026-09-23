@@ -27,7 +27,7 @@ export const LAYER_CONFIG: Record<ExperienceLevel, Record<Layer, readonly Sectio
 };
 
 /** Chapter-signature sections promoted to Core for BOTH levels (owner decision, spec §10 D10). */
-export const CHAPTER_CORE_OVERRIDES: Readonly<Record<string, readonly SectionKey[]>> = {
+const CHAPTER_CORE_OVERRIDES: Readonly<Record<string, readonly SectionKey[]>> = {
   s11: ['faq'],
   s15: ['glossary'],
 };
@@ -103,7 +103,7 @@ export function getInlineSectionsAt(chapter: Chapter, key: SectionKey, conceptIn
  * or content placed in it. Chapters whose hero replaced all of these
  * (s1 after Q4, s14 after Q6) drop the section.
  */
-export function hasDiagramContent(chapter: Chapter): boolean {
+function hasDiagramContent(chapter: Chapter): boolean {
   return (
     DIAGRAM_WIDGET_CHAPTERS.has(chapter.id) ||
     chapter.id === GLOSSARY_MAP_CHAPTER ||

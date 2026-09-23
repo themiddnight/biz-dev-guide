@@ -1,7 +1,7 @@
 import type { Chapter } from '../types';
 
 /** Every string the index search reads for one chapter (lower-cased by the matcher). */
-export function chapterSearchFields(ch: Chapter): string[] {
+function chapterSearchFields(ch: Chapter): string[] {
   return [
     ch.title,
     ch.subtitle,

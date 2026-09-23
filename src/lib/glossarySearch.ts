@@ -24,7 +24,7 @@ const haystack = (term: GlossaryTerm) =>
  * hit found only inside the definition, so typing `BA` cannot land on `Backlog` first. Deliberately
  * a fixed ladder of five rungs, not a score: the order is then obvious from reading the entry.
  */
-export function searchRank(term: GlossaryTerm, needle: string): number {
+function searchRank(term: GlossaryTerm, needle: string): number {
   const labels = termLabelKeys(term);
   const aliases = (term.aliases ?? []).map(a => a.trim().toLowerCase());
   if (labels.includes(needle)) return 0; // typed the visible name

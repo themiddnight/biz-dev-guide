@@ -4,7 +4,7 @@
  * title and hero figure; start at the reader card instead. Desktop keeps the page top.
  */
 export const CHAPTER_START_ID = 'chapter-start';
-export const MOBILE_CHAPTER_QUERY = '(max-width: 1023.98px)';
+const MOBILE_CHAPTER_QUERY = '(max-width: 1023.98px)';
 
 /** Scroll offset that puts the card just below the sticky header. */
 export function chapterStartTop(cardDocTop: number, stickyHeaderHeight: number, gap = 8): number {

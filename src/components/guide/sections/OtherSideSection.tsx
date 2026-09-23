@@ -26,7 +26,7 @@ const Label: React.FC<{ children: React.ReactNode }> = ({ children }) => (
  * renders strings, so rendering it twice — as StrictMode does — cannot change its markers. Every
  * field is prose, the `saysVsHears` dialogue lines included (D21).
  */
-export const SideViewCard: React.FC<{
+const SideViewCard: React.FC<{
   view: SideViewTerms;
   ctx: Pick<GuideSectionContext, 'onNavigateChapter' | 'onSearchGlossary'>;
 }> = ({ view, ctx }) => {

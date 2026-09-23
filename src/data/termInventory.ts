@@ -18,7 +18,7 @@ export interface TermField {
 const texts = (...values: (string | undefined)[]): string[] => values.filter((v): v is string => !!v);
 
 /** Every reader-visible string of one content block, including nested `details` bodies. */
-export function blockTexts(block: ContentBlock): string[] {
+function blockTexts(block: ContentBlock): string[] {
   switch (block.kind) {
     case 'table':
       return [
@@ -39,7 +39,7 @@ export function blockTexts(block: ContentBlock): string[] {
   }
 }
 
-export const TERM_FIELDS: readonly TermField[] = [
+const TERM_FIELDS: readonly TermField[] = [
   { field: 'title', get: c => [c.title] },
   { field: 'enTerm', get: c => texts(c.enTerm) },
   { field: 'subtitle', get: c => [c.subtitle] },
@@ -94,7 +94,7 @@ export function beginnerVisibleTexts(chapter: Chapter): TermOccurrence[] {
  * Multi-token or mixed-case terms the ALL-CAPS scan cannot see. Matched before it, so the
  * longer form always wins (`CI/CD` over `CI`, `UX/UI` over `UX`).
  */
-export const COMPOUND_TERMS: readonly string[] = [
+const COMPOUND_TERMS: readonly string[] = [
   'CI/CD', 'UX/UI', 'FURPS+', 'QR Code', 'Tech Debt', 'Test Pyramid', 'Testing Pyramid',
   'Quality Gate', 'User Story', 'Availability Zone', 'DoR', 'DoD', 'PjM', 'SaaS', 'IaC',
 ];
@@ -105,7 +105,7 @@ export const COMPOUND_TERMS: readonly string[] = [
  * uses it (`P0-P3`, `L4`, the `#A1024` order number). An explicit reviewed list, not a
  * heuristic — an entry here is a claim that no reader has to look this up in the glossary.
  */
-export const KNOWN_NON_TERMS: ReadonlySet<string> = new Set([
+const KNOWN_NON_TERMS: ReadonlySet<string> = new Set([
   // Roles, teams and sides the guide names constantly
   'BUSINESS', 'ENGINEERING', 'DEV', 'DEVS', 'DESIGNER', 'SALES', 'ADMIN', 'SUPPORT', 'MARKETING',
   'FINANCE', 'LEGAL', 'OPS', 'TEAM', 'LEAD', 'STAFF', 'USER', 'USERS', 'CUSTOMER', 'CLIENT',
@@ -126,7 +126,7 @@ export const KNOWN_NON_TERMS: ReadonlySet<string> = new Set([
 ]);
 
 /** The mixed-case long tail: words with a glossary entry that the ALL-CAPS scan cannot see. */
-export const TRACKED_TERMS: readonly string[] = [
+const TRACKED_TERMS: readonly string[] = [
   'Sprint', 'Agile', 'Waterfall', 'Refactor', 'Refactoring', 'Monolith', 'Microservices',
   'Sketch', 'Gate', 'Pyramid',
 ];
@@ -200,7 +200,7 @@ export function termPattern(key: string, flags = 'i'): RegExp {
 }
 
 /** Lower-cased key -> ids of the entries that answer to it. A key with 2+ ids is ambiguous. */
-export const GLOSSARY_KEY_INDEX: ReadonlyMap<string, readonly string[]> = (() => {
+const GLOSSARY_KEY_INDEX: ReadonlyMap<string, readonly string[]> = (() => {
   const index = new Map<string, string[]>();
   for (const entry of GLOSSARY) {
     for (const key of glossaryKeys(entry)) index.set(key, [...(index.get(key) ?? []), entry.id]);
