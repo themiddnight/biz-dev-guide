@@ -16,7 +16,7 @@ export default defineConfig(() => {
       // renders on first load. Lazy-loading the AI and Quiz tabs only brings it to ~1.26 MB, so the
       // 500 kB default cannot be met without splitting the chapter data. The limit sits just above
       // today's size so real growth still warns.
-      chunkSizeWarningLimit: 1600,
+      chunkSizeWarningLimit: 1500,
     },
     server: {
       // HMR is disabled in AI Studio via DISABLE_HMR env var.
