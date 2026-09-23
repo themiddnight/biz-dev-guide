@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <circle cx="16" cy="11" r="9" fill="oklch(55.5% 0.163 48.998 / 0.2)" stroke="oklch(55.5% 0.163 48.998)" stroke-width="2.5"/>
+  <circle cx="16" cy="21" r="9" fill="oklch(45.7% 0.24 277.023 / 0.2)" stroke="oklch(45.7% 0.24 277.023)" stroke-width="2.5"/>
+  <circle cx="16" cy="16" r="2.5" fill="oklch(20.5% 0 0)"/>
+</svg>

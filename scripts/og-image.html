@@ -1,0 +1,87 @@
+<!doctype html>
+<!--
+  Source for public/og-image.png (1200×630, the Open Graph / Twitter large-card size).
+  Colours are the design tokens from src/index.css. Re-render after editing:
+
+  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless --hide-scrollbars \
+    --force-device-scale-factor=1 --window-size=1200,630 --virtual-time-budget=5000 \
+    --screenshot=public/og-image.png scripts/og-image.html
+-->
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Prompt:wght@400;500;600;700&display=block" rel="stylesheet">
+    <style>
+      :root {
+        --base-100: #ffffff;
+        --base-300: oklch(97% 0 0);
+        --content: oklch(20.5% 0 0);
+        --content-secondary: oklch(43.9% 0 0);
+        --content-muted: oklch(55.6% 0 0);
+        --border: oklch(92.2% 0 0);
+        --business: oklch(55.5% 0.163 48.998);
+        --engineer: oklch(45.7% 0.24 277.023);
+      }
+      * { box-sizing: border-box; margin: 0; }
+      html, body { width: 1200px; height: 630px; overflow: hidden; }
+      body {
+        font-family: 'Geist', 'Prompt', sans-serif;
+        color: var(--content);
+        background:
+          radial-gradient(circle at 1px 1px, var(--border) 1.5px, transparent 0) 0 0 / 28px 28px,
+          var(--base-100);
+        display: flex;
+        padding: 72px 80px;
+      }
+      .copy { flex: 1; display: flex; flex-direction: column; }
+      .pill {
+        align-self: flex-start;
+        font-size: 22px; font-weight: 500;
+        padding: 8px 18px;
+        border: 1.5px solid var(--border);
+        border-radius: 999px;
+        background: var(--base-100);
+        color: var(--content-secondary);
+      }
+      h1 {
+        margin-top: 44px;
+        font-family: 'Prompt', sans-serif;
+        font-size: 68px; font-weight: 700;
+        line-height: 1.25; white-space: nowrap; letter-spacing: -0.01em;
+      }
+      .biz { color: var(--business); }
+      .eng { color: var(--engineer); }
+      .sub {
+        margin-top: 28px;
+        font-family: 'Prompt', sans-serif;
+        font-size: 28px; font-weight: 400;
+        color: var(--content-secondary);
+      }
+      .tags { margin-top: auto; display: flex; gap: 12px; }
+      .tags span {
+        font-family: 'Prompt', sans-serif;
+        font-size: 22px; font-weight: 500;
+        padding: 8px 18px;
+        border-radius: 12px;
+        background: var(--base-300);
+        border: 1.5px solid var(--border);
+      }
+      .art { width: 280px; display: flex; align-items: center; justify-content: flex-end; }
+    </style>
+  </head>
+  <body>
+    <div class="copy">
+      <div class="pill">Interactive Guide &amp; AI</div>
+      <h1>จุดที่ <span class="biz">Business</span> กับ<br><span class="eng">Engineering</span> มาเจอกัน</h1>
+      <p class="sub">คู่มือกลางข้ามสายงาน ให้สองฝั่งเข้าใจกันง่ายขึ้น</p>
+      <div class="tags"><span>ถาม AI</span><span>Interactive Quiz</span></div>
+    </div>
+    <div class="art">
+      <svg width="280" height="400" viewBox="0 0 280 400" aria-hidden="true">
+        <circle cx="140" cy="130" r="110" fill="oklch(55.5% 0.163 48.998 / 0.16)" stroke="oklch(55.5% 0.163 48.998)" stroke-width="4" />
+        <circle cx="140" cy="270" r="110" fill="oklch(45.7% 0.24 277.023 / 0.16)" stroke="oklch(45.7% 0.24 277.023)" stroke-width="4" />
+        <circle cx="140" cy="200" r="16" fill="oklch(20.5% 0 0)" />
+      </svg>
+    </div>
+  </body>
+</html>

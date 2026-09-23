@@ -1,4 +1,5 @@
 import express from "express";
+import fs from "fs";
 import path from "path";
 import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
@@ -9,6 +10,16 @@ const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 
 app.use(express.json());
+// Cloud Run terminates TLS at its proxy; trust X-Forwarded-Proto so req.protocol reads https.
+app.set("trust proxy", true);
+
+// index.html writes __SITE_URL__ where og:url / og:image need an absolute URL. AI Studio injects
+// APP_URL at runtime; anywhere else the request's own origin stands in for it.
+function withSiteUrl(html: string, fallbackOrigin: string): string {
+  const appUrl = process.env.APP_URL;
+  const origin = appUrl && /^https?:\/\//.test(appUrl) ? appUrl.replace(/\/+$/, "") : fallbackOrigin;
+  return html.replaceAll("__SITE_URL__", origin);
+}
 
 // Lazy-initialize Gemini API
 let geminiClient: GoogleGenAI | null = null;
@@ -154,13 +165,21 @@ async function start() {
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
+      plugins: [
+        {
+          name: "site-url",
+          transformIndexHtml: (html) => withSiteUrl(html, `http://localhost:${PORT}`),
+        },
+      ],
     });
     app.use(vite.middlewares);
   } else {
     const distPath = path.join(process.cwd(), "dist");
-    app.use(express.static(distPath));
-    app.get("*", (_req, res) => {
-      res.sendFile(path.join(distPath, "index.html"));
+    const indexHtml = fs.readFileSync(path.join(distPath, "index.html"), "utf8");
+    // index: false so "/" reaches the handler below instead of the raw, placeholder-bearing file.
+    app.use(express.static(distPath, { index: false }));
+    app.get("*", (req, res) => {
+      res.type("html").send(withSiteUrl(indexHtml, `${req.protocol}://${req.get("host")}`));
     });
   }
 
