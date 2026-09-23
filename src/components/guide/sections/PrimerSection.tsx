@@ -4,6 +4,7 @@ import type { SectionProps } from './registry';
 import { RichText } from '../../content/RichText';
 import { primerTerms } from '../../../lib/sectionTerms';
 import { TAP } from '../../ui/tapTarget';
+import { IconBadge } from '../../ui/IconBadge';
 
 export const PrimerSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggle, ctx }) => {
   // Each glossary term is marked once in this section (spec P3.5), computed purely from the chapter.
@@ -13,15 +14,13 @@ export const PrimerSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggl
     <RichText text={text} onNavigateChapter={ctx.onNavigateChapter} onSearchGlossary={ctx.onSearchGlossary} />
   );
   return (
-    <div className="border border-base-border rounded-2xl overflow-hidden bg-base-100 shadow-2xs">
+    <div className="border border-base-border rounded-box overflow-hidden bg-base-100 shadow-2xs">
       <button
         onClick={onToggle}
-        className={`${TAP} w-full p-3.5 sm:p-4.5 flex items-center justify-between bg-base-300 hover:bg-base-border text-left cursor-pointer select-none transition-colors`}
+        className={`${TAP} w-full p-box flex items-center justify-between bg-base-300 hover:bg-base-border text-left cursor-pointer select-none transition-colors`}
       >
         <div className="flex items-center gap-3">
-          <div className="w-7 h-7 rounded-xl bg-primary text-primary-content flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
-            🌟
-          </div>
+          <IconBadge size="md">🌟</IconBadge>
           <div>
             <h3 className="text-xs sm:text-sm font-bold text-base-content">
               จุดเริ่มต้นสำหรับมือใหม่ (เริ่มจากศูนย์)
@@ -35,10 +34,10 @@ export const PrimerSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggl
       </button>
 
       {isOpen && (
-        <div className="p-4 sm:p-5 space-y-3.5 border-t border-base-border bg-base-100 text-xs sm:text-sm">
+        <div className="p-box space-y-3.5 border-t border-base-border bg-base-100 text-xs sm:text-sm">
           <div className="space-y-1">
             <div className="font-bold text-base-content flex items-center gap-1.5 text-xs">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary inline-block"></span>
+              <span className="w-1.5 h-1.5 rounded-full bg-base-content inline-block"></span>
               <span>สิ่งนี้คืออะไร? (What is it?)</span>
             </div>
             <p className="text-base-content-secondary leading-relaxed pl-3 font-normal text-xs sm:text-sm">
@@ -48,7 +47,7 @@ export const PrimerSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggl
 
           <div className="space-y-1">
             <div className="font-bold text-base-content flex items-center gap-1.5 text-xs">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary inline-block"></span>
+              <span className="w-1.5 h-1.5 rounded-full bg-base-content inline-block"></span>
               <span>ทำไมถึงสำคัญมาก? ถ้าไม่มีจะเกิดอะไรขึ้น? (Why it matters?)</span>
             </div>
             <p className="text-base-content-secondary leading-relaxed pl-3 font-normal text-xs sm:text-sm">
@@ -56,7 +55,7 @@ export const PrimerSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggl
             </p>
           </div>
 
-          <div className="p-3 sm:p-3.5 rounded-xl bg-base-300 border border-base-border space-y-1">
+          <div className="p-box-dense rounded-xl bg-base-300 border border-base-border space-y-1">
             <div className="font-bold text-base-content flex items-center gap-1.5 text-xs">
               <Lightbulb className="w-4 h-4 text-warning" />
               <span>เทียบกับเรื่องในชีวิตประจำวัน (Real-World Analogy)</span>

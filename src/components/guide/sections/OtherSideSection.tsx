@@ -4,7 +4,9 @@ import { ROLES, ROLE_META, otherRole, type Role } from '../../../data/rolePerspe
 import type { GuideSectionContext, OtherSideView, SectionProps } from './registry';
 import { RichText } from '../../content/RichText';
 import { otherSideTerms, type SideViewTerms } from '../../../lib/sectionTerms';
-import { TAP, TAP_GAP } from '../../ui/tapTarget';
+import { TAP } from '../../ui/tapTarget';
+import { IconBadge } from '../../ui/IconBadge';
+import { Tabs } from '../../ui/Tabs';
 
 const person = (r: Role) => ROLE_META[r].person;
 
@@ -36,7 +38,7 @@ export const SideViewCard: React.FC<{
   return (
     <div
       data-other-side-view={side}
-      className="min-w-0 p-3.5 sm:p-4 rounded-xl bg-base-300 border border-base-border space-y-3.5 text-xs sm:text-sm"
+      className="min-w-0 p-box-dense rounded-xl bg-base-300 border border-base-border space-y-3.5 text-xs sm:text-sm"
     >
       <div className="text-xs font-bold text-base-content-muted">
         {ROLE_META[side].icon} {ROLE_META[side].side}
@@ -97,17 +99,15 @@ export const OtherSideSection: React.FC<SectionProps> = ({ chapter, isOpen, onTo
   const heading = role ? `${ROLE_META[otherRole(role)].side} มองเรื่องนี้ยังไง` : 'สองฝั่งมองเรื่องนี้ยังไง';
 
   return (
-    <div className="border border-base-border rounded-2xl overflow-hidden bg-base-100 shadow-2xs">
+    <div className="border border-base-border rounded-box overflow-hidden bg-base-100 shadow-2xs">
       <button
         type="button"
         onClick={onToggle}
         aria-expanded={!!isOpen}
-        className={`${TAP} w-full p-3.5 sm:p-4.5 flex items-center justify-between bg-base-300 hover:bg-base-border text-left cursor-pointer select-none transition-colors`}
+        className={`${TAP} w-full p-box flex items-center justify-between bg-base-300 hover:bg-base-border text-left cursor-pointer select-none transition-colors`}
       >
         <div className="flex items-center gap-3">
-          <div className="w-7 h-7 rounded-xl bg-primary text-primary-content flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
-            🔁
-          </div>
+          <IconBadge size="md">🔁</IconBadge>
           <div>
             <h3 className="text-xs sm:text-sm font-bold text-base-content">{heading}</h3>
             <p className="text-[11px] sm:text-xs text-base-content-muted">
@@ -119,23 +119,16 @@ export const OtherSideSection: React.FC<SectionProps> = ({ chapter, isOpen, onTo
       </button>
 
       {isOpen && (
-        <div className="p-3.5 sm:p-5 space-y-3.5 border-t border-base-border">
-          <div role="group" aria-label="เลือกฝั่งที่จะดู" className="flex flex-wrap gap-1.5" data-other-side-switch>
-            {SWITCH_OPTIONS.map(opt => (
-              <button
-                key={opt.value}
-                type="button"
-                aria-pressed={otherSideView === opt.value}
-                onClick={() => setOtherSideView(opt.value)}
-                className={`${TAP_GAP[6]} px-3 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer transition-colors ${
-                  otherSideView === opt.value
-                    ? 'bg-primary text-primary-content border-primary'
-                    : 'bg-base-100 text-base-content-body border-base-border hover:bg-base-300'
-                }`}
-              >
-                {opt.label}
-              </button>
-            ))}
+        <div className="p-box space-y-3.5 border-t border-base-border">
+          <div data-other-side-switch>
+            <Tabs<OtherSideView>
+              variant="pills"
+              aria-label="เลือกฝั่งที่จะดู"
+              className="flex-wrap"
+              items={SWITCH_OPTIONS}
+              value={otherSideView}
+              onChange={setOtherSideView}
+            />
           </div>
           <div className={cards.length > 1 ? 'grid grid-cols-1 md:grid-cols-2 gap-3' : ''}>
             {cards.map(view => <SideViewCard key={view.side} view={view} ctx={ctx} />)}

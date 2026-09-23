@@ -9,19 +9,19 @@ import { FIGURES } from '../../figures';
 import { GlossaryCategoryMap } from '../../glossary/GlossaryCategoryMap';
 import { GLOSSARY } from '../../../data/glossary';
 import type { SectionProps } from './registry';
-import { TAP, TAP_Y } from '../../ui/tapTarget';
+import { TAP } from '../../ui/tapTarget';
+import { IconBadge } from '../../ui/IconBadge';
+import { Tabs } from '../../ui/Tabs';
 
 export const DiagramSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggle, ctx }) => {
   return (
-    <div className="border border-base-border rounded-2xl overflow-hidden bg-base-100 shadow-2xs">
+    <div className="border border-base-border rounded-box overflow-hidden bg-base-100 shadow-2xs">
       <button
         onClick={onToggle}
-        className={`${TAP} w-full p-3.5 sm:p-4.5 flex items-center justify-between bg-base-300 hover:bg-base-border text-left cursor-pointer select-none transition-colors`}
+        className={`${TAP} w-full p-box flex items-center justify-between bg-base-300 hover:bg-base-border text-left cursor-pointer select-none transition-colors`}
       >
         <div className="flex items-center gap-3">
-          <div className="w-7 h-7 rounded-xl bg-primary text-primary-content flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
-            🗺️
-          </div>
+          <IconBadge size="md">🗺️</IconBadge>
           <div>
             <h3 className="text-xs sm:text-sm font-bold text-base-content">
               {chapter.diagramTitle || `แผนภาพโครงสร้างและกระบวนการบทที่ ${chapter.num}`}
@@ -35,7 +35,7 @@ export const DiagramSection: React.FC<SectionProps> = ({ chapter, isOpen, onTogg
       </button>
 
       {isOpen && (
-        <div className="p-3.5 sm:p-5 border-t border-base-border bg-base-100 space-y-4">
+        <div className="p-box border-t border-base-border bg-base-100 space-y-4">
           {/* s5: diagram families + T1 render above the Monolith vs Microservices simulator (spec §3.4 order) */}
           {chapter.id === 's5' && (
             <div className="space-y-3">
@@ -75,30 +75,20 @@ export const DiagramSection: React.FC<SectionProps> = ({ chapter, isOpen, onTogg
             <>
             <div
               id={S5_JUMP_TARGET_IDS.c4}
-              className="anchor-target mt-4 p-4 sm:p-5 rounded-2xl bg-base-100 border border-base-border space-y-3"
+              className="anchor-target mt-4 p-box-dense rounded-box bg-base-100 border border-base-border space-y-3"
             >
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <h4 className="text-xs sm:text-sm font-bold text-base-content flex items-center gap-2">
                   <Layers className="w-4 h-4 text-base-content-secondary" />
                   <span>Interactive C4 Model Explorer (คลิกซูมเข้าดูทีละระดับ)</span>
                 </h4>
-                <div className="flex items-center gap-1">
-                  {[1, 2, 3, 4].map((lvl) => (
-                    <button
-                      key={lvl}
-                      type="button"
-                      onClick={() => ctx.setC4Level(lvl)}
-                      aria-pressed={ctx.c4Level === lvl}
-                      className={`${TAP_Y} px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                        ctx.c4Level === lvl
-                          ? 'bg-primary text-primary-content shadow-xs'
-                          : 'bg-base-300 text-base-content-secondary hover:bg-base-border'
-                      }`}
-                    >
-                      L{lvl}
-                    </button>
-                  ))}
-                </div>
+                <Tabs<string>
+                  variant="segmented"
+                  aria-label="ระดับ C4"
+                  items={[1, 2, 3, 4].map(lvl => ({ value: String(lvl), label: `L${lvl}` }))}
+                  value={String(ctx.c4Level)}
+                  onChange={v => ctx.setC4Level(Number(v))}
+                />
               </div>
 
               <p className="text-[11px] sm:text-xs text-base-content-muted leading-relaxed">

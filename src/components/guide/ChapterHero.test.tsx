@@ -33,4 +33,11 @@ describe('ChapterHero', () => {
       expect(html.split('data-chapter-opening').length - 1, ch.id).toBe(1);
     }
   });
+
+  it('the chapter number is a soft badge that still names the chapter to screen readers (§10.3)', () => {
+    const s4 = CHAPTERS.find(c => c.id === 's4')!;
+    const html = renderToStaticMarkup(<ChapterHero chapter={s4} experienceLevel="beginner" isRead={false} />);
+    expect(html).toContain(`aria-label="บทที่ ${s4.num}"`);
+    expect(html).not.toMatch(/(?<![\w:/-])bg-primary(?![\w/-])/);
+  });
 });

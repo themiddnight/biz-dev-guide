@@ -37,14 +37,14 @@ export const FrictionPlaybookCard: React.FC<FrictionPlaybookCardProps> = ({
     return (
       <div 
         id="friction-playbook-card"
-        className="border border-base-border rounded-xl sm:rounded-2xl overflow-hidden bg-base-100 shadow-2xs transition-all"
+        className="border border-base-border rounded-box overflow-hidden bg-base-100 shadow-2xs transition-all"
       >
         <button
           onClick={onToggle}
-          className={`${TAP} w-full p-3 sm:p-4 flex items-center justify-between bg-base-300 text-left cursor-pointer select-none transition-colors hover:bg-base-border`}
+          className={`${TAP} w-full p-box flex items-center justify-between bg-base-300 text-left cursor-pointer select-none transition-colors hover:bg-base-border`}
         >
-          <div className="flex items-center gap-2.5 sm:gap-3">
-            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-warning text-warning-content flex items-center justify-center font-bold text-xs sm:text-sm shadow-xs shrink-0">
+          <div className="flex items-center gap-stack">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-field bg-warning text-warning-content flex items-center justify-center font-bold text-xs sm:text-sm shadow-xs shrink-0">
               ⚡
             </div>
             <div>
@@ -67,8 +67,8 @@ export const FrictionPlaybookCard: React.FC<FrictionPlaybookCardProps> = ({
         </button>
 
         {isOpen && (
-          <div className="p-2 sm:p-4 space-y-3 sm:space-y-4 border-t border-base-border bg-base-100 text-xs sm:text-sm">
-            <div className="p-3 sm:p-3.5 rounded-xl bg-warning/10 border border-warning/25 space-y-2">
+          <div className="p-box-dense space-y-3 sm:space-y-4 border-t border-base-border bg-base-100 text-xs sm:text-sm">
+            <div className="p-box-dense rounded-xl bg-warning/10 border border-warning/25 space-y-2">
               <div className="flex items-center gap-1.5 font-bold text-warning text-xs sm:text-sm">
                 <Scale className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-warning" />
                 <span>3 ข้อที่ควรจำเมื่อคุยเรื่อง {chapterTitle}</span>
@@ -105,15 +105,15 @@ export const FrictionPlaybookCard: React.FC<FrictionPlaybookCardProps> = ({
   return (
     <div 
       id="friction-playbook-card"
-      className="border border-base-border rounded-xl sm:rounded-2xl overflow-hidden bg-base-100 shadow-2xs transition-all"
+      className="border border-base-border rounded-box overflow-hidden bg-base-100 shadow-2xs transition-all"
     >
       {/* Playbook Header Accordion */}
       <button
         onClick={onToggle}
-        className={`${TAP} w-full p-3 sm:p-4 flex items-center justify-between bg-base-300 text-left cursor-pointer select-none transition-colors hover:bg-base-border`}
+        className={`${TAP} w-full p-box flex items-center justify-between bg-base-300 text-left cursor-pointer select-none transition-colors hover:bg-base-border`}
       >
-        <div className="flex items-center gap-2.5 sm:gap-3">
-          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-warning text-warning-content flex items-center justify-center font-bold text-xs sm:text-sm shadow-xs shrink-0">
+        <div className="flex items-center gap-stack">
+          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-field bg-warning text-warning-content flex items-center justify-center font-bold text-xs sm:text-sm shadow-xs shrink-0">
             ⚡
           </div>
           <div>
@@ -136,7 +136,7 @@ export const FrictionPlaybookCard: React.FC<FrictionPlaybookCardProps> = ({
       </button>
 
       {isOpen && (
-        <div className="p-2 sm:p-4 space-y-3 sm:space-y-3.5 border-t border-base-border bg-base-100 text-xs sm:text-sm">
+        <div className="p-box-dense space-y-3 sm:space-y-3.5 border-t border-base-border bg-base-100 text-xs sm:text-sm">
           {/* Section 1: The Iceberg - Frustrations and Root Cause */}
           <div className="space-y-2.5">
             <div className="flex items-center gap-1.5 text-xs font-bold text-base-content">
@@ -144,9 +144,9 @@ export const FrictionPlaybookCard: React.FC<FrictionPlaybookCardProps> = ({
               <span>สิ่งที่ไม่ได้พูดออกมา (Under the Surface)</span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 sm:gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-stack">
               {/* Business Frustration */}
-              <div className="p-3 sm:p-3.5 rounded-xl bg-warning/10 border border-warning/25">
+              <div className="p-box-dense rounded-xl bg-warning/10 border border-warning/25">
                 <div className="flex items-center gap-1.5 text-xs font-bold text-warning mb-1">
                   <Briefcase className="w-3.5 h-3.5 text-warning" />
                   <span>สิ่งที่ Business อึดอัดใจ</span>
@@ -157,7 +157,7 @@ export const FrictionPlaybookCard: React.FC<FrictionPlaybookCardProps> = ({
               </div>
 
               {/* Engineer Frustration */}
-              <div className="p-3 sm:p-3.5 rounded-xl bg-engineer/10 border border-engineer/25">
+              <div className="p-box-dense rounded-xl bg-engineer/10 border border-engineer/25">
                 <div className="flex items-center gap-1.5 text-xs font-bold text-engineer mb-1">
                   <Code2 className="w-3.5 h-3.5 text-engineer" />
                   <span>สิ่งที่ Engineer อึดอัดใจ</span>
@@ -169,7 +169,7 @@ export const FrictionPlaybookCard: React.FC<FrictionPlaybookCardProps> = ({
             </div>
 
             {/* Root Cause Card */}
-            <div className="p-3 sm:p-3.5 rounded-xl bg-base-300 border border-base-border flex items-start gap-2 sm:gap-2.5">
+            <div className="p-box-dense rounded-xl bg-base-300 border border-base-border flex items-start gap-2 sm:gap-2.5">
               <span className="text-base shrink-0 mt-0.5">🎯</span>
               <div>
                 <span className="font-bold text-base-content text-xs">
@@ -227,11 +227,11 @@ export const FrictionPlaybookCard: React.FC<FrictionPlaybookCardProps> = ({
               <span>ประโยคต่อรองที่ใช้ได้จริง (Battle-tested Scripts)</span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 sm:gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-stack">
               {playbook.goldenScripts.map((script, idx) => (
                 <div 
                   key={idx}
-                  className="p-3 sm:p-3.5 rounded-xl border border-base-border bg-base-300 space-y-2"
+                  className="p-box-dense rounded-xl border border-base-border bg-base-300 space-y-2"
                 >
                   <div className="text-[11px] font-bold text-base-content-body pb-1 border-b border-base-border">
                     สถานการณ์: {script.situation}
@@ -242,7 +242,7 @@ export const FrictionPlaybookCard: React.FC<FrictionPlaybookCardProps> = ({
                       <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-warning/10 text-warning border border-warning/25">
                         💼 Business ควรพูด:
                       </span>
-                      <div className="p-2 sm:p-2.5 rounded-lg bg-base-100 border border-base-border text-xs italic text-base-content leading-relaxed">
+                      <div className="p-box-dense rounded-lg bg-base-100 border border-base-border text-xs italic text-base-content leading-relaxed">
                         {script.businessScript}
                       </div>
                     </div>
@@ -253,7 +253,7 @@ export const FrictionPlaybookCard: React.FC<FrictionPlaybookCardProps> = ({
                       <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-engineer/10 text-engineer border border-engineer/25">
                         💻 Engineer ควรพูด:
                       </span>
-                      <div className="p-2 sm:p-2.5 rounded-lg bg-base-100 border border-base-border text-xs italic text-base-content leading-relaxed">
+                      <div className="p-box-dense rounded-lg bg-base-100 border border-base-border text-xs italic text-base-content leading-relaxed">
                         {script.engineerScript}
                       </div>
                     </div>
@@ -265,7 +265,7 @@ export const FrictionPlaybookCard: React.FC<FrictionPlaybookCardProps> = ({
 
           {/* Section 4: Interactive Dilemma Simulator (if available) */}
           {playbook.dilemma && (
-            <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-base-300 border border-base-border space-y-3 sm:space-y-3.5">
+            <div className="p-box-dense rounded-box bg-base-300 border border-base-border space-y-3 sm:space-y-3.5">
               <div className="flex items-center justify-between flex-wrap gap-1.5 sm:gap-2">
                 <div className="flex items-center gap-1.5 text-base-content font-bold text-xs sm:text-sm">
                   <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-warning" />
@@ -277,7 +277,7 @@ export const FrictionPlaybookCard: React.FC<FrictionPlaybookCardProps> = ({
               </div>
 
               {/* Dilemma Dialogue Quote */}
-              <div className="p-2.5 sm:p-3 rounded-lg sm:rounded-xl bg-base-100 border border-base-border space-y-0.5 sm:space-y-1">
+              <div className="p-box-dense rounded-field bg-base-100 border border-base-border space-y-0.5 sm:space-y-1">
                 <div className="text-[10px] sm:text-[11px] font-semibold text-base-content-muted">
                   สถานการณ์: {playbook.dilemma.scenario}
                 </div>
@@ -299,7 +299,7 @@ export const FrictionPlaybookCard: React.FC<FrictionPlaybookCardProps> = ({
                     return (
                       <div
                         key={option.id}
-                        className={`p-2.5 sm:p-3 rounded-lg sm:rounded-xl border text-xs transition-all ${
+                        className={`p-box-dense rounded-field border text-xs transition-all ${
                           isSelected
                             ? option.isOptimal
                               ? 'bg-success/10 border-success font-medium'

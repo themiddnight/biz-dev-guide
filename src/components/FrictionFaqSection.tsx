@@ -176,7 +176,7 @@ export const FrictionFaqSection: React.FC<FrictionFaqSectionProps> = ({
   return (
     <div className="space-y-5">
       {/* Audience callouts (static .aud-callout) — both shown together */}
-      <div className="p-3 sm:p-3.5 rounded-xl border bg-base-300 border-base-border text-xs sm:text-sm text-base-content-body leading-relaxed space-y-2.5">
+      <div className="p-box-dense rounded-xl border bg-base-300 border-base-border text-xs sm:text-sm text-base-content-body leading-relaxed space-y-2.5">
         <div>
           <span className="block font-bold text-base-content mb-0.5">
             {FAQ_AUDIENCE_CALLOUTS.business.who}
@@ -253,7 +253,7 @@ export const FrictionFaqSection: React.FC<FrictionFaqSectionProps> = ({
           ))}
         </ol>
 
-        <div className="p-3 sm:p-3.5 rounded-xl border text-xs sm:text-sm leading-relaxed bg-warning/10 border-warning/25 text-warning">
+        <div className="p-box-dense rounded-xl border text-xs sm:text-sm leading-relaxed bg-warning/10 border-warning/25 text-warning">
           <RichText text={FAQ_CAVEAT} onNavigateChapter={onNavigateChapter} />
         </div>
 

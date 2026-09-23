@@ -15,15 +15,15 @@ import { FIGURES } from '../figures';
 export const SwimlaneVsSequence: React.FC = () => (
   <details
     id={S5_JUMP_TARGET_IDS.behavior}
-    className="group scroll-mt-4 rounded-2xl bg-base-100 border border-base-border overflow-hidden"
+    className="group scroll-mt-4 rounded-box bg-base-100 border border-base-border overflow-hidden"
   >
-    <summary className={`${TAP_Y} flex items-center justify-between gap-2 p-3.5 sm:p-4 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden bg-base-300 hover:bg-base-border transition-colors`}>
+    <summary className={`${TAP_Y} flex items-center justify-between gap-2 p-box-dense cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden bg-base-300 hover:bg-base-border transition-colors`}>
       <span className="text-xs sm:text-sm font-bold text-base-content">
         {SWIMLANE_VS_SEQUENCE.summary}
       </span>
       <ChevronDown className="w-4 h-4 shrink-0 text-base-content-muted transition-transform group-open:rotate-180" />
     </summary>
-    <div className="p-3.5 sm:p-5 space-y-4 border-t border-base-border">
+    <div className="p-box-dense space-y-4 border-t border-base-border">
       <p className="text-xs sm:text-sm text-base-content-secondary leading-relaxed">
         <RichText text={SWIMLANE_VS_SEQUENCE.intro} />
       </p>

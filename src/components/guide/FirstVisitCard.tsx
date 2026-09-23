@@ -22,7 +22,7 @@ export const FirstVisitCard: React.FC<{
   onChoose: (role: Role, mode: FirstVisitMode) => void;
   onSkip: () => void;
 }> = ({ chapters, onChoose, onSkip }) => (
-  <div data-first-visit className="bg-base-100 border border-base-border rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xs space-y-4">
+  <div data-first-visit className="bg-base-100 border border-base-border rounded-box p-box-spacious shadow-2xs space-y-4">
     <div className="space-y-1">
       <h2 className="text-lg sm:text-xl font-extrabold text-base-content">เริ่มจากตรงไหนดี?</h2>
       <p className="text-xs sm:text-sm text-base-content-secondary">เลือกสายงานและระดับของคุณ กดครั้งเดียวก็เริ่มอ่าน</p>

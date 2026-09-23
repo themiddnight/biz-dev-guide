@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import type { Chapter } from '../../types';
 import { LAYER_META, SECTION_META, sectionHasTool, type LayerGroup, type OpenState, type SectionKey } from '../../data/sectionLayers';
 import { SCROLL_ROOM, TAP } from '../ui/tapTarget';
+import { ToggleChip } from '../ui/ToggleChip';
 
 interface SectionOutlineProps {
   chapter: Chapter;
@@ -34,7 +35,7 @@ export const SectionOutline: React.FC<SectionOutlineProps> = ({ chapter, layout,
     <div
       ref={barRef}
       data-section-outline
-      className="sticky z-30 -mx-4 sm:-mx-6 lg:-mx-7 px-4 sm:px-6 lg:px-7 py-2 bg-base-100 border-b border-base-border"
+      className="sticky z-30 -mx-box-spacious px-box-spacious py-2 bg-base-100 border-b border-base-border"
       style={{ top: 'var(--header-h)' }}
     >
       <div className={`flex flex-nowrap sm:flex-wrap items-center gap-1.5 overflow-x-auto ${SCROLL_ROOM}`}>
@@ -46,18 +47,15 @@ export const SectionOutline: React.FC<SectionOutlineProps> = ({ chapter, layout,
             {group.sections.map(key => {
               const open = !!openState.sections[key] && openState.layers[group.layer];
               return (
-                <button
+                <ToggleChip
                   key={key}
-                  type="button"
+                  selected={open}
+                  shape="pill"
+                  size="xs"
                   data-outline-chip={key}
                   aria-controls={`sec-${key}`}
-                  aria-pressed={open}
                   onClick={() => onSelectSection(key)}
-                  className={`${TAP} shrink-0 whitespace-nowrap px-2.5 py-1 rounded-full border text-xs font-semibold cursor-pointer transition-colors ${
-                    open
-                      ? 'bg-primary text-primary-content border-primary'
-                      : 'bg-transparent text-base-content-body border-base-border'
-                  }`}
+                  className="shrink-0"
                 >
                   {SECTION_META[key].chip}
                   {sectionHasTool(chapter, key) && (
@@ -65,7 +63,7 @@ export const SectionOutline: React.FC<SectionOutlineProps> = ({ chapter, layout,
                       ลองเล่น
                     </span>
                   )}
-                </button>
+                </ToggleChip>
               );
             })}
           </React.Fragment>

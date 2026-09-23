@@ -24,7 +24,7 @@ const blockTitleClass = 'text-xs sm:text-sm font-bold text-base-content';
 const introClass = 'text-xs sm:text-sm text-base-content-secondary leading-relaxed';
 const detailsClass =
   'group rounded-xl border border-base-border bg-base-100 overflow-hidden';
-const summaryClass = `${TAP_Y} flex items-center justify-between gap-2 p-3 sm:p-3.5 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden bg-base-300 hover:bg-base-border transition-colors`;
+const summaryClass = `${TAP_Y} flex items-center justify-between gap-2 p-box-dense cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden bg-base-300 hover:bg-base-border transition-colors`;
 
 const SummaryChevron = () => (
   <ChevronDown className="w-4 h-4 shrink-0 text-base-content-muted transition-transform group-open:rotate-180" />
@@ -55,7 +55,7 @@ const Block: React.FC<BlockProps> = ({ block, onNavigateChapter }) => {
 
     case 'note':
       return (
-        <div className={`p-3 sm:p-3.5 rounded-xl border text-xs sm:text-sm leading-relaxed ${NOTE_TONES[block.tone]}`}>
+        <div className={`p-box-dense rounded-xl border text-xs sm:text-sm leading-relaxed ${NOTE_TONES[block.tone]}`}>
           {block.title && <div className="font-bold mb-1">{block.title}</div>}
           <div>{rich(block.body)}</div>
         </div>
@@ -115,7 +115,7 @@ const Block: React.FC<BlockProps> = ({ block, onNavigateChapter }) => {
             <span className={blockTitleClass}>{block.summary}</span>
             <SummaryChevron />
           </summary>
-          <div className="p-3 sm:p-4 space-y-4 border-t border-base-border">
+          <div className="p-box-dense space-y-4 border-t border-base-border">
             {block.body.map(child => (
               <Block key={child.id} block={child} onNavigateChapter={onNavigateChapter} />
             ))}
@@ -130,7 +130,7 @@ const Block: React.FC<BlockProps> = ({ block, onNavigateChapter }) => {
             <span className={blockTitleClass}>{block.title ?? 'แหล่งอ้างอิง'}</span>
             <SummaryChevron />
           </summary>
-          <div className="p-3 sm:p-4 space-y-3 border-t border-base-border">
+          <div className="p-box-dense space-y-3 border-t border-base-border">
             <ul className="pl-5 space-y-1 list-disc text-xs sm:text-sm text-base-content-body">
               {block.items.map((item, idx) => (
                 <li key={idx} className="leading-relaxed">
@@ -174,7 +174,7 @@ export const ContentBlocks: React.FC<ContentBlocksProps> = ({ sections, placemen
         <section key={sIdx} className="space-y-4">
           {section.heading && (
             <h3 className="text-sm sm:text-base font-bold text-base-content flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary inline-block"></span>
+              <span className="w-1.5 h-1.5 rounded-full bg-base-content inline-block"></span>
               <span>{section.heading}</span>
             </h3>
           )}

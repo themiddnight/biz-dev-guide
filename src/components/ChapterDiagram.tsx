@@ -94,7 +94,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
     return (
       <div className="space-y-4">
         {/* Code route: five gates from a dev's branch to real users */}
-        <div className="p-4 sm:p-5 rounded-2xl bg-base-100 border border-base-border space-y-4">
+        <div className="p-box-dense rounded-box bg-base-100 border border-base-border space-y-4">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-2">
               <GitBranch className="w-4 h-4 text-engineer shrink-0" />
@@ -234,7 +234,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
       <div className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {/* MoSCoW Grid */}
-          <div className="p-4 rounded-2xl border border-base-border bg-base-100 space-y-3">
+          <div className="p-4 rounded-box border border-base-border bg-base-100 space-y-3">
             <span className="text-xs font-bold text-engineer uppercase tracking-wider">
               MoSCoW Framework (จัดกลุ่มตามความจำเป็น)
             </span>
@@ -262,7 +262,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
           </div>
 
           {/* RICE Scoring Formula */}
-          <div className="p-4 rounded-2xl border border-base-border bg-base-100 space-y-3">
+          <div className="p-4 rounded-box border border-base-border bg-base-100 space-y-3">
             <span className="text-xs font-bold text-data-2 uppercase tracking-wider">
               RICE Scoring (ให้คะแนนตามสูตร)
             </span>
@@ -305,7 +305,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
             { step: '3. Hi-Fi Interactive Prototype', speed: 'ทำเสร็จใน 3-5 วัน', cost: 'เริ่มแพง', change: 'แก้สี ฟอนต์ แอนิเมชัน 2 ชม.', color: 'border-data-2/40' },
             { step: '4. Production Live Code', speed: 'ทำเสร็จใน 2-4 สัปดาห์', cost: 'แพงสุด', change: 'รื้อ Database/API/Test เป็นสัปดาห์', color: 'border-data-5/40' },
           ].map((item, idx) => (
-            <div key={idx} className={`p-4 rounded-2xl bg-base-100 border ${item.color} space-y-2`}>
+            <div key={idx} className={`p-4 rounded-box bg-base-100 border ${item.color} space-y-2`}>
               <span className="text-xs font-bold text-base-content block">{item.step}</span>
               <div className="text-[11px] text-base-content-muted space-y-1">
                 <div>⏱️ {item.speed}</div>
@@ -325,7 +325,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
   if (chapterId === 's4') {
     return (
       <div className="space-y-3">
-        <div className="p-4 rounded-2xl bg-gradient-to-b from-data-4/10 via-data-1/10 to-engineer/10 border border-data-1/25 space-y-3">
+        <div className="p-4 rounded-box bg-gradient-to-b from-data-4/10 via-data-1/10 to-engineer/10 border border-data-1/25 space-y-3">
           {/* Tip of Iceberg */}
           <div className="p-3.5 rounded-xl bg-base-100/90 border border-data-1/25 shadow-xs space-y-1">
             <div className="flex items-center justify-between">
@@ -384,7 +384,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
     const svcOk = 'bg-base-100 border-success/25';
     return (
       <div className="space-y-4">
-        <div className="p-4 sm:p-5 rounded-2xl bg-base-100 border border-base-border space-y-4">
+        <div className="p-box-dense rounded-box bg-base-100 border border-base-border space-y-4">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-2">
               <span className="text-base">🧩</span>
@@ -433,7 +433,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
 
           {/* Architecture Display */}
           {archMode === 'monolith' ? (
-            <div className={`p-4 rounded-2xl border transition-all ${
+            <div className={`p-4 rounded-box border transition-all ${
               paymentFailed 
                 ? 'bg-error/10 border-error text-error' 
                 : 'bg-base-300 border-base-border'
@@ -479,7 +479,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
               </p>
             </div>
           ) : (
-            <div className="p-4 rounded-2xl bg-base-300 border border-base-border space-y-3">
+            <div className="p-4 rounded-box bg-base-300 border border-base-border space-y-3">
               <div className="flex justify-between items-center gap-2 flex-wrap">
                 <span className="font-bold text-xs uppercase tracking-wider text-engineer">
                   Microservices &amp; API Gateway
@@ -558,14 +558,14 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
           )}
         </div>
         {/* Sync vs Async simulator (moved from former chapter 15 diagram), closed by default */}
-        <details className="group rounded-2xl bg-base-100 border border-base-border overflow-hidden">
-          <summary className={`${TAP_Y} flex items-center justify-between gap-2 p-3.5 sm:p-4 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden bg-base-300 hover:bg-base-300 transition-colors`}>
+        <details className="group rounded-box bg-base-100 border border-base-border overflow-hidden">
+          <summary className={`${TAP_Y} flex items-center justify-between gap-2 p-box-dense cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden bg-base-300 hover:bg-base-300 transition-colors`}>
             <span className="text-xs sm:text-sm font-bold text-base-content">
               Sync vs Async: Polling / Webhook / WebSocket
             </span>
             <ChevronDown className="w-4 h-4 shrink-0 text-base-content-muted transition-transform group-open:rotate-180" />
           </summary>
-          <div className="p-3 sm:p-4 border-t border-base-border">
+          <div className="p-box-dense border-t border-base-border">
             <ProtocolSimulator />
           </div>
         </details>
@@ -579,7 +579,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
   if (chapterId === 's6') {
     return (
       <div className="space-y-3">
-        <div className="p-4 rounded-2xl border border-base-border bg-base-100 space-y-3">
+        <div className="p-4 rounded-box border border-base-border bg-base-100 space-y-3">
           <span className="text-xs font-bold text-engineer uppercase tracking-wider">
             The Two Gates: Definition of Ready (DoR) vs Definition of Done (DoD)
           </span>
@@ -618,7 +618,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <button
             onClick={() => setPyramidLevel('e2e')}
-            className={`${TAP} p-3.5 rounded-2xl border text-left transition-all cursor-pointer ${
+            className={`${TAP} p-3.5 rounded-box border text-left transition-all cursor-pointer ${
               pyramidLevel === 'e2e' ? 'border-error bg-error/10 shadow-xs' : 'border-base-border'
             }`}
           >
@@ -631,7 +631,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
 
           <button
             onClick={() => setPyramidLevel('integration')}
-            className={`${TAP} p-3.5 rounded-2xl border text-left transition-all cursor-pointer ${
+            className={`${TAP} p-3.5 rounded-box border text-left transition-all cursor-pointer ${
               pyramidLevel === 'integration' ? 'border-engineer bg-engineer/10 shadow-xs' : 'border-base-border'
             }`}
           >
@@ -644,7 +644,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
 
           <button
             onClick={() => setPyramidLevel('unit')}
-            className={`${TAP} p-3.5 rounded-2xl border text-left transition-all cursor-pointer ${
+            className={`${TAP} p-3.5 rounded-box border text-left transition-all cursor-pointer ${
               pyramidLevel === 'unit' ? 'border-success bg-success/10 shadow-xs' : 'border-base-border'
             }`}
           >
@@ -670,7 +670,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
     return (
       <div className="space-y-4">
         {renderReleaseTrain()}
-        <div className="p-4 rounded-2xl border border-base-border bg-base-100 space-y-3">
+        <div className="p-4 rounded-box border border-base-border bg-base-100 space-y-3">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <span className="text-xs font-bold text-engineer uppercase tracking-wider">
               Canary Release Simulator (ปล่อยผู้ใช้ทีละกลุ่ม)
@@ -787,7 +787,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
   // =========================================================================
   if (chapterId === 's10') {
     return (
-      <div className="p-4 rounded-2xl border border-base-border bg-base-100 space-y-3">
+      <div className="p-4 rounded-box border border-base-border bg-base-100 space-y-3">
         <span className="text-xs font-bold text-engineer uppercase tracking-wider">
           Closed-Loop Support &amp; Incident Escalation (L1 ➔ L2 ➔ L3)
         </span>
@@ -839,7 +839,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
 
     return (
       <div className="space-y-4">
-        <div className="p-4 sm:p-5 rounded-2xl bg-base-100 border border-base-border space-y-4">
+        <div className="p-box-dense rounded-box bg-base-100 border border-base-border space-y-4">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-2">
               <span className="text-base">🔺</span>
@@ -922,7 +922,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
           </div>
 
           {/* Real-time Triangle Visual & Metrics */}
-          <div className="p-4 rounded-2xl bg-neutral text-neutral-content flex flex-col sm:flex-row items-center justify-between gap-4 border border-neutral">
+          <div className="p-4 rounded-box bg-neutral text-neutral-content flex flex-col sm:flex-row items-center justify-between gap-4 border border-neutral">
             <div className="space-y-1.5 text-xs text-center sm:text-left">
               <div className="text-base-content-muted">แรงกดดันต่อคุณภาพ:</div>
               <div className={`text-2xl sm:text-3xl font-bold flex items-center justify-center sm:justify-start gap-2 ${level.color}`}>
@@ -989,7 +989,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
   if (chapterId === 's12') {
     return (
       <div className="space-y-4">
-        <div className="p-4 sm:p-5 rounded-2xl bg-base-100 border border-base-border space-y-4">
+        <div className="p-box-dense rounded-box bg-base-100 border border-base-border space-y-4">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-2">
               <span className="text-base">🔀</span>
@@ -1093,7 +1093,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
   if (chapterId === 's13') {
     return (
       <div className="space-y-3">
-        <div className="p-4 rounded-2xl border border-base-border bg-base-100 space-y-3">
+        <div className="p-4 rounded-box border border-base-border bg-base-100 space-y-3">
           <span className="text-xs font-bold text-data-2 uppercase tracking-wider flex items-center gap-1.5">
             <Bot className="w-4 h-4" />
             <span>SDLC ที่เปลี่ยนไปในยุค AI (2026+)</span>

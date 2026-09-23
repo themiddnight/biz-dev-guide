@@ -32,15 +32,15 @@ export const RoleMindsetCard: React.FC<RoleMindsetCardProps> = ({
   return (
     <div 
       id="role-mindset-card"
-      className="border border-base-border rounded-xl sm:rounded-2xl overflow-hidden bg-base-100 shadow-2xs transition-all"
+      className="border border-base-border rounded-box overflow-hidden bg-base-100 shadow-2xs transition-all"
     >
       {/* Header Button */}
       <button
         onClick={onToggle}
-        className={`${TAP} w-full p-3 sm:p-4 flex items-center justify-between bg-base-300 text-left cursor-pointer select-none transition-colors hover:bg-base-border`}
+        className={`${TAP} w-full p-box flex items-center justify-between bg-base-300 text-left cursor-pointer select-none transition-colors hover:bg-base-border`}
       >
-        <div className="flex items-center gap-2.5 sm:gap-3">
-          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-success text-success-content flex items-center justify-center font-bold text-xs sm:text-sm shadow-xs shrink-0">
+        <div className="flex items-center gap-stack">
+          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-field bg-success text-success-content flex items-center justify-center font-bold text-xs sm:text-sm shadow-xs shrink-0">
             🌱
           </div>
           <div>
@@ -63,16 +63,16 @@ export const RoleMindsetCard: React.FC<RoleMindsetCardProps> = ({
       </button>
 
       {isOpen && (
-        <div className="p-4 sm:p-5 space-y-3.5 sm:space-y-4 border-t border-base-border bg-base-100 text-xs sm:text-sm">
+        <div className="p-box space-y-3.5 sm:space-y-4 border-t border-base-border bg-base-100 text-xs sm:text-sm">
           {/* Role Perspective Selector Tabs */}
           <div className="flex items-center justify-between flex-wrap gap-2 pb-1.5 border-b border-base-border">
             <span className="text-[11px] sm:text-xs font-semibold text-base-content-secondary">
               กำลังดู Mindset ของ:
             </span>
-            <div className="flex items-center gap-1 p-0.5 sm:p-1 bg-base-300 rounded-lg sm:rounded-xl border border-base-border">
+            <div className="flex items-center gap-1 p-0.5 sm:p-1 bg-base-300 rounded-field border border-base-border">
               <button
                 onClick={() => setActiveTab('business')}
-                className={`${TAP} flex items-center gap-1 sm:gap-1.5 px-2.5 py-1 rounded-md sm:rounded-lg text-[11px] sm:text-xs font-medium cursor-pointer transition-all ${
+                className={`${TAP} flex items-center gap-1 sm:gap-1.5 px-2.5 py-1 rounded-selector text-[11px] sm:text-xs font-medium cursor-pointer transition-all ${
                   activeTab === 'business'
                     ? 'bg-base-100 text-business shadow-2xs font-bold'
                     : 'text-base-content-secondary hover:text-base-content'
@@ -83,7 +83,7 @@ export const RoleMindsetCard: React.FC<RoleMindsetCardProps> = ({
               </button>
               <button
                 onClick={() => setActiveTab('engineer')}
-                className={`${TAP} flex items-center gap-1 sm:gap-1.5 px-2.5 py-1 rounded-md sm:rounded-lg text-[11px] sm:text-xs font-medium cursor-pointer transition-all ${
+                className={`${TAP} flex items-center gap-1 sm:gap-1.5 px-2.5 py-1 rounded-selector text-[11px] sm:text-xs font-medium cursor-pointer transition-all ${
                   activeTab === 'engineer'
                     ? 'bg-base-100 text-engineer shadow-2xs font-bold'
                     : 'text-base-content-secondary hover:text-base-content'
@@ -96,7 +96,7 @@ export const RoleMindsetCard: React.FC<RoleMindsetCardProps> = ({
           </div>
 
           {/* Role Header Profile */}
-          <div className="p-3 sm:p-3.5 rounded-xl bg-base-300 border border-base-border flex flex-col items-start gap-2 sm:gap-2.5">
+          <div className="p-box-dense rounded-xl bg-base-300 border border-base-border flex flex-col items-start gap-2 sm:gap-2.5">
             <div className="min-w-0">
               <div className="flex items-center gap-2">
                 <span className="text-lg sm:text-xl">{currentRoleKey === 'business' ? '💼' : '💻'}</span>
@@ -114,7 +114,7 @@ export const RoleMindsetCard: React.FC<RoleMindsetCardProps> = ({
           {/* Two-Column: What they care about vs What keeps them awake */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 sm:gap-3.5">
             {/* What they care about */}
-            <div className="p-3 sm:p-3.5 rounded-xl bg-engineer/10 border border-engineer/25 space-y-2">
+            <div className="p-box-dense rounded-xl bg-engineer/10 border border-engineer/25 space-y-2">
               <div className="flex items-center gap-1.5 text-engineer font-bold text-xs">
                 <Target className="w-3.5 h-3.5 text-engineer" />
                 <span>3 สิ่งที่บทบาทนี้แคร์ที่สุดในงาน</span>
@@ -130,7 +130,7 @@ export const RoleMindsetCard: React.FC<RoleMindsetCardProps> = ({
             </div>
 
             {/* What keeps them awake */}
-            <div className="p-3 sm:p-3.5 rounded-xl bg-warning/10 border border-warning/25 space-y-2">
+            <div className="p-box-dense rounded-xl bg-warning/10 border border-warning/25 space-y-2">
               <div className="flex items-center gap-1.5 text-warning font-bold text-xs">
                 <AlertTriangle className="w-3.5 h-3.5 text-warning" />
                 <span>สิ่งที่เขากังวลหรือกลัว</span>
@@ -147,18 +147,18 @@ export const RoleMindsetCard: React.FC<RoleMindsetCardProps> = ({
           </div>
 
           {/* Unspoken thoughts (The Iceberg Under the Surface) */}
-          <div className="p-3 sm:p-3.5 rounded-xl bg-data-2/10 border border-data-2/25 space-y-1.5">
+          <div className="p-box-dense rounded-xl bg-data-2/10 border border-data-2/25 space-y-1.5">
             <div className="flex items-center gap-1.5 text-data-2 font-bold text-xs">
               <MessageCircle className="w-3.5 h-3.5 text-data-2" />
               <span>เสียงในใจที่เขาไม่ได้พูดออกมาตรงๆ (Unspoken Truth)</span>
             </div>
-            <div className="p-2.5 sm:p-3 rounded-lg bg-base-100 border border-base-border text-xs italic text-base-content-body leading-relaxed">
+            <div className="p-box-dense rounded-lg bg-base-100 border border-base-border text-xs italic text-base-content-body leading-relaxed">
               &ldquo;{guide.unspokenThoughts}&rdquo;
             </div>
           </div>
 
           {/* Golden Bridge Advice: How to communicate with them */}
-          <div className="p-3 sm:p-3.5 rounded-xl bg-success/10 border border-success/25 space-y-1.5">
+          <div className="p-box-dense rounded-xl bg-success/10 border border-success/25 space-y-1.5">
             <div className="flex items-center gap-1.5 text-success font-bold text-xs sm:text-sm">
               <HeartHandshake className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-success" />
               <span>วิธีคุยกับฝั่งนี้ (Bridge Advice)</span>

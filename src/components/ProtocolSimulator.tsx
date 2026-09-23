@@ -41,7 +41,7 @@ export const ProtocolSimulator: React.FC = () => {
 
     return (
       <div className="space-y-4">
-        <div className="p-4 sm:p-5 rounded-2xl bg-base-100 border border-base-border space-y-4">
+        <div className="p-box-dense rounded-box bg-base-100 border border-base-border space-y-4">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-2">
               <span className="text-base">📡</span>

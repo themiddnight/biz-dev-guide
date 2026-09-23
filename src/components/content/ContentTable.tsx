@@ -131,11 +131,11 @@ export const ContentTable: React.FC<ContentTableProps> = ({ block, onNavigateCha
   if (block.collapsed) {
     return (
       <details className="group rounded-xl border border-base-border bg-base-100 overflow-hidden">
-        <summary className={`${TAP_Y} flex items-center justify-between gap-2 p-3 sm:p-3.5 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden bg-base-300 hover:bg-base-border transition-colors`}>
+        <summary className={`${TAP_Y} flex items-center justify-between gap-2 p-box-dense cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden bg-base-300 hover:bg-base-border transition-colors`}>
           <span className={titleClass}>{block.title ?? 'ตาราง'}</span>
           <ChevronDown className="w-4 h-4 shrink-0 text-base-content-muted transition-transform group-open:rotate-180" />
         </summary>
-        <div className="p-3 sm:p-4 border-t border-base-border">{body}</div>
+        <div className="p-box-dense border-t border-base-border">{body}</div>
       </details>
     );
   }

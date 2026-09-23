@@ -6,6 +6,7 @@ import type { SectionProps } from './registry';
 import { RichText } from '../../content/RichText';
 import { coreConceptTerms } from '../../../lib/sectionTerms';
 import { TAP } from '../../ui/tapTarget';
+import { IconBadge } from '../../ui/IconBadge';
 
 export const CoreConceptsSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggle, ctx }) => {
   // Beginners see each concept compact (heading + detail); bullets and inline sections sit behind a toggle.
@@ -21,15 +22,13 @@ export const CoreConceptsSection: React.FC<SectionProps> = ({ chapter, isOpen, o
     <RichText text={text} onNavigateChapter={ctx.onNavigateChapter} onSearchGlossary={ctx.onSearchGlossary} />
   );
   return (
-    <div className="border border-base-border rounded-2xl overflow-hidden bg-base-100 shadow-2xs">
+    <div className="border border-base-border rounded-box overflow-hidden bg-base-100 shadow-2xs">
       <button
         onClick={onToggle}
-        className={`${TAP} w-full p-3.5 sm:p-4.5 flex items-center justify-between bg-base-300 hover:bg-base-border text-left cursor-pointer select-none transition-colors`}
+        className={`${TAP} w-full p-box flex items-center justify-between bg-base-300 hover:bg-base-border text-left cursor-pointer select-none transition-colors`}
       >
         <div className="flex items-center gap-3">
-          <div className="w-7 h-7 rounded-xl bg-primary text-primary-content flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
-            💡
-          </div>
+          <IconBadge size="md">💡</IconBadge>
           <div>
             <h3 className="text-xs sm:text-sm font-bold text-base-content">
               แนวคิดหลัก (Core Concepts)
@@ -43,7 +42,7 @@ export const CoreConceptsSection: React.FC<SectionProps> = ({ chapter, isOpen, o
       </button>
 
       {isOpen && (
-        <div className="p-3.5 sm:p-5 space-y-3.5 border-t border-base-border bg-base-100">
+        <div className="p-box space-y-3.5 border-t border-base-border bg-base-100">
           {chapter.coreConcepts.map((concept, cIdx) => {
             const inline = getInlineSectionsAt(chapter, 'coreConcepts', cIdx);
             const bulletCount = concept.bulletPoints?.length ?? 0;
@@ -52,10 +51,10 @@ export const CoreConceptsSection: React.FC<SectionProps> = ({ chapter, isOpen, o
             return (
             <React.Fragment key={cIdx}>
               <div
-                className="p-3.5 sm:p-4 rounded-xl bg-base-300 border border-base-border space-y-2"
+                className="p-box-dense rounded-xl bg-base-300 border border-base-border space-y-2"
               >
                 <div className="text-xs sm:text-sm font-bold text-base-content flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary inline-block"></span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-base-content inline-block"></span>
                   <span>{concept.heading}</span>
                 </div>
                 <p data-concept-detail={cIdx} className="text-xs sm:text-sm text-base-content-secondary leading-relaxed pl-3 font-normal">

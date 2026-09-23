@@ -2,19 +2,18 @@ import React from 'react';
 import { ShieldAlert, CheckCircle2, ChevronDown, ChevronUp } from 'lucide-react';
 import type { SectionProps } from './registry';
 import { TAP } from '../../ui/tapTarget';
+import { IconBadge } from '../../ui/IconBadge';
 
 export const DialogueSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggle }) => {
   if (!chapter.dialogueExample) return null;
   return (
-    <div className="border border-base-border rounded-2xl overflow-hidden bg-base-100 shadow-2xs">
+    <div className="border border-base-border rounded-box overflow-hidden bg-base-100 shadow-2xs">
       <button
         onClick={onToggle}
-        className={`${TAP} w-full p-3.5 sm:p-4.5 flex items-center justify-between bg-base-300 hover:bg-base-border text-left cursor-pointer select-none transition-colors`}
+        className={`${TAP} w-full p-box flex items-center justify-between bg-base-300 hover:bg-base-border text-left cursor-pointer select-none transition-colors`}
       >
         <div className="flex items-center gap-3">
-          <div className="w-7 h-7 rounded-xl bg-primary text-primary-content flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
-            💬
-          </div>
+          <IconBadge size="md">💬</IconBadge>
           <div>
             <h3 className="text-xs sm:text-sm font-bold text-base-content">
               บทสนทนาจริงในที่ทำงาน (วิธีพูดที่พัง vs วิธีพูดที่ปัง)
@@ -28,7 +27,7 @@ export const DialogueSection: React.FC<SectionProps> = ({ chapter, isOpen, onTog
       </button>
 
       {isOpen && (
-        <div className="p-3.5 sm:p-5 space-y-3.5 border-t border-base-border bg-base-100">
+        <div className="p-box space-y-3.5 border-t border-base-border bg-base-100">
           <div className="p-3 rounded-xl bg-base-300 border border-base-border text-xs text-base-content-secondary font-normal">
             <span className="font-bold text-base-content">สถานการณ์: </span>
             {chapter.dialogueExample.context}

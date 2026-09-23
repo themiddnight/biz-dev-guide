@@ -5,6 +5,7 @@ import { HeroFigure } from './HeroFigure';
 import type { Role } from '../../data/rolePerspective';
 import { RichText } from '../content/RichText';
 import { heroTerms } from '../../lib/sectionTerms';
+import { IconBadge } from '../ui/IconBadge';
 
 interface ChapterHeroProps {
   chapter: Chapter;
@@ -40,16 +41,14 @@ export const ChapterHero: React.FC<ChapterHeroProps> = ({
       {prose(marked.plainAnalogy)}
     </p>
   );
-  const analogyClassName = 'p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-base-300 border border-base-border space-y-1.5';
+  const analogyClassName = 'p-box rounded-box bg-base-300 border border-base-border space-y-1.5';
 
   return (
     <>
       {/* Chapter Header */}
       <div className="space-y-3 pb-4 sm:pb-5 border-b border-base-border">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="w-8 h-8 rounded-xl bg-primary text-primary-content font-black text-sm flex items-center justify-center shrink-0 shadow-xs">
-            {chapter.num}
-          </span>
+          <IconBadge size="md" label={`บทที่ ${chapter.num}`}>{chapter.num}</IconBadge>
           <span className="px-2.5 py-0.5 rounded-full bg-base-300 border border-base-border text-base-content-body text-[11px] sm:text-xs font-semibold uppercase tracking-wider">
             {chapter.roleTag}
           </span>
