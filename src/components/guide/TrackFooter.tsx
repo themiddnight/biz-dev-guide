@@ -5,7 +5,7 @@ import { TRACK_META, type TrackKey, type TrackNext } from '../../data/readingTra
 import { TAP } from '../ui/tapTarget';
 import { Button } from '../ui/Button';
 
-const cardClass = 'p-box rounded-box border border-base-border text-right bg-base-300';
+const cardClass = 'p-box-dense rounded-box border border-base-border text-right bg-base-300';
 
 export const TrackNextCard: React.FC<{
   next: Extract<TrackNext, { kind: 'next' }>;
