@@ -580,7 +580,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                     className={`${TAP} px-3 py-2 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
                       isCurrentRead
                         ? 'bg-success/10 border-success/25 text-success'
-                        : 'bg-base-300 border-base-border text-base-content-body hover:bg-base-300'
+                        : 'bg-base-300 border-base-border text-base-content-body hover:bg-base-border'
                     }`}
                     title="ทำเครื่องหมายว่าอ่านและเข้าใจบทนี้แล้ว (+30 XP)"
                   >

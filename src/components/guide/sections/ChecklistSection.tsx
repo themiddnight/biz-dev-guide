@@ -10,7 +10,7 @@ export const ChecklistSection: React.FC<SectionProps> = ({ chapter, isOpen, onTo
     <div className="border border-base-border rounded-2xl overflow-hidden bg-base-100 shadow-2xs">
       <button
         onClick={onToggle}
-        className={`${TAP} w-full p-3.5 sm:p-4.5 flex items-center justify-between bg-base-300 hover:bg-base-300 text-left cursor-pointer select-none transition-colors`}
+        className={`${TAP} w-full p-3.5 sm:p-4.5 flex items-center justify-between bg-base-300 hover:bg-base-border text-left cursor-pointer select-none transition-colors`}
       >
         <div className="flex items-center gap-3">
           <div className="w-7 h-7 rounded-xl bg-primary text-primary-content flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
