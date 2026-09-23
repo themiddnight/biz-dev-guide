@@ -1,6 +1,6 @@
 # First-visit card: choose role and level in one tap (I-15)
 
-- Status: **Draft**, awaiting owner review. The design was approved in chat on 2026-09-23.
+- Status: **Implemented** in `54fc47a` (owner approved the spec and both copy lines 2026-09-23). Acceptance: `work/acceptance-first-visit.md`.
 - Evidence: `work/ux-test-roles-r3/synthesis.md` I-15 (L-M, 1 of 4; 3 of 4 in round 2). Mint asked
   whether the level row was a third choice or whether she needed a role *and* a level.
   `2026-09-23-role-ux-fixes.md` §10 I-06 and `2026-09-23-round3-ux-fixes.md` §10 I-15.
