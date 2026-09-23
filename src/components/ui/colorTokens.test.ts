@@ -47,12 +47,6 @@ export function violations(src: string): { line: number; text: string }[] {
   return [...starts].sort((a, b) => a[0] - b[0]).map(([s, text]) => ({ line: src.slice(0, s).split('\n').length, text }));
 }
 
-/**
- * Ratchet (spec §12): files not yet migrated, with their exact violation count. A migration task
- * fixes a file and deletes its line here in the same commit; a count that drifts either way fails.
- */
-const BASELINE: Record<string, number> = {};
-
 describe('colour tokens only', () => {
   const files = [...sourceFiles(join(SRC, 'components')), join(SRC, 'App.tsx')].map(f => {
     const src = readFileSync(f, 'utf8');
@@ -77,17 +71,22 @@ describe('colour tokens only', () => {
     expect(hit('บทที่ #A1024 และ href="#faq"')).toEqual([]);
   });
 
-  it('a file outside the baseline has no raw colour', () => {
-    const bad = files.filter(f => !(f.file in BASELINE) && f.found.length)
+  it('no file has a raw colour', () => {
+    const bad = files.filter(f => f.found.length)
       .flatMap(f => f.found.slice(0, 5).map(v => `${f.file}:${v.line} ${v.text}`));
     expect(bad).toEqual([]);
   });
 
-  it('a baselined file still has exactly its recorded count (lower the baseline when you fix one)', () => {
-    const drift = files.filter(f => f.file in BASELINE && f.found.length !== BASELINE[f.file])
-      .map(f => `${f.file}: baseline ${BASELINE[f.file]}, found ${f.found.length}`);
-    expect(drift).toEqual([]);
-    const gone = Object.keys(BASELINE).filter(k => !files.some(f => f.file === k));
-    expect(gone).toEqual([]);
+  it('bg-primary outside ui/ appears only at the §10.4 progress fills', () => {
+    const PROGRESS_FILL = {
+      'components/GamificationTab.tsx': 1,
+      'components/GuideTab.tsx': 1,
+      'components/Header.tsx': 1,
+      'components/QuizTab.tsx': 1,
+    };
+    const fills = Object.fromEntries(files
+      .map(f => [f.file, (f.src.match(/(?<![\w:/-])bg-primary(?![\w/-])/g) ?? []).length] as const)
+      .filter(([, n]) => n > 0));
+    expect(fills).toEqual(PROGRESS_FILL);
   });
 });

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
 /**
@@ -9,50 +9,15 @@ import { join } from 'node:path';
  */
 const SRC = join(process.cwd(), 'src');
 
-const MIGRATED: string[] = [
-  'App.tsx',
-  'components/Header.tsx',
-  'components/GuideTab.tsx',
-  'components/guide/TrackPanel.tsx',
-  'components/guide/TrackFooter.tsx',
-  'components/guide/sections/CoreConceptsSection.tsx',
-  'components/guide/sections/DiagramSection.tsx',
-  'components/guide/sections/DialogueSection.tsx',
-  'components/guide/sections/ExamplesSection.tsx',
-  'components/guide/sections/GlossarySection.tsx',
-  'components/guide/sections/ReferenceSection.tsx',
-  'components/guide/sections/JargonSection.tsx',
-  'components/guide/sections/FaqSection.tsx',
-  'components/guide/sections/PitfallsSection.tsx',
-  'components/guide/sections/PrimerSection.tsx',
-  'components/guide/sections/ChecklistSection.tsx',
-  'components/guide/sections/WorkflowSection.tsx',
-  'components/guide/sections/OtherSideSection.tsx',
-  'components/guide/SectionOutline.tsx',
-  'components/guide/ChapterHero.tsx',
-  'components/guide/FirstVisitCard.tsx',
-  'components/guide/HeroFigure.tsx',
-  'components/guide/IndexEmptyState.tsx',
-  'components/guide/LayerGroup.tsx',
-  'components/guide/InlineSections.tsx',
-  'components/content/ContentBlocks.tsx',
-  'components/content/ContentTable.tsx',
-  'components/content/InlineTerm.tsx',
-  'components/content/RichText.tsx',
-  'components/FrictionFaqSection.tsx',
-  'components/FrictionPlaybookCard.tsx',
-  'components/RoleMindsetCard.tsx',
-  'components/ChapterDiagram.tsx',
-  'components/ProtocolSimulator.tsx',
-  'components/diagrams/DiagramFamilyGrid.tsx',
-  'components/diagrams/SwimlaneVsSequence.tsx',
-  'components/figures/shared/FigurePanels.tsx',
-  'components/QuizTab.tsx',
-  'components/quiz/QuizResultScreen.tsx',
-  'components/glossary/GlossaryPanel.tsx',
-  'components/glossary/GlossaryCategoryMap.tsx',
-  'components/AIAssistantTab.tsx',
-];
+function sourceFiles(dir: string): string[] {
+  return readdirSync(dir, { withFileTypes: true }).flatMap(e => {
+    const p = join(dir, e.name);
+    if (e.isDirectory()) return e.name === 'ui' ? [] : sourceFiles(p);
+    return p.endsWith('.tsx') && !p.includes('.test.') ? [p.slice(SRC.length + 1)] : [];
+  });
+}
+
+const MIGRATED: string[] = [...sourceFiles(join(SRC, 'components')), 'App.tsx'];
 
 /** Responsive combos that §5/§7.6 replace with tokens. */
 const LEGACY_LAYOUT = [

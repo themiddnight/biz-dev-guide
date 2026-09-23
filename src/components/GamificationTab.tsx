@@ -16,7 +16,9 @@ import {
   GraduationCap,
   ShieldCheck
 } from 'lucide-react';
-import { TAP } from './ui/tapTarget';
+import { Button } from './ui/Button';
+import { IconBadge } from './ui/IconBadge';
+import { Card } from './ui/Card';
 
 interface GamificationTabProps {
   badges: Badge[];
@@ -59,14 +61,12 @@ export const GamificationTab: React.FC<GamificationTabProps> = ({
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8 pb-16">
+    <div className="max-w-4xl mx-auto space-y-section pb-16">
       {/* Profile & Level Card */}
-      <div className="p-5 sm:p-6 bg-base-100 rounded-2xl sm:rounded-3xl border border-base-border shadow-2xs space-y-5">
+      <div className="p-box-spacious bg-base-100 rounded-box border border-base-border shadow-2xs space-y-5">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-primary text-primary-content flex items-center justify-center font-extrabold text-xl sm:text-2xl shadow-xs">
-              Lv.{currentTier.level}
-            </div>
+            <IconBadge size="lg" label={`Lv.${currentTier.level}`}>Lv.{currentTier.level}</IconBadge>
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-lg sm:text-2xl font-bold text-base-content">
@@ -79,7 +79,7 @@ export const GamificationTab: React.FC<GamificationTabProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center gap-2 px-3.5 py-1.5 sm:px-4 sm:py-2 bg-warning/10 text-warning rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base border border-warning/25">
+          <div className="flex items-center gap-2 px-3.5 py-1.5 sm:px-4 sm:py-2 bg-warning/10 text-warning rounded-box font-bold text-sm sm:text-base border border-warning/25">
             <Zap className="w-4 h-4 sm:w-5 sm:h-5 fill-warning text-warning" />
             <span>{userStats.xp} Total XP</span>
           </div>
@@ -106,7 +106,7 @@ export const GamificationTab: React.FC<GamificationTabProps> = ({
 
       {/* Stats Quick Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-        <div className="p-3.5 sm:p-4 bg-base-100 rounded-xl sm:rounded-2xl border border-base-border shadow-2xs space-y-1">
+        <div className="p-box bg-base-100 rounded-box border border-base-border shadow-2xs space-y-1">
           <div className="flex items-center gap-1.5 text-base-content-muted text-xs font-medium">
             <BookOpen className="w-3.5 h-3.5 text-base-content-secondary" />
             <span>อ่านแล้ว</span>
@@ -117,7 +117,7 @@ export const GamificationTab: React.FC<GamificationTabProps> = ({
           <span className="text-[11px] text-base-content-muted">บุ๊กมาร์ก {userStats.bookmarks.length}</span>
         </div>
 
-        <div className="p-3.5 sm:p-4 bg-base-100 rounded-xl sm:rounded-2xl border border-base-border shadow-2xs space-y-1">
+        <div className="p-box bg-base-100 rounded-box border border-base-border shadow-2xs space-y-1">
           <div className="flex items-center gap-1.5 text-base-content-muted text-xs font-medium">
             <Bot className="w-3.5 h-3.5 text-base-content-secondary" />
             <span>คำถามที่ถาม AI</span>
@@ -128,7 +128,7 @@ export const GamificationTab: React.FC<GamificationTabProps> = ({
           <span className="text-[11px] text-base-content-muted">ครั้งที่ปรึกษา</span>
         </div>
 
-        <div className="p-3.5 sm:p-4 bg-base-100 rounded-xl sm:rounded-2xl border border-base-border shadow-2xs space-y-1">
+        <div className="p-box bg-base-100 rounded-box border border-base-border shadow-2xs space-y-1">
           <div className="flex items-center gap-1.5 text-base-content-muted text-xs font-medium">
             <Trophy className="w-3.5 h-3.5 text-warning" />
             <span>ควิซที่ตอบถูก</span>
@@ -139,7 +139,7 @@ export const GamificationTab: React.FC<GamificationTabProps> = ({
           <span className="text-[11px] text-base-content-muted">ข้อที่ตอบถูก</span>
         </div>
 
-        <div className="p-3.5 sm:p-4 bg-base-100 rounded-xl sm:rounded-2xl border border-base-border shadow-2xs space-y-1">
+        <div className="p-box bg-base-100 rounded-box border border-base-border shadow-2xs space-y-1">
           <div className="flex items-center gap-1.5 text-base-content-muted text-xs font-medium">
             <Award className="w-3.5 h-3.5 text-success" />
             <span>เหรียญความสำเร็จ</span>
@@ -167,21 +167,19 @@ export const GamificationTab: React.FC<GamificationTabProps> = ({
             return (
               <div
                 key={badge.id}
-                className={`p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border transition-all flex items-start gap-3 ${
+                className={`p-box rounded-box border transition-all flex items-start gap-3 ${
                   badge.unlocked
                     ? 'bg-base-100 border-base-border-strong shadow-xs'
                     : 'bg-base-100 border-base-border'
                 }`}
               >
-                <div
-                  className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                    badge.unlocked
-                      ? 'bg-primary text-primary-content shadow-xs'
-                      : 'bg-base-border text-base-content-muted'
-                  }`}
-                >
-                  {badge.unlocked ? getIcon(badge.icon) : <Lock className="w-4 h-4 sm:w-5 sm:h-5" />}
-                </div>
+                {badge.unlocked ? (
+                  <IconBadge size="none" className="w-9 h-9 sm:w-10 sm:h-10">{getIcon(badge.icon)}</IconBadge>
+                ) : (
+                  <IconBadge size="none" className="w-9 h-9 sm:w-10 sm:h-10 opacity-50 text-base-content-subtle">
+                    <Lock className="w-4 h-4 sm:w-5 sm:h-5" />
+                  </IconBadge>
+                )}
 
                 <div className="min-w-0 space-y-1">
                   <div className="flex items-center justify-between gap-2">
@@ -210,28 +208,22 @@ export const GamificationTab: React.FC<GamificationTabProps> = ({
       </div>
 
       {/* Action CTA */}
-      <div className="p-5 sm:p-6 bg-primary text-primary-content rounded-2xl sm:rounded-3xl flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
+      <Card variant="subtle" padding="spacious" className="flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="space-y-1 text-center sm:text-left">
           <h3 className="text-base sm:text-lg font-bold">ต้องการเพิ่ม XP และปลดล็อกเหรียญที่เหลือ?</h3>
-          <p className="text-xs sm:text-sm text-primary-content/70">
+          <p className="text-xs sm:text-sm text-base-content-secondary">
             ลองทำแบบทดสอบจำลองสถานการณ์ หรือถามคำถามใหม่กับ AI เพื่อสะสม XP
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <button
-            onClick={onStartQuiz}
-            className={`${TAP} px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-base-100 text-base-content text-xs sm:text-sm font-bold shadow-xs hover:opacity-90 transition-all cursor-pointer`}
-          >
+          <Button color="primary" variant="solid" size="md" onClick={onStartQuiz}>
             ไปทำควิซ (+XP)
-          </button>
-          <button
-            onClick={onGoToGuide}
-            className={`${TAP} px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl border border-primary-content/30 text-primary-content text-xs sm:text-sm font-semibold hover:bg-primary-content/10 transition-all cursor-pointer`}
-          >
+          </Button>
+          <Button color="neutral" variant="outline" size="md" onClick={onGoToGuide}>
             อ่านคู่มือต่อ
-          </button>
+          </Button>
         </div>
-      </div>
+      </Card>
     </div>
   );
 };
