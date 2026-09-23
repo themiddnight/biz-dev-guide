@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { GLOSSARY_CATEGORIES, GlossaryCategory, GlossaryTerm } from '../../data/glossary';
 import type { GlossaryFilter } from './GlossaryPanel';
-import { TAP } from '../ui/tapTarget';
+import { ToggleChip } from '../ui/ToggleChip';
 
 interface GlossaryCategoryMapProps {
   terms: GlossaryTerm[];
@@ -19,7 +19,7 @@ export const GlossaryCategoryMap: React.FC<GlossaryCategoryMapProps> = ({ terms,
   }, [terms]);
 
   return (
-    <div className="p-4 sm:p-5 rounded-2xl bg-base-100 border border-base-border space-y-3">
+    <div className="p-box rounded-box bg-base-100 border border-base-border space-y-3">
       <p className="text-[11px] sm:text-xs text-base-content-muted">
         {GLOSSARY_CATEGORIES.length} หมวด รวม {terms.length} คำ — กดหมวดเพื่อกรองคำศัพท์
       </p>
@@ -27,19 +27,15 @@ export const GlossaryCategoryMap: React.FC<GlossaryCategoryMapProps> = ({ terms,
         {GLOSSARY_CATEGORIES.map(cat => {
           const active = activeCategory === cat.key;
           return (
-            <button
+            <ToggleChip
+              selected={active}
+              shape="card"
               key={cat.key}
-              type="button"
               onClick={() => onSelectCategory(cat.key)}
-              aria-pressed={active}
-              className={`${TAP} p-3 rounded-xl border text-left transition-all cursor-pointer min-w-0 ${
-                active
-                  ? 'bg-primary border-primary text-primary-content'
-                  : 'bg-base-300 border-base-border hover:border-base-border-strong'
-              }`}
+              className="p-3 min-w-0"
             >
               <div className="flex items-start justify-between gap-2">
-                <span className={`text-xs font-bold leading-snug ${active ? '' : 'text-base-content'}`}>
+                <span className="text-xs font-bold leading-snug text-base-content">
                   {cat.label}
                 </span>
                 <span
@@ -57,7 +53,7 @@ export const GlossaryCategoryMap: React.FC<GlossaryCategoryMapProps> = ({ terms,
               >
                 {cat.labelTh}
               </div>
-            </button>
+            </ToggleChip>
           );
         })}
       </div>

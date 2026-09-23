@@ -49,6 +49,8 @@ const MIGRATED: string[] = [
   'components/figures/shared/FigurePanels.tsx',
   'components/QuizTab.tsx',
   'components/quiz/QuizResultScreen.tsx',
+  'components/glossary/GlossaryPanel.tsx',
+  'components/glossary/GlossaryCategoryMap.tsx',
 ];
 
 /** Responsive combos that §5/§7.6 replace with tokens. */
