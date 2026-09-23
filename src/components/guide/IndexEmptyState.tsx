@@ -1,4 +1,5 @@
 import React from 'react';
+import { TAP } from '../ui/tapTarget';
 
 interface IndexEmptyStateProps {
   query: string;
@@ -15,7 +16,7 @@ export const IndexEmptyState: React.FC<IndexEmptyStateProps> = ({ query, roleFil
     <button
       type="button"
       onClick={onClear}
-      className="px-2.5 py-1 rounded-lg font-medium whitespace-nowrap transition-all cursor-pointer bg-neutral-100 dark:bg-[#1f1f1f] text-neutral-600 dark:text-[#a3a3a3] hover:bg-neutral-200 dark:hover:bg-[#262626]"
+      className={`${TAP} px-2.5 py-1 rounded-lg font-medium whitespace-nowrap transition-all cursor-pointer bg-neutral-100 dark:bg-[#1f1f1f] text-neutral-600 dark:text-[#a3a3a3] hover:bg-neutral-200 dark:hover:bg-[#262626]`}
     >
       ล้างการค้นหา
     </button>

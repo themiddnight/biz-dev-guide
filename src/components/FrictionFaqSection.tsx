@@ -14,6 +14,7 @@ import {
 import { GLOSSARY } from '../data/glossary';
 import { FIGURES } from './figures';
 import { RichText } from './content/RichText';
+import { TAP, TAP_GAP } from './ui/tapTarget';
 
 interface FrictionFaqSectionProps {
   onNavigateChapter: (chapterId: string) => void;
@@ -78,7 +79,7 @@ export const FrictionFaqSection: React.FC<FrictionFaqSectionProps> = ({
           onClick={() => toggleItem(faq.id)}
           aria-expanded={isOpen}
           aria-controls={panelId}
-          className="w-full p-3.5 flex items-start justify-between gap-3 text-left cursor-pointer select-none hover:bg-neutral-50 dark:hover:bg-[#181818] transition-colors"
+          className={`${TAP} w-full p-3.5 flex items-start justify-between gap-3 text-left cursor-pointer select-none hover:bg-neutral-50 dark:hover:bg-[#181818] transition-colors`}
         >
           <span className="flex items-start gap-2.5 font-bold text-xs sm:text-sm text-neutral-900 dark:text-[#fafafa] leading-relaxed">
             <span className="shrink-0 mt-0.5 px-1.5 py-0.5 rounded-md bg-neutral-100 dark:bg-[#1f1f1f] border border-neutral-200 dark:border-[#333333] text-[10px] text-neutral-600 dark:text-[#a3a3a3]">
@@ -139,7 +140,7 @@ export const FrictionFaqSection: React.FC<FrictionFaqSectionProps> = ({
                     type="button"
                     onClick={() => onSearchGlossary(concept)}
                     title={`ค้นหา "${concept}" ในหน้ารวมคำศัพท์ (บทที่ 15)`}
-                    className={`${chipClass} cursor-pointer bg-neutral-100 dark:bg-[#1f1f1f] border-neutral-200 dark:border-[#333333] text-neutral-800 dark:text-[#d4d4d4] hover:bg-neutral-200 dark:hover:bg-[#262626] underline decoration-dotted decoration-neutral-400 dark:decoration-[#525252] underline-offset-2`}
+                    className={`${TAP_GAP[6]} ${chipClass} cursor-pointer bg-neutral-100 dark:bg-[#1f1f1f] border-neutral-200 dark:border-[#333333] text-neutral-800 dark:text-[#d4d4d4] hover:bg-neutral-200 dark:hover:bg-[#262626] underline decoration-dotted decoration-neutral-400 dark:decoration-[#525252] underline-offset-2`}
                   >
                     {concept}
                   </button>
@@ -158,7 +159,7 @@ export const FrictionFaqSection: React.FC<FrictionFaqSectionProps> = ({
               <button
                 type="button"
                 onClick={() => onScrollToPlaybook(faq.relatedPlaybookChapterId as string)}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-900 dark:text-white underline decoration-neutral-400 dark:decoration-[#525252] underline-offset-2 hover:decoration-neutral-900 dark:hover:decoration-white cursor-pointer"
+                className={`${TAP} inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-900 dark:text-white underline decoration-neutral-400 dark:decoration-[#525252] underline-offset-2 hover:decoration-neutral-900 dark:hover:decoration-white cursor-pointer`}
               >
                 {faq.relatedPlaybookChapterId === 's11'
                   ? 'ดู Iron Triangle ด้านบน'
@@ -197,7 +198,7 @@ export const FrictionFaqSection: React.FC<FrictionFaqSectionProps> = ({
           onClick={() => setIsJumpOpen(prev => !prev)}
           aria-expanded={isJumpOpen}
           aria-controls="s11-faq-jump"
-          className="w-full flex items-center justify-between gap-2 text-left sm:cursor-default cursor-pointer"
+          className={`${TAP} w-full flex items-center justify-between gap-2 text-left sm:cursor-default cursor-pointer`}
         >
           <span className="flex items-center gap-2 text-[11px] sm:text-xs font-bold text-neutral-900 dark:text-[#fafafa]">
             <ListOrdered className="w-4 h-4 text-neutral-500 dark:text-[#a3a3a3]" />
@@ -213,7 +214,7 @@ export const FrictionFaqSection: React.FC<FrictionFaqSectionProps> = ({
               key={faq.id}
               type="button"
               onClick={() => jumpTo(faq.id)}
-              className={`${chipClass} cursor-pointer text-left bg-neutral-50 dark:bg-[#181818] border-neutral-200 dark:border-[#262626] text-neutral-700 dark:text-[#c4c4c4] hover:bg-neutral-100 dark:hover:bg-[#1f1f1f]`}
+              className={`${TAP_GAP[6]} ${chipClass} cursor-pointer text-left bg-neutral-50 dark:bg-[#181818] border-neutral-200 dark:border-[#262626] text-neutral-700 dark:text-[#c4c4c4] hover:bg-neutral-100 dark:hover:bg-[#1f1f1f]`}
             >
               <span className="text-neutral-400 dark:text-[#737373] mr-1">{idx + 1}.</span>
               {faq.question}
@@ -265,7 +266,7 @@ export const FrictionFaqSection: React.FC<FrictionFaqSectionProps> = ({
                   href={source.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 underline decoration-neutral-400 dark:decoration-[#525252] underline-offset-2 hover:decoration-neutral-900 dark:hover:decoration-white"
+                  className={`${TAP} inline-flex items-center gap-1 underline decoration-neutral-400 dark:decoration-[#525252] underline-offset-2 hover:decoration-neutral-900 dark:hover:decoration-white`}
                 >
                   {source.label}
                   <ExternalLink className="w-3 h-3" />

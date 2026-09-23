@@ -2,6 +2,7 @@ import React from 'react';
 import type { Chapter, ExperienceLevel } from '../../types';
 import { TRACK_CHAPTER_NUMS, getTrackMinutes, resolveTrack } from '../../data/readingTracks';
 import { ROLE_META, type Role } from '../../data/rolePerspective';
+import { TAP, TAP_GAP } from '../ui/tapTarget';
 
 const ROLE_OPTIONS: { role: Role; line: string }[] = [
   { role: 'biz', line: 'เริ่มจากบท PM ที่คุณคุ้น แล้วไปดูว่าทีม Engineering รับงานต่อยังไง' },
@@ -28,7 +29,7 @@ export const FirstVisitCard: React.FC<{
           type="button"
           data-first-visit-role={option.role}
           onClick={() => onChooseRole(option.role)}
-          className="text-left p-4 rounded-xl border border-neutral-200 dark:border-[#333333] hover:border-neutral-400 dark:hover:border-[#525252] cursor-pointer space-y-1.5"
+          className={`${TAP} text-left p-4 rounded-xl border border-neutral-200 dark:border-[#333333] hover:border-neutral-400 dark:hover:border-[#525252] cursor-pointer space-y-1.5`}
         >
           <div className="font-bold text-sm text-neutral-900 dark:text-[#fafafa]">{ROLE_META[option.role].icon} {ROLE_META[option.role].origin}</div>
           <div className="text-xs text-neutral-600 dark:text-[#a3a3a3] leading-relaxed">{option.line}</div>
@@ -46,13 +47,13 @@ export const FirstVisitCard: React.FC<{
           type="button"
           data-first-visit-option={option.level}
           onClick={() => onChoose(option.level)}
-          className="px-2.5 py-1 rounded-lg border border-neutral-200 dark:border-[#333333] hover:border-neutral-400 dark:hover:border-[#525252] text-xs font-semibold text-neutral-700 dark:text-[#d4d4d4] cursor-pointer"
+          className={`${TAP_GAP[8]} px-2.5 py-1 rounded-lg border border-neutral-200 dark:border-[#333333] hover:border-neutral-400 dark:hover:border-[#525252] text-xs font-semibold text-neutral-700 dark:text-[#d4d4d4] cursor-pointer`}
         >
           {option.label}
         </button>
       ))}
     </div>
-    <button type="button" data-first-visit-skip onClick={onSkip} className="text-xs font-semibold text-neutral-500 dark:text-[#8e8e8e] hover:underline cursor-pointer">
+    <button type="button" data-first-visit-skip onClick={onSkip} className={`${TAP} text-xs font-semibold text-neutral-500 dark:text-[#8e8e8e] hover:underline cursor-pointer`}>
       ข้ามไปก่อน (ใช้โหมดมือใหม่)
     </button>
   </div>

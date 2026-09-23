@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { GLOSSARY_CATEGORIES, GlossaryCategory, GlossaryTerm } from '../../data/glossary';
 import type { GlossaryFilter } from './GlossaryPanel';
+import { TAP } from '../ui/tapTarget';
 
 interface GlossaryCategoryMapProps {
   terms: GlossaryTerm[];
@@ -31,7 +32,7 @@ export const GlossaryCategoryMap: React.FC<GlossaryCategoryMapProps> = ({ terms,
               type="button"
               onClick={() => onSelectCategory(cat.key)}
               aria-pressed={active}
-              className={`p-3 rounded-xl border text-left transition-all cursor-pointer min-w-0 ${
+              className={`${TAP} p-3 rounded-xl border text-left transition-all cursor-pointer min-w-0 ${
                 active
                   ? 'bg-neutral-900 border-neutral-900 text-white dark:bg-white dark:border-white dark:text-[#0a0a0a]'
                   : 'bg-neutral-50 dark:bg-[#181818] border-neutral-200 dark:border-[#262626] hover:border-neutral-400 dark:hover:border-[#404040]'

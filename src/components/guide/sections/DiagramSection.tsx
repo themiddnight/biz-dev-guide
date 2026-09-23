@@ -9,13 +9,14 @@ import { FIGURES } from '../../figures';
 import { GlossaryCategoryMap } from '../../glossary/GlossaryCategoryMap';
 import { GLOSSARY } from '../../../data/glossary';
 import type { SectionProps } from './registry';
+import { TAP, TAP_Y } from '../../ui/tapTarget';
 
 export const DiagramSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggle, ctx }) => {
   return (
     <div className="border border-neutral-200 dark:border-[#262626] rounded-2xl overflow-hidden bg-white dark:bg-[#141414] shadow-2xs">
       <button
         onClick={onToggle}
-        className="w-full p-3.5 sm:p-4.5 flex items-center justify-between bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f] text-left cursor-pointer select-none transition-colors"
+        className={`${TAP} w-full p-3.5 sm:p-4.5 flex items-center justify-between bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f] text-left cursor-pointer select-none transition-colors`}
       >
         <div className="flex items-center gap-3">
           <div className="w-7 h-7 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
@@ -88,7 +89,7 @@ export const DiagramSection: React.FC<SectionProps> = ({ chapter, isOpen, onTogg
                       type="button"
                       onClick={() => ctx.setC4Level(lvl)}
                       aria-pressed={ctx.c4Level === lvl}
-                      className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                      className={`${TAP_Y} px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                         ctx.c4Level === lvl
                           ? 'bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] shadow-xs'
                           : 'bg-neutral-100 dark:bg-[#1f1f1f] text-neutral-600 dark:text-[#a3a3a3] hover:bg-neutral-200 dark:hover:bg-[#262626]'

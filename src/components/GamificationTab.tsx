@@ -16,6 +16,7 @@ import {
   GraduationCap,
   ShieldCheck
 } from 'lucide-react';
+import { TAP } from './ui/tapTarget';
 
 interface GamificationTabProps {
   badges: Badge[];
@@ -219,13 +220,13 @@ export const GamificationTab: React.FC<GamificationTabProps> = ({
         <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={onStartQuiz}
-            className="px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-white dark:bg-[#0a0a0a] text-neutral-900 dark:text-white text-xs sm:text-sm font-bold shadow-xs hover:opacity-90 transition-all cursor-pointer"
+            className={`${TAP} px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-white dark:bg-[#0a0a0a] text-neutral-900 dark:text-white text-xs sm:text-sm font-bold shadow-xs hover:opacity-90 transition-all cursor-pointer`}
           >
             ไปทำควิซ (+XP)
           </button>
           <button
             onClick={onGoToGuide}
-            className="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl border border-neutral-700 dark:border-neutral-300 text-neutral-200 dark:text-neutral-800 text-xs sm:text-sm font-semibold hover:bg-neutral-800 dark:hover:bg-neutral-100 transition-all cursor-pointer"
+            className={`${TAP} px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl border border-neutral-700 dark:border-neutral-300 text-neutral-200 dark:text-neutral-800 text-xs sm:text-sm font-semibold hover:bg-neutral-800 dark:hover:bg-neutral-100 transition-all cursor-pointer`}
           >
             อ่านคู่มือต่อ
           </button>

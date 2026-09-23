@@ -31,6 +31,7 @@ import {
   AlertCircle,
   ChevronDown
 } from 'lucide-react';
+import { TAP, TAP_Y } from './ui/tapTarget';
 
 interface ChapterDiagramProps {
   chapterId: string;
@@ -113,7 +114,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
                 setSkipChecks(!skipChecks);
                 if (routeStatus !== 'idle') setRouteStatus(statusAt(routeGate, !skipChecks));
               }}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+              className={`${TAP} px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
                 skipChecks 
                   ? 'bg-rose-500 text-white shadow-xs' 
                   : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200'
@@ -134,7 +135,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
                 <div key={idx} className="relative">
                   <button
                     onClick={() => selectGate(idx)}
-                    className={`w-full h-full p-3 rounded-xl border text-left transition-all cursor-pointer ${
+                    className={`${TAP} w-full h-full p-3 rounded-xl border text-left transition-all cursor-pointer ${
                       isCurrent && routeStatus === 'incident'
                         ? 'border-rose-500 bg-rose-50 dark:bg-rose-950/40 text-rose-900 dark:text-rose-200 ring-2 ring-rose-400'
                         : isCurrent && routeStatus === 'caught'
@@ -401,7 +402,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
               <div className="flex rounded-xl bg-slate-100 dark:bg-slate-800 p-1">
                 <button
                   onClick={() => { setArchMode('monolith'); setPaymentFailed(false); }}
-                  className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  className={`${TAP} px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                     archMode === 'monolith' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600 dark:text-slate-300'
                   }`}
                 >
@@ -409,7 +410,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
                 </button>
                 <button
                   onClick={() => { setArchMode('microservices'); setPaymentFailed(false); }}
-                  className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  className={`${TAP} px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                     archMode === 'microservices' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600 dark:text-slate-300'
                   }`}
                 >
@@ -419,7 +420,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
 
               <button
                 onClick={() => setPaymentFailed(!paymentFailed)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                className={`${TAP} px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   paymentFailed 
                     ? 'bg-rose-500 text-white shadow-xs' 
                     : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200'
@@ -617,7 +618,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <button
             onClick={() => setPyramidLevel('e2e')}
-            className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer ${
+            className={`${TAP} p-3.5 rounded-2xl border text-left transition-all cursor-pointer ${
               pyramidLevel === 'e2e' ? 'border-rose-500 bg-rose-50/80 dark:bg-rose-950/40 shadow-xs' : 'border-slate-200 dark:border-slate-800'
             }`}
           >
@@ -630,7 +631,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
 
           <button
             onClick={() => setPyramidLevel('integration')}
-            className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer ${
+            className={`${TAP} p-3.5 rounded-2xl border text-left transition-all cursor-pointer ${
               pyramidLevel === 'integration' ? 'border-indigo-500 bg-indigo-50/80 dark:bg-indigo-950/40 shadow-xs' : 'border-slate-200 dark:border-slate-800'
             }`}
           >
@@ -643,7 +644,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
 
           <button
             onClick={() => setPyramidLevel('unit')}
-            className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer ${
+            className={`${TAP} p-3.5 rounded-2xl border text-left transition-all cursor-pointer ${
               pyramidLevel === 'unit' ? 'border-emerald-500 bg-emerald-50/80 dark:bg-emerald-950/40 shadow-xs' : 'border-slate-200 dark:border-slate-800'
             }`}
           >
@@ -680,7 +681,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
               </span>
               <button
                 onClick={() => setCanaryBug(!canaryBug)}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold cursor-pointer transition-all ${
+                className={`${TAP} px-2.5 py-1 rounded-lg text-xs font-bold cursor-pointer transition-all ${
                   canaryBug ? 'bg-rose-500 text-white shadow-xs' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
                 }`}
               >
@@ -704,7 +705,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
                 <button
                   key={pct}
                   onClick={() => setCanaryPercent(pct)}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-bold cursor-pointer transition-all ${
+                  className={`${TAP_Y} px-2.5 py-1 rounded-lg text-xs font-bold cursor-pointer transition-all ${
                     canaryPercent === pct ? 'bg-indigo-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
                   }`}
                 >
@@ -762,7 +763,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
             <button
               key={idx}
               onClick={() => setBoehmPhase(idx)}
-              className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
+              className={`${TAP} p-3 rounded-xl border text-left transition-all cursor-pointer ${
                 boehmPhase === idx
                   ? 'border-rose-500 bg-rose-50/80 dark:bg-rose-950/40 shadow-xs'
                   : 'border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50'
@@ -1005,7 +1006,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
             <div className="flex rounded-xl bg-slate-100 dark:bg-slate-800 p-1">
               <button
                 onClick={() => setDualTrackPhase('discovery')}
-                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                className={`${TAP} px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                   dualTrackPhase === 'discovery' ? 'bg-pink-600 text-white shadow-xs' : 'text-slate-600 dark:text-slate-300'
                 }`}
               >
@@ -1013,7 +1014,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
               </button>
               <button
                 onClick={() => setDualTrackPhase('delivery')}
-                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                className={`${TAP} px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                   dualTrackPhase === 'delivery' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 dark:text-slate-300'
                 }`}
               >
@@ -1021,7 +1022,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
               </button>
               <button
                 onClick={() => setDualTrackPhase('synchronized')}
-                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                className={`${TAP} px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                   dualTrackPhase === 'synchronized' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600 dark:text-slate-300'
                 }`}
               >

@@ -12,6 +12,7 @@ import {
   Briefcase,
   Code2
 } from 'lucide-react';
+import { TAP } from './ui/tapTarget';
 
 interface FrictionPlaybookCardProps {
   playbook?: FrictionPlaybook;
@@ -40,7 +41,7 @@ export const FrictionPlaybookCard: React.FC<FrictionPlaybookCardProps> = ({
       >
         <button
           onClick={onToggle}
-          className="w-full p-3 sm:p-4 flex items-center justify-between bg-neutral-50/80 dark:bg-[#181818] text-left cursor-pointer select-none transition-colors hover:bg-neutral-100/80 dark:hover:bg-[#1f1f1f]"
+          className={`${TAP} w-full p-3 sm:p-4 flex items-center justify-between bg-neutral-50/80 dark:bg-[#181818] text-left cursor-pointer select-none transition-colors hover:bg-neutral-100/80 dark:hover:bg-[#1f1f1f]`}
         >
           <div className="flex items-center gap-2.5 sm:gap-3">
             <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-amber-500 text-white flex items-center justify-center font-bold text-xs sm:text-sm shadow-xs shrink-0">
@@ -109,7 +110,7 @@ export const FrictionPlaybookCard: React.FC<FrictionPlaybookCardProps> = ({
       {/* Playbook Header Accordion */}
       <button
         onClick={onToggle}
-        className="w-full p-3 sm:p-4 flex items-center justify-between bg-neutral-50/80 dark:bg-[#181818] text-left cursor-pointer select-none transition-colors hover:bg-neutral-100/80 dark:hover:bg-[#1f1f1f]"
+        className={`${TAP} w-full p-3 sm:p-4 flex items-center justify-between bg-neutral-50/80 dark:bg-[#181818] text-left cursor-pointer select-none transition-colors hover:bg-neutral-100/80 dark:hover:bg-[#1f1f1f]`}
       >
         <div className="flex items-center gap-2.5 sm:gap-3">
           <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-amber-500 text-white flex items-center justify-center font-bold text-xs sm:text-sm shadow-xs shrink-0">
@@ -312,7 +313,7 @@ export const FrictionPlaybookCard: React.FC<FrictionPlaybookCardProps> = ({
                           type="button"
                           onClick={() => handleSelectDilemma(option.id, option.isOptimal)}
                           aria-pressed={isSelected}
-                          className="w-full flex items-start justify-between gap-2 text-left cursor-pointer rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                          className={`${TAP} w-full flex items-start justify-between gap-2 text-left cursor-pointer rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500`}
                         >
                           <span className="flex items-start gap-1.5 sm:gap-2">
                             <span className="font-bold text-neutral-400 dark:text-[#737373] shrink-0">

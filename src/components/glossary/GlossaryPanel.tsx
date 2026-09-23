@@ -6,6 +6,7 @@ import { ROLES, type Role } from '../../data/rolePerspective';
 import { tokens } from '../../styles/tokens';
 import { RichText } from '../content/RichText';
 import { searchGlossaryTerms } from '../../lib/glossarySearch';
+import { TAP, TAP_GAP, TAP_POSITIONED } from '../ui/tapTarget';
 
 export type GlossaryFilter = GlossaryCategory | 'all';
 
@@ -28,8 +29,9 @@ interface GlossaryPanelProps {
   role?: Role | null;
 }
 
+// Side and category chip rows sit 16px apart, so each ring takes half of that.
 const chipClass = (active: boolean) =>
-  `shrink-0 px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+  `${TAP_GAP[16]} shrink-0 px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
     active
       ? 'bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] shadow-xs'
       : 'bg-neutral-100 dark:bg-[#1f1f1f] text-neutral-600 dark:text-[#a3a3a3] hover:bg-neutral-200 dark:hover:bg-[#262626]'
@@ -119,7 +121,7 @@ export const GlossaryPanel: React.FC<GlossaryPanelProps> = ({
             type="button"
             onClick={() => setQuery('')}
             aria-label="ล้างคำค้นหา"
-            className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-md text-neutral-400 hover:text-neutral-700 dark:text-[#737373] dark:hover:text-[#d4d4d4] cursor-pointer"
+            className={`${TAP_POSITIONED} absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-md text-neutral-400 hover:text-neutral-700 dark:text-[#737373] dark:hover:text-[#d4d4d4] cursor-pointer`}
           >
             <X className="w-3.5 h-3.5" />
           </button>
@@ -143,7 +145,7 @@ export const GlossaryPanel: React.FC<GlossaryPanelProps> = ({
       </div>
 
       {/* Category chips: scroll horizontally on mobile, wrap from sm */}
-      <div className="flex flex-nowrap sm:flex-wrap gap-1.5 overflow-x-auto sm:overflow-visible pb-1 sm:pb-0 -mx-1 px-1">
+      <div className="flex flex-nowrap sm:flex-wrap gap-1.5 overflow-x-auto sm:overflow-visible pb-1 sm:pb-0 max-sm:-mt-2.5 max-sm:pt-2.5 max-sm:-mb-2.5 max-sm:pb-3.5 -mx-1 px-1">
         <button type="button" onClick={() => setCategory('all')} aria-pressed={activeCategory === 'all'} className={chipClass(activeCategory === 'all')}>
           ทั้งหมด ({side === 'all' ? terms.length : sideCounts[side]})
         </button>
@@ -171,7 +173,7 @@ export const GlossaryPanel: React.FC<GlossaryPanelProps> = ({
           <button
             type="button"
             onClick={clearFilters}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] text-xs font-bold cursor-pointer"
+            className={`${TAP} inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] text-xs font-bold cursor-pointer`}
           >
             ล้างตัวกรอง
           </button>
@@ -212,7 +214,7 @@ export const GlossaryPanel: React.FC<GlossaryPanelProps> = ({
                       key={chId}
                       type="button"
                       onClick={() => onNavigateChapter(chId)}
-                      className="px-2 py-0.5 rounded-md bg-neutral-100 dark:bg-[#1f1f1f] border border-neutral-200 dark:border-[#262626] text-[10px] sm:text-[11px] font-semibold text-neutral-700 dark:text-[#d4d4d4] hover:bg-neutral-200 dark:hover:bg-[#262626] cursor-pointer transition-colors"
+                      className={`${TAP_GAP[6]} px-2 py-0.5 rounded-md bg-neutral-100 dark:bg-[#1f1f1f] border border-neutral-200 dark:border-[#262626] text-[10px] sm:text-[11px] font-semibold text-neutral-700 dark:text-[#d4d4d4] hover:bg-neutral-200 dark:hover:bg-[#262626] cursor-pointer transition-colors`}
                     >
                       บทที่ {chapterNum[chId] ?? chId.replace('s', '')}
                     </button>

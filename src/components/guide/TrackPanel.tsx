@@ -2,6 +2,7 @@ import React from 'react';
 import { Check } from 'lucide-react';
 import type { Chapter } from '../../types';
 import { TRACK_META, getTrackMinutes, getTrackProgress, resolveTrack, trackPrimaryLabel, type TrackKey } from '../../data/readingTracks';
+import { TAP, TAP_GAP } from '../ui/tapTarget';
 
 interface TrackPanelProps {
   chapters: Chapter[];
@@ -43,7 +44,7 @@ export const TrackPanel: React.FC<TrackPanelProps> = ({ chapters, trackKey, read
                 data-track-item={id}
                 aria-current={isActive ? 'true' : undefined}
                 onClick={() => onSelectChapter(id)}
-                className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-left text-xs cursor-pointer ${
+                className={`${TAP_GAP[4]} w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-left text-xs cursor-pointer ${
                   isActive ? 'bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a]' : 'text-neutral-800 dark:text-[#d4d4d4] hover:bg-neutral-100 dark:hover:bg-[#1f1f1f]'
                 }`}
               >
@@ -59,7 +60,7 @@ export const TrackPanel: React.FC<TrackPanelProps> = ({ chapters, trackKey, read
         type="button"
         data-track-primary
         onClick={() => (firstUnreadId === null ? onStartQuiz() : onSelectChapter(firstUnreadId))}
-        className="w-full px-3 py-2 rounded-lg bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] text-xs font-bold cursor-pointer"
+        className={`${TAP} w-full px-3 py-2 rounded-lg bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] text-xs font-bold cursor-pointer`}
       >
         {trackPrimaryLabel(read, firstUnreadId)}
       </button>

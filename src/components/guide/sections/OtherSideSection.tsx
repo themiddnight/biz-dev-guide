@@ -4,6 +4,7 @@ import { ROLES, ROLE_META, otherRole, type Role } from '../../../data/rolePerspe
 import type { GuideSectionContext, OtherSideView, SectionProps } from './registry';
 import { RichText } from '../../content/RichText';
 import { otherSideTerms, type SideViewTerms } from '../../../lib/sectionTerms';
+import { TAP, TAP_GAP } from '../../ui/tapTarget';
 
 const person = (r: Role) => ROLE_META[r].person;
 
@@ -101,7 +102,7 @@ export const OtherSideSection: React.FC<SectionProps> = ({ chapter, isOpen, onTo
         type="button"
         onClick={onToggle}
         aria-expanded={!!isOpen}
-        className="w-full p-3.5 sm:p-4.5 flex items-center justify-between bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f] text-left cursor-pointer select-none transition-colors"
+        className={`${TAP} w-full p-3.5 sm:p-4.5 flex items-center justify-between bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f] text-left cursor-pointer select-none transition-colors`}
       >
         <div className="flex items-center gap-3">
           <div className="w-7 h-7 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
@@ -126,7 +127,7 @@ export const OtherSideSection: React.FC<SectionProps> = ({ chapter, isOpen, onTo
                 type="button"
                 aria-pressed={otherSideView === opt.value}
                 onClick={() => setOtherSideView(opt.value)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer transition-colors ${
+                className={`${TAP_GAP[6]} px-3 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer transition-colors ${
                   otherSideView === opt.value
                     ? 'bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] border-neutral-900 dark:border-white'
                     : 'bg-white dark:bg-[#141414] text-neutral-700 dark:text-[#c4c4c4] border-neutral-200 dark:border-[#333333] hover:bg-neutral-100 dark:hover:bg-[#1f1f1f]'

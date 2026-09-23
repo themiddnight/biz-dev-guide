@@ -4,6 +4,7 @@ import { ChapterContentSection, ContentBlock, ContentPlacement, FigureKey } from
 import { FIGURES, FigureProps } from '../figures';
 import { ContentTable } from './ContentTable';
 import { RichText } from './RichText';
+import { TAP } from '../ui/tapTarget';
 
 interface ContentBlocksProps {
   sections: ChapterContentSection[];
@@ -139,7 +140,7 @@ const Block: React.FC<BlockProps> = ({ block, onNavigateChapter }) => {
                       href={item.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 underline decoration-neutral-400 dark:decoration-[#525252] underline-offset-2 hover:decoration-neutral-900 dark:hover:decoration-white"
+                      className={`${TAP} inline-flex items-center gap-1 underline decoration-neutral-400 dark:decoration-[#525252] underline-offset-2 hover:decoration-neutral-900 dark:hover:decoration-white`}
                     >
                       {item.label}
                       <ExternalLink className="w-3 h-3" />

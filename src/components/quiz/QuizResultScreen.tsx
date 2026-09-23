@@ -2,6 +2,7 @@ import React from 'react';
 import { Sparkles, RotateCcw, Trophy, Target, Zap, Bot, BookOpen } from 'lucide-react';
 import { CHAPTERS } from '../../data/chaptersData';
 import { resultCopy, scoreBand, type MissedItem } from '../../lib/quizResult';
+import { TAP } from '../ui/tapTarget';
 
 interface QuizResultScreenProps {
   score: number;
@@ -101,7 +102,7 @@ export const QuizResultScreen: React.FC<QuizResultScreenProps> = ({
                     type="button"
                     data-quiz-review-chapter={chapter.id}
                     onClick={() => onOpenChapter(chapter.id)}
-                    className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-neutral-100 dark:bg-[#1a1a1a] text-neutral-900 dark:text-[#e5e5e5] border border-neutral-200 dark:border-[#262626] text-xs font-semibold hover:bg-neutral-200/70 dark:hover:bg-[#222222] transition-all cursor-pointer max-w-full"
+                    className={`${TAP} inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-neutral-100 dark:bg-[#1a1a1a] text-neutral-900 dark:text-[#e5e5e5] border border-neutral-200 dark:border-[#262626] text-xs font-semibold hover:bg-neutral-200/70 dark:hover:bg-[#222222] transition-all cursor-pointer max-w-full`}
                   >
                     <BookOpen className="w-4 h-4 shrink-0" />
                     <span className="truncate">อ่านบทที่ {chapter.num}: {chapter.title}</span>
@@ -117,7 +118,7 @@ export const QuizResultScreen: React.FC<QuizResultScreenProps> = ({
       <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
         <button
           onClick={onRestart}
-          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl sm:rounded-2xl bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] text-xs sm:text-sm font-semibold hover:opacity-90 transition-all cursor-pointer shadow-xs"
+          className={`${TAP} w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl sm:rounded-2xl bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] text-xs sm:text-sm font-semibold hover:opacity-90 transition-all cursor-pointer shadow-xs`}
         >
           <RotateCcw className="w-4 h-4" />
           <span>ทำแบบทดสอบอีกครั้ง</span>
@@ -125,7 +126,7 @@ export const QuizResultScreen: React.FC<QuizResultScreenProps> = ({
 
         <button
           onClick={onAskAI}
-          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl sm:rounded-2xl bg-neutral-100 dark:bg-[#1a1a1a] text-neutral-900 dark:text-[#e5e5e5] border border-neutral-200 dark:border-[#262626] text-xs sm:text-sm font-semibold hover:bg-neutral-200/70 dark:hover:bg-[#222222] transition-all cursor-pointer"
+          className={`${TAP} w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl sm:rounded-2xl bg-neutral-100 dark:bg-[#1a1a1a] text-neutral-900 dark:text-[#e5e5e5] border border-neutral-200 dark:border-[#262626] text-xs sm:text-sm font-semibold hover:bg-neutral-200/70 dark:hover:bg-[#222222] transition-all cursor-pointer`}
         >
           <Bot className="w-4 h-4" />
           <span>ถาม AI ทบทวนข้อที่ยังไม่แม่น</span>

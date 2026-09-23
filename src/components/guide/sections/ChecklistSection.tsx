@@ -1,6 +1,7 @@
 import React from 'react';
 import { ChevronDown, ChevronUp, CheckSquare, Square } from 'lucide-react';
 import type { SectionProps } from './registry';
+import { TAP } from '../../ui/tapTarget';
 
 export const ChecklistSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggle, ctx }) => {
   /* SECTION 8: Pre-flight Checklist */
@@ -9,7 +10,7 @@ export const ChecklistSection: React.FC<SectionProps> = ({ chapter, isOpen, onTo
     <div className="border border-neutral-200 dark:border-[#262626] rounded-2xl overflow-hidden bg-white dark:bg-[#141414] shadow-2xs">
       <button
         onClick={onToggle}
-        className="w-full p-3.5 sm:p-4.5 flex items-center justify-between bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f] text-left cursor-pointer select-none transition-colors"
+        className={`${TAP} w-full p-3.5 sm:p-4.5 flex items-center justify-between bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f] text-left cursor-pointer select-none transition-colors`}
       >
         <div className="flex items-center gap-3">
           <div className="w-7 h-7 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] flex items-center justify-center font-bold text-xs shadow-xs shrink-0">

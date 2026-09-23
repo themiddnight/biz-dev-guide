@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { RefreshCw, Radio, Zap } from 'lucide-react';
+import { TAP } from './ui/tapTarget';
 
 /**
  * Sync vs Async protocol simulator (Polling / Webhook / WebSocket).
@@ -58,7 +59,7 @@ export const ProtocolSimulator: React.FC = () => {
             <div className="flex rounded-xl bg-slate-100 dark:bg-slate-800 p-1">
               <button
                 onClick={() => { setProtocolMode('polling'); setIsPolling(false); }}
-                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                className={`${TAP} px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                   protocolMode === 'polling' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 dark:text-slate-300'
                 }`}
               >
@@ -66,7 +67,7 @@ export const ProtocolSimulator: React.FC = () => {
               </button>
               <button
                 onClick={() => { setProtocolMode('webhook'); setIsPolling(false); setWsConnected(false); }}
-                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                className={`${TAP} px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                   protocolMode === 'webhook' ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-600 dark:text-slate-300'
                 }`}
               >
@@ -74,7 +75,7 @@ export const ProtocolSimulator: React.FC = () => {
               </button>
               <button
                 onClick={() => { setProtocolMode('websocket'); setIsPolling(false); }}
-                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                className={`${TAP} px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                   protocolMode === 'websocket' ? 'bg-amber-600 text-white shadow-xs' : 'text-slate-600 dark:text-slate-300'
                 }`}
               >
@@ -93,7 +94,7 @@ export const ProtocolSimulator: React.FC = () => {
                 </span>
                 <button
                   onClick={() => setIsPolling(!isPolling)}
-                  className={`px-3 py-1 rounded-lg text-xs font-bold cursor-pointer ${
+                  className={`${TAP} px-3 py-1 rounded-lg text-xs font-bold cursor-pointer ${
                     isPolling ? 'bg-rose-500 text-white' : 'bg-blue-600 text-white'
                   }`}
                 >
@@ -128,7 +129,7 @@ export const ProtocolSimulator: React.FC = () => {
                     const time = new Date().toLocaleTimeString();
                     setWebhookLogs((prev) => [`[${time}] Event: payment.succeeded - ได้รับเงิน 1,500 บาทจากธนาคารทันที!`, ...prev.slice(0, 2)]);
                   }}
-                  className="px-3 py-1 bg-emerald-600 text-white rounded-lg text-xs font-bold cursor-pointer hover:bg-emerald-700"
+                  className={`${TAP} px-3 py-1 bg-emerald-600 text-white rounded-lg text-xs font-bold cursor-pointer hover:bg-emerald-700`}
                 >
                   กดจำลองลูกค้าสแกนจ่ายเงินสำเร็จ
                 </button>
@@ -164,7 +165,7 @@ export const ProtocolSimulator: React.FC = () => {
                 </span>
                 <button
                   onClick={() => setWsConnected(!wsConnected)}
-                  className={`px-3 py-1 rounded-lg text-xs font-bold cursor-pointer ${
+                  className={`${TAP} px-3 py-1 rounded-lg text-xs font-bold cursor-pointer ${
                     wsConnected ? 'bg-rose-500 text-white' : 'bg-amber-600 text-white'
                   }`}
                 >

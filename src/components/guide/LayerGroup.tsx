@@ -1,6 +1,7 @@
 import React from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { LAYER_META, SECTION_META, type LayerGroup } from '../../data/sectionLayers';
+import { TAP } from '../ui/tapTarget';
 
 interface LayerGroupViewProps {
   group: LayerGroup;
@@ -16,7 +17,7 @@ export const LayerGroupView: React.FC<LayerGroupViewProps> = ({ group, isExpande
         type="button"
         aria-expanded={isExpanded}
         onClick={onToggle}
-        className="w-full flex items-center justify-between gap-3 py-2 border-b border-neutral-200 dark:border-[#262626] text-left cursor-pointer"
+        className={`${TAP} w-full flex items-center justify-between gap-3 py-2 border-b border-neutral-200 dark:border-[#262626] text-left cursor-pointer`}
       >
         <span className="text-sm sm:text-base font-extrabold text-neutral-900 dark:text-[#fafafa]">
           {LAYER_META[group.layer].name}

@@ -2,6 +2,7 @@ import React from 'react';
 import type { ChapterHeroFigure } from '../../types';
 import { FIGURES } from '../figures';
 import { ROLES, ROLE_META, type Role } from '../../data/rolePerspective';
+import { TAP } from '../ui/tapTarget';
 
 interface HeroFigureProps {
   figure: ChapterHeroFigure;
@@ -37,7 +38,7 @@ export const HeroFigure: React.FC<HeroFigureProps> = ({ figure, analogy, role, s
             type="button"
             data-seat-flip
             onClick={onFlipSeat}
-            className="cursor-pointer text-xs font-semibold text-neutral-600 dark:text-[#a3a3a3] underline underline-offset-2 hover:text-neutral-900 dark:hover:text-[#fafafa]"
+            className={`${TAP} cursor-pointer text-xs font-semibold text-neutral-600 dark:text-[#a3a3a3] underline underline-offset-2 hover:text-neutral-900 dark:hover:text-[#fafafa]`}
           >
             {seat === role ? 'นั่งเก้าอี้อีกฝั่ง' : 'กลับเก้าอี้ตัวเอง'}
           </button>

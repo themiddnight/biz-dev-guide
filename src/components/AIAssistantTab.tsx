@@ -15,6 +15,7 @@ import {
   RefreshCw,
   WifiOff
 } from 'lucide-react';
+import { TAP, TAP_GAP, TAP_POSITIONED } from './ui/tapTarget';
 
 interface AIAssistantTabProps {
   initialPrompt?: string;
@@ -154,7 +155,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
             <button
               key={r}
               onClick={() => setRolePerspective(r)}
-              className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+              className={`${TAP} px-2.5 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer ${
                 rolePerspective === r
                   ? 'bg-white dark:bg-[#262626] text-neutral-900 dark:text-white shadow-2xs font-bold'
                   : 'text-neutral-500 dark:text-[#737373] hover:text-neutral-900 dark:hover:text-white'
@@ -177,7 +178,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
             <button
               key={idx}
               onClick={() => handleSend(prompt)}
-              className="text-xs px-3 py-1.5 rounded-xl bg-white dark:bg-[#141414] hover:bg-neutral-50 dark:hover:bg-[#1c1c1c] text-neutral-700 dark:text-[#c4c4c4] border border-neutral-200 dark:border-[#262626] hover:border-neutral-400 dark:hover:border-[#404040] transition-all text-left cursor-pointer shadow-2xs"
+              className={`${TAP_GAP[8]} text-xs px-3 py-1.5 rounded-xl bg-white dark:bg-[#141414] hover:bg-neutral-50 dark:hover:bg-[#1c1c1c] text-neutral-700 dark:text-[#c4c4c4] border border-neutral-200 dark:border-[#262626] hover:border-neutral-400 dark:hover:border-[#404040] transition-all text-left cursor-pointer shadow-2xs`}
             >
               {prompt}
             </button>
@@ -272,7 +273,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
                     </span>
                     <button
                       onClick={() => copyToClipboard(msg.content, msg.id)}
-                      className="hover:text-neutral-900 dark:hover:text-white flex items-center gap-1 cursor-pointer transition-colors"
+                      className={`${TAP} hover:text-neutral-900 dark:hover:text-white flex items-center gap-1 cursor-pointer transition-colors`}
                     >
                       {copiedId === msg.id ? (
                         <>
@@ -325,7 +326,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
         <button
           type="submit"
           disabled={!inputQuestion.trim() || isLoading}
-          className="absolute right-2 px-3.5 py-2 bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:hover:bg-neutral-200 dark:text-[#0a0a0a] disabled:opacity-40 rounded-lg sm:rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer disabled:cursor-not-allowed"
+          className={`${TAP_POSITIONED} absolute right-2 px-3.5 py-2 bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:hover:bg-neutral-200 dark:text-[#0a0a0a] disabled:opacity-40 rounded-lg sm:rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer disabled:cursor-not-allowed`}
         >
           {isLoading ? (
             <Loader2 className="w-4 h-4 animate-spin" />

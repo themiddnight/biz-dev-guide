@@ -1,6 +1,7 @@
 import React from 'react';
 import { DIAGRAM_FAMILIES, DiagramFamily, DiagramJumpTarget } from '../../data/diagramFamilies';
 import { FIGURES } from '../figures';
+import { TAP } from '../ui/tapTarget';
 
 interface DiagramFamilyGridProps {
   onJump: (target: DiagramJumpTarget) => void;
@@ -45,7 +46,7 @@ export const DiagramFamilyGrid: React.FC<DiagramFamilyGridProps> = ({ onJump }) 
           key={family.id}
           type="button"
           onClick={() => onJump(target)}
-          className={`${cardBase} ${jumpClass}`}
+          className={`${TAP} ${cardBase} ${jumpClass}`}
         >
           <FamilyCardBody family={family} />
         </button>

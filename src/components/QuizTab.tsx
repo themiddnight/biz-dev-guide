@@ -15,6 +15,7 @@ import {
   Bot,
   BookOpen
 } from 'lucide-react';
+import { TAP, TAP_GAP } from './ui/tapTarget';
 
 type AnswerQuiz = (questionId: number, correct: boolean) => number; // pays XP now; returns XP actually awarded
 type CompleteQuiz = (score: number, roundSize: number) => void; // stats and badges only
@@ -99,7 +100,7 @@ export const QuizTab: React.FC<QuizTabProps> = ({
               aria-pressed={selected}
               data-quiz-round={r}
               onClick={() => chooseRound(r)}
-              className={`px-3 py-1.5 rounded-full border text-xs font-semibold transition-colors cursor-pointer ${
+              className={`${TAP_GAP[8]} px-3 py-1.5 rounded-full border text-xs font-semibold transition-colors cursor-pointer ${
                 selected
                   ? 'bg-neutral-900 text-white border-neutral-900 dark:bg-white dark:text-[#0a0a0a] dark:border-white'
                   : 'bg-white dark:bg-[#141414] text-neutral-700 dark:text-[#c4c4c4] border-neutral-200 dark:border-[#262626] hover:border-neutral-400 dark:hover:border-[#404040]'
@@ -258,7 +259,7 @@ const QuizRun: React.FC<QuizRunProps> = ({
               key={`${currentQ.id}-${option.text}`}
               onClick={() => handleSelectOption(idx)}
               disabled={isAnswered}
-              className={`w-full p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border text-left text-xs sm:text-sm font-medium transition-all flex items-start justify-between gap-3 cursor-pointer disabled:cursor-default ${btnStyle}`}
+              className={`${TAP} w-full p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border text-left text-xs sm:text-sm font-medium transition-all flex items-start justify-between gap-3 cursor-pointer disabled:cursor-default ${btnStyle}`}
             >
               <div className="flex items-start gap-3">
                 <span className={`w-6 h-6 rounded-lg text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 ${
@@ -308,7 +309,7 @@ const QuizRun: React.FC<QuizRunProps> = ({
               type="button"
               data-quiz-chapter={currentQ.chapterId}
               onClick={() => onOpenChapter(currentQ.chapterId!)}
-              className="inline-flex items-center gap-2 px-4 py-3 rounded-xl sm:rounded-2xl bg-neutral-100 dark:bg-[#1a1a1a] text-neutral-900 dark:text-[#e5e5e5] border border-neutral-200 dark:border-[#262626] text-xs sm:text-sm font-semibold hover:bg-neutral-200/70 dark:hover:bg-[#222222] transition-all cursor-pointer"
+              className={`${TAP} inline-flex items-center gap-2 px-4 py-3 rounded-xl sm:rounded-2xl bg-neutral-100 dark:bg-[#1a1a1a] text-neutral-900 dark:text-[#e5e5e5] border border-neutral-200 dark:border-[#262626] text-xs sm:text-sm font-semibold hover:bg-neutral-200/70 dark:hover:bg-[#222222] transition-all cursor-pointer`}
             >
               <BookOpen className="w-4 h-4" />
               <span>อ่านบทที่เกี่ยวข้อง</span>
@@ -316,7 +317,7 @@ const QuizRun: React.FC<QuizRunProps> = ({
           )}
           <button
             onClick={handleNext}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl sm:rounded-2xl bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:hover:bg-neutral-200 dark:text-[#0a0a0a] text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer"
+            className={`${TAP} inline-flex items-center gap-2 px-6 py-3 rounded-xl sm:rounded-2xl bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:hover:bg-neutral-200 dark:text-[#0a0a0a] text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer`}
           >
             <span>{currentIndex + 1 === questions.length ? 'ดูผล' : 'คำถามข้อถัดไป'}</span>
             <ArrowRight className="w-4 h-4" />

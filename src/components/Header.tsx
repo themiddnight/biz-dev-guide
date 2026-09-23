@@ -15,6 +15,7 @@ import {
   Sprout,
   Handshake
 } from 'lucide-react';
+import { TAP, TAP_Y } from './ui/tapTarget';
 
 const ROLE_OPTIONS: { value: Role | null; label: string; title?: string }[] = [
   { value: 'biz', label: `${ROLE_META.biz.icon} Business`, title: ROLE_META.biz.origin },
@@ -22,9 +23,9 @@ const ROLE_OPTIONS: { value: Role | null; label: string; title?: string }[] = [
   { value: null, label: 'ไม่ระบุ' },
 ];
 
-// Segmented-control button, at least 32px tall (spec P1.4).
+// Segmented-control button, at least 32px tall (spec P1.4); 44px to the finger below sm.
 const segmentClass = (active: boolean) =>
-  `flex items-center gap-1 px-2 py-1 min-h-8 rounded-[3px] text-xs transition-all cursor-pointer ${
+  `${TAP} flex items-center gap-1 px-2 py-1 min-h-8 rounded-[3px] text-xs transition-all cursor-pointer ${
     active
       ? 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 font-bold'
       : 'text-neutral-600 dark:text-[#737373] hover:text-neutral-900 dark:hover:text-white font-medium'
@@ -218,7 +219,7 @@ export const Header: React.FC<HeaderProps> = ({
                 <button
                   onClick={() => setTheme('light')}
                   title="Light mode (สว่าง)"
-                  className={`p-1.5 rounded-[3px] transition-all cursor-pointer ${
+                  className={`${TAP_Y} p-1.5 rounded-[3px] transition-all cursor-pointer ${
                     theme === 'light'
                       ? 'bg-white dark:bg-neutral-800 text-neutral-950 shadow-2xs font-bold'
                       : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
@@ -230,7 +231,7 @@ export const Header: React.FC<HeaderProps> = ({
                 <button
                   onClick={() => setTheme('dark')}
                   title="Dark mode (มืด)"
-                  className={`p-1.5 rounded-[3px] transition-all cursor-pointer ${
+                  className={`${TAP_Y} p-1.5 rounded-[3px] transition-all cursor-pointer ${
                     theme === 'dark'
                       ? 'bg-neutral-900 dark:bg-[#262626] text-white shadow-2xs font-bold'
                       : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
@@ -242,7 +243,7 @@ export const Header: React.FC<HeaderProps> = ({
                 <button
                   onClick={() => setTheme('system')}
                   title="System default (ตามระบบ)"
-                  className={`p-1.5 rounded-[3px] transition-all cursor-pointer ${
+                  className={`${TAP_Y} p-1.5 rounded-[3px] transition-all cursor-pointer ${
                     theme === 'system'
                       ? 'bg-neutral-900 dark:bg-[#262626] text-white shadow-2xs font-bold'
                       : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
@@ -259,10 +260,10 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Control Bar: Tabs & Experience Level */}
         <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-2 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 border-t border-neutral-200 dark:border-[#262626]">
           {/* Navigation Tabs (Variation 4 Mono Button Style) */}
-          <nav className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none" aria-label="Main Navigation">
+          <nav className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 max-sm:-mt-2.5 max-sm:pt-2.5 max-sm:-mb-2.5 max-sm:pb-3.5 scrollbar-none" aria-label="Main Navigation">
             <button
               onClick={() => setActiveTab('guide')}
-              className={`flex items-center gap-1.5 px-3 py-1 rounded-[4px] text-xs font-semibold uppercase tracking-wider transition-all shrink-0 cursor-pointer border ${
+              className={`${TAP} flex items-center gap-1.5 px-3 py-1 rounded-[4px] text-xs font-semibold uppercase tracking-wider transition-all shrink-0 cursor-pointer border ${
                 activeTab === 'guide'
                   ? 'bg-neutral-950 text-white dark:bg-white dark:text-neutral-950 border-neutral-950 dark:border-white'
                   : 'border-neutral-200 dark:border-[#262626] text-neutral-600 dark:text-[#a3a3a3] hover:bg-neutral-100 dark:hover:bg-[#1a1a1a] hover:text-neutral-900 dark:hover:text-white'
@@ -274,7 +275,7 @@ export const Header: React.FC<HeaderProps> = ({
 
             <button
               onClick={() => setActiveTab('ai')}
-              className={`flex items-center gap-1.5 px-3 py-1 rounded-[4px] text-xs font-semibold uppercase tracking-wider transition-all shrink-0 cursor-pointer border ${
+              className={`${TAP} flex items-center gap-1.5 px-3 py-1 rounded-[4px] text-xs font-semibold uppercase tracking-wider transition-all shrink-0 cursor-pointer border ${
                 activeTab === 'ai'
                   ? 'bg-neutral-950 text-white dark:bg-white dark:text-neutral-950 border-neutral-950 dark:border-white'
                   : 'border-neutral-200 dark:border-[#262626] text-neutral-600 dark:text-[#a3a3a3] hover:bg-neutral-100 dark:hover:bg-[#1a1a1a] hover:text-neutral-900 dark:hover:text-white'
@@ -286,7 +287,7 @@ export const Header: React.FC<HeaderProps> = ({
 
             <button
               onClick={() => setActiveTab('quiz')}
-              className={`flex items-center gap-1.5 px-3 py-1 rounded-[4px] text-xs font-semibold uppercase tracking-wider transition-all shrink-0 cursor-pointer border ${
+              className={`${TAP} flex items-center gap-1.5 px-3 py-1 rounded-[4px] text-xs font-semibold uppercase tracking-wider transition-all shrink-0 cursor-pointer border ${
                 activeTab === 'quiz'
                   ? 'bg-neutral-950 text-white dark:bg-white dark:text-neutral-950 border-neutral-950 dark:border-white'
                   : 'border-neutral-200 dark:border-[#262626] text-neutral-600 dark:text-[#a3a3a3] hover:bg-neutral-100 dark:hover:bg-[#1a1a1a] hover:text-neutral-900 dark:hover:text-white'
@@ -298,7 +299,7 @@ export const Header: React.FC<HeaderProps> = ({
 
             <button
               onClick={() => setActiveTab('gamification')}
-              className={`flex items-center gap-1.5 px-3 py-1 rounded-[4px] text-xs font-semibold uppercase tracking-wider transition-all shrink-0 cursor-pointer border ${
+              className={`${TAP} flex items-center gap-1.5 px-3 py-1 rounded-[4px] text-xs font-semibold uppercase tracking-wider transition-all shrink-0 cursor-pointer border ${
                 activeTab === 'gamification'
                   ? 'bg-neutral-950 text-white dark:bg-white dark:text-neutral-950 border-neutral-950 dark:border-white'
                   : 'border-neutral-200 dark:border-[#262626] text-neutral-600 dark:text-[#a3a3a3] hover:bg-neutral-100 dark:hover:bg-[#1a1a1a] hover:text-neutral-900 dark:hover:text-white'

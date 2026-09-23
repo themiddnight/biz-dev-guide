@@ -50,6 +50,7 @@ import {
   Check,
   SlidersHorizontal
 } from 'lucide-react';
+import { TAP, TAP_GAP } from './ui/tapTarget';
 
 /** Glossary terms the index search matches for s15, computed once. */
 const GLOSSARY_TERMS = GLOSSARY.map(g => g.term);
@@ -364,7 +365,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
             {/* Open Table of Contents Button */}
             <button
               onClick={openIndex}
-              className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:hover:bg-neutral-200 dark:text-[#0a0a0a] text-xs sm:text-sm font-semibold shadow-xs transition-all cursor-pointer"
+              className={`${TAP_GAP[8]} inline-flex items-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:hover:bg-neutral-200 dark:text-[#0a0a0a] text-xs sm:text-sm font-semibold shadow-xs transition-all cursor-pointer`}
             >
               <List className="w-4 h-4" />
               <span>สารบัญทั้ง {chapters.length} บท (Index)</span>
@@ -372,7 +373,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
 
             <button
               onClick={onStartQuiz}
-              className="inline-flex items-center gap-2 px-3 sm:px-3.5 py-2 sm:py-2.5 rounded-xl bg-neutral-100 dark:bg-[#1a1a1a] border border-neutral-200 dark:border-[#262626] text-neutral-700 dark:text-[#d4d4d4] text-xs sm:text-sm font-medium hover:bg-neutral-200/70 dark:hover:bg-[#222222] transition-all cursor-pointer"
+              className={`${TAP_GAP[8]} inline-flex items-center gap-2 px-3 sm:px-3.5 py-2 sm:py-2.5 rounded-xl bg-neutral-100 dark:bg-[#1a1a1a] border border-neutral-200 dark:border-[#262626] text-neutral-700 dark:text-[#d4d4d4] text-xs sm:text-sm font-medium hover:bg-neutral-200/70 dark:hover:bg-[#222222] transition-all cursor-pointer`}
             >
               <GraduationCap className="w-4 h-4 text-amber-500" />
               <span>ทำควิซสะสม XP</span>
@@ -381,7 +382,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
             {/* Quick jump to the glossary (chapter 15) */}
             <button
               onClick={() => handleSelectChapter('s15')}
-              className="inline-flex items-center gap-2 px-3 sm:px-3.5 py-2 sm:py-2.5 rounded-xl bg-neutral-100 dark:bg-[#1a1a1a] border border-neutral-200 dark:border-[#262626] text-neutral-700 dark:text-[#d4d4d4] text-xs sm:text-sm font-medium hover:bg-neutral-200/70 dark:hover:bg-[#222222] transition-all cursor-pointer"
+              className={`${TAP_GAP[8]} inline-flex items-center gap-2 px-3 sm:px-3.5 py-2 sm:py-2.5 rounded-xl bg-neutral-100 dark:bg-[#1a1a1a] border border-neutral-200 dark:border-[#262626] text-neutral-700 dark:text-[#d4d4d4] text-xs sm:text-sm font-medium hover:bg-neutral-200/70 dark:hover:bg-[#222222] transition-all cursor-pointer`}
             >
               <span aria-hidden="true">📖</span>
               <span>Glossary</span>
@@ -453,7 +454,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                 <button
                   key={tag.id}
                   onClick={() => setSelectedRole(tag.id)}
-                  className={`px-2.5 py-1 rounded-lg font-medium whitespace-nowrap transition-all cursor-pointer ${
+                  className={`${TAP} px-2.5 py-1 rounded-lg font-medium whitespace-nowrap transition-all cursor-pointer ${
                     selectedRole === tag.id
                       ? 'bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] font-bold shadow-xs'
                       : 'bg-neutral-100 dark:bg-[#1f1f1f] text-neutral-600 dark:text-[#a3a3a3] hover:bg-neutral-200 dark:hover:bg-[#262626]'
@@ -476,7 +477,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                   <button
                     key={chapter.id}
                     onClick={() => handleSelectChapter(chapter.id)}
-                    className={`w-full text-left p-2.5 rounded-xl border transition-all cursor-pointer flex items-start gap-2.5 ${
+                    className={`${TAP} w-full text-left p-2.5 rounded-xl border transition-all cursor-pointer flex items-start gap-2.5 ${
                       isActive
                         ? 'bg-neutral-100 dark:bg-[#1f1f1f] border-neutral-300 dark:border-[#3a3a3a] shadow-xs'
                         : 'bg-neutral-50/50 dark:bg-[#141414]/60 border-neutral-200/60 dark:border-[#262626] hover:border-neutral-300 dark:hover:border-[#333333] hover:bg-neutral-100/70 dark:hover:bg-[#1a1a1a]'
@@ -539,7 +540,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                 <button
                   disabled={!prevChapter}
                   onClick={() => prevChapter && handleSelectChapter(prevChapter.id)}
-                  className={`p-2 rounded-xl border flex items-center gap-1 text-xs font-semibold transition-all ${
+                  className={`${TAP} p-2 rounded-xl border flex items-center gap-1 text-xs font-semibold transition-all ${
                     prevChapter
                       ? 'border-neutral-200 dark:border-[#262626] hover:bg-neutral-100 dark:hover:bg-[#1f1f1f] text-neutral-700 dark:text-[#d4d4d4] cursor-pointer'
                       : 'border-neutral-100 dark:border-[#1c1c1c] text-neutral-300 dark:text-[#444444] cursor-not-allowed'
@@ -553,7 +554,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                 {/* Mobile Table of Contents Toggle */}
                 <button
                   onClick={openIndex}
-                  className="lg:hidden px-3 py-2 rounded-xl bg-neutral-100 dark:bg-[#1f1f1f] hover:bg-neutral-200 text-neutral-700 dark:text-[#d4d4d4] text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
+                  className={`${TAP} lg:hidden px-3 py-2 rounded-xl bg-neutral-100 dark:bg-[#1f1f1f] hover:bg-neutral-200 text-neutral-700 dark:text-[#d4d4d4] text-xs font-semibold flex items-center gap-1.5 cursor-pointer`}
                 >
                   <List className="w-3.5 h-3.5" />
                   <span>สารบัญ ({activeChapter.num}/{chapters.length})</span>
@@ -576,7 +577,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                 {onToggleReadChapter && (
                   <button
                     onClick={() => onToggleReadChapter(activeChapter.id)}
-                    className={`px-3 py-2 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                    className={`${TAP} px-3 py-2 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
                       isCurrentRead
                         ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300'
                         : 'bg-neutral-50 dark:bg-[#1a1a1a] border-neutral-200 dark:border-[#262626] text-neutral-700 dark:text-[#d4d4d4] hover:bg-neutral-100 dark:hover:bg-[#222222]'
@@ -591,7 +592,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                 {/* Bookmark Toggle */}
                 <button
                   onClick={() => onToggleBookmark(activeChapter.id)}
-                  className={`p-2 rounded-xl border transition-all cursor-pointer ${
+                  className={`${TAP} p-2 rounded-xl border transition-all cursor-pointer ${
                     isCurrentBookmarked
                       ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-300 dark:border-amber-700 text-amber-600 dark:text-amber-400'
                       : 'bg-neutral-50 dark:bg-[#1a1a1a] border-neutral-200 dark:border-[#262626] text-neutral-500 hover:text-neutral-800 dark:hover:text-[#fafafa]'
@@ -605,7 +606,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                 <button
                   disabled={!nextChapter}
                   onClick={() => nextChapter && handleSelectChapter(nextChapter.id)}
-                  className={`p-2 rounded-xl border flex items-center gap-1 text-xs font-semibold transition-all ${
+                  className={`${TAP} p-2 rounded-xl border flex items-center gap-1 text-xs font-semibold transition-all ${
                     nextChapter
                       ? 'border-neutral-200 dark:border-[#262626] bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] hover:opacity-90 cursor-pointer shadow-xs'
                       : 'border-neutral-100 dark:border-[#1c1c1c] text-neutral-300 dark:text-[#444444] cursor-not-allowed'
@@ -651,7 +652,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                   <div className="flex items-center gap-1.5 self-start sm:self-auto">
                     <button
                       onClick={() => onExperienceLevelChange && onExperienceLevelChange('beginner')}
-                      className={`px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer transition-all ${
+                      className={`${TAP} px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer transition-all ${
                         chapterLevel === 'beginner'
                           ? 'bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] shadow-xs font-bold'
                           : 'bg-white dark:bg-[#1f1f1f] text-neutral-600 dark:text-[#a3a3a3] border border-neutral-200 dark:border-[#333333] hover:bg-neutral-100 dark:hover:bg-[#262626]'
@@ -661,7 +662,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                     </button>
                     <button
                       onClick={() => onExperienceLevelChange && onExperienceLevelChange('experienced')}
-                      className={`px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer transition-all ${
+                      className={`${TAP} px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer transition-all ${
                         chapterLevel === 'experienced'
                           ? 'bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] shadow-xs font-bold'
                           : 'bg-white dark:bg-[#1f1f1f] text-neutral-600 dark:text-[#a3a3a3] border border-neutral-200 dark:border-[#333333] hover:bg-neutral-100 dark:hover:bg-[#262626]'
@@ -695,7 +696,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                         data-chapter-level={lvl}
                         aria-pressed={chapterLevel === lvl}
                         onClick={() => handleChapterLevelPick(lvl)}
-                        className={`px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer transition-all ${
+                        className={`${TAP} px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer transition-all ${
                           chapterLevel === lvl
                             ? 'bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] shadow-xs font-bold'
                             : 'bg-white dark:bg-[#1f1f1f] text-neutral-600 dark:text-[#a3a3a3] border border-neutral-200 dark:border-[#333333] hover:bg-neutral-100 dark:hover:bg-[#262626]'
@@ -713,7 +714,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                           type="button"
                           data-chapter-level-reset
                           onClick={() => onChapterLevelChange?.(activeChapter.id, null)}
-                          className="text-xs font-semibold text-neutral-500 dark:text-[#8e8e8e] hover:underline cursor-pointer"
+                          className={`${TAP} text-xs font-semibold text-neutral-500 dark:text-[#8e8e8e] hover:underline cursor-pointer`}
                         >
                           {chapterLevelResetLabel(levelMode)}
                         </button>
@@ -774,7 +775,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <button
                   onClick={() => onAskAIWithPrompt(`ช่วยอธิบายบทที่ ${activeChapter.num} "${activeChapter.title}" ให้ฟังอย่างละเอียด พร้อมยกตัวอย่างเคสจริงในบริษัทเทคให้เห็นภาพ`)}
-                  className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-neutral-100 dark:bg-[#1f1f1f] text-neutral-900 dark:text-[#fafafa] hover:bg-neutral-200 dark:hover:bg-[#262626] text-xs sm:text-sm font-semibold border border-neutral-200 dark:border-[#333333] transition-colors cursor-pointer"
+                  className={`${TAP} inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-neutral-100 dark:bg-[#1f1f1f] text-neutral-900 dark:text-[#fafafa] hover:bg-neutral-200 dark:hover:bg-[#262626] text-xs sm:text-sm font-semibold border border-neutral-200 dark:border-[#333333] transition-colors cursor-pointer`}
                 >
                   <Bot className="w-4 h-4 text-neutral-700 dark:text-[#a3a3a3]" />
                   <span>ถาม AI เพิ่มเรื่องบทนี้</span>
@@ -787,7 +788,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                       if (trackNext.kind === 'next') handleSelectChapter(trackNext.chapterId);
                       else if (trackNext.kind === 'not-in-track' && nextChapter) handleSelectChapter(nextChapter.id);
                     }}
-                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer"
+                    className={`${TAP} inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer`}
                   >
                     <CheckCircle2 className="w-4 h-4" />
                     <span>
@@ -806,7 +807,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                 {prevChapter ? (
                   <button
                     onClick={() => handleSelectChapter(prevChapter.id)}
-                    className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-neutral-200 dark:border-[#262626] hover:border-neutral-400 dark:hover:border-[#404040] text-left transition-all cursor-pointer bg-neutral-50/70 dark:bg-[#181818] group"
+                    className={`${TAP} p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-neutral-200 dark:border-[#262626] hover:border-neutral-400 dark:hover:border-[#404040] text-left transition-all cursor-pointer bg-neutral-50/70 dark:bg-[#181818] group`}
                   >
                     <div className="flex items-center gap-1 text-[11px] text-neutral-500 dark:text-[#737373] group-hover:text-neutral-900 dark:group-hover:text-white transition-colors">
                       <ArrowLeft className="w-3.5 h-3.5" />
@@ -826,7 +827,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                   nextChapter && (
                     <button
                       onClick={() => handleSelectChapter(nextChapter.id)}
-                      className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-neutral-200 dark:border-[#262626] hover:border-neutral-400 dark:hover:border-[#404040] text-right transition-all cursor-pointer bg-neutral-50/70 dark:bg-[#181818] group"
+                      className={`${TAP} p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-neutral-200 dark:border-[#262626] hover:border-neutral-400 dark:hover:border-[#404040] text-right transition-all cursor-pointer bg-neutral-50/70 dark:bg-[#181818] group`}
                     >
                       <div className="flex items-center justify-end gap-1 text-[11px] text-neutral-900 dark:text-white font-semibold">
                         <span>บทถัดไป</span>
@@ -863,7 +864,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
               </div>
               <button
                 onClick={closeIndex}
-                className="p-2 rounded-xl text-neutral-400 hover:text-neutral-700 dark:hover:text-[#fafafa] hover:bg-neutral-100 dark:hover:bg-[#1f1f1f] cursor-pointer"
+                className={`${TAP} p-2 rounded-xl text-neutral-400 hover:text-neutral-700 dark:hover:text-[#fafafa] hover:bg-neutral-100 dark:hover:bg-[#1f1f1f] cursor-pointer`}
               >
                 <X className="w-5 h-5" />
               </button>
@@ -886,7 +887,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                 />
               </div>
 
-              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-xs">
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 max-sm:-mt-2.5 max-sm:pt-2.5 max-sm:-mb-2.5 max-sm:pb-3.5 scrollbar-none text-xs">
                 {[
                   { id: 'all', label: 'ทั้งหมด' },
                   { id: 'pm', label: 'PM' },
@@ -901,7 +902,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                   <button
                     key={tag.id}
                     onClick={() => setSelectedRole(tag.id)}
-                    className={`px-3 py-1 rounded-lg font-medium whitespace-nowrap transition-all cursor-pointer text-[11px] ${
+                    className={`${TAP} px-3 py-1 rounded-lg font-medium whitespace-nowrap transition-all cursor-pointer text-[11px] ${
                       selectedRole === tag.id
                         ? 'bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] font-bold'
                         : 'bg-neutral-200/80 dark:bg-[#262626] text-neutral-700 dark:text-[#a3a3a3] hover:bg-neutral-300 dark:hover:bg-[#333333]'
@@ -975,7 +976,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
               <span className="text-neutral-500 dark:text-[#8e8e8e] text-[11px]">สะสม XP จากการอ่านและการทำควิซ</span>
               <button
                 onClick={closeIndex}
-                className="px-4 py-2 bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] font-semibold rounded-xl cursor-pointer"
+                className={`${TAP} px-4 py-2 bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] font-semibold rounded-xl cursor-pointer`}
               >
                 ปิดสารบัญ
               </button>

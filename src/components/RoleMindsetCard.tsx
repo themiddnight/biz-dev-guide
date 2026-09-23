@@ -13,6 +13,7 @@ import {
   MessageCircle,
   Trophy
 } from 'lucide-react';
+import { TAP } from './ui/tapTarget';
 
 interface RoleMindsetCardProps {
   isOpen: boolean;
@@ -36,7 +37,7 @@ export const RoleMindsetCard: React.FC<RoleMindsetCardProps> = ({
       {/* Header Button */}
       <button
         onClick={onToggle}
-        className="w-full p-3 sm:p-4 flex items-center justify-between bg-neutral-50/80 dark:bg-[#181818] text-left cursor-pointer select-none transition-colors hover:bg-neutral-100/80 dark:hover:bg-[#1f1f1f]"
+        className={`${TAP} w-full p-3 sm:p-4 flex items-center justify-between bg-neutral-50/80 dark:bg-[#181818] text-left cursor-pointer select-none transition-colors hover:bg-neutral-100/80 dark:hover:bg-[#1f1f1f]`}
       >
         <div className="flex items-center gap-2.5 sm:gap-3">
           <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-xs sm:text-sm shadow-xs shrink-0">
@@ -71,7 +72,7 @@ export const RoleMindsetCard: React.FC<RoleMindsetCardProps> = ({
             <div className="flex items-center gap-1 p-0.5 sm:p-1 bg-neutral-100 dark:bg-[#1a1a1a] rounded-lg sm:rounded-xl border border-neutral-200/60 dark:border-[#262626]">
               <button
                 onClick={() => setActiveTab('business')}
-                className={`flex items-center gap-1 sm:gap-1.5 px-2.5 py-1 rounded-md sm:rounded-lg text-[11px] sm:text-xs font-medium cursor-pointer transition-all ${
+                className={`${TAP} flex items-center gap-1 sm:gap-1.5 px-2.5 py-1 rounded-md sm:rounded-lg text-[11px] sm:text-xs font-medium cursor-pointer transition-all ${
                   activeTab === 'business'
                     ? 'bg-white dark:bg-[#262626] text-amber-700 dark:text-amber-300 shadow-2xs font-bold'
                     : 'text-neutral-600 dark:text-[#737373] hover:text-neutral-900 dark:hover:text-white'
@@ -82,7 +83,7 @@ export const RoleMindsetCard: React.FC<RoleMindsetCardProps> = ({
               </button>
               <button
                 onClick={() => setActiveTab('engineer')}
-                className={`flex items-center gap-1 sm:gap-1.5 px-2.5 py-1 rounded-md sm:rounded-lg text-[11px] sm:text-xs font-medium cursor-pointer transition-all ${
+                className={`${TAP} flex items-center gap-1 sm:gap-1.5 px-2.5 py-1 rounded-md sm:rounded-lg text-[11px] sm:text-xs font-medium cursor-pointer transition-all ${
                   activeTab === 'engineer'
                     ? 'bg-white dark:bg-[#262626] text-indigo-700 dark:text-indigo-300 shadow-2xs font-bold'
                     : 'text-neutral-600 dark:text-[#737373] hover:text-neutral-900 dark:hover:text-white'
