@@ -762,7 +762,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                 {onToggleReadChapter && !isCurrentRead && (
                   <Button
                     color="success"
-                    variant="solid"
+                    variant="soft"
                     size="md"
                     onClick={() => {
                       onToggleReadChapter(activeChapter.id);

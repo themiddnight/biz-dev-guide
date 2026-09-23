@@ -49,4 +49,10 @@ describe('TrackPanel hierarchy (spec §10.1, §10.2)', () => {
     expect(primary).toContain('w-full');
     expect(primary).not.toMatch(/(?<![\w:/-])bg-primary(?![\w/-])/);
   });
+
+  it('the panel sits on bg-base-100 so the soft (bg-base-300) button and active row keep a visible boundary', () => {
+    const panel = html.match(/<div[^>]*data-track-panel[^>]*>/)![0];
+    expect(panel).toMatch(/(?<![\w:/-])bg-base-100(?![\w/-])/);
+    expect(panel).not.toMatch(/(?<![\w:/-])bg-base-300(?![\w/-])/);
+  });
 });

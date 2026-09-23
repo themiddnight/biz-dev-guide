@@ -89,4 +89,10 @@ describe('Phase 3 hierarchy and layout tokens', () => {
       .map(f => `${f.file}: ${count(f.src, PRIMARY_SOLID)} primary solids`);
     expect(bad).toEqual([]);
   });
+
+  it('the Guide chapter-end mark-read is a success soft, never a second solid CTA beside TrackEndCard (§9)', () => {
+    const guide = files.find(f => f.file === 'components/GuideTab.tsx')!.src;
+    expect(guide).toMatch(/color="success"\s+variant="soft"/);
+    expect(guide).not.toMatch(/color="success"\s+variant="solid"/);
+  });
 });
