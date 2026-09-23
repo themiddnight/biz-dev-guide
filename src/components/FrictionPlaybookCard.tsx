@@ -67,7 +67,7 @@ export const FrictionPlaybookCard: React.FC<FrictionPlaybookCardProps> = ({
         </button>
 
         {isOpen && (
-          <div className="p-box-dense space-y-3 sm:space-y-4 border-t border-base-border bg-base-100 text-xs sm:text-sm">
+          <div className="p-box space-y-3 sm:space-y-4 border-t border-base-border bg-base-100 text-xs sm:text-sm">
             <div className="p-box-dense rounded-xl bg-warning/10 border border-warning/25 space-y-2">
               <div className="flex items-center gap-1.5 font-bold text-warning text-xs sm:text-sm">
                 <Scale className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-warning" />
@@ -136,7 +136,7 @@ export const FrictionPlaybookCard: React.FC<FrictionPlaybookCardProps> = ({
       </button>
 
       {isOpen && (
-        <div className="p-box-dense space-y-3 sm:space-y-3.5 border-t border-base-border bg-base-100 text-xs sm:text-sm">
+        <div className="p-box space-y-3 sm:space-y-3.5 border-t border-base-border bg-base-100 text-xs sm:text-sm">
           {/* Section 1: The Iceberg - Frustrations and Root Cause */}
           <div className="space-y-2.5">
             <div className="flex items-center gap-1.5 text-xs font-bold text-base-content">
