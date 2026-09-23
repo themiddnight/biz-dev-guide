@@ -1,4 +1,4 @@
-// The answers /api/ask-ai gives when Groq cannot: hand-written answers to the questions people ask
+// The answers /api/ask-ai gives when no AI model can: hand-written answers to the questions people ask
 // most, then the chapter the user was reading, then guide chapters that name what the question
 // names, and last a general answer.
 import { chapters1_5 } from "../src/data/chapters/chapters1_5.js";

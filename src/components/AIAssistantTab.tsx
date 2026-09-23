@@ -83,6 +83,7 @@ const clockTime = () => new Date().toLocaleTimeString([], { hour: '2-digit', min
 // Footer label for an answer: the provider, plus the exact model when the server reported one.
 export function answerSourceLabel(source?: ChatMessage['source'], model?: string): string {
   if (source === 'groq') return model ? `Groq · ${model}` : 'Groq AI';
+  if (source === 'gemini') return model ? `Gemini · ${model}` : 'Gemini AI';
   return source ? 'คลังความรู้ผู้เชี่ยวชาญ' : 'Expert Assistant';
 }
 
@@ -177,7 +178,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
     }
   };
 
-  // Source of the most recent server answer ('groq' | 'fallback' | undefined before any answer).
+  // Source of the most recent server answer ('groq' | 'gemini' | 'fallback' | undefined before any answer).
   const lastAnswer = [...messages].reverse().find((m) => m.role === 'assistant' && m.source);
   const lastSource = lastAnswer?.source;
   const isOffline = lastSource === 'fallback';
@@ -285,7 +286,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
                     {/* Model ids are long; let the label and time wrap as units instead of mid-phrase on phones */}
                     <span className="flex flex-wrap items-center gap-x-1 whitespace-nowrap">
                       <span
-                        className={msg.source === 'groq' ? 'text-success font-semibold' : undefined}
+                        className={msg.source && msg.source !== 'fallback' ? 'text-success font-semibold' : undefined}
                       >
                         ● {answerSourceLabel(msg.source, msg.model)}
                       </span>
@@ -376,7 +377,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
           </Button>
         </form>
         <p className="px-1 text-[11px] text-base-content-muted">
-          AI ตัวนี้ใช้ Groq แบบฟรี จำกัดจำนวนคำถามต่อนาทีและต่อวัน ถ้าถามถี่เกินไป ระบบจะสลับ model หรือตอบจากคลังความรู้ในตัวแทน
+          AI ตัวนี้ใช้ Groq และ Gemini แบบฟรี จำกัดจำนวนคำถามต่อนาทีและต่อวัน ถ้าถามถี่เกินไป ระบบจะสลับ model หรือตอบจากคลังความรู้ในตัวแทน
         </p>
       </div>
     </div>

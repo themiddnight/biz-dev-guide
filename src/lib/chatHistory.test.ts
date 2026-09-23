@@ -21,9 +21,22 @@ describe('buildChatHistory', () => {
     ]);
   });
 
-  it('keeps only the last 4 messages, in order', () => {
-    const messages = [1, 2, 3].flatMap((n) => [msg(`q${n}`, 'user', `q${n}`), msg(`a${n}`, 'assistant', `a${n}`, 'groq')]);
-    expect(buildChatHistory(messages).map((m) => m.content)).toEqual(['q2', 'a2', 'q3', 'a3']);
+  it('keeps the last 5 questions but only the latest answer, in order', () => {
+    const messages = [1, 2, 3, 4, 5, 6, 7].flatMap((n) => [
+      msg(`q${n}`, 'user', `q${n}`),
+      msg(`a${n}`, 'assistant', `a${n}`, 'groq'),
+    ]);
+    expect(buildChatHistory(messages).map((m) => m.content)).toEqual(['q3', 'q4', 'q5', 'q6', 'q7', 'a7']);
+  });
+
+  it('keeps the latest answer when the last question got no reply', () => {
+    const history = buildChatHistory([
+      msg('1', 'user', 'q1'),
+      msg('2', 'assistant', 'a1', 'groq'),
+      msg('3', 'user', 'q2'),
+      msg('4', 'assistant', 'ขออภัย รับคำตอบไม่สำเร็จ'),
+    ]);
+    expect(history.map((m) => m.content)).toEqual(['q1', 'a1', 'q2']);
   });
 
   it('truncates long answers to their head, but never the user text', () => {

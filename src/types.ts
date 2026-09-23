@@ -272,7 +272,7 @@ export interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
   timestamp: string;
-  source?: 'groq' | 'fallback';
+  source?: 'groq' | 'gemini' | 'fallback';
   /** The model that wrote the answer, e.g. "qwen/qwen3.8-27b"; absent for fallback answers. */
   model?: string;
   /** Why a fallback answer was served; "rate_limited" when Groq's free quota ran out. */
