@@ -110,7 +110,8 @@ async function callGroq(
       } else {
         if (res.status === 429) rateLimited = true;
         const err = await res.text().catch(() => "");
-        console.warn(`[Groq ${model}] Failed (${res.status}):`, err.slice(0, 100));
+        // Long enough for a 429 to name the limit it hit (per minute or per day) and when it resets
+        console.warn(`[Groq ${model}] Failed (${res.status}):`, err.slice(0, 300));
       }
     } catch (e: any) {
       console.warn(`[Groq ${model}] Error:`, e?.message || e);
