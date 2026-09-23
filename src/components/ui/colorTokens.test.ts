@@ -58,7 +58,6 @@ const BASELINE: Record<string, number> = {
   'components/FrictionPlaybookCard.tsx': 204,
   'components/GamificationTab.tsx': 120,
   'components/GuideTab.tsx': 379,
-  'components/Header.tsx': 136,
   'components/ProtocolSimulator.tsx': 103,
   'components/QuizTab.tsx': 107,
   'components/RoleMindsetCard.tsx': 106,
@@ -93,7 +92,6 @@ const BASELINE: Record<string, number> = {
   'components/guide/sections/ReferenceSection.tsx': 24,
   'components/guide/sections/WorkflowSection.tsx': 36,
   'components/quiz/QuizResultScreen.tsx': 71,
-  'App.tsx': 23,
 };
 
 describe('colour tokens only', () => {
