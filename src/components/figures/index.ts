@@ -1,0 +1,103 @@
+import type React from 'react';
+import type { FigureKey } from '../../types';
+import { C4L1 } from './C4L1';
+import { C4L1Hero } from './C4L1Hero';
+import { C4L2 } from './C4L2';
+import { C4L3 } from './C4L3';
+import { C4L4 } from './C4L4';
+import { ConeOfUncertainty } from './ConeOfUncertainty';
+import { EnvFlow } from './EnvFlow';
+import { FamilyBehaviorSig } from './FamilyBehaviorSig';
+import { FamilyPlanSig } from './FamilyPlanSig';
+import { FamilyProcessSig } from './FamilyProcessSig';
+import { FamilyScreenSig } from './FamilyScreenSig';
+import { FamilyStructureSig } from './FamilyStructureSig';
+import { FamilyThinkingSig } from './FamilyThinkingSig';
+import { GateTimeline } from './GateTimeline';
+import { RefundAiReview } from './RefundAiReview';
+import { RefundBacklogCut } from './RefundBacklogCut';
+import { RefundC4Impact } from './RefundC4Impact';
+import { RefundDebtDiff } from './RefundDebtDiff';
+import { RefundDeployLog } from './RefundDeployLog';
+import { RefundDualTrackBoard } from './RefundDualTrackBoard';
+import { RefundFidelity } from './RefundFidelity';
+import { RefundGlossaryFix } from './RefundGlossaryFix';
+import { RefundHandoffDrift } from './RefundHandoffDrift';
+import { RefundKpiSplit } from './RefundKpiSplit';
+import { RefundNfrSpec } from './RefundNfrSpec';
+import { RefundSequence } from './RefundSequence';
+import { RefundSloDashboard } from './RefundSloDashboard';
+import { RefundSpecStack } from './RefundSpecStack';
+import { RefundStoryGates } from './RefundStoryGates';
+import { RefundSwimlane } from './RefundSwimlane';
+import { RefundTestReport } from './RefundTestReport';
+import { TechDebtQuadrant } from './TechDebtQuadrant';
+import { ThreeLenses } from './ThreeLenses';
+import { TranslationLayers } from './TranslationLayers';
+import { UncertaintySpectrum } from './UncertaintySpectrum';
+
+/**
+ * Registry of static figures ported from the original HTML guide (SVG -> JSX).
+ *
+ * Porting rules (spec §1.2):
+ * - One file per figure in this folder; keep `viewBox`, `role="img"`, `<title>`/`<desc>`.
+ * - Convert attributes to JSX (`text-anchor` -> `textAnchor`, `stroke-width` -> `strokeWidth`, ...).
+ * - Replace every `var(--X)` with `var(--fig-X)` (tokens live in `.fig-scope`, `src/index.css`).
+ * - Make every `id` (markers, `url(#…)`, `aria-labelledby`) unique per instance with `useId()`.
+ * - Wrap the root in `<div className="fig-scope">`; scale with `width: 100%; height: auto`,
+ *   capped by the static per-figure `max-width`.
+ * - Figures may hold view-only UI state (e.g. mobile tabs); content stays static.
+ */
+export interface FigureProps {
+  className?: string;
+}
+
+export const FIGURES: Record<FigureKey, React.FC<FigureProps>> = {
+  'tech-debt-quadrant': TechDebtQuadrant,
+  'cone-of-uncertainty': ConeOfUncertainty,
+  // s5 diagram literacy (spec §3.3)
+  'family-structure': FamilyStructureSig,
+  'family-behavior': FamilyBehaviorSig,
+  'family-process': FamilyProcessSig,
+  'family-screen': FamilyScreenSig,
+  'family-thinking': FamilyThinkingSig,
+  'family-plan': FamilyPlanSig,
+  'three-lenses': ThreeLenses,
+  'c4-l1-hero': C4L1Hero,
+  'c4-l1': C4L1,
+  'c4-l2': C4L2,
+  'c4-l3': C4L3,
+  'c4-l4': C4L4,
+  'refund-swimlane': RefundSwimlane,
+  'refund-sequence': RefundSequence,
+  // s2 hero (chapter figure briefs 2026-09-22, s2)
+  'refund-backlog-cut': RefundBacklogCut,
+  // s3 visual-first pilot hero (spec 2026-09-22 §2)
+  'refund-fidelity': RefundFidelity,
+  // s4 hero (chapter figure briefs 2026-09-22, s4)
+  'refund-nfr-spec': RefundNfrSpec,
+  // s5 hero (chapter figure briefs 2026-09-22, s5 option B)
+  'refund-c4-impact': RefundC4Impact,
+  // s6 hero (chapter figure briefs 2026-09-22, s6)
+  'refund-story-gates': RefundStoryGates,
+  // s7 hero (chapter figure briefs 2026-09-22, s7)
+  'refund-test-report': RefundTestReport,
+  // s9 hero (chapter figure briefs 2026-09-22, s9)
+  'refund-debt-diff': RefundDebtDiff,
+  // s14 hero (chapter figure briefs 2026-09-22, s14)
+  'refund-spec-stack': RefundSpecStack,
+  // s10, s11, s13, s15 heroes (chapter figure briefs 2026-09-22, wave 2c)
+  'refund-slo-dashboard': RefundSloDashboard,
+  'refund-kpi-split': RefundKpiSplit,
+  'refund-ai-review': RefundAiReview,
+  'refund-glossary-fix': RefundGlossaryFix,
+  // s1, s8, s12 heroes (chapter figure briefs 2026-09-22, wave 3)
+  'refund-handoff-drift': RefundHandoffDrift,
+  'refund-deploy-log': RefundDeployLog,
+  'refund-dual-track-board': RefundDualTrackBoard,
+  // Appendix figures (spec §6)
+  'translation-layers': TranslationLayers,
+  'gate-timeline': GateTimeline,
+  'env-flow': EnvFlow,
+  'uncertainty-spectrum': UncertaintySpectrum,
+};

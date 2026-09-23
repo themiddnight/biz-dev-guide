@@ -2,11 +2,15 @@
 
 @theme {
   --font-sans: 'Geist', 'Prompt', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
   --color-slate-850: #172033;
 }
 
 @custom-variant dark (&:where(.dark, .dark *));
+
+/* No monospace in content: code-like elements use the body font (kbd keeps the preflight monospace). */
+code, samp, pre {
+  font-family: inherit;
+}
 
 ::selection {
   background: #ffffff;
@@ -51,6 +55,22 @@
   }
 }
 
+/*
+ * Anchor offset (I-18): GuideTab measures the sticky app header with a ResizeObserver and
+ * writes its height to --header-h on <html>. SectionOutline does the same for its own bar,
+ * writing --outline-h. Every id'd element (anchor / scrollIntoView target) keeps clear of
+ * both. Unlayered on purpose so it beats Tailwind scroll-mt-*.
+ */
+:root {
+  --header-h: 0px;
+  --outline-h: 0px;
+}
+
+[id],
+.anchor-target {
+  scroll-margin-top: calc(var(--header-h) + var(--outline-h, 0px) + 16px);
+}
+
 /* Design Token Utility Classes */
 .token-card {
   background-color: var(--surface-card);
@@ -88,7 +108,6 @@
 }
 
 .token-label-mono {
-  font-family: 'JetBrains Mono', monospace;
   font-size: 0.6875rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
@@ -96,12 +115,7 @@
   font-weight: 600;
 }
 
-.mono {
-  font-family: 'JetBrains Mono', monospace;
-}
-
 .label {
-  font-family: 'JetBrains Mono', monospace;
   font-size: 0.65rem;
   text-transform: uppercase;
   letter-spacing: 0.15em;
@@ -139,4 +153,57 @@
 
 .dark ::-webkit-scrollbar-thumb:hover {
   background: #404040;
+}
+
+/* Static figure port scope (SVG -> JSX). Figures reference var(--fig-*) only,
+   so they never shadow the app's own --text-muted / --border-color tokens. */
+.fig-scope {
+  --fig-bg: #ffffff;
+  --fig-surface-2: #eeeef0;
+  --fig-border: #e2e2e5;
+  --fig-text: #1a1a1e;
+  --fig-text-2: #5b5b63;
+  --fig-text-muted: #8a8a92;
+  --fig-accent: #3b4bd6;
+  --fig-accent-bg: #eef2ff;
+  --fig-accent-border: #c7cffa;
+  --fig-warn: #9a6400;
+  --fig-warn-bg: #fff6e5;
+  --fig-warn-border: #f3dfa8;
+  --fig-ok: #1a7a4c;
+  --fig-ok-bg: #e9f8f0;
+  --fig-ok-border: #b9e6cf;
+  /* Role colours (static --c-*), used by the uncertainty spectrum figure */
+  --fig-c-pm: hsl(18 70% 42%);
+  --fig-c-ux: hsl(300 55% 46%);
+  --fig-c-ba: hsl(50 75% 36%);
+  --fig-c-sa: hsl(205 75% 42%);
+  --fig-c-eng: hsl(170 65% 32%);
+  --fig-c-qa: hsl(135 55% 32%);
+  --fig-c-devops: hsl(280 55% 48%);
+}
+
+.dark .fig-scope {
+  --fig-bg: #141414;
+  --fig-surface-2: #1f1f1f;
+  --fig-border: #333333;
+  --fig-text: #e5e5e5;
+  --fig-text-2: #a3a3a3;
+  --fig-text-muted: #737373;
+  --fig-accent: #aab4ff;
+  --fig-accent-bg: #232a52;
+  --fig-accent-border: #3b4487;
+  --fig-warn: #f0c674;
+  --fig-warn-bg: #3a2e12;
+  --fig-warn-border: #5c4a1e;
+  --fig-ok: #7fe0b3;
+  --fig-ok-bg: #123324;
+  --fig-ok-border: #1f5c3e;
+  --fig-c-pm: hsl(18 60% 72%);
+  --fig-c-ux: hsl(300 50% 78%);
+  --fig-c-ba: hsl(50 60% 68%);
+  --fig-c-sa: hsl(205 65% 75%);
+  --fig-c-eng: hsl(170 50% 68%);
+  --fig-c-qa: hsl(135 45% 68%);
+  --fig-c-devops: hsl(280 55% 80%);
 }

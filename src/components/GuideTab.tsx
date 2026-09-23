@@ -1,73 +1,99 @@
-import React, { useState, useEffect } from 'react';
-import { Chapter, AudienceMode, ExperienceLevel } from '../types';
-import { ROLE_MINDSETS } from '../data/roleMindsets';
-import { FRICTION_PLAYBOOKS } from '../data/frictionPlaybooks';
-import { ChapterDiagram } from './ChapterDiagram';
-import { RoleMindsetCard } from './RoleMindsetCard';
-import { FrictionPlaybookCard } from './FrictionPlaybookCard';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { Chapter, ExperienceLevel } from '../types';
+import { CHAPTER_START_ID, scrollToChapterStart } from '../lib/chapterScroll';
+import { S5_JUMP_TARGET_IDS, DiagramJumpTarget } from '../data/diagramFamilies';
+import { GlossaryFilter } from './glossary/GlossaryPanel';
+import { GLOSSARY, GlossaryCategory } from '../data/glossary';
+import { filterIndexChapters } from '../lib/chapterSearch';
+import { IndexEmptyState } from './guide/IndexEmptyState';
+import { SECTION_COMPONENTS, type GuideSectionContext, type OtherSideView } from './guide/sections/registry';
+import {
+  getChapterLayout,
+  deriveOpenState,
+  expandAll,
+  collapseAll,
+  openSection,
+  toggleSection,
+  toggleLayer,
+  isSectionPresent,
+  getInlineSectionsAt,
+  SECTION_META,
+  type OpenState,
+  type SectionKey,
+} from '../data/sectionLayers';
+import type { RequestedSection } from '../lib/chapterRoute';
+import { LayerGroupView } from './guide/LayerGroup';
+import { InlineSections } from './guide/InlineSections';
+import { ChapterHero } from './guide/ChapterHero';
+import { SectionOutline } from './guide/SectionOutline';
+import { TrackPanel } from './guide/TrackPanel';
+import { chapterLevelResetLabel, chapterLevelScopeLabel } from './guide/rolePerspectiveUi';
+import { TrackNextCard, TrackEndCard } from './guide/TrackFooter';
+import { getTrackNext, resolveTrack, type TrackKey } from '../data/readingTracks';
+import { planChapterLevelChoice } from '../lib/rolePrefs';
+import { ROLE_META, otherRole, resolveChapterLevel, getActiveTrackKey, type LevelInputs, type LevelMode, type Role } from '../data/rolePerspective';
+import { FirstVisitCard, type FirstVisitMode } from './guide/FirstVisitCard';
 import { 
   Search, 
   Bookmark, 
   BookmarkCheck, 
   Bot, 
-  Sparkles, 
-  Layers, 
-  Clock, 
-  ChevronRight, 
+  Sparkles,
+  ChevronRight,
   ChevronLeft,
-  ChevronDown, 
-  ChevronUp,
-  Info,
-  AlertCircle,
-  Lightbulb,
   CheckCircle2,
-  CheckSquare,
-  Square,
-  Workflow,
-  BookOpen,
-  ShieldAlert,
   List,
   X,
   ArrowLeft,
   ArrowRight,
   GraduationCap,
-  MessageSquare,
   Check,
-  Share2,
-  SlidersHorizontal,
-  Briefcase,
-  Code2,
-  Users,
-  Handshake,
-  Sprout,
-  Scale,
-  Flame,
-  Zap
+  SlidersHorizontal
 } from 'lucide-react';
+import { TAP, TAP_GAP } from './ui/tapTarget';
+
+/** Glossary terms the index search matches for s15, computed once. */
+const GLOSSARY_TERMS = GLOSSARY.map(g => g.term);
 
 interface GuideTabProps {
   chapters: Chapter[];
-  audienceMode: AudienceMode;
-  experienceLevel?: ExperienceLevel;
+  levelInputs: LevelInputs;
   onExperienceLevelChange?: (lvl: ExperienceLevel) => void;
-  onAudienceChange?: (mode: AudienceMode) => void;
-  plainModeEnabled: boolean;
+  onChooseRole?: (role: Role | null) => void;
+  onChapterLevelChange?: (chapterId: string, level: ExperienceLevel | null) => void;
+  showFirstVisit?: boolean;
+  onChooseInitialLevel?: (level: ExperienceLevel) => void;
+  /** First-visit card: the level that goes with the chosen role (spec 2026-09-23-first-visit-role-and-level). */
+  onLevelModeChange?: (mode: LevelMode) => void;
+  loadedFromHash: boolean;
+  initialSource: 'hash' | 'stored' | 'default';
+  hasNavigated: boolean;
   bookmarks: string[];
   readChapters?: string[];
   onToggleBookmark: (chapterId: string) => void;
   onToggleReadChapter?: (chapterId: string) => void;
   onAskAIWithPrompt: (prompt: string) => void;
   onStartQuiz: () => void;
-  onEarnXp?: (amount: number, reason: string) => void;
+  onEarnXp?: (chapterId: string, amount: number, reason: string) => void;
+  activeChapterId: string;
+  requestedSection: RequestedSection | null;
+  onNavigateChapter: (chapterId: string, section?: SectionKey) => void;
+  onReplaceSection: (section: SectionKey | null) => void;
+  onRequestedSectionApplied: () => void;
 }
 
 export const GuideTab: React.FC<GuideTabProps> = ({
   chapters,
-  audienceMode,
-  experienceLevel = 'beginner',
+  levelInputs,
   onExperienceLevelChange,
-  onAudienceChange,
-  plainModeEnabled,
+  onChooseRole,
+  onChapterLevelChange,
+  showFirstVisit,
+  onChooseInitialLevel,
+  onLevelModeChange,
+  loadedFromHash,
+  initialSource,
+  hasNavigated,
   bookmarks,
   readChapters = [],
   onToggleBookmark,
@@ -75,102 +101,207 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   onAskAIWithPrompt,
   onStartQuiz,
   onEarnXp,
+  onReplaceSection,
+  onRequestedSectionApplied,
+  activeChapterId,
+  requestedSection,
+  onNavigateChapter,
 }) => {
-  const [activeChapterId, setActiveChapterId] = useState<string>('s1');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRole, setSelectedRole] = useState<string>('all');
   const [isIndexOpen, setIsIndexOpen] = useState(false);
   const [checkedChecklist, setCheckedChecklist] = useState<Record<string, boolean>>({});
   const [c4Level, setC4Level] = useState<number>(1);
-  const [expandedFaqId, setExpandedFaqId] = useState<number | null>(1);
-  const [mindsetSubTab, setMindsetSubTab] = useState<'business' | 'engineer'>('business');
-  const [dilemmaAnswers, setDilemmaAnswers] = useState<Record<string, string>>({});
+  const [glossaryCategory, setGlossaryCategory] = useState<GlossaryFilter>('all');
+  const [glossaryQuery, setGlossaryQuery] = useState('');
+  const [pendingScrollId, setPendingScrollId] = useState<string | null>(null);
+  // Button that opened the index drawer, so focus can return to it on close (I-25).
+  const indexOpenerRef = useRef<HTMLElement | null>(null);
 
-  // Accordion section states for the active chapter
-  const [openSections, setOpenSections] = useState<Record<string, boolean>>({
-    mindset: true,
-    friction: true,
-    primer: experienceLevel === 'beginner',
-    jargon: experienceLevel === 'beginner',
-    dialogue: true,
-    diagram: true,
-    examples: true,
-    coreConcepts: true,
-    workflow: false,
-    pitfalls: experienceLevel === 'experienced',
-    checklist: false,
-  });
+  const openIndex = (event: React.MouseEvent<HTMLElement>) => {
+    indexOpenerRef.current = event.currentTarget;
+    setIsIndexOpen(true);
+  };
 
-  // Automatically adapt default visible sections when user toggles Experience Level
-  useEffect(() => {
-    if (experienceLevel === 'experienced') {
-      setOpenSections(prev => ({
-        ...prev,
-        friction: true,
-        dialogue: true,
-        pitfalls: true,
-      }));
-    } else {
-      setOpenSections(prev => ({
-        ...prev,
-        mindset: true,
-        primer: true,
-        jargon: true,
-      }));
+  const closeIndex = () => {
+    setIsIndexOpen(false);
+    const opener = indexOpenerRef.current;
+    indexOpenerRef.current = null;
+    if (opener && document.contains(opener)) {
+      window.requestAnimationFrame(() => opener.focus());
     }
-  }, [experienceLevel]);
+  };
+
+  // Esc closes the index drawer and returns focus to its opener.
+  useEffect(() => {
+    if (!isIndexOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        closeIndex();
+      }
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [isIndexOpen]);
+
+  // Publish the sticky app header height as --header-h so anchor targets clear it (I-18).
+  useEffect(() => {
+    const header = document.querySelector<HTMLElement>('header.sticky') ?? document.querySelector<HTMLElement>('header');
+    if (!header) return;
+    const root = document.documentElement;
+    const update = () => root.style.setProperty('--header-h', `${Math.ceil(header.getBoundingClientRect().height)}px`);
+    update();
+    if (typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(update);
+    observer.observe(header);
+    return () => observer.disconnect();
+  }, []);
+
+  // Deferred scroll: wait for the committed render + layout before scrolling to the target.
+  useEffect(() => {
+    if (!pendingScrollId) return;
+    let raf2 = 0;
+    const raf1 = window.requestAnimationFrame(() => {
+      raf2 = window.requestAnimationFrame(() => {
+        document.getElementById(pendingScrollId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setPendingScrollId(null);
+      });
+    });
+    return () => {
+      window.cancelAnimationFrame(raf1);
+      window.cancelAnimationFrame(raf2);
+    };
+  }, [pendingScrollId, activeChapterId]);
 
   // Find active chapter object
   const activeChapter = chapters.find(c => c.id === activeChapterId) || chapters[0];
   const activeIndex = chapters.findIndex(c => c.id === activeChapterId);
+
+  const { role, levelMode } = levelInputs;
+  const { level: chapterLevel, source: levelSource } = resolveChapterLevel(levelInputs, activeChapter);
+  const trackKey = getActiveTrackKey(role, levelInputs.baseLevel);
+  const layout = useMemo(() => getChapterLayout(chapterLevel, activeChapter), [chapterLevel, activeChapter]);
+  const [openState, setOpenState] = useState<OpenState>(() => deriveOpenState(layout, activeChapter.id));
+
+  // Other-side box: defaults to the other side (both when no role); resets on role change, not persisted (spec P2.2).
+  const defaultOtherSideView: OtherSideView = role ? otherRole(role) : 'both';
+  // The pick remembers the role it was made under, so a role change falls back to the
+  // default in the same render (no effect, no stale frame).
+  const [otherSidePick, setOtherSidePick] = useState<{ role: Role | null; view: OtherSideView } | null>(null);
+  const otherSideView = otherSidePick && otherSidePick.role === role ? otherSidePick.view : defaultOtherSideView;
+  const setOtherSideView = (view: OtherSideView) => setOtherSidePick({ role, view });
+
+  // Hero seat: the reader's own seat unless flipped; resets on chapter or role change, not persisted (spec P3.3).
+  // Stored with the chapter:role key it applies to, so it is derived rather than reset by an effect.
+  const seatKey = `${activeChapter.id}:${role}`;
+  const [flippedFor, setFlippedFor] = useState<string | null>(null);
+  const seatFlipped = flippedFor === seatKey;
+  const seat = role ? (seatFlipped ? otherRole(role) : role) : 'biz';
+
+  // Lens hint names the Core sections this chapter actually opens with (from the layer config).
+  const coreHint = (layout.find(g => g.layer === 'core')?.sections ?? []).map(k => SECTION_META[k].chip).join(' · ');
+
+  // Per-chapter level button: no redundant override; picking the fallback level clears it.
+  const handleChapterLevelPick = (lvl: ExperienceLevel) => {
+    const action = planChapterLevelChoice(levelInputs, activeChapter, lvl);
+    if (action.kind === 'clear') onChapterLevelChange?.(activeChapter.id, null);
+    else if (action.kind === 'set') onChapterLevelChange?.(activeChapter.id, action.level);
+  };
+
+  // Each chapter (and each level) opens at its Core (spec §1.4, D3).
+  useEffect(() => {
+    setOpenState(deriveOpenState(layout, activeChapter.id));
+  }, [layout]);
+
+  // A requested section opens on top of the re-derived defaults. Declared after the
+  // re-derive effect so that, when both fire in one commit, this update wins.
+  // Keyed on the nonce alone on purpose: it fires once per request, not on layout/level changes.
+  useEffect(() => {
+    if (!requestedSection) return;
+    // Consume the request so a remount (Quiz -> Guide) never re-opens and re-scrolls to it.
+    onRequestedSectionApplied();
+    if (!isSectionPresent(activeChapter, requestedSection.key)) {
+      onReplaceSection(null);
+      return;
+    }
+    setOpenState(openSection(deriveOpenState(layout, activeChapter.id), layout, requestedSection.key));
+    setPendingScrollId(`sec-${requestedSection.key}`);
+  }, [requestedSection?.nonce]);
+
+  // Chip click: open (never close) the section, scroll to it, and record it in the URL (spec §2.1).
+  const handleOutlineSelect = (key: SectionKey) => {
+    setOpenState(prev => openSection(prev, layout, key));
+    setPendingScrollId(`sec-${key}`);
+    onReplaceSection(key);
+  };
   const prevChapter = activeIndex > 0 ? chapters[activeIndex - 1] : null;
   const nextChapter = activeIndex < chapters.length - 1 ? chapters[activeIndex + 1] : null;
 
   const isCurrentBookmarked = bookmarks.includes(activeChapter.id);
+
+  // s5 family-grid jump cards: open the target block (if it is a disclosure) and scroll it into view.
+  const handleDiagramJump = (target: DiagramJumpTarget) => {
+    const el = document.getElementById(S5_JUMP_TARGET_IDS[target]);
+    if (!el) return;
+    if (el instanceof HTMLDetailsElement) el.open = true;
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
   const isCurrentRead = readChapters.includes(activeChapter.id);
+  const trackNext = getTrackNext(resolveTrack(trackKey, chapters), activeChapter.id);
 
-  // Scroll to top when active chapter changes
+  // Start the new chapter at its title (page top on desktop, reader card on mobile)
   const handleSelectChapter = (chapterId: string) => {
-    setActiveChapterId(chapterId);
+    onNavigateChapter(chapterId);
     setIsIndexOpen(false);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    scrollToChapterStart('smooth');
   };
 
-  const toggleSection = (sectionKey: string) => {
-    setOpenSections(prev => ({
-      ...prev,
-      [sectionKey]: !prev[sectionKey]
-    }));
+  // After a first-visit choice, jump to the chosen track's first chapter.
+  // An explicit first-visit choice wins over the loaded hash (round3 spec D4).
+  const jumpToTrackStart = (key: TrackKey) => {
+    const first = resolveTrack(key, chapters)[0];
+    if (first) handleSelectChapter(first);
+    if (!window.matchMedia('(min-width: 1024px)').matches) setIsIndexOpen(true);
+  };
+  const handleFirstVisitChoice = (chosen: Role, mode: FirstVisitMode) => {
+    onChooseRole?.(chosen);
+    onLevelModeChange?.(mode); // always written, so a stale stored mode never survives the choice
+    jumpToTrackStart(chosen);
+  };
+  const handleFirstVisitSkip = () => onChooseInitialLevel?.('beginner');
+
+  // The chapter was restored from storage: say so once, until the reader navigates (round3 spec D2).
+  const showResumedLine = initialSource === 'stored' && !hasNavigated && !showFirstVisit;
+
+  // Category map tile (s15 diagram) -> filter the glossary panel and scroll to it
+  const handleSelectGlossaryCategory = (category: GlossaryCategory) => {
+    setGlossaryCategory(category);
+    setOpenState(prev => openSection(prev, layout, 'glossary'));
+    window.setTimeout(() => {
+      document.getElementById('glossary-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
   };
 
-  const expandAllSections = () => {
-    setOpenSections({
-      mindset: true,
-      friction: true,
-      primer: true,
-      jargon: true,
-      dialogue: true,
-      diagram: true,
-      examples: true,
-      coreConcepts: true,
-      workflow: true,
-      pitfalls: true,
-      checklist: true,
-    });
+  // s11 FAQ concept chip -> open the s15 glossary with the search prefilled
+  const handleSearchGlossary = (query: string) => {
+    setGlossaryQuery(query);
+    setGlossaryCategory('all');
+    onNavigateChapter('s15', 'glossary');
+    setIsIndexOpen(false);
   };
 
-  const collapseAllSections = () => {
-    setOpenSections({
-      primer: false,
-      jargon: false,
-      dialogue: false,
-      diagram: false,
-      examples: false,
-      coreConcepts: false,
-      workflow: false,
-      pitfalls: false,
-      checklist: false,
-    });
+  // s11 FAQ playbook link -> open (and navigate to) a chapter's friction playbook, then scroll to it.
+  // A cross-chapter jump requests the section via the route so the open lands on top of the new
+  // chapter's re-derived defaults; the scroll then runs after the new chapter has rendered.
+  const handleScrollToPlaybook = (chapterId: string) => {
+    if (chapterId !== activeChapterId) {
+      onNavigateChapter(chapterId, 'friction');
+      setIsIndexOpen(false);
+      return;
+    }
+    setOpenState(prev => openSection(prev, layout, 'friction'));
+    setPendingScrollId('friction-playbook-card');
   };
 
   const toggleChecklistItem = (key: string) => {
@@ -180,28 +311,41 @@ export const GuideTab: React.FC<GuideTabProps> = ({
     }));
   };
 
-  // Filtered chapters for the Index
-  const filteredChapters = chapters.filter((ch) => {
-    const matchesSearch = 
-      ch.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      ch.subtitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      ch.keyTakeaway.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      ch.plainAnalogy.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (ch.jargonList && ch.jargonList.some(j => j.term.toLowerCase().includes(searchQuery.toLowerCase())));
+  const sectionCtx: GuideSectionContext = {
+    chapters,
+    onEarnXp,
+    onNavigateChapter: handleSelectChapter,
+    onDiagramJump: handleDiagramJump,
+    onScrollToPlaybook: handleScrollToPlaybook,
+    onSearchGlossary: handleSearchGlossary,
+    onSelectGlossaryCategory: handleSelectGlossaryCategory,
+    glossaryCategory, setGlossaryCategory,
+    glossaryQuery, setGlossaryQuery,
+    c4Level, setC4Level,
+    checkedChecklist, onToggleChecklistItem: toggleChecklistItem,
+    role,
+    chapterLevel,
+    otherSideView, setOtherSideView,
+  };
 
-    const matchesRole = 
-      selectedRole === 'all' || 
-      ch.roleTag === selectedRole || 
-      ch.roleTag === 'all';
-
-    return matchesSearch && matchesRole;
-  });
+  // Filtered chapters for the Index (search reads core concepts too; role UX fixes P4.1)
+  const filteredChapters = filterIndexChapters(chapters, searchQuery, selectedRole, GLOSSARY_TERMS);
+  const clearIndexFilters = () => {
+    setSearchQuery('');
+    setSelectedRole('all');
+  };
+  const indexEmpty = filteredChapters.length === 0 && (
+    <IndexEmptyState query={searchQuery} roleFiltered={selectedRole !== 'all'} onClear={clearIndexFilters} />
+  );
 
   const percentCompleted = Math.round((readChapters.length / chapters.length) * 100);
 
   return (
     <div className="space-y-6 pb-20">
       {/* Top Welcome & Quick Jump Banner */}
+      {showFirstVisit ? (
+        <FirstVisitCard chapters={chapters} onChoose={handleFirstVisitChoice} onSkip={handleFirstVisitSkip} />
+      ) : (
       <div className="bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xs">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="space-y-1.5 max-w-2xl">
@@ -210,35 +354,44 @@ export const GuideTab: React.FC<GuideTabProps> = ({
               <span>โหมดอ่านทีละบท พร้อมสารบัญกระโดดข้ามได้ตลอดเวลา</span>
             </div>
             <h2 className="text-lg sm:text-2xl font-extrabold text-neutral-900 dark:text-[#fafafa] tracking-tight">
-              คู่มือสองโลก Business ↔ Engineering (15 บทฉบับเริ่มจาก 0)
+              คู่มือสองโลก Business ↔ Engineering ({chapters.length} บท เริ่มจากศูนย์)
             </h2>
             <p className="text-xs sm:text-sm text-neutral-500 dark:text-[#8e8e8e] leading-relaxed font-normal">
-              ครอบคลุมปฐมบทสำหรับมือใหม่ ศัพท์เทคนิคแปลเป็นภาษาคน ตัวอย่างบทสนทนาจริงในที่ทำงาน แผนภาพจำลองระบบ และทางออกของข้อขัดแย้ง
+              มีตั้งแต่จุดเริ่มต้นสำหรับมือใหม่ ศัพท์เทคนิคแปลเป็นภาษาคน ตัวอย่างบทสนทนาจริงในที่ทำงาน แผนภาพจำลองระบบ และทางออกของข้อขัดแย้ง
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2 shrink-0">
             {/* Open Table of Contents Button */}
             <button
-              onClick={() => setIsIndexOpen(true)}
-              className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:hover:bg-neutral-200 dark:text-[#0a0a0a] text-xs sm:text-sm font-semibold shadow-xs transition-all cursor-pointer"
+              onClick={openIndex}
+              className={`${TAP_GAP[8]} inline-flex items-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:hover:bg-neutral-200 dark:text-[#0a0a0a] text-xs sm:text-sm font-semibold shadow-xs transition-all cursor-pointer`}
             >
               <List className="w-4 h-4" />
-              <span>สารบัญทั้ง 15 บท (Index)</span>
+              <span>สารบัญทั้ง {chapters.length} บท (Index)</span>
             </button>
 
             <button
               onClick={onStartQuiz}
-              className="inline-flex items-center gap-2 px-3 sm:px-3.5 py-2 sm:py-2.5 rounded-xl bg-neutral-100 dark:bg-[#1a1a1a] border border-neutral-200 dark:border-[#262626] text-neutral-700 dark:text-[#d4d4d4] text-xs sm:text-sm font-medium hover:bg-neutral-200/70 dark:hover:bg-[#222222] transition-all cursor-pointer"
+              className={`${TAP_GAP[8]} inline-flex items-center gap-2 px-3 sm:px-3.5 py-2 sm:py-2.5 rounded-xl bg-neutral-100 dark:bg-[#1a1a1a] border border-neutral-200 dark:border-[#262626] text-neutral-700 dark:text-[#d4d4d4] text-xs sm:text-sm font-medium hover:bg-neutral-200/70 dark:hover:bg-[#222222] transition-all cursor-pointer`}
             >
               <GraduationCap className="w-4 h-4 text-amber-500" />
               <span>ทำควิซสะสม XP</span>
+            </button>
+
+            {/* Quick jump to the glossary (chapter 15) */}
+            <button
+              onClick={() => handleSelectChapter('s15')}
+              className={`${TAP_GAP[8]} inline-flex items-center gap-2 px-3 sm:px-3.5 py-2 sm:py-2.5 rounded-xl bg-neutral-100 dark:bg-[#1a1a1a] border border-neutral-200 dark:border-[#262626] text-neutral-700 dark:text-[#d4d4d4] text-xs sm:text-sm font-medium hover:bg-neutral-200/70 dark:hover:bg-[#222222] transition-all cursor-pointer`}
+            >
+              <span aria-hidden="true">📖</span>
+              <span>Glossary</span>
             </button>
           </div>
         </div>
 
         {/* Global Progress Bar */}
-        <div className="mt-4 pt-3.5 border-t border-neutral-100 dark:border-[#262626] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs font-mono">
+        <div className="mt-4 pt-3.5 border-t border-neutral-100 dark:border-[#262626] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs">
           <div className="flex items-center gap-2 text-neutral-600 dark:text-[#a3a3a3] font-medium text-[11px] sm:text-xs">
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
             <span>ความคืบหน้าการอ่าน: อ่านจบแล้ว {readChapters.length} จาก {chapters.length} บท ({percentCompleted}%)</span>
@@ -251,6 +404,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
           </div>
         </div>
       </div>
+      )}
 
       {/* Main Layout: Desktop Sidebar Index + Chapter Reader Card */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-start">
@@ -261,12 +415,16 @@ export const GuideTab: React.FC<GuideTabProps> = ({
             <div className="flex items-center justify-between pb-2 border-b border-neutral-100 dark:border-[#262626]">
               <div className="flex items-center gap-2">
                 <List className="w-4 h-4 text-neutral-900 dark:text-white" />
-                <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">สารบัญบทเรียน (15 บท)</h3>
+                <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">สารบัญบทเรียน ({chapters.length} บท)</h3>
               </div>
-              <span className="text-[11px] font-semibold text-neutral-500 dark:text-[#8e8e8e] font-mono">
+              <span className="text-[11px] font-semibold text-neutral-500 dark:text-[#8e8e8e]">
                 บทที่ {activeIndex + 1}/{chapters.length}
               </span>
             </div>
+
+            <TrackPanel chapters={chapters} trackKey={trackKey} readChapters={readChapters} activeChapterId={activeChapterId} onSelectChapter={handleSelectChapter} onStartQuiz={onStartQuiz} />
+
+            <h3 data-all-chapters-heading className="text-xs font-bold text-neutral-500 dark:text-[#8e8e8e]">ทุกบท ({chapters.length})</h3>
 
             {/* Quick Search in Index */}
             <div className="relative">
@@ -281,7 +439,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
             </div>
 
             {/* Role Filter Chips */}
-            <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-none text-[11px]">
+            <div className="flex items-center gap-1 shrink-0 overflow-x-auto pb-1 scrollbar-none text-[11px]">
               {[
                 { id: 'all', label: 'ทั้งหมด' },
                 { id: 'pm', label: 'PM' },
@@ -291,23 +449,25 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                 { id: 'eng', label: 'Dev' },
                 { id: 'qa', label: 'QA' },
                 { id: 'friction', label: 'ขัดแย้ง' },
-              ].map((role) => (
+                { id: 'biz', label: 'ธุรกิจ' },
+              ].map((tag) => (
                 <button
-                  key={role.id}
-                  onClick={() => setSelectedRole(role.id)}
-                  className={`px-2.5 py-1 rounded-lg font-medium whitespace-nowrap transition-all cursor-pointer ${
-                    selectedRole === role.id
+                  key={tag.id}
+                  onClick={() => setSelectedRole(tag.id)}
+                  className={`${TAP} px-2.5 py-1 rounded-lg font-medium whitespace-nowrap transition-all cursor-pointer ${
+                    selectedRole === tag.id
                       ? 'bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] font-bold shadow-xs'
                       : 'bg-neutral-100 dark:bg-[#1f1f1f] text-neutral-600 dark:text-[#a3a3a3] hover:bg-neutral-200 dark:hover:bg-[#262626]'
                   }`}
                 >
-                  {role.label}
+                  {tag.label}
                 </button>
               ))}
             </div>
 
             {/* Chapter List Scrollable */}
             <div className="space-y-1.5 overflow-y-auto pr-1 flex-1 scrollbar-thin">
+              {indexEmpty}
               {filteredChapters.map((chapter) => {
                 const isActive = chapter.id === activeChapterId;
                 const isRead = readChapters.includes(chapter.id);
@@ -317,13 +477,13 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                   <button
                     key={chapter.id}
                     onClick={() => handleSelectChapter(chapter.id)}
-                    className={`w-full text-left p-2.5 rounded-xl border transition-all cursor-pointer flex items-start gap-2.5 ${
+                    className={`${TAP} w-full text-left p-2.5 rounded-xl border transition-all cursor-pointer flex items-start gap-2.5 ${
                       isActive
                         ? 'bg-neutral-100 dark:bg-[#1f1f1f] border-neutral-300 dark:border-[#3a3a3a] shadow-xs'
                         : 'bg-neutral-50/50 dark:bg-[#141414]/60 border-neutral-200/60 dark:border-[#262626] hover:border-neutral-300 dark:hover:border-[#333333] hover:bg-neutral-100/70 dark:hover:bg-[#1a1a1a]'
                     }`}
                   >
-                    <div className={`w-6 h-6 rounded-lg text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 font-mono ${
+                    <div className={`w-6 h-6 rounded-lg text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 ${
                       isActive
                         ? 'bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] shadow-xs'
                         : isRead
@@ -346,7 +506,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                           <BookmarkCheck className="w-3.5 h-3.5 text-amber-500 shrink-0" />
                         )}
                       </div>
-                      <div className="flex items-center gap-1.5 mt-0.5 text-[10px] text-neutral-500 dark:text-[#737373] font-mono">
+                      <div className="flex items-center gap-1.5 mt-0.5 text-[10px] text-neutral-500 dark:text-[#737373]">
                         <span className="uppercase font-semibold">{chapter.roleTag}</span>
                         <span>•</span>
                         <span>{chapter.readTime}</span>
@@ -368,1010 +528,276 @@ export const GuideTab: React.FC<GuideTabProps> = ({
         {/* Right Column: Active Chapter Reader Card ("บทละหน้า") */}
         <div className="lg:col-span-8 space-y-4 sm:space-y-6">
           {/* Chapter Top Navigation Bar */}
-          <div className="bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-2xs flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2 min-w-0">
-              {/* Prev Chapter Button */}
-              <button
-                disabled={!prevChapter}
-                onClick={() => prevChapter && handleSelectChapter(prevChapter.id)}
-                className={`p-2 rounded-xl border flex items-center gap-1 text-xs font-semibold transition-all ${
-                  prevChapter
-                    ? 'border-neutral-200 dark:border-[#262626] hover:bg-neutral-100 dark:hover:bg-[#1f1f1f] text-neutral-700 dark:text-[#d4d4d4] cursor-pointer'
-                    : 'border-neutral-100 dark:border-[#1c1c1c] text-neutral-300 dark:text-[#444444] cursor-not-allowed'
-                }`}
-                title={prevChapter ? `บทก่อนหน้า: ${prevChapter.title}` : 'นี่คือบทแรก'}
-              >
-                <ChevronLeft className="w-4 h-4" />
-                <span className="hidden sm:inline">บทก่อนหน้า</span>
-              </button>
-
-              {/* Mobile Table of Contents Toggle */}
-              <button
-                onClick={() => setIsIndexOpen(true)}
-                className="lg:hidden px-3 py-2 rounded-xl bg-neutral-100 dark:bg-[#1f1f1f] hover:bg-neutral-200 text-neutral-700 dark:text-[#d4d4d4] text-xs font-semibold flex items-center gap-1.5 cursor-pointer font-mono"
-              >
-                <List className="w-3.5 h-3.5" />
-                <span>สารบัญ ({activeChapter.num}/15)</span>
-              </button>
-
-              {/* Current Chapter Indicator on Desktop */}
-              <div className="hidden lg:flex items-center gap-2 pl-2">
-                <span className="px-2.5 py-1 rounded-lg bg-neutral-100 dark:bg-[#1f1f1f] text-neutral-800 dark:text-[#d4d4d4] text-xs font-bold border border-neutral-200 dark:border-[#333333] font-mono">
-                  บทที่ {activeChapter.num} จาก {chapters.length}
-                </span>
-                <span className="text-xs text-neutral-600 dark:text-[#8e8e8e] font-medium truncate max-w-[200px]">
-                  {activeChapter.title}
-                </span>
-              </div>
-            </div>
-
-            {/* Next Chapter & Action Buttons */}
-            <div className="flex items-center gap-2 shrink-0">
-              {/* Mark as read toggle */}
-              {onToggleReadChapter && (
+          <div className="bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-2xs">
+            {showResumedLine && (
+              <p data-resumed className="mb-2 text-xs text-neutral-500 dark:text-[#8e8e8e] truncate">
+                อ่านต่อจากครั้งก่อน · บทที่ {activeChapter.num}
+              </p>
+            )}
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2 min-w-0">
+                {/* Prev Chapter Button */}
                 <button
-                  onClick={() => onToggleReadChapter(activeChapter.id)}
-                  className={`px-3 py-2 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
-                    isCurrentRead
-                      ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300'
-                      : 'bg-neutral-50 dark:bg-[#1a1a1a] border-neutral-200 dark:border-[#262626] text-neutral-700 dark:text-[#d4d4d4] hover:bg-neutral-100 dark:hover:bg-[#222222]'
+                  disabled={!prevChapter}
+                  onClick={() => prevChapter && handleSelectChapter(prevChapter.id)}
+                  className={`${TAP} p-2 rounded-xl border flex items-center gap-1 text-xs font-semibold transition-all ${
+                    prevChapter
+                      ? 'border-neutral-200 dark:border-[#262626] hover:bg-neutral-100 dark:hover:bg-[#1f1f1f] text-neutral-700 dark:text-[#d4d4d4] cursor-pointer'
+                      : 'border-neutral-100 dark:border-[#1c1c1c] text-neutral-300 dark:text-[#444444] cursor-not-allowed'
                   }`}
-                  title="ทำเครื่องหมายว่าอ่านและเข้าใจบทนี้แล้ว (+30 XP)"
+                  title={prevChapter ? `บทก่อนหน้า: ${prevChapter.title}` : 'นี่คือบทแรก'}
                 >
-                  <CheckCircle2 className={`w-3.5 h-3.5 ${isCurrentRead ? 'text-emerald-600 dark:text-emerald-400' : 'text-neutral-400'}`} />
-                  <span className="hidden md:inline">{isCurrentRead ? 'อ่านแล้ว' : 'ทำเครื่องหมายว่าอ่านแล้ว'}</span>
+                  <ChevronLeft className="w-4 h-4" />
+                  <span className="hidden sm:inline">บทก่อนหน้า</span>
                 </button>
-              )}
 
-              {/* Bookmark Toggle */}
-              <button
-                onClick={() => onToggleBookmark(activeChapter.id)}
-                className={`p-2 rounded-xl border transition-all cursor-pointer ${
-                  isCurrentBookmarked
-                    ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-300 dark:border-amber-700 text-amber-600 dark:text-amber-400'
-                    : 'bg-neutral-50 dark:bg-[#1a1a1a] border-neutral-200 dark:border-[#262626] text-neutral-500 hover:text-neutral-800 dark:hover:text-[#fafafa]'
-                }`}
-                title={isCurrentBookmarked ? 'ลบบุ๊กมาร์ก' : 'บันทึกบทนี้ (+15 XP)'}
-              >
-                {isCurrentBookmarked ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
-              </button>
+                {/* Mobile Table of Contents Toggle */}
+                <button
+                  onClick={openIndex}
+                  className={`${TAP} lg:hidden px-3 py-2 rounded-xl bg-neutral-100 dark:bg-[#1f1f1f] hover:bg-neutral-200 text-neutral-700 dark:text-[#d4d4d4] text-xs font-semibold flex items-center gap-1.5 cursor-pointer`}
+                >
+                  <List className="w-3.5 h-3.5" />
+                  <span>สารบัญ ({activeChapter.num}/{chapters.length})</span>
+                </button>
 
-              {/* Next Chapter Button */}
-              <button
-                disabled={!nextChapter}
-                onClick={() => nextChapter && handleSelectChapter(nextChapter.id)}
-                className={`p-2 rounded-xl border flex items-center gap-1 text-xs font-semibold transition-all ${
-                  nextChapter
-                    ? 'border-neutral-200 dark:border-[#262626] bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] hover:opacity-90 cursor-pointer shadow-xs'
-                    : 'border-neutral-100 dark:border-[#1c1c1c] text-neutral-300 dark:text-[#444444] cursor-not-allowed'
-                }`}
-                title={nextChapter ? `บทถัดไป: ${nextChapter.title}` : 'นี่คือบทสุดท้าย'}
-              >
-                <span className="hidden sm:inline">บทถัดไป</span>
-                <ChevronRight className="w-4 h-4" />
-              </button>
+                {/* Current Chapter Indicator on Desktop */}
+                <div className="hidden lg:flex items-center gap-2 pl-2">
+                  <span className="px-2.5 py-1 rounded-lg bg-neutral-100 dark:bg-[#1f1f1f] text-neutral-800 dark:text-[#d4d4d4] text-xs font-bold border border-neutral-200 dark:border-[#333333]">
+                    บทที่ {activeChapter.num} จาก {chapters.length}
+                  </span>
+                  <span className="text-xs text-neutral-600 dark:text-[#8e8e8e] font-medium truncate max-w-[200px]">
+                    {activeChapter.title}
+                  </span>
+                </div>
+              </div>
+
+              {/* Next Chapter & Action Buttons */}
+              <div className="flex items-center gap-2 shrink-0">
+                {/* Mark as read toggle */}
+                {onToggleReadChapter && (
+                  <button
+                    onClick={() => onToggleReadChapter(activeChapter.id)}
+                    className={`${TAP} px-3 py-2 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                      isCurrentRead
+                        ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300'
+                        : 'bg-neutral-50 dark:bg-[#1a1a1a] border-neutral-200 dark:border-[#262626] text-neutral-700 dark:text-[#d4d4d4] hover:bg-neutral-100 dark:hover:bg-[#222222]'
+                    }`}
+                    title="ทำเครื่องหมายว่าอ่านและเข้าใจบทนี้แล้ว (+30 XP)"
+                  >
+                    <CheckCircle2 className={`w-3.5 h-3.5 ${isCurrentRead ? 'text-emerald-600 dark:text-emerald-400' : 'text-neutral-400'}`} />
+                    <span className="hidden md:inline">{isCurrentRead ? 'อ่านแล้ว' : 'ทำเครื่องหมายว่าอ่านแล้ว'}</span>
+                  </button>
+                )}
+
+                {/* Bookmark Toggle */}
+                <button
+                  onClick={() => onToggleBookmark(activeChapter.id)}
+                  className={`${TAP} p-2 rounded-xl border transition-all cursor-pointer ${
+                    isCurrentBookmarked
+                      ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-300 dark:border-amber-700 text-amber-600 dark:text-amber-400'
+                      : 'bg-neutral-50 dark:bg-[#1a1a1a] border-neutral-200 dark:border-[#262626] text-neutral-500 hover:text-neutral-800 dark:hover:text-[#fafafa]'
+                  }`}
+                  title={isCurrentBookmarked ? 'ลบบุ๊กมาร์ก' : 'บันทึกบทนี้ (+15 XP)'}
+                >
+                  {isCurrentBookmarked ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
+                </button>
+
+                {/* Next Chapter Button */}
+                <button
+                  disabled={!nextChapter}
+                  onClick={() => nextChapter && handleSelectChapter(nextChapter.id)}
+                  className={`${TAP} p-2 rounded-xl border flex items-center gap-1 text-xs font-semibold transition-all ${
+                    nextChapter
+                      ? 'border-neutral-200 dark:border-[#262626] bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] hover:opacity-90 cursor-pointer shadow-xs'
+                      : 'border-neutral-100 dark:border-[#1c1c1c] text-neutral-300 dark:text-[#444444] cursor-not-allowed'
+                  }`}
+                  title={nextChapter ? `บทถัดไป: ${nextChapter.title}` : 'นี่คือบทสุดท้าย'}
+                >
+                  <span className="hidden sm:inline">บทถัดไป</span>
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           </div>
 
           {/* Chapter Main Content Reader Card */}
-          <div className="bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-7 shadow-2xs space-y-5 sm:space-y-6">
+          <div id={CHAPTER_START_ID} className="bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-7 shadow-2xs space-y-5 sm:space-y-6">
             
-            {/* Chapter Header */}
-            <div className="space-y-3 pb-4 sm:pb-5 border-b border-neutral-100 dark:border-[#262626]">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="w-8 h-8 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] font-black text-sm flex items-center justify-center shrink-0 shadow-xs font-mono">
-                  {activeChapter.num}
-                </span>
-                <span className="px-2.5 py-0.5 rounded-full bg-neutral-100 dark:bg-[#1f1f1f] border border-neutral-200 dark:border-[#333333] text-neutral-800 dark:text-[#d4d4d4] text-[11px] sm:text-xs font-semibold uppercase tracking-wider font-mono">
-                  {activeChapter.roleTag}
-                </span>
-                <span className="flex items-center gap-1 text-[11px] sm:text-xs text-neutral-500 dark:text-[#737373] font-medium font-mono">
-                  <Clock className="w-3.5 h-3.5" />
-                  {activeChapter.readTime}
-                </span>
-                {isCurrentRead && (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 border border-emerald-300/50 dark:border-emerald-800/50 text-emerald-800 dark:text-emerald-300 text-[11px] sm:text-xs font-semibold font-mono">
-                    <Check className="w-3 h-3" />
-                    ผ่านแล้ว
-                  </span>
-                )}
-              </div>
-
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-neutral-900 dark:text-[#fafafa] tracking-tight leading-tight">
-                {activeChapter.title}
-              </h1>
-              <p className="text-xs sm:text-sm text-neutral-500 dark:text-[#8e8e8e] leading-relaxed font-normal">
-                {activeChapter.subtitle}
-              </p>
-
-              {/* Expand/Collapse All Accordion Control */}
-              <div className="flex items-center justify-between pt-1 text-xs">
-                <div className="text-neutral-500 dark:text-[#737373] font-normal">
-                  คลิกที่หัวข้อเพื่อเปิด/ปิดเนื้อหาย่อย หรือดูทีละส่วน
-                </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={expandAllSections}
-                    className="text-neutral-800 dark:text-[#d4d4d4] hover:underline font-semibold cursor-pointer"
-                  >
-                    ขยายทั้งหมด
-                  </button>
-                  <span className="text-neutral-300 dark:text-[#333333]">|</span>
-                  <button
-                    onClick={collapseAllSections}
-                    className="text-neutral-500 dark:text-[#737373] hover:underline font-semibold cursor-pointer"
-                  >
-                    ย่อทั้งหมด
-                  </button>
-                </div>
-              </div>
-            </div>
+            <ChapterHero
+              chapter={activeChapter}
+              experienceLevel={chapterLevel}
+              isRead={isCurrentRead}
+              role={role}
+              seat={seat}
+              onFlipSeat={() => setFlippedFor((f) => (f === seatKey ? null : seatKey))}
+              onNavigateChapter={handleSelectChapter}
+              onSearchGlossary={handleSearchGlossary}
+            />
 
             {/* ADAPTIVE LENS CONTROLLER BANNER */}
             <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-2 sm:space-y-2.5">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <span className="text-xs font-bold text-neutral-800 dark:text-[#e5e5e5] flex items-center gap-1.5 font-mono">
-                    <SlidersHorizontal className="w-3.5 h-3.5 text-neutral-600 dark:text-[#a3a3a3]" />
-                    <span>Active Lens:</span>
-                  </span>
-                  <span className="text-[11px] sm:text-xs font-semibold px-2 py-0.5 rounded-md bg-neutral-200 dark:bg-[#262626] text-neutral-800 dark:text-[#d4d4d4]">
-                    {audienceMode === 'business' ? '💼 Business' : audienceMode === 'engineer' ? '💻 Engineer' : '👥 The Bridge (ทั้งสองฝั่ง)'}
-                  </span>
-                  <span className="text-[11px] sm:text-xs font-semibold px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300">
-                    {experienceLevel === 'beginner' ? '🌱 Beginner' : '⚡ Experienced'}
-                  </span>
-                </div>
+              {role === null ? (
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="text-xs font-bold text-neutral-800 dark:text-[#e5e5e5] flex items-center gap-1.5">
+                      <SlidersHorizontal className="w-3.5 h-3.5 text-neutral-600 dark:text-[#a3a3a3]" />
+                      <span>Active Mode:</span>
+                    </span>
+                    <span className="text-[11px] sm:text-xs font-semibold px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300">
+                      {chapterLevel === 'beginner' ? '🌱 Beginner' : '⚡ Experienced'}
+                    </span>
+                  </div>
 
-                {/* Quick Switch Buttons */}
-                <div className="flex items-center gap-1.5 self-start sm:self-auto">
-                  <button
-                    onClick={() => onExperienceLevelChange && onExperienceLevelChange('beginner')}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer transition-all ${
-                      experienceLevel === 'beginner'
-                        ? 'bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] shadow-xs font-bold'
-                        : 'bg-white dark:bg-[#1f1f1f] text-neutral-600 dark:text-[#a3a3a3] border border-neutral-200 dark:border-[#333333] hover:bg-neutral-100 dark:hover:bg-[#262626]'
-                    }`}
-                  >
-                    🌱 ปูพื้นฐาน Mindset
-                  </button>
-                  <button
-                    onClick={() => onExperienceLevelChange && onExperienceLevelChange('experienced')}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer transition-all ${
-                      experienceLevel === 'experienced'
-                        ? 'bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] shadow-xs font-bold'
-                        : 'bg-white dark:bg-[#1f1f1f] text-neutral-600 dark:text-[#a3a3a3] border border-neutral-200 dark:border-[#333333] hover:bg-neutral-100 dark:hover:bg-[#262626]'
-                    }`}
-                  >
-                    ⚡ คัมภีร์รับมือ Friction
-                  </button>
+                  {/* Quick Switch Buttons */}
+                  <div className="flex items-center gap-1.5 self-start sm:self-auto">
+                    <button
+                      onClick={() => onExperienceLevelChange && onExperienceLevelChange('beginner')}
+                      className={`${TAP} px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer transition-all ${
+                        chapterLevel === 'beginner'
+                          ? 'bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] shadow-xs font-bold'
+                          : 'bg-white dark:bg-[#1f1f1f] text-neutral-600 dark:text-[#a3a3a3] border border-neutral-200 dark:border-[#333333] hover:bg-neutral-100 dark:hover:bg-[#262626]'
+                      }`}
+                    >
+                      🌱 ใหม่กับเรื่องนี้
+                    </button>
+                    <button
+                      onClick={() => onExperienceLevelChange && onExperienceLevelChange('experienced')}
+                      className={`${TAP} px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer transition-all ${
+                        chapterLevel === 'experienced'
+                          ? 'bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] shadow-xs font-bold'
+                          : 'bg-white dark:bg-[#1f1f1f] text-neutral-600 dark:text-[#a3a3a3] border border-neutral-200 dark:border-[#333333] hover:bg-neutral-100 dark:hover:bg-[#262626]'
+                      }`}
+                    >
+                      ⚡ ทำงานข้ามทีมมาแล้ว
+                    </button>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div data-role-lens={role} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <p className="text-xs font-bold text-neutral-800 dark:text-[#e5e5e5] flex items-start gap-1.5" data-role-lens-status>
+                    <SlidersHorizontal className="w-3.5 h-3.5 mt-0.5 shrink-0 text-neutral-600 dark:text-[#a3a3a3]" />
+                    <span>
+                      {activeChapter.home === 'shared'
+                        ? 'บทนี้เป็นงานที่สองฝั่งทำร่วมกัน'
+                        : `บทนี้เป็นงาน${ROLE_META[activeChapter.home === role ? role : otherRole(role)].side}`}
+                      {' · '}
+                      {levelSource === 'global'
+                        ? 'ใช้ระดับเดียวกันทุกบท'
+                        : chapterLevel === 'experienced' ? 'เปิดแบบคุ้นงาน' : 'เปิดแบบมือใหม่'}
+                    </span>
+                  </p>
+
+                  {/* Per-chapter level switch (this chapter only) */}
+                  <div className="flex flex-wrap items-center gap-1.5 self-start sm:self-auto" role="group" aria-label="ระดับของบทนี้">
+                    {([['beginner', '🌱 มือใหม่'], ['experienced', '⚡ คุ้นงานแล้ว']] as const).map(([lvl, label]) => (
+                      <button
+                        key={lvl}
+                        type="button"
+                        data-chapter-level={lvl}
+                        aria-pressed={chapterLevel === lvl}
+                        onClick={() => handleChapterLevelPick(lvl)}
+                        className={`${TAP} px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer transition-all ${
+                          chapterLevel === lvl
+                            ? 'bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] shadow-xs font-bold'
+                            : 'bg-white dark:bg-[#1f1f1f] text-neutral-600 dark:text-[#a3a3a3] border border-neutral-200 dark:border-[#333333] hover:bg-neutral-100 dark:hover:bg-[#262626]'
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                    {levelSource === 'chapter' && (
+                      <>
+                        <span data-chapter-level-scope className="text-xs text-neutral-500 dark:text-[#8e8e8e]">
+                          {chapterLevelScopeLabel(role)}
+                        </span>
+                        <button
+                          type="button"
+                          data-chapter-level-reset
+                          onClick={() => onChapterLevelChange?.(activeChapter.id, null)}
+                          className={`${TAP} text-xs font-semibold text-neutral-500 dark:text-[#8e8e8e] hover:underline cursor-pointer`}
+                        >
+                          {chapterLevelResetLabel(levelMode)}
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
 
               <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e] leading-relaxed">
-                {experienceLevel === 'beginner'
-                  ? '💡 โหมด Beginner: เน้นปูพื้นฐานวิธีคิด (Mindset) ของบทบาทที่เลือก สิ่งที่เขาแคร์ และคำแนะนำเชื่อมความสัมพันธ์'
-                  : '⚡ โหมด Experienced: เน้นกลยุทธ์รับมือข้อขัดแย้ง (Friction Playbook) ตาราง Trade-off ในการต่อรอง และสคริปต์พูดจริงในห้องประชุม'}
+                {chapterLevel === 'beginner'
+                  ? `💡 โหมดมือใหม่: เปิด ${coreHint} ไว้ก่อน ส่วนอื่นพับไว้ในชั้น "นำไปใช้" และ "เจาะลึก"`
+                  : `⚡ โหมดทำงานข้ามทีม: เปิด ${coreHint} ไว้ก่อน วิธีรับมือ Friction อยู่ในชั้น "นำไปใช้"`}
               </p>
             </div>
 
-            {/* ADAPTIVE SECTION RENDERING: Beginner vs Experienced ordering */}
-            {experienceLevel === 'experienced' ? (
-              <>
-                {/* 1. Friction & Negotiation Playbook (Prioritized in Experienced mode) */}
-                <FrictionPlaybookCard
-                  playbook={activeChapter.frictionPlaybook}
-                  chapterTitle={activeChapter.title}
-                  audienceMode={audienceMode}
-                  isOpen={openSections.friction}
-                  onToggle={() => toggleSection('friction')}
-                  onEarnXp={onEarnXp}
-                />
+            <SectionOutline
+              chapter={activeChapter}
+              layout={layout}
+              openState={openState}
+              onSelectSection={handleOutlineSelect}
+              onExpandAll={() => setOpenState(expandAll(layout))}
+              onCollapseAll={() => setOpenState(collapseAll(layout))}
+            />
 
-                {/* 2. Role Mindset & Empathy Guide */}
-                <RoleMindsetCard
-                  audienceMode={audienceMode}
-                  onSelectRole={onAudienceChange}
-                  isOpen={openSections.mindset}
-                  onToggle={() => toggleSection('mindset')}
-                />
-              </>
-            ) : (
-              <>
-                {/* 1. Role Mindset & Empathy Guide (Prioritized in Beginner mode) */}
-                <RoleMindsetCard
-                  audienceMode={audienceMode}
-                  onSelectRole={onAudienceChange}
-                  isOpen={openSections.mindset}
-                  onToggle={() => toggleSection('mindset')}
-                />
-
-                {/* 2. Friction & Negotiation Playbook */}
-                <FrictionPlaybookCard
-                  playbook={activeChapter.frictionPlaybook}
-                  chapterTitle={activeChapter.title}
-                  audienceMode={audienceMode}
-                  isOpen={openSections.friction}
-                  onToggle={() => toggleSection('friction')}
-                  onEarnXp={onEarnXp}
-                />
-              </>
-            )}
-
-            {/* Quick Perspective & Metaphor Box */}
-            <div className="space-y-3">
-              {/* Plain Language Metaphor (เปรียบแบบบ้านๆ) */}
-              <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-1.5">
-                <div className="flex items-center gap-2 text-xs font-bold text-neutral-900 dark:text-[#fafafa]">
-                  <Sparkles className="w-4 h-4 text-amber-500" />
-                  <span>เปรียบแบบบ้านๆ (Real-World Analogy)</span>
-                </div>
-                <p className="text-xs sm:text-sm text-neutral-700 dark:text-[#c4c4c4] leading-relaxed font-normal">
-                  {activeChapter.plainAnalogy}
-                </p>
-              </div>
-
-              {/* Audience Perspectives (Business & Engineer Notes) */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {(audienceMode === 'business' || audienceMode === 'both') && (
-                  <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-1.5">
-                    <div className="flex items-center gap-2 text-xs font-bold text-amber-800 dark:text-amber-300">
-                      <Info className="w-4 h-4 text-amber-500" />
-                      <span>มุมมองฝั่ง Business</span>
-                    </div>
-                    <p className="text-xs text-neutral-600 dark:text-[#a3a3a3] leading-relaxed font-normal">
-                      {activeChapter.businessNote}
-                    </p>
-                  </div>
-                )}
-
-                {(audienceMode === 'engineer' || audienceMode === 'both') && (
-                  <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-1.5">
-                    <div className="flex items-center gap-2 text-xs font-bold text-blue-800 dark:text-blue-300">
-                      <CheckCircle2 className="w-4 h-4 text-blue-500" />
-                      <span>มุมมองฝั่ง Engineer</span>
-                    </div>
-                    <p className="text-xs text-neutral-600 dark:text-[#a3a3a3] leading-relaxed font-normal">
-                      {activeChapter.engineerNote}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* SECTION 1: ปฐมบทสำหรับมือใหม่ (Beginner Primer) */}
-            {activeChapter.beginnerPrimer && (
-              <div className="border border-neutral-200 dark:border-[#262626] rounded-2xl overflow-hidden bg-white dark:bg-[#141414] shadow-2xs">
-                <button
-                  onClick={() => toggleSection('primer')}
-                  className="w-full p-3.5 sm:p-4.5 flex items-center justify-between bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f] text-left cursor-pointer select-none transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-7 h-7 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
-                      🌟
-                    </div>
-                    <div>
-                      <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
-                        ปฐมบทสำหรับมือใหม่ (ปูพื้นฐานจาก 0)
-                      </h3>
-                      <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e]">
-                        อธิบายเรื่องนี้แบบไม่ใช้ศัพท์ยาก เข้าใจได้แม้ไม่เคยเขียนโค้ด
-                      </p>
-                    </div>
-                  </div>
-                  {openSections.primer ? <ChevronUp className="w-4 h-4 text-neutral-600 dark:text-[#a3a3a3]" /> : <ChevronDown className="w-4 h-4 text-neutral-400 dark:text-[#737373]" />}
-                </button>
-
-                {openSections.primer && (
-                  <div className="p-4 sm:p-5 space-y-3.5 border-t border-neutral-100 dark:border-[#262626] bg-white dark:bg-[#141414] text-xs sm:text-sm">
-                    <div className="space-y-1">
-                      <div className="font-bold text-neutral-900 dark:text-[#e5e5e5] flex items-center gap-1.5 text-xs">
-                        <span className="w-1.5 h-1.5 rounded-full bg-neutral-900 dark:bg-white inline-block"></span>
-                        <span>สิ่งนี้คืออะไร? (What is it?)</span>
-                      </div>
-                      <p className="text-neutral-600 dark:text-[#a3a3a3] leading-relaxed pl-3 font-normal text-xs sm:text-sm">
-                        {activeChapter.beginnerPrimer.whatIsIt}
-                      </p>
-                    </div>
-
-                    <div className="space-y-1">
-                      <div className="font-bold text-neutral-900 dark:text-[#e5e5e5] flex items-center gap-1.5 text-xs">
-                        <span className="w-1.5 h-1.5 rounded-full bg-neutral-900 dark:bg-white inline-block"></span>
-                        <span>ทำไมถึงสำคัญมาก? ถ้าไม่มีจะเกิดอะไรขึ้น? (Why it matters?)</span>
-                      </div>
-                      <p className="text-neutral-600 dark:text-[#a3a3a3] leading-relaxed pl-3 font-normal text-xs sm:text-sm">
-                        {activeChapter.beginnerPrimer.whyItMatters}
-                      </p>
-                    </div>
-
-                    <div className="p-3 sm:p-3.5 rounded-xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-1">
-                      <div className="font-bold text-neutral-900 dark:text-[#fafafa] flex items-center gap-1.5 text-xs">
-                        <Lightbulb className="w-4 h-4 text-amber-500" />
-                        <span>สถานการณ์จริงในชีวิตประจำวัน (Real-World Analogy Scenario)</span>
-                      </div>
-                      <p className="text-neutral-600 dark:text-[#a3a3a3] leading-relaxed font-normal text-xs">
-                        {activeChapter.beginnerPrimer.realWorldScenario}
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* SECTION 2: พจนานุกรมศัพท์จำเป็น (Jargon Buster) */}
-            {activeChapter.jargonList && activeChapter.jargonList.length > 0 && (
-              <div className="border border-neutral-200 dark:border-[#262626] rounded-2xl overflow-hidden bg-white dark:bg-[#141414] shadow-2xs">
-                <button
-                  onClick={() => toggleSection('jargon')}
-                  className="w-full p-3.5 sm:p-4.5 flex items-center justify-between text-left cursor-pointer select-none transition-colors bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f]"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-7 h-7 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
-                      📖
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
-                          พจนานุกรมคำศัพท์จำเป็น (Jargon Buster)
-                        </h3>
-                        <span className="px-2 py-0.5 rounded-full bg-neutral-200 dark:bg-[#262626] text-neutral-800 dark:text-[#d4d4d4] text-[10px] sm:text-[11px] font-semibold font-mono">
-                          {activeChapter.jargonList.length} คำ
-                        </span>
-                      </div>
-                      <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e] mt-0.5">
-                        ศัพท์เทคนิคประจำบท แปลเป็นภาษาคนแบบเห็นภาพชัดเจน
-                      </p>
-                    </div>
-                  </div>
-                  {openSections.jargon ? (
-                    <ChevronUp className="w-4 h-4 text-neutral-600 dark:text-[#a3a3a3]" />
-                  ) : (
-                    <ChevronDown className="w-4 h-4 text-neutral-400 dark:text-[#737373]" />
-                  )}
-                </button>
-
-                {openSections.jargon && (
-                  <div className="p-3.5 sm:p-5 grid grid-cols-1 gap-3 border-t border-neutral-100 dark:border-[#262626] bg-white dark:bg-[#141414]">
-                    {activeChapter.jargonList.map((item, jIdx) => (
-                      <div 
-                        key={jIdx}
-                        className="p-3.5 rounded-xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-2 text-xs sm:text-sm"
-                      >
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="font-bold text-neutral-900 dark:text-white text-xs sm:text-sm font-mono">
-                            {item.term}
-                          </span>
-                          <span className="px-2 py-0.5 rounded-md bg-neutral-200/80 dark:bg-[#262626] border border-neutral-300/60 dark:border-[#333333] text-neutral-700 dark:text-[#d4d4d4] text-[10px] font-semibold font-mono">
-                            Technical Term
-                          </span>
-                        </div>
-                        <div className="text-neutral-500 dark:text-[#8e8e8e] text-xs font-normal leading-relaxed">
-                          <span className="font-bold text-neutral-700 dark:text-[#c4c4c4]">นิยามทางการ: </span>
-                          <span>{item.formalDefinition}</span>
-                        </div>
-                        <div className="p-2.5 rounded-lg bg-neutral-100 dark:bg-[#1f1f1f] border border-neutral-200 dark:border-[#333333] text-neutral-800 dark:text-[#e5e5e5] text-xs leading-relaxed">
-                          <span className="font-bold text-neutral-900 dark:text-white">🗣️ แปลภาษาคน: </span>
-                          <span>{item.humanTranslation}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* SECTION 3: ตัวอย่างบทสนทนาจริงในที่ทำงาน (Workplace Dialogue) */}
-            {activeChapter.dialogueExample && (
-              <div className="border border-neutral-200 dark:border-[#262626] rounded-2xl overflow-hidden bg-white dark:bg-[#141414] shadow-2xs">
-                <button
-                  onClick={() => toggleSection('dialogue')}
-                  className="w-full p-3.5 sm:p-4.5 flex items-center justify-between bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f] text-left cursor-pointer select-none transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-7 h-7 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
-                      💬
-                    </div>
-                    <div>
-                      <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
-                        บทสนทนาจริงในที่ทำงาน (วิธีพูดที่พัง vs วิธีพูดที่ปัง)
-                      </h3>
-                      <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e]">
-                        เปรียบเทียบประโยคพูดคุยในห้องประชุม พร้อมบทเรียนการสื่อสาร
-                      </p>
-                    </div>
-                  </div>
-                  {openSections.dialogue ? <ChevronUp className="w-4 h-4 text-neutral-600 dark:text-[#a3a3a3]" /> : <ChevronDown className="w-4 h-4 text-neutral-400 dark:text-[#737373]" />}
-                </button>
-
-                {openSections.dialogue && (
-                  <div className="p-3.5 sm:p-5 space-y-3.5 border-t border-neutral-100 dark:border-[#262626] bg-white dark:bg-[#141414]">
-                    <div className="p-3 rounded-xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] text-xs text-neutral-600 dark:text-[#a3a3a3] font-normal">
-                      <span className="font-bold text-neutral-900 dark:text-[#fafafa]">บริบทสถานการณ์: </span>
-                      {activeChapter.dialogueExample.context}
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-                      {/* Wrong Way */}
-                      <div className="p-3.5 rounded-xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200/70 dark:border-rose-900/40 space-y-2 text-xs sm:text-sm">
-                        <div className="flex items-center gap-1.5 font-bold text-rose-900 dark:text-rose-300 text-xs">
-                          <ShieldAlert className="w-4 h-4 text-rose-500" />
-                          <span>❌ วิธีพูดที่สร้างปัญหา (Wrong Way)</span>
-                        </div>
-                        <div className="p-2.5 rounded-lg bg-white/90 dark:bg-[#181818] border border-rose-100 dark:border-rose-950/80 text-rose-950 dark:text-rose-200 italic font-medium text-xs">
-                          {activeChapter.dialogueExample.wrongWay.speaker}
-                        </div>
-                        <p className="text-neutral-700 dark:text-[#a3a3a3] text-xs leading-relaxed font-normal">
-                          {activeChapter.dialogueExample.wrongWay.text}
-                        </p>
-                        <div className="text-[11px] text-rose-800 dark:text-rose-300 font-semibold pt-0.5">
-                          ⚠️ ผลเสีย: {activeChapter.dialogueExample.wrongWay.issue}
-                        </div>
-                      </div>
-
-                      {/* Right Way */}
-                      <div className="p-3.5 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/70 dark:border-emerald-900/40 space-y-2 text-xs sm:text-sm">
-                        <div className="flex items-center gap-1.5 font-bold text-emerald-900 dark:text-emerald-300 text-xs">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                          <span>✅ วิธีพูดที่ถูกต้องและได้ผล (Right Way)</span>
-                        </div>
-                        <div className="p-2.5 rounded-lg bg-white/90 dark:bg-[#181818] border border-emerald-100 dark:border-emerald-950/80 text-emerald-950 dark:text-emerald-200 italic font-medium text-xs">
-                          {activeChapter.dialogueExample.rightWay.speaker}
-                        </div>
-                        <p className="text-neutral-700 dark:text-[#a3a3a3] text-xs leading-relaxed font-normal">
-                          {activeChapter.dialogueExample.rightWay.text}
-                        </p>
-                        <div className="text-[11px] text-emerald-800 dark:text-emerald-300 font-semibold pt-0.5">
-                          💡 ผลลัพธ์: {activeChapter.dialogueExample.rightWay.benefit}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* SECTION 4: อินโฟกราฟิก & แผนภาพจำลองกระบวนการ (Visual Diagram) */}
-            <div className="border border-neutral-200 dark:border-[#262626] rounded-2xl overflow-hidden bg-white dark:bg-[#141414] shadow-2xs">
-              <button
-                onClick={() => toggleSection('diagram')}
-                className="w-full p-3.5 sm:p-4.5 flex items-center justify-between bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f] text-left cursor-pointer select-none transition-colors"
+            {layout.filter(group => group.sections.length > 0).map(group => (
+              <LayerGroupView
+                key={group.layer}
+                group={group}
+                isExpanded={openState.layers[group.layer]}
+                onToggle={() => setOpenState(prev => toggleLayer(prev, group.layer))}
               >
-                <div className="flex items-center gap-3">
-                  <div className="w-7 h-7 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
-                    🗺️
-                  </div>
-                  <div>
-                    <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
-                      {activeChapter.diagramTitle || `แผนภาพโครงสร้างและกระบวนการบทที่ ${activeChapter.num}`}
-                    </h3>
-                    <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e]">
-                      {activeChapter.diagramDescription || 'แผนภาพจำลองสถาปัตยกรรมและกระบวนการทำงานร่วมกัน'}
-                    </p>
-                  </div>
-                </div>
-                {openSections.diagram ? <ChevronUp className="w-4 h-4 text-neutral-600 dark:text-[#a3a3a3]" /> : <ChevronDown className="w-4 h-4 text-neutral-400 dark:text-[#737373]" />}
-              </button>
-
-              {openSections.diagram && (
-                <div className="p-3.5 sm:p-5 border-t border-neutral-100 dark:border-[#262626] bg-neutral-50/50 dark:bg-[#111111] space-y-4">
-                  {/* Structured Visual Illustration & Metaphor Schema */}
-                  {activeChapter.illustrations && activeChapter.illustrations.length > 0 && (
-                    <div className="space-y-3.5">
-                      {activeChapter.illustrations.map((ill) => (
-                        <div 
-                          key={ill.id}
-                          className="p-3.5 sm:p-5 rounded-2xl bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] shadow-2xs space-y-3"
-                        >
-                          <div className="flex items-center justify-between flex-wrap gap-2">
-                            <div className="flex items-center gap-2.5">
-                              <span className="px-2.5 py-0.5 rounded-lg bg-neutral-100 dark:bg-[#1f1f1f] border border-neutral-200 dark:border-[#333333] text-neutral-800 dark:text-[#d4d4d4] font-semibold text-[11px] flex items-center gap-1.5 font-mono">
-                                <span>🎨</span>
-                                <span>Visual Architecture</span>
-                              </span>
-                              <div>
-                                <h4 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
-                                  {ill.title}
-                                </h4>
-                                <p className="text-[11px] text-neutral-500 dark:text-[#8e8e8e]">
-                                  {ill.subtitle}
-                                </p>
-                              </div>
-                            </div>
-                            <span className="px-2 py-0.5 rounded-md bg-neutral-100 dark:bg-[#1f1f1f] border border-neutral-200 dark:border-[#333333] text-neutral-700 dark:text-[#d4d4d4] text-[10px] font-mono font-semibold">
-                              Type: {ill.svgType}
-                            </span>
-                          </div>
-
-                          {/* Visual Analogy Metaphor */}
-                          <div className="p-3 rounded-xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] text-xs space-y-1">
-                            <div className="font-bold text-neutral-900 dark:text-[#fafafa] flex items-center gap-1.5">
-                              <Lightbulb className="w-4 h-4 text-amber-500 shrink-0" />
-                              <span>ภาพเปรียบเทียบในชีวิตจริง (Mental Model Metaphor)</span>
-                            </div>
-                            <p className="text-neutral-600 dark:text-[#a3a3a3] leading-relaxed text-[11px] sm:text-xs font-normal">
-                              {ill.visualMetaphor}
-                            </p>
-                          </div>
-
-                          {/* Structured SVG Visual Blueprint Scene */}
-                          <div className="p-3 rounded-xl bg-neutral-100/70 dark:bg-[#0a0a0a] border border-neutral-200 dark:border-[#262626] text-[11px] space-y-1">
-                            <span className="font-mono text-[10px] text-neutral-800 dark:text-[#d4d4d4] uppercase tracking-wider block font-bold">
-                              📐 โครงสร้างแผนผังเชิงนามธรรม (Visual Blueprint Scene):
-                            </span>
-                            <p className="text-neutral-600 dark:text-[#8e8e8e] leading-relaxed font-normal">
-                              {ill.svgDescription}
-                            </p>
-                          </div>
-
-                          {/* Visual Elements Matrix */}
-                          {ill.elements && ill.elements.length > 0 && (
-                            <div className="space-y-1.5 pt-1">
-                              <span className="text-[11px] font-bold text-neutral-800 dark:text-[#e5e5e5] block font-mono">
-                                องค์ประกอบสำคัญในแผนภาพ ({ill.elements.length} ส่วน):
-                              </span>
-                              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 text-xs">
-                                {ill.elements.map((elem, eIdx) => (
-                                  <div 
-                                    key={eIdx}
-                                    className="p-2.5 rounded-xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-1"
-                                  >
-                                    <div className="flex items-center justify-between">
-                                      <span className="font-bold text-[11px] text-neutral-900 dark:text-[#fafafa] truncate">
-                                        {elem.label}
-                                      </span>
-                                      <span 
-                                        className="w-2.5 h-2.5 rounded-full shrink-0" 
-                                        style={{ backgroundColor: elem.color }}
-                                      />
-                                    </div>
-                                    <div className="text-[10px] text-neutral-700 dark:text-[#d4d4d4] font-semibold font-mono">
-                                      {elem.role}
-                                    </div>
-                                    <div className="text-[10px] text-neutral-500 dark:text-[#8e8e8e] leading-normal font-normal">
-                                      {elem.detail}
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Key Takeaway */}
-                          <div className="pt-1 text-[11px] text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5 font-medium">
-                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                            <span><b>สาระสำคัญ:</b> {ill.takeaway}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Interactive Chapter Diagram Simulator */}
-                  <ChapterDiagram chapterId={activeChapter.id} />
-
-                  {/* Interactive C4 Model Zoom for Chapter 5 */}
-                  {activeChapter.id === 's5' && (
-                    <div className="mt-4 p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] space-y-3">
-                      <div className="flex items-center justify-between flex-wrap gap-2">
-                        <h4 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa] flex items-center gap-2">
-                          <Layers className="w-4 h-4 text-neutral-600 dark:text-[#a3a3a3]" />
-                          <span>Interactive C4 Model Explorer (คลิกซูมเข้าดูทีละระดับ)</span>
-                        </h4>
-                        <div className="flex items-center gap-1">
-                          {[1, 2, 3, 4].map((lvl) => (
-                            <button
-                              key={lvl}
-                              onClick={() => setC4Level(lvl)}
-                              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer font-mono ${
-                                c4Level === lvl
-                                  ? 'bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] shadow-xs'
-                                  : 'bg-neutral-100 dark:bg-[#1f1f1f] text-neutral-600 dark:text-[#a3a3a3] hover:bg-neutral-200 dark:hover:bg-[#262626]'
-                              }`}
-                            >
-                              L{lvl}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="p-3.5 bg-neutral-50 dark:bg-[#181818] rounded-xl border border-neutral-200 dark:border-[#262626] text-xs sm:text-sm space-y-1">
-                        {c4Level === 1 && (
-                          <div>
-                            <span className="font-bold text-neutral-900 dark:text-[#fafafa] font-mono">Level 1: System Context</span>
-                            <p className="text-neutral-600 dark:text-[#a3a3a3] mt-1 leading-relaxed text-xs">
-                              ซูมออกสุด เห็นระบบเป็นกล่องเดียวตรงกลาง ล้อมรอบด้วย Actor (ลูกค้า, ร้านค้า, ไรเดอร์) และระบบภายนอก (Payment Gateway, Map API) — <b>เหมาะที่สุดสำหรับ Business Stakeholders และผู้บริหาร</b>
-                            </p>
-                          </div>
-                        )}
-                        {c4Level === 2 && (
-                          <div>
-                            <span className="font-bold text-neutral-900 dark:text-[#fafafa] font-mono">Level 2: Container Diagram</span>
-                            <p className="text-neutral-600 dark:text-[#a3a3a3] mt-1 leading-relaxed text-xs">
-                              ซูมเข้ามา 1 ชั้น เห็นหน่วยที่ Deploy แยกกันได้ เช่น Single Page App, Mobile App, Backend API, Database — <b>เหมาะสำหรับ Tech Lead &amp; Software Architects</b>
-                            </p>
-                          </div>
-                        )}
-                        {c4Level === 3 && (
-                          <div>
-                            <span className="font-bold text-neutral-900 dark:text-[#fafafa] font-mono">Level 3: Component Diagram</span>
-                            <p className="text-neutral-600 dark:text-[#a3a3a3] mt-1 leading-relaxed text-xs">
-                              ซูมเข้าไปในหนึ่ง Container (เช่น Backend API) แสดงโมดูลย่อย เช่น OrderComponent, PaymentController, NotificationService — <b>เหมาะสำหรับทีม Developer ที่ Implement</b>
-                            </p>
-                          </div>
-                        )}
-                        {c4Level === 4 && (
-                          <div>
-                            <span className="font-bold text-neutral-900 dark:text-[#fafafa] font-mono">Level 4: Code Diagram (UML Class)</span>
-                            <p className="text-neutral-600 dark:text-[#a3a3a3] mt-1 leading-relaxed text-xs">
-                              ซูมระดับ Class / Functions ในโค้ดจริง — <i>คำแนะนำ:</i> มักไม่ต้องวาดมือเพราะโค้ดเปลี่ยนเร็ว ให้ IDE สร้างอัตโนมัติ
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Interactive Friction Scenarios for Chapter 11 */}
-                  {activeChapter.id === 's11' && (
-                    <div className="mt-4 space-y-2">
-                      <h4 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa] flex items-center gap-2">
-                        <AlertCircle className="w-4 h-4 text-amber-500" />
-                        <span>คลิกเพื่อดูทางออกของ 4 ข้อขัดแย้งยอดนิยมตลอดกาล:</span>
-                      </h4>
-
-                      {[
-                        {
-                          id: 1,
-                          q: 'ทำไม "แค่เพิ่มปุ่มเดียว" ถึงใช้เวลาเป็นสัปดาห์?',
-                          root: 'ปุ่มที่ตาเห็นคือ 5% ที่เหลือคือ logic คืนเงิน ตัดสต็อก แจ้งเตือนร้านค้า และ edge cases',
-                          script: 'ถามว่า: "เวอร์ชันที่เล็กที่สุดที่ยังใช้งานได้ (MVP) มีอะไรบ้าง ตัดเงื่อนไขไหนออกก่อนได้บ้าง?"',
-                        },
-                        {
-                          id: 2,
-                          q: 'ทำไม Requirement ถึงเปลี่ยนบ่อย ไม่มีวิธีรับมือเลยเหรอ?',
-                          root: 'โลกธุรกิจเปลี่ยนจริง (คู่แข่ง/ผู้ใช้) แต่ถ้ากระบวนการหย่อนจะเกิด Scope Creep เงียบๆ',
-                          script: 'ถามหา "ทำไม" เบื้องหลังความต้องการเสมอ และทำระบบ Change Request เบาๆ เพื่อให้เห็นต้นทุน',
-                        },
-                        {
-                          id: 3,
-                          q: 'ทำไมงาน Technical Debt ไม่เคยได้เข้า Sprint สักที?',
-                          root: 'ทีม Dev เสนอด้วยศัพท์เทคนิคที่ Business คำนวณความคุ้มค่าไม่ถูก เลยแพ้ Feature ใหม่เสมอ',
-                          script: 'Dev ต้องแปลเป็นความเสี่ยง: "ถ้าไม่แก้ตรงนี้ เมื่อยอดขายโต 2 เท่า ระบบจะรับไม่ไหวและส่งผลให้สูญเสียรายได้ X บาท"',
-                        },
-                        {
-                          id: 4,
-                          q: 'ทำไม Estimate ไม่เคยตรง แล้วจะวางแผนธุรกิจยังไง?',
-                          root: 'Cone of Uncertainty: วันแรกคือวันที่รู้น้อยที่สุด การขอตัวเลขเป๊ะๆ คือการขอสิ่งที่ไม่มีอยู่จริง',
-                          script: 'ขอ Estimate เป็นช่วง (เช่น 2-4 สัปดาห์) พร้อมระบุสมมติฐาน และมี Checkpoint ตรวจสอบความคืบหน้าถี่ๆ',
-                        },
-                      ].map((item) => (
-                        <div 
-                          key={item.id}
-                          className="p-3.5 bg-white dark:bg-[#141414] rounded-xl border border-neutral-200 dark:border-[#262626] space-y-2"
-                        >
-                          <div 
-                            onClick={() => setExpandedFaqId(expandedFaqId === item.id ? null : item.id)}
-                            className="font-bold text-xs sm:text-sm text-neutral-900 dark:text-[#fafafa] flex items-center justify-between cursor-pointer select-none"
-                          >
-                            <span>{item.q}</span>
-                            <span className="text-neutral-400 dark:text-[#737373] font-mono text-base">{expandedFaqId === item.id ? '−' : '+'}</span>
-                          </div>
-                          {expandedFaqId === item.id && (
-                            <div className="pt-2 border-t border-neutral-100 dark:border-[#262626] text-xs space-y-2">
-                              <div>
-                                <span className="font-bold text-neutral-700 dark:text-[#c4c4c4]">สาเหตุที่แท้จริง: </span>
-                                <span className="text-neutral-600 dark:text-[#a3a3a3]">{item.root}</span>
-                              </div>
-                              <div className="p-2.5 rounded-lg bg-neutral-100 dark:bg-[#1f1f1f] border border-neutral-200 dark:border-[#333333]">
-                                <span className="font-bold text-neutral-900 dark:text-white">ประโยคทางออกในห้องประชุม: </span>
-                                <span className="text-neutral-700 dark:text-[#d4d4d4]">{item.script}</span>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* SECTION 4.5: กรณีศึกษาจริงจากบริษัทเทค (Real-World Case Studies) */}
-            {activeChapter.realWorldExamples && activeChapter.realWorldExamples.length > 0 && (
-              <div className="border border-neutral-200 dark:border-[#262626] rounded-2xl overflow-hidden bg-white dark:bg-[#141414] shadow-2xs">
-                <button
-                  onClick={() => toggleSection('examples')}
-                  className="w-full p-3.5 sm:p-4.5 flex items-center justify-between bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f] text-left cursor-pointer select-none transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-7 h-7 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
-                      🏢
-                    </div>
-                    <div>
-                      <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
-                        กรณีศึกษาจริงในอุตสาหกรรม (Real-World Case Studies)
-                      </h3>
-                      <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e]">
-                        บทเรียนจริงจากบริษัทเทคและสตาร์ทอัพ ({activeChapter.realWorldExamples.length} เรื่องราว)
-                      </p>
-                    </div>
-                  </div>
-                  {openSections.examples ? <ChevronUp className="w-4 h-4 text-neutral-600 dark:text-[#a3a3a3]" /> : <ChevronDown className="w-4 h-4 text-neutral-400 dark:text-[#737373]" />}
-                </button>
-
-                {openSections.examples && (
-                  <div className="p-3.5 sm:p-5 space-y-3.5 border-t border-neutral-100 dark:border-[#262626] bg-white dark:bg-[#141414]">
-                    {activeChapter.realWorldExamples.map((ex, eIdx) => (
-                      <div
-                        key={eIdx}
-                        className="p-3.5 sm:p-5 rounded-2xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-3"
-                      >
-                        <div className="flex items-center justify-between flex-wrap gap-2">
-                          <div className="font-bold text-xs sm:text-sm text-neutral-900 dark:text-[#fafafa] flex items-center gap-2">
-                            <span className="px-2 py-0.5 rounded-md bg-neutral-200 dark:bg-[#262626] text-neutral-800 dark:text-[#d4d4d4] text-[10px] font-mono font-bold">
-                              {ex.companyOrIndustry}
-                            </span>
-                            <span>{ex.title}</span>
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs sm:text-sm">
-                          <div className="p-3 rounded-xl bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] space-y-1">
-                            <span className="font-bold text-neutral-800 dark:text-[#e5e5e5] text-xs flex items-center gap-1.5">
-                              📌 บริบทและโจทย์เริ่มต้น:
-                            </span>
-                            <p className="text-neutral-600 dark:text-[#a3a3a3] leading-relaxed text-xs">
-                              {ex.situation}
-                            </p>
-                          </div>
-
-                          <div className="p-3 rounded-xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200/70 dark:border-rose-900/40 space-y-1">
-                            <span className="font-bold text-rose-900 dark:text-rose-300 text-xs flex items-center gap-1.5">
-                              ⚠️ สิ่งที่เกิดขึ้น / จุดสะดุด:
-                            </span>
-                            <p className="text-rose-950 dark:text-rose-200 leading-relaxed text-xs">
-                              {ex.whatHappened}
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="p-3.5 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/70 dark:border-emerald-900/40 space-y-1 text-xs sm:text-sm">
-                          <span className="font-bold text-emerald-900 dark:text-emerald-300 text-xs flex items-center gap-1.5">
-                            ✅ วิธีแก้ปัญหาและการประสานงาน:
-                          </span>
-                          <p className="text-neutral-800 dark:text-[#d4d4d4] leading-relaxed text-xs font-normal">
-                            {ex.resolution}
-                          </p>
-                        </div>
-
-                        <div className="p-2.5 rounded-xl bg-neutral-100 dark:bg-[#1f1f1f] border border-neutral-200 dark:border-[#333333] text-xs text-neutral-800 dark:text-[#d4d4d4] flex items-center gap-2 font-medium">
-                          <Lightbulb className="w-4 h-4 text-amber-500 shrink-0" />
-                          <span><b>บทเรียนสำคัญ:</b> {ex.keyLesson}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* SECTION 5: ความรู้เชิงลึก & แนวคิดหลัก (Core Concepts) */}
-            {activeChapter.coreConcepts && activeChapter.coreConcepts.length > 0 && (
-              <div className="border border-neutral-200 dark:border-[#262626] rounded-2xl overflow-hidden bg-white dark:bg-[#141414] shadow-2xs">
-                <button
-                  onClick={() => toggleSection('coreConcepts')}
-                  className="w-full p-3.5 sm:p-4.5 flex items-center justify-between bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f] text-left cursor-pointer select-none transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-7 h-7 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
-                      💡
-                    </div>
-                    <div>
-                      <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
-                        ความรู้เชิงลึกและหลักการสำคัญ (Core Deep-Dive Concepts)
-                      </h3>
-                      <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e]">
-                        แนวคิดและทฤษฎีสำคัญที่ใช้ในการทำงานจริง ({activeChapter.coreConcepts.length} หัวข้อ)
-                      </p>
-                    </div>
-                  </div>
-                  {openSections.coreConcepts ? <ChevronUp className="w-4 h-4 text-neutral-600 dark:text-[#a3a3a3]" /> : <ChevronDown className="w-4 h-4 text-neutral-400 dark:text-[#737373]" />}
-                </button>
-
-                {openSections.coreConcepts && (
-                  <div className="p-3.5 sm:p-5 space-y-3.5 border-t border-neutral-100 dark:border-[#262626] bg-white dark:bg-[#141414]">
-                    {activeChapter.coreConcepts.map((concept, cIdx) => (
-                      <div 
-                        key={cIdx}
-                        className="p-3.5 sm:p-4 rounded-xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-2"
-                      >
-                        <div className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa] flex items-center gap-2">
-                          <span className="w-1.5 h-1.5 rounded-full bg-neutral-900 dark:bg-white inline-block"></span>
-                          <span>{concept.heading}</span>
-                        </div>
-                        <p className="text-xs sm:text-sm text-neutral-600 dark:text-[#a3a3a3] leading-relaxed pl-3 font-normal">
-                          {concept.detail}
-                        </p>
-                        {concept.bulletPoints && concept.bulletPoints.length > 0 && (
-                          <ul className="pt-1 pl-7 space-y-1.5 list-disc text-xs sm:text-sm text-neutral-600 dark:text-[#a3a3a3] font-normal">
-                            {concept.bulletPoints.map((bp, bpIdx) => (
-                              <li key={bpIdx} className="leading-relaxed">{bp}</li>
-                            ))}
-                          </ul>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* SECTION 6: ขั้นตอนการทำงานจริง (Real-World Workflow) */}
-            {activeChapter.realWorldWorkflow && activeChapter.realWorldWorkflow.length > 0 && (
-              <div className="border border-neutral-200 dark:border-[#262626] rounded-2xl overflow-hidden bg-white dark:bg-[#141414] shadow-2xs">
-                <button
-                  onClick={() => toggleSection('workflow')}
-                  className="w-full p-3.5 sm:p-4.5 flex items-center justify-between bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f] text-left cursor-pointer select-none transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-7 h-7 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
-                      🔄
-                    </div>
-                    <div>
-                      <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
-                        ขั้นตอนการทำงานจริงในองค์กร (Real-World Workflow)
-                      </h3>
-                      <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e]">
-                        ลำดับขั้นตอนส่งต่องานจริงระหว่างฝ่าย ({activeChapter.realWorldWorkflow.length} ขั้นตอน)
-                      </p>
-                    </div>
-                  </div>
-                  {openSections.workflow ? <ChevronUp className="w-4 h-4 text-neutral-600 dark:text-[#a3a3a3]" /> : <ChevronDown className="w-4 h-4 text-neutral-400 dark:text-[#737373]" />}
-                </button>
-
-                {openSections.workflow && (
-                  <div className="p-3.5 sm:p-5 grid grid-cols-1 sm:grid-cols-2 gap-3 border-t border-neutral-100 dark:border-[#262626] bg-white dark:bg-[#141414]">
-                    {activeChapter.realWorldWorkflow.map((wf, wIdx) => (
-                      <div 
-                        key={wIdx}
-                        className="p-3.5 rounded-xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-1.5 text-xs"
-                      >
-                        <div className="flex items-center justify-between gap-1">
-                          <span className="font-bold text-neutral-900 dark:text-[#fafafa] text-xs sm:text-sm">{wf.step}</span>
-                          <span className="px-2 py-0.5 rounded-md bg-neutral-200 dark:bg-[#262626] text-neutral-800 dark:text-[#d4d4d4] font-semibold text-[10px] sm:text-[11px] font-mono">
-                            {wf.role}
-                          </span>
-                        </div>
-                        <p className="text-neutral-600 dark:text-[#a3a3a3] leading-relaxed font-normal">
-                          {wf.description}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* SECTION 7: กับดักที่เจอบ่อยและทางออก (Common Pitfalls & Solutions) */}
-            {activeChapter.commonPitfalls && activeChapter.commonPitfalls.length > 0 && (
-              <div className="border border-neutral-200 dark:border-[#262626] rounded-2xl overflow-hidden bg-white dark:bg-[#141414] shadow-2xs">
-                <button
-                  onClick={() => toggleSection('pitfalls')}
-                  className="w-full p-3.5 sm:p-4.5 flex items-center justify-between bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f] text-left cursor-pointer select-none transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-7 h-7 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
-                      ⚠️
-                    </div>
-                    <div>
-                      <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
-                        กับดักที่เจอบ่อยและทางออกที่แนะนำ (Pitfalls &amp; Solutions)
-                      </h3>
-                      <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e]">
-                        สิ่งที่มักทำให้โปรเจกต์ล่าช้าหรือล้มเหลว พร้อมวิธีป้องกัน
-                      </p>
-                    </div>
-                  </div>
-                  {openSections.pitfalls ? <ChevronUp className="w-4 h-4 text-neutral-600 dark:text-[#a3a3a3]" /> : <ChevronDown className="w-4 h-4 text-neutral-400 dark:text-[#737373]" />}
-                </button>
-
-                {openSections.pitfalls && (
-                  <div className="p-3.5 sm:p-5 space-y-3 border-t border-neutral-100 dark:border-[#262626] bg-white dark:bg-[#141414]">
-                    {activeChapter.commonPitfalls.map((cp, cpIdx) => (
-                      <div 
-                        key={cpIdx}
-                        className="p-3.5 rounded-xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200/70 dark:border-rose-900/40 space-y-1.5 text-xs sm:text-sm"
-                      >
-                        <div className="flex items-center gap-1.5 font-bold text-rose-900 dark:text-rose-300 text-xs">
-                          <ShieldAlert className="w-4 h-4 text-rose-500 shrink-0" />
-                          <span>กับดัก: {cp.pitfall}</span>
-                        </div>
-                        <div className="pl-5 text-neutral-700 dark:text-[#c4c4c4] leading-relaxed text-xs">
-                          <span className="font-bold text-emerald-800 dark:text-emerald-400">💡 ทางออกที่แนะนำ: </span>
-                          <span>{cp.solution}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* SECTION 8: Pre-flight Checklist */}
-            {activeChapter.checklist && activeChapter.checklist.length > 0 && (
-              <div className="border border-neutral-200 dark:border-[#262626] rounded-2xl overflow-hidden bg-white dark:bg-[#141414] shadow-2xs">
-                <button
-                  onClick={() => toggleSection('checklist')}
-                  className="w-full p-3.5 sm:p-4.5 flex items-center justify-between bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f] text-left cursor-pointer select-none transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-7 h-7 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
-                      ✅
-                    </div>
-                    <div>
-                      <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
-                        Pre-flight Checklist ก่อนเข้าประชุมหรือส่งต่องาน
-                      </h3>
-                      <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e]">
-                        เช็กลิสต์ตรวจความพร้อม ป้องกันการตกหล่นก่อนส่งต่องาน ({activeChapter.checklist.length} ข้อ)
-                      </p>
-                    </div>
-                  </div>
-                  {openSections.checklist ? <ChevronUp className="w-4 h-4 text-neutral-600 dark:text-[#a3a3a3]" /> : <ChevronDown className="w-4 h-4 text-neutral-400 dark:text-[#737373]" />}
-                </button>
-
-                {openSections.checklist && (
-                  <div className="p-3.5 sm:p-5 border-t border-neutral-100 dark:border-[#262626] bg-white dark:bg-[#141414] space-y-1.5 text-xs">
-                    {activeChapter.checklist.map((item, idx) => {
-                      const itemKey = `${activeChapter.id}_cl_${idx}`;
-                      const isChecked = !!checkedChecklist[itemKey];
-                      return (
-                        <div
-                          key={idx}
-                          onClick={() => toggleChecklistItem(itemKey)}
-                          className={`flex items-start gap-2.5 p-2.5 rounded-xl cursor-pointer transition-colors ${
-                            isChecked
-                              ? 'bg-neutral-100 dark:bg-[#1f1f1f] text-neutral-400 dark:text-[#666666] line-through opacity-80'
-                              : 'hover:bg-neutral-50 dark:hover:bg-[#181818] text-neutral-700 dark:text-[#d4d4d4]'
-                          }`}
-                        >
-                          {isChecked ? (
-                            <CheckSquare className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-                          ) : (
-                            <Square className="w-4 h-4 text-neutral-400 dark:text-[#737373] shrink-0 mt-0.5" />
-                          )}
-                          <span className="leading-relaxed font-normal">{item}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            )}
+                {group.sections.map(key => {
+                  const Section = SECTION_COMPONENTS[key];
+                  return (
+                    <section key={key} id={`sec-${key}`} className="anchor-target" data-layer={group.layer}>
+                      <Section
+                        chapter={activeChapter}
+                        isOpen={!!openState.sections[key]}
+                        onToggle={() => setOpenState(prev => toggleSection(prev, key))}
+                        ctx={sectionCtx}
+                      />
+                      {openState.sections[key] && (
+                        <InlineSections
+                          className="mt-3.5"
+                          sections={getInlineSectionsAt(activeChapter, key)}
+                          onNavigateChapter={sectionCtx.onNavigateChapter}
+                        />
+                      )}
+                    </section>
+                  );
+                })}
+              </LayerGroupView>
+            ))}
 
             {/* Chapter Footer Actions */}
             <div className="pt-5 border-t border-neutral-100 dark:border-[#262626] space-y-3.5">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <button
                   onClick={() => onAskAIWithPrompt(`ช่วยอธิบายบทที่ ${activeChapter.num} "${activeChapter.title}" ให้ฟังอย่างละเอียด พร้อมยกตัวอย่างเคสจริงในบริษัทเทคให้เห็นภาพ`)}
-                  className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-neutral-100 dark:bg-[#1f1f1f] text-neutral-900 dark:text-[#fafafa] hover:bg-neutral-200 dark:hover:bg-[#262626] text-xs sm:text-sm font-semibold border border-neutral-200 dark:border-[#333333] transition-colors cursor-pointer"
+                  className={`${TAP} inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-neutral-100 dark:bg-[#1f1f1f] text-neutral-900 dark:text-[#fafafa] hover:bg-neutral-200 dark:hover:bg-[#262626] text-xs sm:text-sm font-semibold border border-neutral-200 dark:border-[#333333] transition-colors cursor-pointer`}
                 >
                   <Bot className="w-4 h-4 text-neutral-700 dark:text-[#a3a3a3]" />
-                  <span>ถาม AI Bridge Assistant เจาะลึกบทนี้</span>
+                  <span>ถาม AI เพิ่มเรื่องบทนี้</span>
                 </button>
 
                 {onToggleReadChapter && !isCurrentRead && (
                   <button
                     onClick={() => {
                       onToggleReadChapter(activeChapter.id);
-                      if (nextChapter) {
-                        handleSelectChapter(nextChapter.id);
-                      }
+                      if (trackNext.kind === 'next') handleSelectChapter(trackNext.chapterId);
+                      else if (trackNext.kind === 'not-in-track' && nextChapter) handleSelectChapter(nextChapter.id);
                     }}
-                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer font-mono"
+                    className={`${TAP} inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer`}
                   >
                     <CheckCircle2 className="w-4 h-4" />
-                    <span>อ่านจบแล้ว! ไปบทถัดไป (+30 XP)</span>
+                    <span>
+                      {trackNext.kind === 'next'
+                        ? 'อ่านจบแล้ว! ไปบทถัดไปใน track (+30 XP)'
+                        : trackNext.kind === 'end'
+                        ? 'อ่านจบแล้ว! (+30 XP)'
+                        : 'อ่านจบแล้ว! ไปบทถัดไป (+30 XP)'}
+                    </span>
                   </button>
                 )}
               </div>
@@ -1381,9 +807,9 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                 {prevChapter ? (
                   <button
                     onClick={() => handleSelectChapter(prevChapter.id)}
-                    className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-neutral-200 dark:border-[#262626] hover:border-neutral-400 dark:hover:border-[#404040] text-left transition-all cursor-pointer bg-neutral-50/70 dark:bg-[#181818] group"
+                    className={`${TAP} p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-neutral-200 dark:border-[#262626] hover:border-neutral-400 dark:hover:border-[#404040] text-left transition-all cursor-pointer bg-neutral-50/70 dark:bg-[#181818] group`}
                   >
-                    <div className="flex items-center gap-1 text-[11px] text-neutral-500 dark:text-[#737373] group-hover:text-neutral-900 dark:group-hover:text-white transition-colors font-mono">
+                    <div className="flex items-center gap-1 text-[11px] text-neutral-500 dark:text-[#737373] group-hover:text-neutral-900 dark:group-hover:text-white transition-colors">
                       <ArrowLeft className="w-3.5 h-3.5" />
                       <span>บทก่อนหน้า</span>
                     </div>
@@ -1393,19 +819,25 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                   </button>
                 ) : <div />}
 
-                {nextChapter && (
-                  <button
-                    onClick={() => handleSelectChapter(nextChapter.id)}
-                    className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-neutral-200 dark:border-[#262626] hover:border-neutral-400 dark:hover:border-[#404040] text-right transition-all cursor-pointer bg-neutral-50/70 dark:bg-[#181818] group"
-                  >
-                    <div className="flex items-center justify-end gap-1 text-[11px] text-neutral-900 dark:text-white font-semibold font-mono">
-                      <span>บทถัดไป</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </div>
-                    <div className="font-bold text-xs sm:text-sm text-neutral-900 dark:text-[#fafafa] mt-1 truncate">
-                      บทที่ {nextChapter.num}: {nextChapter.title}
-                    </div>
-                  </button>
+                {trackNext.kind === 'next' ? (
+                  <TrackNextCard next={trackNext} chapters={chapters} onSelectChapter={handleSelectChapter} />
+                ) : trackNext.kind === 'end' ? (
+                  <TrackEndCard trackKey={trackKey} onStartQuiz={onStartQuiz} onOpenIndex={openIndex} />
+                ) : (
+                  nextChapter && (
+                    <button
+                      onClick={() => handleSelectChapter(nextChapter.id)}
+                      className={`${TAP} p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-neutral-200 dark:border-[#262626] hover:border-neutral-400 dark:hover:border-[#404040] text-right transition-all cursor-pointer bg-neutral-50/70 dark:bg-[#181818] group`}
+                    >
+                      <div className="flex items-center justify-end gap-1 text-[11px] text-neutral-900 dark:text-white font-semibold">
+                        <span>บทถัดไป</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </div>
+                      <div className="font-bold text-xs sm:text-sm text-neutral-900 dark:text-[#fafafa] mt-1 truncate">
+                        บทที่ {nextChapter.num}: {nextChapter.title}
+                      </div>
+                    </button>
+                  )
                 )}
               </div>
             </div>
@@ -1424,15 +856,15 @@ export const GuideTab: React.FC<GuideTabProps> = ({
               <div>
                 <h3 className="font-bold text-base text-neutral-900 dark:text-[#fafafa] flex items-center gap-2">
                   <List className="w-4 h-4 text-neutral-600 dark:text-[#a3a3a3]" />
-                  <span>สารบัญทั้ง 15 บท</span>
+                  <span>สารบัญทั้ง {chapters.length} บท</span>
                 </h3>
-                <p className="text-xs text-neutral-500 dark:text-[#8e8e8e] mt-0.5 font-mono">
+                <p className="text-xs text-neutral-500 dark:text-[#8e8e8e] mt-0.5">
                   อ่านแล้ว {readChapters.length}/{chapters.length} บท • เลือกเพื่อกระโดดข้ามทันที
                 </p>
               </div>
               <button
-                onClick={() => setIsIndexOpen(false)}
-                className="p-2 rounded-xl text-neutral-400 hover:text-neutral-700 dark:hover:text-[#fafafa] hover:bg-neutral-100 dark:hover:bg-[#1f1f1f] cursor-pointer"
+                onClick={closeIndex}
+                className={`${TAP} p-2 rounded-xl text-neutral-400 hover:text-neutral-700 dark:hover:text-[#fafafa] hover:bg-neutral-100 dark:hover:bg-[#1f1f1f] cursor-pointer`}
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1440,6 +872,10 @@ export const GuideTab: React.FC<GuideTabProps> = ({
 
             {/* Drawer Search & Filter */}
             <div className="p-4 border-b border-neutral-100 dark:border-[#262626] space-y-3 bg-neutral-50 dark:bg-[#181818]">
+              <TrackPanel chapters={chapters} trackKey={trackKey} readChapters={readChapters} activeChapterId={activeChapterId} onSelectChapter={handleSelectChapter} onStartQuiz={onStartQuiz} />
+
+              <h3 data-all-chapters-heading className="text-xs font-bold text-neutral-500 dark:text-[#8e8e8e]">ทุกบท ({chapters.length})</h3>
+
               <div className="relative">
                 <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-[#737373]" />
                 <input
@@ -1451,7 +887,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                 />
               </div>
 
-              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-xs">
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 max-sm:-mt-2.5 max-sm:pt-2.5 max-sm:-mb-2.5 max-sm:pb-3.5 scrollbar-none text-xs">
                 {[
                   { id: 'all', label: 'ทั้งหมด' },
                   { id: 'pm', label: 'PM' },
@@ -1461,17 +897,18 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                   { id: 'eng', label: 'Dev' },
                   { id: 'qa', label: 'QA' },
                   { id: 'friction', label: 'ขัดแย้ง' },
-                ].map((role) => (
+                  { id: 'biz', label: 'ธุรกิจ' },
+                ].map((tag) => (
                   <button
-                    key={role.id}
-                    onClick={() => setSelectedRole(role.id)}
-                    className={`px-3 py-1 rounded-lg font-medium whitespace-nowrap transition-all cursor-pointer font-mono text-[11px] ${
-                      selectedRole === role.id
+                    key={tag.id}
+                    onClick={() => setSelectedRole(tag.id)}
+                    className={`${TAP} px-3 py-1 rounded-lg font-medium whitespace-nowrap transition-all cursor-pointer text-[11px] ${
+                      selectedRole === tag.id
                         ? 'bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] font-bold'
                         : 'bg-neutral-200/80 dark:bg-[#262626] text-neutral-700 dark:text-[#a3a3a3] hover:bg-neutral-300 dark:hover:bg-[#333333]'
                     }`}
                   >
-                    {role.label}
+                    {tag.label}
                   </button>
                 ))}
               </div>
@@ -1479,6 +916,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
 
             {/* Chapter Items List */}
             <div className="p-3.5 overflow-y-auto flex-1 space-y-1.5 divide-y divide-neutral-100 dark:divide-[#262626]">
+              {indexEmpty}
               {filteredChapters.map((chapter) => {
                 const isActive = chapter.id === activeChapterId;
                 const isRead = readChapters.includes(chapter.id);
@@ -1494,7 +932,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                         : 'hover:bg-neutral-50 dark:hover:bg-[#181818]'
                     }`}
                   >
-                    <div className={`w-7 h-7 rounded-lg text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 font-mono ${
+                    <div className={`w-7 h-7 rounded-lg text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 ${
                       isActive
                         ? 'bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a]'
                         : isRead
@@ -1518,7 +956,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                       <p className="text-[11px] text-neutral-500 dark:text-[#8e8e8e] line-clamp-1 font-normal">
                         {chapter.subtitle}
                       </p>
-                      <div className="flex items-center gap-2 pt-1 text-[10px] text-neutral-500 dark:text-[#737373] font-normal font-mono">
+                      <div className="flex items-center gap-2 pt-1 text-[10px] text-neutral-500 dark:text-[#737373] font-normal">
                         <span className="px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-[#262626] uppercase text-neutral-700 dark:text-[#a3a3a3]">
                           {chapter.roleTag}
                         </span>
@@ -1535,10 +973,10 @@ export const GuideTab: React.FC<GuideTabProps> = ({
 
             {/* Drawer Footer */}
             <div className="p-4 border-t border-neutral-200 dark:border-[#262626] bg-neutral-50 dark:bg-[#181818] flex items-center justify-between text-xs">
-              <span className="text-neutral-500 dark:text-[#8e8e8e] font-mono text-[11px]">สะสม XP จากการอ่านและการทำควิซ</span>
+              <span className="text-neutral-500 dark:text-[#8e8e8e] text-[11px]">สะสม XP จากการอ่านและการทำควิซ</span>
               <button
-                onClick={() => setIsIndexOpen(false)}
-                className="px-4 py-2 bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] font-semibold rounded-xl cursor-pointer"
+                onClick={closeIndex}
+                className={`${TAP} px-4 py-2 bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] font-semibold rounded-xl cursor-pointer`}
               >
                 ปิดสารบัญ
               </button>

@@ -1,6 +1,108 @@
-export type AudienceMode = 'business' | 'engineer' | 'both';
+import type { SectionKey } from './data/sectionLayers';
+import type { ChapterHome, Role } from './data/rolePerspective';
 
 export type ExperienceLevel = 'beginner' | 'experienced';
+
+/**
+ * Rich text subset used by restored reference content (see RichText component):
+ * `**bold**`, `\n` for a line break, and `[[sN|label]]` for an in-app chapter link.
+ */
+export type RichText = string;
+
+/**
+ * Keys of the static-figure registry (`src/components/figures/index.ts`).
+ * Each workstream that ports a figure adds its key here together with the
+ * component, so `FIGURES` stays an exhaustive `Record<FigureKey, …>`.
+ */
+export type FigureKey =
+  | 'tech-debt-quadrant'
+  | 'cone-of-uncertainty'
+  | 'family-structure'
+  | 'family-behavior'
+  | 'family-process'
+  | 'family-screen'
+  | 'family-thinking'
+  | 'family-plan'
+  | 'three-lenses'
+  | 'c4-l1-hero'
+  | 'c4-l1'
+  | 'c4-l2'
+  | 'c4-l3'
+  | 'c4-l4'
+  | 'refund-swimlane'
+  | 'refund-sequence'
+  | 'translation-layers'
+  | 'gate-timeline'
+  | 'env-flow'
+  | 'uncertainty-spectrum'
+  | 'refund-fidelity'
+  | 'refund-nfr-spec'
+  | 'refund-c4-impact'
+  | 'refund-story-gates'
+  | 'refund-test-report'
+  | 'refund-spec-stack'
+  | 'refund-backlog-cut'
+  | 'refund-debt-diff'
+  | 'refund-slo-dashboard'
+  | 'refund-kpi-split'
+  | 'refund-ai-review'
+  | 'refund-glossary-fix'
+  | 'refund-handoff-drift'
+  | 'refund-deploy-log'
+  | 'refund-dual-track-board';
+
+/** One figure shown right under a chapter's subtitle (visual-first pilot). */
+export interface ChapterHeroFigure {
+  figureKey: FigureKey;
+  /** One line, plain text (no RichText/links). Must make sense without the chapter body. */
+  caption: string;
+  /** The refund moment narrated from each seat (role-perspective spec P3.2). One line, ≤ 100 chars. */
+  seats: Record<Role, string>;
+}
+
+export interface TableColumn {
+  key: string;
+  label: string;
+  widthHint?: 'narrow' | 'wide';
+}
+
+export interface TableRow {
+  cells: Record<string, RichText>;
+}
+
+export type ContentBlock =
+  | {
+      kind: 'table';
+      id: string;
+      title?: string;
+      intro?: RichText;
+      columns: TableColumn[];
+      rows: TableRow[];
+      footnote?: RichText;
+      mobile?: 'stack' | 'scroll';
+      collapsed?: boolean;
+    }
+  | { kind: 'note'; id: string; tone: 'info' | 'warn' | 'ok'; title?: string; body: RichText }
+  | { kind: 'figure'; id: string; figureKey: FigureKey; title?: string; caption?: RichText }
+  | { kind: 'cards'; id: string; title?: string; intro?: RichText; cards: { term: string; def: RichText }[] }
+  | { kind: 'details'; id: string; summary: string; body: ContentBlock[] }
+  | { kind: 'sources'; id: string; title?: string; items: { label: string; url?: string }[]; caveat?: RichText };
+
+interface ContentSectionBase {
+  heading?: string;
+  blocks: ContentBlock[];
+}
+
+/**
+ * Where a content section renders. Default (`undefined`) is the Reference section.
+ * `'inline'` renders right after the anchor section's body (or after core concept
+ * `conceptIndex` when `after` is `'coreConcepts'`), inside the anchor's open state.
+ */
+export type ChapterContentSection =
+  | (ContentSectionBase & { placement?: 'reference' | 'diagram' })
+  | (ContentSectionBase & { placement: 'inline'; after: SectionKey; conceptIndex?: number });
+
+export type ContentPlacement = NonNullable<ChapterContentSection['placement']>;
 
 export type TabType = 'guide' | 'ai' | 'quiz' | 'gamification' | 'simulator';
 
@@ -24,7 +126,7 @@ export interface WorkplaceDialogue {
 
 export interface JargonTerm {
   term: string;
-  formalDefinition: string;
+  formalDefinition?: string; // omitted when it would only restate humanTranslation
   humanTranslation: string; // แปลภาษาคนแบบเห็นภาพ
   meetingExample?: string; // ตัวอย่างการใช้ในห้องประชุมจริง
 }
@@ -42,25 +144,6 @@ export interface ChapterPitfall {
   pitfall: string;
   symptom?: string; // อาการเตือนภัยที่เห็นในทีม
   solution: string; // ทางออกที่แก้ได้จริง
-  preventionRule?: string; // กฎเหล็กป้องกันล่วงหน้า
-}
-
-export interface SvgVisualElement {
-  label: string;
-  role: string;
-  color: string;
-  detail: string;
-}
-
-export interface ChapterIllustration {
-  id: string;
-  title: string;
-  subtitle: string;
-  visualMetaphor: string; // อธิบายเปรียบเทียบภาพให้เข้าใจทันที
-  svgType: 'pipeline' | 'matrix' | 'triangle' | 'kitchen-architecture' | 'dual-orbit' | 'iceberg' | 'pyramid' | 'c4' | 'protocol-comparison' | 'custom';
-  svgDescription: string; // Structured description of visual scene
-  elements: SvgVisualElement[];
-  takeaway: string;
 }
 
 export interface NegotiationDilemmaOption {
@@ -110,12 +193,38 @@ export interface RoleMindsetGuide {
   bridgeAdvice: string;
 }
 
+/** What one side typically says, how the other side hears it, and a rewrite that lands. */
+export interface SaysVsHears {
+  youSay: string; // what the READER's side typically says
+  theyHear: string; // how the explained side hears it
+  sayInstead: string; // a rewrite that lands
+}
+
+/** How one side sees this chapter's topic, written for a reader from the other side (spec P2.1). */
+export interface SideView {
+  measuredBy: string; // what this side is judged on, for this topic
+  fears: [string, string]; // two concrete, topic-specific fears
+  saysVsHears: [SaysVsHears, SaysVsHears];
+  askThem: string[]; // 2-3 questions the reader should ask this side
+}
+
+/** Key = the side being explained. A Dev reads `perspectives.biz`. */
+export type ChapterPerspectives = Record<Role, SideView>;
+
 export interface Chapter {
   id: string;
   num: number;
   title: string;
+  enTerm?: string; // canonical English name, shown as a tag and matched by search
   subtitle: string;
-  roleTag: 'all' | 'pm' | 'ux' | 'ba' | 'sa' | 'eng' | 'qa' | 'devops' | 'support' | 'friction' | 'ai';
+  /**
+   * One Thai line under the subtitle (term-definitions spec P4.1): why this chapter matters and how
+   * it connects to the guide's promise, true for a reader arriving from any track or a cold link, and
+   * what every abbreviation in title/subtitle/enTerm/keyTakeaway stands for. A `RichText` string.
+   */
+  chapterOpening: string;
+  roleTag: 'all' | 'pm' | 'ux' | 'ba' | 'sa' | 'eng' | 'qa' | 'devops' | 'support' | 'friction' | 'ai' | 'biz';
+  home: ChapterHome; // which side does this work (role perspective, spec P1.1)
   businessNote: string;
   engineerNote: string;
   contentHtml?: string;
@@ -132,8 +241,10 @@ export interface Chapter {
   realWorldWorkflow?: { step: string; role: string; description: string }[];
   checklist?: string[];
   commonPitfalls?: ChapterPitfall[];
-  illustrations?: ChapterIllustration[];
+  heroFigure?: ChapterHeroFigure;
   frictionPlaybook?: FrictionPlaybook;
+  contentSections?: ChapterContentSection[];
+  perspectives?: ChapterPerspectives; // merged from chapterPerspectives.ts; required by a test
 }
 
 export interface QuizQuestion {
@@ -148,6 +259,8 @@ export interface QuizQuestion {
     explanation: string;
   }[];
   xp: number;
+  forRole: Role | 'both'; // 'both' = role literacy for everyone; otherwise a seat-specific scenario (spec P5.1)
+  chapterId?: string; // chapter behind the question, opened by อ่านบทที่เกี่ยวข้อง
 }
 
 export interface Badge {
@@ -169,7 +282,7 @@ export interface UserStats {
   aiQuestionsAsked: number;
   readChapters: string[];
   bookmarks: string[];
-  plainModeEnabled: boolean;
+  xpClaims: string[]; // keys of XP awards already paid out (see lib/xp.ts)
 }
 
 export interface ChatMessage {

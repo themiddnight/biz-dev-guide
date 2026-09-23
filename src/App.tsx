@@ -1,8 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { AudienceMode, ExperienceLevel, TabType, UserStats, Badge } from './types';
+import React, { useState, useEffect, useRef } from 'react';
+import { ExperienceLevel, TabType, UserStats, Badge } from './types';
+import { readStorage, writeStorage, removeStorage } from './lib/storage';
+import { parseRole, parseLevelMode, planRoleChoice, loadChapterLevelsByRole, chapterLevelsFor, withChapterLevel } from './lib/rolePrefs';
+import type { LevelInputs, LevelMode, Role } from './data/rolePerspective';
 import { CHAPTERS } from './data/chaptersData';
+import { formatChapterHash } from './lib/chapterRoute';
+import { useChapterRoute } from './hooks/useChapterRoute';
 import { QUIZ_QUESTIONS } from './data/quizQuestions';
 import { INITIAL_BADGES, LEVEL_TIERS } from './data/badgesData';
+import { applyXpClaims, unclaimed, seedLegacyClaims, xpKey, AI_XP_QUESTION_CAP, XpClaim, qualifiesQuizMaster, quizAnswerClaims } from './lib/xp';
 import { Header } from './components/Header';
 import { GuideTab } from './components/GuideTab';
 import { AIAssistantTab } from './components/AIAssistantTab';
@@ -12,12 +18,80 @@ import { Sparkles, Trophy, Zap, X } from 'lucide-react';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<TabType>('guide');
-  const [audienceMode, setAudienceMode] = useState<AudienceMode>('both');
+  const route = useChapterRoute(CHAPTERS, { onChapterRoute: () => setActiveTab('guide') });
+
+  // Tabs are not routes: clear the hash off the guide, restore it on return (spec §5.2) —
+  // but only when the URL had a chapter hash, so a plain visit stays a bare URL. A hash
+  // already present (back/forward from another tab) is kept as is, section included.
+  const prevTabRef = useRef(activeTab);
+  useEffect(() => {
+    const prev = prevTabRef.current;
+    prevTabRef.current = activeTab;
+    if (activeTab !== 'guide') {
+      if (window.location.hash) window.history.replaceState(null, '', window.location.pathname + window.location.search);
+      return;
+    }
+    if (prev !== 'guide' && route.hashInUrl && !window.location.hash) {
+      const num = CHAPTERS.find(c => c.id === route.activeChapterId)?.num;
+      if (num !== undefined) window.history.replaceState(null, '', formatChapterHash(num));
+    }
+  }, [activeTab, route.activeChapterId, route.hashInUrl]);
   const [experienceLevel, setExperienceLevel] = useState<ExperienceLevel>(() => {
-    const saved = localStorage.getItem('be_guide_exp_level') as ExperienceLevel | null;
+    const saved = readStorage('be_guide_exp_level') as ExperienceLevel | null;
     return saved || 'beginner';
   });
-  const [plainModeEnabled, setPlainModeEnabled] = useState(false);
+  const [levelChosen, setLevelChosen] = useState(() => readStorage('be_guide_exp_level') !== null);
+
+  // First-visit choice or skip: set and persist the level, no XP (spec §4.1).
+  const handleChooseInitialLevel = (level: ExperienceLevel) => {
+    setExperienceLevel(level);
+    writeStorage('be_guide_exp_level', level);
+    setLevelChosen(true);
+  };
+
+  // Role perspective (spec P1.2). No role = today's behaviour (D2). None of these pay XP (D5).
+  const [role, setRole] = useState<Role | null>(() => parseRole(readStorage('be_guide_role')));
+  const [levelMode, setLevelMode] = useState<LevelMode>(() => parseLevelMode(readStorage('be_guide_level_mode')));
+  // Per-chapter overrides are stored per role and swap with it (role UX fixes Phase 3, supersedes D4).
+  // The legacy flat key is migrated once and removed.
+  const [levelsInit] = useState(() => loadChapterLevelsByRole(
+    readStorage('be_guide_chapter_levels_by_role'), readStorage('be_guide_chapter_levels'),
+    parseRole(readStorage('be_guide_role')), CHAPTERS.map(c => c.id),
+  ));
+  const [chapterLevelsByRole, setChapterLevelsByRole] = useState(levelsInit.byRole);
+  useEffect(() => {
+    if (!levelsInit.migrated) return;
+    const json = JSON.stringify(levelsInit.byRole);
+    writeStorage('be_guide_chapter_levels_by_role', json);
+    // Drop the legacy key only once the new one is really stored (a full quota fails silently).
+    if (readStorage('be_guide_chapter_levels_by_role') === json) removeStorage('be_guide_chapter_levels');
+  }, [levelsInit]);
+  const chapterLevels = chapterLevelsFor(chapterLevelsByRole, role);
+  const levelInputs: LevelInputs = { role, baseLevel: experienceLevel, levelMode, chapterLevels };
+
+  // Changing role keeps levelMode; the new role's override set applies through chapterLevelsFor.
+  const handleChooseRole = (next: Role | null) => {
+    const plan = planRoleChoice(role, next, levelChosen);
+    // An explicit "no role" is a choice too: without this the first-visit card would reappear.
+    if (plan.dismissFirstVisit) handleChooseInitialLevel(experienceLevel);
+    if (!plan.changeRole) return;
+    setRole(next);
+    if (next === null) removeStorage('be_guide_role');
+    else writeStorage('be_guide_role', next);
+  };
+
+  const handleLevelModeChange = (mode: LevelMode) => {
+    setLevelMode(mode);
+    writeStorage('be_guide_level_mode', mode);
+  };
+
+  const handleChapterLevelChange = (chapterId: string, level: ExperienceLevel | null) => {
+    if (role === null) return; // the per-chapter switch is not rendered without a role
+    const next = withChapterLevel(chapterLevelsByRole, role, chapterId, level);
+    setChapterLevelsByRole(next);
+    writeStorage('be_guide_chapter_levels_by_role', JSON.stringify(next));
+  };
+
   const [aiPromptPrefill, setAiPromptPrefill] = useState('');
   const [toastMessage, setToastMessage] = useState<{ title: string; subtitle: string } | null>(null);
 
@@ -58,22 +132,44 @@ export default function App() {
 
   const [badges, setBadges] = useState<Badge[]>(() => {
     const saved = localStorage.getItem('be_guide_badges');
-    return saved ? JSON.parse(saved) : INITIAL_BADGES;
+    if (!saved) return INITIAL_BADGES;
+    // Merge saved unlock state onto the current badge list so removed badges
+    // (e.g. the old `plain_talker`) and stale fields are dropped.
+    try {
+      const savedBadges = JSON.parse(saved) as Partial<Badge>[];
+      return INITIAL_BADGES.map((b) => {
+        const s = savedBadges.find((sb) => sb.id === b.id);
+        return s?.unlocked ? { ...b, unlocked: true, unlockedAt: s.unlockedAt } : b;
+      });
+    } catch {
+      return INITIAL_BADGES;
+    }
   });
 
   const [userStats, setUserStats] = useState<UserStats>(() => {
-    const saved = localStorage.getItem('be_guide_stats');
-    return saved ? JSON.parse(saved) : {
-      xp: 25,
+    const defaults: UserStats = {
+      xp: 0,
       level: 1,
-      levelTitle: 'Novice Observer (ผู้สังเกตการณ์มือใหม่)',
+      levelTitle: LEVEL_TIERS[0].title,
       quizzesCompleted: 0,
       correctAnswers: 0,
       aiQuestionsAsked: 0,
-      readChapters: ['s1'],
-      bookmarks: ['s1', 's11'],
-      plainModeEnabled: false,
+      readChapters: [],
+      bookmarks: [],
+      xpClaims: [],
     };
+    const saved = localStorage.getItem('be_guide_stats');
+    if (!saved) return defaults;
+    try {
+      const { plainModeEnabled: _legacyPlain, ...rest } = JSON.parse(saved);
+      const stats: UserStats = { ...defaults, ...rest };
+      if (!Array.isArray(rest.xpClaims)) {
+        stats.xpClaims = seedLegacyClaims(stats, readStorage('be_guide_exp_level'));
+      }
+      return stats;
+    } catch {
+      return defaults;
+    }
   });
 
   // Save to localStorage
@@ -85,113 +181,93 @@ export default function App() {
     localStorage.setItem('be_guide_badges', JSON.stringify(badges));
   }, [badges]);
 
-  // Recalculate level on XP change
-  const addXp = (amount: number, reason: string) => {
-    setUserStats((prev) => {
-      const newXp = prev.xp + amount;
-      const currentTier = LEVEL_TIERS.slice().reverse().find(t => newXp >= t.minXp) || LEVEL_TIERS[0];
-      return {
-        ...prev,
-        xp: newXp,
-        level: currentTier.level,
-        levelTitle: currentTier.title,
-      };
-    });
-
-    setToastMessage({
-      title: `+${amount} XP!`,
-      subtitle: reason,
-    });
+  const showToast = (title: string, subtitle: string) => {
+    setToastMessage({ title, subtitle });
     setTimeout(() => setToastMessage(null), 3500);
   };
 
-  const unlockBadge = (badgeId: string) => {
-    setBadges((prev) =>
-      prev.map((b) => {
-        if (b.id === badgeId && !b.unlocked) {
-          addXp(50, `ปลดล็อกเหรียญตรา: ${b.title}`);
-          return {
-            ...b,
-            unlocked: true,
-            unlockedAt: new Date().toLocaleDateString('th-TH'),
-          };
-        }
-        return b;
-      })
-    );
+  // Pay out XP only for claims this profile hasn't earned yet; returns the XP
+  // actually awarded. Decided against the rendered state so the toast shows once,
+  // and re-checked inside the updater so a stale closure can't double-pay.
+  const claimXp = (claims: XpClaim[], reason: string, title?: string) => {
+    const amount = unclaimed(userStats, claims).reduce((sum, c) => sum + c.amount, 0);
+    if (amount === 0) return 0;
+    setUserStats((prev) => applyXpClaims(prev, claims));
+    showToast(title ?? `+${amount} XP!`, reason);
+    return amount;
   };
 
-  // Audience toggle handler
-  const handleAudienceChange = (mode: AudienceMode) => {
-    setAudienceMode(mode);
-    if (mode !== 'both') {
-      unlockBadge('view_switcher');
-    }
+  // Decide the unlock outside the state updater so XP is awarded exactly once
+  // (updaters run twice under StrictMode).
+  const unlockBadge = (badgeId: string) => {
+    const badge = badges.find((b) => b.id === badgeId);
+    if (!badge || badge.unlocked) return;
+    const unlockedAt = new Date().toLocaleDateString('th-TH');
+    setBadges((prev) =>
+      prev.map((b) => (b.id === badgeId && !b.unlocked ? { ...b, unlocked: true, unlockedAt } : b))
+    );
+    claimXp([{ key: xpKey.badge(badgeId), amount: 50 }], `ปลดล็อกเหรียญ: ${badge.title}`);
   };
 
   // Experience level toggle handler
   const handleExperienceLevelChange = (level: ExperienceLevel) => {
+    writeStorage('be_guide_exp_level', level);
+    setLevelChosen(true);
+    if (level === experienceLevel) return;
     setExperienceLevel(level);
-    localStorage.setItem('be_guide_exp_level', level);
+    // First switch into each mode pays once; toggling back and forth pays nothing.
     if (level === 'experienced') {
-      addXp(15, 'เปิดโหมด Experienced: ศึกษาคัมภีร์รับมือ Friction');
+      claimXp([{ key: xpKey.mode(level), amount: 15 }], 'เปิดโหมด Experienced: อ่านคู่มือรับมือ Friction');
     } else {
-      addXp(10, 'เปิดโหมด Beginner: ปูพื้นฐาน Mindset');
+      claimXp([{ key: xpKey.mode(level), amount: 10 }], 'เปิดโหมด Beginner: เริ่มจาก Mindset พื้นฐาน');
     }
   };
 
-  // Plain mode toggle handler
-  const handleTogglePlainMode = () => {
-    setPlainModeEnabled((prev) => {
-      const next = !prev;
-      if (next) {
-        unlockBadge('plain_talker');
-        addXp(10, 'เปิดโหมดแปลภาษาบ้านๆ');
-      }
-      return next;
-    });
-  };
-
-  // Bookmark toggle
+  // Bookmark toggle (no XP: bookmarking is not a learning action)
   const handleToggleBookmark = (chapterId: string) => {
-    setUserStats((prev) => {
-      const isBookmarked = prev.bookmarks.includes(chapterId);
-      const newBookmarks = isBookmarked
+    const isBookmarked = userStats.bookmarks.includes(chapterId);
+    setUserStats((prev) => ({
+      ...prev,
+      bookmarks: isBookmarked
         ? prev.bookmarks.filter((id) => id !== chapterId)
-        : [...prev.bookmarks, chapterId];
-
-      if (!isBookmarked) {
-        addXp(15, 'บันทึกบทลงในบุ๊กมาร์ก');
-      }
-
-      return {
-        ...prev,
-        bookmarks: newBookmarks,
-      };
-    });
+        : [...prev.bookmarks.filter((id) => id !== chapterId), chapterId],
+    }));
+    showToast(isBookmarked ? 'นำบุ๊กมาร์กออกแล้ว' : 'บุ๊กมาร์กแล้ว', 'ดูบทที่บุ๊กมาร์กไว้ได้ในคู่มือ');
   };
 
   // Toggle chapter read status
   const handleToggleReadChapter = (chapterId: string) => {
-    setUserStats((prev) => {
-      const isRead = prev.readChapters.includes(chapterId);
-      const newRead = isRead
+    const isRead = userStats.readChapters.includes(chapterId);
+    const newRead = isRead
+      ? userStats.readChapters.filter((id) => id !== chapterId)
+      : [...userStats.readChapters, chapterId];
+
+    setUserStats((prev) => ({
+      ...prev,
+      readChapters: isRead
         ? prev.readChapters.filter((id) => id !== chapterId)
-        : [...prev.readChapters, chapterId];
+        : [...prev.readChapters.filter((id) => id !== chapterId), chapterId],
+    }));
 
-      if (!isRead) {
-        addXp(30, 'อ่านและทำความเข้าใจบทนี้สำเร็จ');
-        unlockBadge('fast_learner');
-        if (newRead.length >= 15) {
-          unlockBadge('grandmaster');
-        }
-      }
+    if (isRead) {
+      showToast('ยกเลิกเครื่องหมายว่าอ่านแล้ว', 'บทนี้กลับเป็นยังไม่ได้อ่าน');
+      return;
+    }
 
-      return {
-        ...prev,
-        readChapters: newRead,
-      };
-    });
+    // Re-marking a chapter after unmarking it does not pay again.
+    if (claimXp([{ key: xpKey.read(chapterId), amount: 30 }], 'อ่านบทนี้จบแล้ว', 'ทำเครื่องหมายว่าอ่านแล้ว +30 XP') === 0) {
+      showToast('ทำเครื่องหมายว่าอ่านแล้ว', 'บทนี้เคยได้รับ XP ไปแล้ว');
+    }
+    unlockBadge('first_step');
+    if (newRead.length >= CHAPTERS.length) {
+      unlockBadge('deep_scholar');
+    }
+  };
+
+  // Friction dilemma: GuideTab only reports XP for an optimal dilemma pick; once per chapter
+  const handleDilemmaXp = (chapterId: string, amount: number, reason: string) => {
+    claimXp([{ key: xpKey.dilemma(chapterId), amount }], reason);
+    unlockBadge('conflict_mediator');
   };
 
   // Ask AI handler
@@ -201,16 +277,34 @@ export default function App() {
   };
 
   const handleQuestionAsked = () => {
+    const n = userStats.aiQuestionsAsked + 1;
     setUserStats((prev) => ({
       ...prev,
       aiQuestionsAsked: prev.aiQuestionsAsked + 1,
     }));
-    addXp(20, 'ปรึกษา AI Bridge Assistant');
+    if (n <= AI_XP_QUESTION_CAP) {
+      claimXp([{ key: xpKey.ai(n), amount: 20 }], `ปรึกษา AI Bridge Assistant (${n}/${AI_XP_QUESTION_CAP})`);
+    }
     unlockBadge('ai_consultant');
   };
 
-  // Quiz completion
-  const handleCompleteQuiz = (score: number, totalEarnedXp: number) => {
+  // Quiz "อ่านบทที่เกี่ยวข้อง": leave the quiz for the mapped chapter in the guide.
+  const handleOpenChapterFromQuiz = (chapterId: string) => {
+    setActiveTab('guide');
+    route.navigate(chapterId);
+  };
+
+  // Quiz answer: each question pays its XP the moment it is first answered correctly,
+  // so leaving mid-round keeps it; retakes only pay for newly-correct questions.
+  // Returns the XP actually awarded.
+  const handleQuizAnswer = (questionId: number, correct: boolean) => {
+    const question = QUIZ_QUESTIONS.find((q) => q.id === questionId);
+    if (!question) return 0;
+    return claimXp(quizAnswerClaims(question, correct), 'ตอบแบบทดสอบถูก');
+  };
+
+  // Quiz completion: stats and badges only (XP was already paid per answer).
+  const handleCompleteQuiz = (score: number, roundSize: number) => {
     setUserStats((prev) => ({
       ...prev,
       quizzesCompleted: prev.quizzesCompleted + 1,
@@ -218,7 +312,8 @@ export default function App() {
     }));
     unlockBadge('quiz_starter');
 
-    if (score >= QUIZ_QUESTIONS.length * 0.8) {
+    // Judged on the round played, not the whole bank (D13).
+    if (qualifiesQuizMaster(score, roundSize)) {
       unlockBadge('quiz_master');
     }
   };
@@ -227,7 +322,7 @@ export default function App() {
     <div className="min-h-screen bg-[#fafafa] dark:bg-[#0a0a0a] text-neutral-900 dark:text-[#e5e5e5] font-sans antialiased transition-colors duration-200">
       {/* Toast Alert for XP / Badges */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 bg-neutral-950 dark:bg-[#141414] text-white rounded-[4px] shadow-2xl border border-neutral-800 dark:border-[#262626] animate-slideUp font-mono">
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 bg-neutral-950 dark:bg-[#141414] text-white rounded-[4px] shadow-2xl border border-neutral-800 dark:border-[#262626] animate-slideUp">
           <div className="w-7 h-7 rounded-[3px] bg-white text-neutral-950 flex items-center justify-center font-bold shrink-0 text-xs">
             <Zap className="w-3.5 h-3.5 fill-current" />
           </div>
@@ -253,12 +348,14 @@ export default function App() {
       <Header
         activeTab={activeTab}
         setActiveTab={setActiveTab}
-        audienceMode={audienceMode}
-        setAudienceMode={handleAudienceChange}
         experienceLevel={experienceLevel}
         setExperienceLevel={handleExperienceLevelChange}
+        role={role}
+        onChooseRole={handleChooseRole}
+        levelMode={levelMode}
+        onLevelModeChange={handleLevelModeChange}
         userStats={userStats}
-        togglePlainMode={handleTogglePlainMode}
+        chapterCount={CHAPTERS.length}
         theme={theme}
         setTheme={setTheme}
       />
@@ -268,18 +365,28 @@ export default function App() {
         {activeTab === 'guide' && (
           <GuideTab
             chapters={CHAPTERS}
-            audienceMode={audienceMode}
-            experienceLevel={experienceLevel}
+            levelInputs={levelInputs}
             onExperienceLevelChange={handleExperienceLevelChange}
-            onAudienceChange={handleAudienceChange}
-            plainModeEnabled={plainModeEnabled}
+            onChooseRole={handleChooseRole}
+            onChapterLevelChange={handleChapterLevelChange}
+            showFirstVisit={!levelChosen && role === null}
+            onChooseInitialLevel={handleChooseInitialLevel}
+            onLevelModeChange={handleLevelModeChange}
             bookmarks={userStats.bookmarks}
             readChapters={userStats.readChapters}
             onToggleBookmark={handleToggleBookmark}
             onToggleReadChapter={handleToggleReadChapter}
             onAskAIWithPrompt={handleAskAIWithPrompt}
             onStartQuiz={() => setActiveTab('quiz')}
-            onEarnXp={(amount, reason) => addXp(amount, reason)}
+            onEarnXp={handleDilemmaXp}
+            activeChapterId={route.activeChapterId}
+            requestedSection={route.requestedSection}
+            onNavigateChapter={route.navigate}
+            onReplaceSection={route.replaceSection}
+            onRequestedSectionApplied={route.clearRequestedSection}
+            loadedFromHash={route.loadedFromHash}
+            initialSource={route.initialSource}
+            hasNavigated={route.hasNavigated}
           />
         )}
 
@@ -293,8 +400,11 @@ export default function App() {
         {activeTab === 'quiz' && (
           <QuizTab
             questions={QUIZ_QUESTIONS}
+            role={role}
+            onAnswer={handleQuizAnswer}
             onCompleteQuiz={handleCompleteQuiz}
             onAskAIWithPrompt={handleAskAIWithPrompt}
+            onOpenChapter={handleOpenChapterFromQuiz}
           />
         )}
 
@@ -302,6 +412,7 @@ export default function App() {
           <GamificationTab
             badges={badges}
             userStats={userStats}
+            chapterCount={CHAPTERS.length}
             onStartQuiz={() => setActiveTab('quiz')}
             onGoToGuide={() => setActiveTab('guide')}
           />
@@ -314,8 +425,9 @@ export default function App() {
           <p className="font-semibold text-slate-700 dark:text-slate-300">
             จุดที่ business กับ engineering มาเจอกัน — Interactive Knowledge &amp; Collaboration Platform
           </p>
+          <p>คู่มือกลาง แชร์ต่อได้ — ปรับปรุงเพิ่มเองได้ตามงานที่เจอจริง</p>
           <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-            ออกแบบเพื่อลดช่องว่างความเข้าใจผิดระหว่าง Business และ Engineering พร้อมเครื่องมือ AI และระบบ Interactive Gamification
+            ช่วยให้ Business กับ Engineering เข้าใจกันง่ายขึ้น พร้อมเครื่องมือ AI และระบบ Interactive Gamification
           </p>
         </div>
       </footer>

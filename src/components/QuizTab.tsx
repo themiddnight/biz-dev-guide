@@ -1,46 +1,161 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { QuizQuestion } from '../types';
+import type { Role } from '../data/rolePerspective';
+import { QUIZ_ROUNDS, QUIZ_ROUND_META, QuizRound, defaultQuizRound, getQuizRound, initialQuizRound } from '../data/quizRounds';
+import { readStorage, removeStorage, writeStorage } from '../lib/storage';
+import { missedItems, type QuizAnswer } from '../lib/quizResult';
+import { QuizResultScreen } from './quiz/QuizResultScreen';
 import { 
-  Sparkles, 
   CheckCircle2, 
   XCircle, 
   ArrowRight, 
-  RotateCcw, 
-  Trophy, 
   HelpCircle, 
   Award,
   Zap,
-  Bot
+  Bot,
+  BookOpen
 } from 'lucide-react';
+import { TAP, TAP_GAP } from './ui/tapTarget';
+
+type AnswerQuiz = (questionId: number, correct: boolean) => number; // pays XP now; returns XP actually awarded
+type CompleteQuiz = (score: number, roundSize: number) => void; // stats and badges only
 
 interface QuizTabProps {
-  questions: QuizQuestion[];
-  onCompleteQuiz: (score: number, totalXpEarned: number) => void;
+  questions: QuizQuestion[]; // the full bank; the tab picks the round
+  role: Role | null;
+  onAnswer: AnswerQuiz;
+  onCompleteQuiz: CompleteQuiz;
   onAskAIWithPrompt: (prompt: string) => void;
+  onOpenChapter: (chapterId: string) => void;
 }
 
+interface QuizRunProps {
+  questions: QuizQuestion[]; // one round
+  onAnswer: AnswerQuiz;
+  onCompleteQuiz: CompleteQuiz;
+  onRunStarted: (started: boolean) => void;
+  onAskAIWithPrompt: (prompt: string) => void;
+  onOpenChapter: (chapterId: string) => void;
+}
+
+// Shuffle options once per attempt so the correct answer is not tied to a fixed position.
+// Correctness always follows option.isCorrect, never the displayed index.
+const shuffleOptions = (questions: QuizQuestion[]): QuizQuestion['options'][] =>
+  questions.map((q) => {
+    const opts = [...q.options];
+    for (let i = opts.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [opts[i], opts[j]] = [opts[j], opts[i]];
+    }
+    return opts;
+  });
+
+const ROUND_KEY = 'be_guide_quiz_round';
+
+// Round chips (spec P5.3). The run below is keyed by round, so switching rounds
+// restarts index, score and shuffled options with no confirmation (D12).
 export const QuizTab: React.FC<QuizTabProps> = ({
   questions,
+  role,
+  onAnswer,
   onCompleteQuiz,
   onAskAIWithPrompt,
+  onOpenChapter,
+}) => {
+  const [round, setRound] = useState<QuizRound>(() => initialQuizRound(readStorage(ROUND_KEY), role));
+  const [roundRole, setRoundRole] = useState(role);
+  // True once a question in the current run has been answered.
+  const [runStarted, setRunStarted] = useState(false);
+  if (role !== roundRole) {
+    // A role change elsewhere moves the reader to their new default round, but never
+    // abandons a run they have already started answering.
+    setRoundRole(role);
+    // A role change is not a round choice: drop the stored one so the new role's
+    // default is what the tab offers next time (round3 spec D13).
+    removeStorage(ROUND_KEY);
+    if (!runStarted) setRound(defaultQuizRound(role));
+  }
+  const chooseRound = (r: QuizRound) => {
+    if (r === round) return;
+    writeStorage(ROUND_KEY, r);
+    setRound(r);
+    setRunStarted(false);
+  };
+  const roundQuestions = useMemo(() => getQuizRound(questions, round), [questions, round]);
+
+  return (
+    <div className="space-y-5 sm:space-y-6">
+      <div
+        role="group"
+        aria-label="เลือกชุดคำถาม"
+        className="max-w-3xl mx-auto flex flex-wrap gap-2"
+      >
+        {QUIZ_ROUNDS.map((r) => {
+          const selected = r === round;
+          const count = getQuizRound(questions, r).length;
+          return (
+            <button
+              key={r}
+              type="button"
+              aria-pressed={selected}
+              data-quiz-round={r}
+              onClick={() => chooseRound(r)}
+              className={`${TAP_GAP[8]} px-3 py-1.5 rounded-full border text-xs font-semibold transition-colors cursor-pointer ${
+                selected
+                  ? 'bg-neutral-900 text-white border-neutral-900 dark:bg-white dark:text-[#0a0a0a] dark:border-white'
+                  : 'bg-white dark:bg-[#141414] text-neutral-700 dark:text-[#c4c4c4] border-neutral-200 dark:border-[#262626] hover:border-neutral-400 dark:hover:border-[#404040]'
+              }`}
+            >
+              {QUIZ_ROUND_META[r].label}{r === role ? ' (สายคุณ)' : ''} · {count} ข้อ
+            </button>
+          );
+        })}
+      </div>
+
+      <QuizRun
+        key={round}
+        questions={roundQuestions}
+        onAnswer={onAnswer}
+        onCompleteQuiz={onCompleteQuiz}
+        onRunStarted={setRunStarted}
+        onAskAIWithPrompt={onAskAIWithPrompt}
+        onOpenChapter={onOpenChapter}
+      />
+    </div>
+  );
+};
+
+const QuizRun: React.FC<QuizRunProps> = ({
+  questions,
+  onAnswer,
+  onCompleteQuiz,
+  onRunStarted,
+  onAskAIWithPrompt,
+  onOpenChapter,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOptionIndex, setSelectedOptionIndex] = useState<number | null>(null);
   const [score, setScore] = useState(0);
-  const [earnedXp, setEarnedXp] = useState(0);
+  const [awardedXp, setAwardedXp] = useState(0);
+  const [answers, setAnswers] = useState<QuizAnswer[]>([]);
   const [isFinished, setIsFinished] = useState(false);
+  const [shuffledOptions, setShuffledOptions] = useState(() => shuffleOptions(questions));
 
   const currentQ = questions[currentIndex];
+  const currentOptions = shuffledOptions[currentIndex] ?? currentQ.options;
 
   const handleSelectOption = (idx: number) => {
     if (selectedOptionIndex !== null) return; // Already answered
     setSelectedOptionIndex(idx);
 
-    const isCorrect = currentQ.options[idx].isCorrect;
-    if (isCorrect) {
-      setScore((prev) => prev + 1);
-      setEarnedXp((prev) => prev + currentQ.xp);
-    }
+    const isCorrect = currentOptions[idx].isCorrect;
+    if (isCorrect) setScore((prev) => prev + 1);
+    // chosenText, not the shuffled index: the shuffle is re-rolled on restart (spec P2.2).
+    setAnswers((prev) => [...prev, { questionId: currentQ.id, correct: isCorrect, chosenText: currentOptions[idx].text }]);
+    onRunStarted(true);
+    // XP is paid on the answer, not at the end, so leaving mid-round keeps it.
+    const awarded = onAnswer(currentQ.id, isCorrect);
+    if (awarded > 0) setAwardedXp((prev) => prev + awarded);
   };
 
   const handleNext = () => {
@@ -49,7 +164,8 @@ export const QuizTab: React.FC<QuizTabProps> = ({
       setSelectedOptionIndex(null);
     } else {
       setIsFinished(true);
-      onCompleteQuiz(score + (currentQ.options[selectedOptionIndex ?? 0]?.isCorrect ? 1 : 0), earnedXp);
+      // score already includes the last answer (updated in handleSelectOption).
+      onCompleteQuiz(score, questions.length);
     }
   };
 
@@ -57,70 +173,24 @@ export const QuizTab: React.FC<QuizTabProps> = ({
     setCurrentIndex(0);
     setSelectedOptionIndex(null);
     setScore(0);
-    setEarnedXp(0);
+    setAwardedXp(0);
+    setAnswers([]);
+    onRunStarted(false);
     setIsFinished(false);
+    setShuffledOptions(shuffleOptions(questions));
   };
 
   if (isFinished) {
-    const percentage = Math.round((score / questions.length) * 100);
-
     return (
-      <div className="max-w-2xl mx-auto py-12 px-4 text-center space-y-6">
-        <div className="w-20 h-20 mx-auto rounded-3xl bg-amber-500/10 text-amber-500 flex items-center justify-center border-2 border-amber-500/20 shadow-lg shadow-amber-500/10 animate-bounce">
-          <Trophy className="w-10 h-10" />
-        </div>
-
-        <div className="space-y-2">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-xs font-semibold border border-emerald-500/20">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>ภารกิจเสร็จสิ้น! บันทึกผลสำเร็จเรียบร้อย</span>
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-50">
-            ยินดีด้วย! คุณทำแบบทดสอบครบแล้ว
-          </h2>
-          <p className="text-slate-600 dark:text-slate-400 text-sm">
-            คุณได้พิสูจน์ความเข้าใจในการลดช่องว่างระหว่างฝั่ง Business และ Engineering
-          </p>
-        </div>
-
-        {/* Score & XP Card */}
-        <div className="grid grid-cols-2 gap-4 max-w-md mx-auto p-6 bg-white dark:bg-[#141414] rounded-2xl sm:rounded-3xl border border-neutral-200 dark:border-[#262626] shadow-2xs">
-          <div className="space-y-1">
-            <span className="text-xs text-neutral-500 dark:text-[#8e8e8e] font-medium">คะแนนที่ได้</span>
-            <div className="text-3xl font-extrabold text-neutral-900 dark:text-[#fafafa]">
-              {score} <span className="text-lg text-neutral-400 dark:text-[#666666] font-normal">/ {questions.length}</span>
-            </div>
-            <span className="text-xs text-neutral-600 dark:text-[#a3a3a3] font-medium">{percentage}% ถูกต้อง</span>
-          </div>
-          <div className="space-y-1 border-l border-neutral-200 dark:border-[#262626] pl-4">
-            <span className="text-xs text-neutral-500 dark:text-[#8e8e8e] font-medium">XP ที่ได้รับ</span>
-            <div className="text-3xl font-extrabold text-amber-500 dark:text-amber-400 flex items-center justify-center gap-1 font-mono">
-              <Zap className="w-6 h-6 fill-amber-500 text-amber-500" />
-              <span>+{earnedXp}</span>
-            </div>
-            <span className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold">สะสมเข้าโปรไฟล์แล้ว</span>
-          </div>
-        </div>
-
-        {/* Actions */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
-          <button
-            onClick={handleRestart}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl sm:rounded-2xl bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] text-xs sm:text-sm font-semibold hover:opacity-90 transition-all cursor-pointer shadow-xs"
-          >
-            <RotateCcw className="w-4 h-4" />
-            <span>ทำแบบทดสอบอีกครั้ง</span>
-          </button>
-
-          <button
-            onClick={() => onAskAIWithPrompt("ช่วยสรุปข้อคิดและทบทวนสิ่งที่ควรระวังจากแบบทดสอบเรื่อง Business vs Engineering")}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl sm:rounded-2xl bg-neutral-100 dark:bg-[#1a1a1a] text-neutral-900 dark:text-[#e5e5e5] border border-neutral-200 dark:border-[#262626] text-xs sm:text-sm font-semibold hover:bg-neutral-200/70 dark:hover:bg-[#222222] transition-all cursor-pointer"
-          >
-            <Bot className="w-4 h-4" />
-            <span>ถาม AI ทบทวนข้อที่ยังไม่แม่น</span>
-          </button>
-        </div>
-      </div>
+      <QuizResultScreen
+        score={score}
+        total={questions.length}
+        awardedXp={awardedXp}
+        missed={missedItems(questions, answers)}
+        onRestart={handleRestart}
+        onAskAI={() => onAskAIWithPrompt('ช่วยสรุปข้อคิดและทบทวนสิ่งที่ควรระวังจากแบบทดสอบเรื่อง Business vs Engineering')}
+        onOpenChapter={onOpenChapter}
+      />
     );
   }
 
@@ -131,7 +201,7 @@ export const QuizTab: React.FC<QuizTabProps> = ({
       {/* Quiz Top Progress */}
       <div className="flex items-center justify-between gap-4">
         <div>
-          <span className="text-[11px] font-bold text-neutral-500 dark:text-[#8e8e8e] uppercase tracking-wider font-mono">
+          <span className="text-[11px] font-bold text-neutral-500 dark:text-[#8e8e8e] uppercase tracking-wider">
             คำถามข้อที่ {currentIndex + 1} จาก {questions.length}
           </span>
           <h2 className="text-base sm:text-xl font-bold text-neutral-900 dark:text-[#fafafa]">
@@ -139,7 +209,7 @@ export const QuizTab: React.FC<QuizTabProps> = ({
           </h2>
         </div>
 
-        <div className="flex items-center gap-1.5 bg-amber-500/10 text-amber-700 dark:text-amber-400 px-3 py-1 rounded-full text-xs font-bold border border-amber-500/25 font-mono">
+        <div className="flex items-center gap-1.5 bg-amber-500/10 text-amber-700 dark:text-amber-400 px-3 py-1 rounded-full text-xs font-bold border border-amber-500/25">
           <Zap className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
           <span>+{currentQ.xp} XP</span>
         </div>
@@ -170,7 +240,7 @@ export const QuizTab: React.FC<QuizTabProps> = ({
 
       {/* Options List */}
       <div className="space-y-2.5 sm:space-y-3">
-        {currentQ.options.map((option, idx) => {
+        {currentOptions.map((option, idx) => {
           const isSelected = selectedOptionIndex === idx;
           let btnStyle = 'border-neutral-200 dark:border-[#262626] bg-white dark:bg-[#141414] text-neutral-800 dark:text-[#e5e5e5] hover:border-neutral-400 dark:hover:border-[#404040]';
 
@@ -186,13 +256,13 @@ export const QuizTab: React.FC<QuizTabProps> = ({
 
           return (
             <button
-              key={idx}
+              key={`${currentQ.id}-${option.text}`}
               onClick={() => handleSelectOption(idx)}
               disabled={isAnswered}
-              className={`w-full p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border text-left text-xs sm:text-sm font-medium transition-all flex items-start justify-between gap-3 cursor-pointer disabled:cursor-default ${btnStyle}`}
+              className={`${TAP} w-full p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border text-left text-xs sm:text-sm font-medium transition-all flex items-start justify-between gap-3 cursor-pointer disabled:cursor-default ${btnStyle}`}
             >
               <div className="flex items-start gap-3">
-                <span className={`w-6 h-6 rounded-lg text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 font-mono ${
+                <span className={`w-6 h-6 rounded-lg text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 ${
                   isAnswered && option.isCorrect
                     ? 'bg-emerald-600 text-white'
                     : isAnswered && isSelected
@@ -223,22 +293,33 @@ export const QuizTab: React.FC<QuizTabProps> = ({
         <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-neutral-50 dark:bg-[#1a1a1a] border border-neutral-200 dark:border-[#262626] space-y-1.5 animate-fadeIn">
           <div className="flex items-center gap-1.5 text-xs font-bold text-neutral-900 dark:text-[#e5e5e5]">
             <HelpCircle className="w-4 h-4 text-indigo-500" />
-            <span>คำอธิบายเฉลยและเหตุผล:</span>
+            <span>เฉลย:</span>
           </div>
           <p className="text-xs sm:text-sm text-neutral-700 dark:text-[#c4c4c4] leading-relaxed font-normal">
-            {currentQ.options[selectedOptionIndex].explanation}
+            {currentOptions[selectedOptionIndex].explanation}
           </p>
         </div>
       )}
 
-      {/* Next Button */}
+      {/* Next Button (+ related chapter, spec P5.3) */}
       {isAnswered && (
-        <div className="flex justify-end pt-2">
+        <div className="flex flex-wrap items-center justify-end gap-2 pt-2">
+          {currentQ.chapterId && (
+            <button
+              type="button"
+              data-quiz-chapter={currentQ.chapterId}
+              onClick={() => onOpenChapter(currentQ.chapterId!)}
+              className={`${TAP} inline-flex items-center gap-2 px-4 py-3 rounded-xl sm:rounded-2xl bg-neutral-100 dark:bg-[#1a1a1a] text-neutral-900 dark:text-[#e5e5e5] border border-neutral-200 dark:border-[#262626] text-xs sm:text-sm font-semibold hover:bg-neutral-200/70 dark:hover:bg-[#222222] transition-all cursor-pointer`}
+            >
+              <BookOpen className="w-4 h-4" />
+              <span>อ่านบทที่เกี่ยวข้อง</span>
+            </button>
+          )}
           <button
             onClick={handleNext}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl sm:rounded-2xl bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:hover:bg-neutral-200 dark:text-[#0a0a0a] text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer"
+            className={`${TAP} inline-flex items-center gap-2 px-6 py-3 rounded-xl sm:rounded-2xl bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:hover:bg-neutral-200 dark:text-[#0a0a0a] text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer`}
           >
-            <span>{currentIndex + 1 === questions.length ? 'ดูสรุปผลลัพธ์' : 'คำถามข้อถัดไป'}</span>
+            <span>{currentIndex + 1 === questions.length ? 'ดูผล' : 'คำถามข้อถัดไป'}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>

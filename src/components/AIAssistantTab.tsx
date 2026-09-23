@@ -12,8 +12,10 @@ import {
   Copy, 
   Check, 
   Lightbulb, 
-  RefreshCw 
+  RefreshCw,
+  WifiOff
 } from 'lucide-react';
+import { TAP, TAP_GAP, TAP_POSITIONED } from './ui/tapTarget';
 
 interface AIAssistantTabProps {
   initialPrompt?: string;
@@ -29,9 +31,9 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
       id: 'welcome',
       role: 'assistant',
       content: `สวัสดีครับ! ผมคือ **AI Bridge Specialist** 🤖
-ผมยินดีช่วยคุณคลี่คลายข้อสงสัยและสร้างสะพานเชื่อมระหว่างโลกของ Business และ Engineering
+ผมช่วยตอบข้อสงสัยเรื่องงานระหว่าง Business กับ Engineering ได้
 
-คุณสามารถถามอะไรก็ได้ เช่น:
+คุณถามอะไรก็ได้ เช่น:
 - ขอวิธีอธิบายศัพท์เทคนิคยากๆ ให้ผู้บริหารฟัง
 - ขอเหตุผลให้ Developer เข้าใจความเร่งด่วนของธุรกิจ
 - ปรึกษากรณีความขัดแย้งในที่ประชุม หรือวิธีประเมินงาน
@@ -98,7 +100,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
       const errorMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: `ขออภัย เกิดข้อผิดพลาดในการรับคำตอบ: ${err.message || 'โปรดตรวจสอบการเชื่อมต่อ'}`,
+        content: `ขออภัย รับคำตอบไม่สำเร็จ: ${err.message || 'ลองเช็กการเชื่อมต่อ'}`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
       setMessages((prev) => [...prev, errorMsg]);
@@ -106,6 +108,10 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
       setIsLoading(false);
     }
   };
+
+  // Source of the most recent server answer ('gemini' | 'fallback' | undefined before any answer).
+  const lastSource = [...messages].reverse().find((m) => m.role === 'assistant' && m.source)?.source;
+  const isOffline = lastSource !== undefined && lastSource !== 'gemini';
 
   const copyToClipboard = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
@@ -115,29 +121,41 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
 
   return (
     <div className="max-w-4xl mx-auto space-y-5 sm:space-y-6 pb-16">
+      {isOffline && (
+        <div
+          role="status"
+          className="flex items-start gap-2.5 p-4 rounded-2xl border border-amber-300 dark:border-amber-500/40 bg-amber-50 dark:bg-amber-500/10 text-amber-900 dark:text-amber-200 text-xs sm:text-sm"
+        >
+          <WifiOff className="w-4 h-4 mt-0.5 shrink-0" aria-hidden="true" />
+          <p>
+            <strong className="font-semibold">โหมดออฟไลน์:</strong> ยังไม่ได้เชื่อมต่อ AI จริง คำตอบเป็นคำแนะนำทั่วไป
+          </p>
+        </div>
+      )}
+
       {/* Header Info */}
       <div className="bg-white dark:bg-[#141414] p-5 sm:p-6 rounded-2xl sm:rounded-3xl border border-neutral-200 dark:border-[#262626] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-2xs">
         <div className="space-y-1">
           <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-neutral-100 dark:bg-[#1f1f1f] text-neutral-800 dark:text-[#d4d4d4] text-[11px] sm:text-xs font-semibold border border-neutral-200 dark:border-[#333333]">
             <Sparkles className="w-3 h-3 text-amber-500" />
-            <span>AI Bridge Assistant Powered by Gemini</span>
+            <span>{lastSource === 'gemini' ? 'AI Bridge Assistant Powered by Gemini' : 'AI Bridge Assistant'}</span>
           </div>
           <h2 className="text-lg sm:text-2xl font-bold text-neutral-900 dark:text-[#fafafa]">
             ถาม AI เพิ่มเติม &amp; ปรึกษาสถานการณ์จริง
           </h2>
           <p className="text-xs sm:text-sm text-neutral-500 dark:text-[#8e8e8e]">
-            ไขข้อสงสัย เจรจาหาทางออกตรงจุด และแปลคำศัพท์ข้ามสายงานได้ทันที
+            ถามข้อสงสัย หาทางออก และแปลศัพท์ข้ามสายงานได้ทันที
           </p>
         </div>
 
         {/* Perspective selector */}
         <div className="flex items-center gap-1 bg-neutral-100 dark:bg-[#1a1a1a] p-1 rounded-xl border border-neutral-200 dark:border-[#262626] shrink-0 shadow-2xs">
-          <span className="text-[11px] font-semibold text-neutral-500 dark:text-[#737373] px-2 font-mono">มุมมอง:</span>
+          <span className="text-[11px] font-semibold text-neutral-500 dark:text-[#737373] px-2">มุมมอง:</span>
           {(['both', 'business', 'engineer'] as const).map((r) => (
             <button
               key={r}
               onClick={() => setRolePerspective(r)}
-              className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+              className={`${TAP} px-2.5 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer ${
                 rolePerspective === r
                   ? 'bg-white dark:bg-[#262626] text-neutral-900 dark:text-white shadow-2xs font-bold'
                   : 'text-neutral-500 dark:text-[#737373] hover:text-neutral-900 dark:hover:text-white'
@@ -160,7 +178,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
             <button
               key={idx}
               onClick={() => handleSend(prompt)}
-              className="text-xs px-3 py-1.5 rounded-xl bg-white dark:bg-[#141414] hover:bg-neutral-50 dark:hover:bg-[#1c1c1c] text-neutral-700 dark:text-[#c4c4c4] border border-neutral-200 dark:border-[#262626] hover:border-neutral-400 dark:hover:border-[#404040] transition-all text-left cursor-pointer shadow-2xs"
+              className={`${TAP_GAP[8]} text-xs px-3 py-1.5 rounded-xl bg-white dark:bg-[#141414] hover:bg-neutral-50 dark:hover:bg-[#1c1c1c] text-neutral-700 dark:text-[#c4c4c4] border border-neutral-200 dark:border-[#262626] hover:border-neutral-400 dark:hover:border-[#404040] transition-all text-left cursor-pointer shadow-2xs`}
             >
               {prompt}
             </button>
@@ -213,13 +231,13 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
                           const isInline = !String(children).includes('\n') && !className;
                           if (isInline) {
                             return (
-                              <code className="px-1.5 py-0.5 rounded bg-neutral-200 dark:bg-[#262626] text-neutral-900 dark:text-[#e5e5e5] font-mono text-[11px] sm:text-xs" {...props}>
+                              <code className="px-1.5 py-0.5 rounded bg-neutral-200 dark:bg-[#262626] text-neutral-900 dark:text-[#e5e5e5] text-[11px] sm:text-xs" {...props}>
                                 {children}
                               </code>
                             );
                           }
                           return (
-                            <div className="my-2.5 rounded-xl overflow-hidden border border-neutral-200 dark:border-[#262626] bg-[#0a0a0a] text-neutral-100 p-3 font-mono text-xs overflow-x-auto">
+                            <div className="my-2.5 rounded-xl overflow-hidden border border-neutral-200 dark:border-[#262626] bg-[#0a0a0a] text-neutral-100 p-3 text-xs overflow-x-auto">
                               <code {...props}>{children}</code>
                             </div>
                           );
@@ -244,18 +262,18 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
                 )}
 
                 {isAi && (
-                  <div className="flex items-center justify-between pt-2 border-t border-neutral-200/60 dark:border-[#262626] text-[11px] text-neutral-500 dark:text-[#8e8e8e] font-mono">
+                  <div className="flex items-center justify-between pt-2 border-t border-neutral-200/60 dark:border-[#262626] text-[11px] text-neutral-500 dark:text-[#8e8e8e]">
                     <span className="flex items-center gap-1">
                       {msg.source === 'gemini' ? (
                         <span className="text-amber-600 dark:text-amber-400 font-semibold">● Gemini Model</span>
                       ) : (
-                        <span>● Expert Assistant</span>
+                        <span>{msg.source ? '● โหมดออฟไลน์ (คำแนะนำทั่วไป)' : '● Expert Assistant'}</span>
                       )}
                       <span>• {msg.timestamp}</span>
                     </span>
                     <button
                       onClick={() => copyToClipboard(msg.content, msg.id)}
-                      className="hover:text-neutral-900 dark:hover:text-white flex items-center gap-1 cursor-pointer transition-colors"
+                      className={`${TAP} hover:text-neutral-900 dark:hover:text-white flex items-center gap-1 cursor-pointer transition-colors`}
                     >
                       {copiedId === msg.id ? (
                         <>
@@ -283,7 +301,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
             </div>
             <div className="p-3 rounded-2xl bg-neutral-100 dark:bg-[#1a1a1a] border border-neutral-200 dark:border-[#262626] text-xs text-neutral-600 dark:text-[#a3a3a3] flex items-center gap-2">
               <Loader2 className="w-4 h-4 animate-spin text-neutral-500" />
-              <span>กำลังวิเคราะห์และเรียบเรียงคำตอบ...</span>
+              <span>กำลังคิดคำตอบ...</span>
             </div>
           </div>
         )}
@@ -308,7 +326,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
         <button
           type="submit"
           disabled={!inputQuestion.trim() || isLoading}
-          className="absolute right-2 px-3.5 py-2 bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:hover:bg-neutral-200 dark:text-[#0a0a0a] disabled:opacity-40 rounded-lg sm:rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer disabled:cursor-not-allowed"
+          className={`${TAP_POSITIONED} absolute right-2 px-3.5 py-2 bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:hover:bg-neutral-200 dark:text-[#0a0a0a] disabled:opacity-40 rounded-lg sm:rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer disabled:cursor-not-allowed`}
         >
           {isLoading ? (
             <Loader2 className="w-4 h-4 animate-spin" />

@@ -4,7 +4,7 @@
  * Palette:
  * - Base/Body/Cards: Monochrome (black / neutral gray / white) for a crisp, professional look
  * - Accents: Preserved semantic tokens (Business: Amber, Eng: Indigo, Both: Neutral, Friction: Flame, Mindset: Emerald)
- * - Typography: Geist (English) + Prompt (Thai) for sans body & headings, JetBrains Mono for codes/metrics/labels
+ * - Typography: Geist (English) + Prompt (Thai) for sans body & headings
  * - Shapes: Preserved friendly rounded curves (rounded-xl, rounded-2xl, rounded-full)
  * - Spacing: Consistent responsive scales for mobile (sm), tablet (md), desktop (lg/xl)
  */
@@ -74,7 +74,7 @@ export const tokens = {
       },
       xp: {
         text: 'text-amber-600 dark:text-amber-400',
-        badge: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/25 font-mono font-bold',
+        badge: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/25 font-bold',
         fill: 'fill-amber-500 text-amber-500',
       },
       success: {
@@ -87,7 +87,6 @@ export const tokens = {
   // Typography Tokens
   typography: {
     fontSans: "font-['Geist','Prompt',-apple-system,BlinkMacSystemFont,'Segoe_UI',Roboto,sans-serif]",
-    fontMono: "font-['JetBrains_Mono',monospace]",
     
     // Hierarchical Scales
     display: 'text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-neutral-900 dark:text-[#e5e5e5] leading-tight',
@@ -101,8 +100,8 @@ export const tokens = {
     caption: 'text-[11px] sm:text-xs text-neutral-500 dark:text-[#737373]',
     
     // Specialized
-    labelMono: 'font-mono text-[10px] sm:text-[11px] tracking-wider uppercase font-semibold text-neutral-500 dark:text-[#737373]',
-    code: 'font-mono text-xs sm:text-sm bg-neutral-100 dark:bg-[#1a1a1a] text-neutral-900 dark:text-[#e5e5e5] px-1.5 py-0.5 rounded border border-neutral-200 dark:border-[#262626]',
+    labelMono: 'text-[10px] sm:text-[11px] tracking-wider uppercase font-semibold text-neutral-500 dark:text-[#737373]',
+    code: 'text-xs sm:text-sm bg-neutral-100 dark:bg-[#1a1a1a] text-neutral-900 dark:text-[#e5e5e5] px-1.5 py-0.5 rounded border border-neutral-200 dark:border-[#262626]',
   },
 
   // Responsive Spacing Variations
