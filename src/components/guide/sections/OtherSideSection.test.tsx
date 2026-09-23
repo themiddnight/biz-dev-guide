@@ -8,6 +8,8 @@ import type { GuideSectionContext, OtherSideView } from './registry';
 const noop = () => {};
 /** renderToStaticMarkup escapes quotes; compare against the escaped form. */
 const esc = (t: string) => t.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+/** Visible text only: prose may now carry inline-term buttons (term-definitions spec P3.4). */
+const textOf = (html: string) => html.replace(/<[^>]+>/g, '');
 const s9 = CHAPTERS.find(c => c.id === 's9')!;
 
 function ctx(role: Role | null, otherSideView: OtherSideView): GuideSectionContext {
@@ -32,8 +34,8 @@ describe('OtherSideSection', () => {
   it('role eng shows the business view and the Dev advice', () => {
     const html = render('eng', 'biz');
     expect(html).toContain('ฝั่ง Business มองเรื่องนี้ยังไง');
-    expect(html).toContain(esc(p.biz.measuredBy));
-    expect(html).not.toContain(esc(p.eng.measuredBy));
+    expect(textOf(html)).toContain(esc(p.biz.measuredBy));
+    expect(textOf(html)).not.toContain(esc(p.eng.measuredBy));
     expect(html).toContain('Business ถูกวัดผลด้วย');
     expect(html).toContain('Dev พูด:');
     expect(html).toContain('Business ได้ยินว่า:');
@@ -46,8 +48,8 @@ describe('OtherSideSection', () => {
   it('role biz shows the engineering view and the Business advice', () => {
     const html = render('biz', 'eng');
     expect(html).toContain('ฝั่ง Engineering มองเรื่องนี้ยังไง');
-    expect(html).toContain(esc(p.eng.measuredBy));
-    expect(html).not.toContain(esc(p.biz.measuredBy));
+    expect(textOf(html)).toContain(esc(p.eng.measuredBy));
+    expect(textOf(html)).not.toContain(esc(p.biz.measuredBy));
     expect(html).toContain('Business ควรทำ:');
     expect(html).toContain(esc(s9.businessNote));
   });
@@ -55,8 +57,8 @@ describe('OtherSideSection', () => {
   it('role null shows both views and both notes', () => {
     const html = render(null, 'both');
     expect(html).toContain('สองฝั่งมองเรื่องนี้ยังไง');
-    expect(html).toContain(esc(p.biz.measuredBy));
-    expect(html).toContain(esc(p.eng.measuredBy));
+    expect(textOf(html)).toContain(esc(p.biz.measuredBy));
+    expect(textOf(html)).toContain(esc(p.eng.measuredBy));
     expect(html).toContain(esc(s9.engineerNote));
     expect(html).toContain(esc(s9.businessNote));
   });
@@ -72,6 +74,6 @@ describe('OtherSideSection', () => {
   it('keeps the heading visible when collapsed', () => {
     const html = renderToStaticMarkup(<OtherSideSection chapter={s9} isOpen={false} onToggle={noop} ctx={ctx('eng', 'biz')} />);
     expect(html).toContain('ฝั่ง Business มองเรื่องนี้ยังไง');
-    expect(html).not.toContain(esc(p.biz.measuredBy));
+    expect(textOf(html)).not.toContain(esc(p.biz.measuredBy));
   });
 });

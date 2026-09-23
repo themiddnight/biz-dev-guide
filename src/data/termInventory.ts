@@ -54,16 +54,14 @@ export const TERM_FIELDS: readonly TermField[] = [
   { field: 'jargonList.meetingExample', get: c => (c.jargonList ?? []).flatMap(j => texts(j.meetingExample)) },
   { field: 'businessNote', get: c => [c.businessNote] },
   { field: 'engineerNote', get: c => [c.engineerNote] },
+  { field: 'perspectives.measuredBy', get: c => Object.values(c.perspectives ?? {}).map(v => v.measuredBy) },
+  { field: 'perspectives.fears', get: c => Object.values(c.perspectives ?? {}).flatMap(v => v.fears) },
   {
-    field: 'perspectives',
+    field: 'perspectives.saysVsHears',
     get: c =>
-      Object.values(c.perspectives ?? {}).flatMap(view => [
-        view.measuredBy,
-        ...view.fears,
-        ...view.saysVsHears.flatMap(s => [s.youSay, s.theyHear, s.sayInstead]),
-        ...view.askThem,
-      ]),
+      Object.values(c.perspectives ?? {}).flatMap(v => v.saysVsHears.flatMap(s => [s.youSay, s.theyHear, s.sayInstead])),
   },
+  { field: 'perspectives.askThem', get: c => Object.values(c.perspectives ?? {}).flatMap(v => v.askThem) },
   { field: 'coreConcepts.heading', get: c => (c.coreConcepts ?? []).map(k => k.heading) },
   { field: 'coreConcepts.detail', get: c => (c.coreConcepts ?? []).map(k => k.detail) },
   { field: 'coreConcepts.bulletPoints', get: c => (c.coreConcepts ?? []).flatMap(k => k.bulletPoints ?? []) },
@@ -188,7 +186,16 @@ export function glossaryKeys(entry: GlossaryTerm): string[] {
  * plain substring test makes that guard vacuous for every 2-3 letter abbreviation.
  */
 export function namesTerm(text: string, key: string): boolean {
-  return new RegExp(`(?<![A-Za-z0-9])${escapeRe(key)}s?(?![A-Za-z0-9])`, 'i').test(text);
+  return termPattern(key).test(text);
+}
+
+/**
+ * The word-boundary pattern behind `namesTerm`, shared with the inline-term matcher
+ * (`src/lib/autoTerms.ts`) so the guard and the matcher agree on what "names a term" means.
+ * `flags` without `i` gives the case-sensitive form the matcher uses for abbreviations.
+ */
+export function termPattern(key: string, flags = 'i'): RegExp {
+  return new RegExp(`(?<![A-Za-z0-9])${escapeRe(key)}s?(?![A-Za-z0-9])`, flags);
 }
 
 /** Lower-cased key -> ids of the entries that answer to it. A key with 2+ ids is ambiguous. */

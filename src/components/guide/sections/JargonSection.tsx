@@ -1,12 +1,20 @@
 import React from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import type { SectionProps } from './registry';
+import { RichText } from '../../content/RichText';
+import { collectTermIds, markTerms } from '../../../lib/autoTerms';
 
 /** Term chips shown in the closed header; the rest collapse into "+n". */
 const MAX_CHIPS = 5;
 
-export const JargonSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggle }) => {
+export const JargonSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggle, ctx }) => {
   if (!chapter.jargonList || chapter.jargonList.length === 0) return null;
+  // One `seen` set per section render (spec P3.5), seeded with the terms the cards themselves
+  // define: a card's own subject is never re-marked inside this block.
+  const seen = new Set(chapter.jargonList.flatMap(item => collectTermIds(item.term)));
+  const rich = (text: string) => (
+    <RichText text={text} onNavigateChapter={ctx.onNavigateChapter} onSearchGlossary={ctx.onSearchGlossary} />
+  );
   return (
     <div className="border border-neutral-200 dark:border-[#262626] rounded-2xl overflow-hidden bg-white dark:bg-[#141414] shadow-2xs">
       <button
@@ -63,13 +71,13 @@ export const JargonSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggl
               className="p-3.5 rounded-xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-2 text-xs sm:text-sm"
             >
               <div className="font-bold text-neutral-900 dark:text-white text-xs sm:text-sm">{item.term}</div>
-              <p className="text-neutral-800 dark:text-[#e5e5e5] leading-relaxed">{item.humanTranslation}</p>
+              <p className="text-neutral-800 dark:text-[#e5e5e5] leading-relaxed">{rich(markTerms(item.humanTranslation, 'prose', seen))}</p>
               {item.formalDefinition && (
                 <p className="text-neutral-500 dark:text-[#8e8e8e] text-xs leading-relaxed">{item.formalDefinition}</p>
               )}
               {item.meetingExample && (
                 <blockquote className="pl-3 border-l-2 border-neutral-300 dark:border-[#404040] text-neutral-600 dark:text-[#b4b4b4] text-xs italic leading-relaxed">
-                  {item.meetingExample}
+                  {rich(markTerms(item.meetingExample, 'quote', seen))}
                 </blockquote>
               )}
             </div>

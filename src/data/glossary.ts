@@ -1399,3 +1399,21 @@ export const GLOSSARY: GlossaryTerm[] = [
     origin: 'app',
   },
 ];
+
+/**
+ * Glossary by id — what an inline term marker `[[g:<id>|label]]` resolves against
+ * (term-definitions spec P3.2). The glossary is the single source of truth: a marker carries an
+ * id and a display label only, never definition text.
+ */
+export const GLOSSARY_BY_ID: ReadonlyMap<string, GlossaryTerm> = new Map(GLOSSARY.map(t => [t.id, t]));
+
+/** Resolve a key to one entry: by id, then by lower-cased `term`, then by lower-cased alias. */
+export function lookupTerm(key: string): GlossaryTerm | undefined {
+  const byId = GLOSSARY_BY_ID.get(key);
+  if (byId) return byId;
+  const needle = key.trim().toLowerCase();
+  return (
+    GLOSSARY.find(t => t.term.toLowerCase() === needle) ??
+    GLOSSARY.find(t => (t.aliases ?? []).some(a => a.toLowerCase() === needle))
+  );
+}

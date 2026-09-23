@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest';
+import { readFileSync, readdirSync } from 'node:fs';
+import { join } from 'node:path';
 import { CHAPTERS } from './chaptersData';
-import { CATEGORY_SIDE, GLOSSARY, GLOSSARY_CATEGORIES, sortTermsForRole, termSide, type GlossaryTerm } from './glossary';
+import { CATEGORY_SIDE, GLOSSARY, GLOSSARY_BY_ID, GLOSSARY_CATEGORIES, lookupTerm, sortTermsForRole, termSide, type GlossaryTerm } from './glossary';
 import { beginnerVisibleTexts, glossaryKeys, namesTerm } from './termInventory';
 
 /** The abbreviations the term-definitions spec added in Phase 2 (P2.1). */
@@ -218,5 +220,44 @@ describe('sortTermsForRole', () => {
 
   it('role null keeps the current order', () => {
     expect(sortTermsForRole(GLOSSARY, null)).toEqual(GLOSSARY);
+  });
+});
+
+/**
+ * The glossary is the single source of truth for inline definitions (term-definitions spec P3.2,
+ * D8): a marker carries an id and a label, and no chapter file repeats a definition.
+ */
+describe('glossary as the single source of inline definitions', () => {
+  const dataDir = join(process.cwd(), 'src', 'data');
+  const chapterFiles = [
+    ...readdirSync(join(dataDir, 'chapters')).filter(f => f.endsWith('.ts')).map(f => join(dataDir, 'chapters', f)),
+    join(dataDir, 'chapterPerspectives.ts'),
+    join(dataDir, 'chapterContentBlocks.ts'),
+    join(dataDir, 'chapterHeroFigures.ts'),
+  ];
+
+  /**
+   * Two short static definitions already appear in s1/s5 reference tables (Deep layer), predating
+   * Phase 3: `chapterContentBlocks.ts:520` (use-case vs user-story row) and `:574` (TOGAF row).
+   * Pinned by equality so they are visible and no new copy can join them; rewording either side is
+   * a content decision for the owner.
+   */
+  const PREEXISTING_COPIES = ['use-case-diagram -> chapterContentBlocks.ts', 'togaf -> chapterContentBlocks.ts'];
+
+  it('no chapter file contains a glossary definition verbatim', () => {
+    const sources = chapterFiles.map(file => [file.split('/').pop()!, readFileSync(file, 'utf8')] as const);
+    expect(sources.length).toBeGreaterThanOrEqual(7);
+    const copied = GLOSSARY.flatMap(t =>
+      sources.filter(([, src]) => src.includes(t.definition)).map(([file]) => `${t.id} -> ${file}`),
+    );
+    expect(copied).toEqual(PREEXISTING_COPIES);
+  });
+
+  it('GLOSSARY_BY_ID holds every entry, and lookupTerm resolves by id, then label, then alias', () => {
+    expect(GLOSSARY_BY_ID.size).toBe(GLOSSARY.length);
+    expect(lookupTerm('sprint')?.id).toBe('sprint');
+    expect(lookupTerm('KR (Key Results)')?.id).toBe('kr');
+    expect(lookupTerm('kpi')?.id).toBe('okr-kpi');
+    expect(lookupTerm('no-such-id')).toBeUndefined();
   });
 });

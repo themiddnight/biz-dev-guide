@@ -5,7 +5,7 @@ import { ROLES, ROLE_META, type Role } from '../../data/rolePerspective';
 
 interface HeroFigureProps {
   figure: ChapterHeroFigure;
-  analogy?: string; // chapter.plainAnalogy, rendered as one plain line
+  analogy?: React.ReactNode; // chapter.plainAnalogy as one line (a string, or ChapterHero's marked RichText)
   role: Role | null;
   seat: Role; // whose seat is narrated when a role is set
   onFlipSeat: () => void;

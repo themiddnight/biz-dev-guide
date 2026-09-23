@@ -629,6 +629,8 @@ export const GuideTab: React.FC<GuideTabProps> = ({
               role={role}
               seat={seat}
               onFlipSeat={() => setFlippedFor((f) => (f === seatKey ? null : seatKey))}
+              onNavigateChapter={handleSelectChapter}
+              onSearchGlossary={handleSearchGlossary}
             />
 
             {/* ADAPTIVE LENS CONTROLLER BANNER */}

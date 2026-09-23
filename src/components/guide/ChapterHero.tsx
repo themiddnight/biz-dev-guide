@@ -3,6 +3,8 @@ import { Clock, Check, Sparkles } from 'lucide-react';
 import type { Chapter, ExperienceLevel } from '../../types';
 import { HeroFigure } from './HeroFigure';
 import type { Role } from '../../data/rolePerspective';
+import { RichText } from '../content/RichText';
+import { markTerms } from '../../lib/autoTerms';
 
 interface ChapterHeroProps {
   chapter: Chapter;
@@ -11,18 +13,31 @@ interface ChapterHeroProps {
   role?: Role | null;
   seat?: Role;
   onFlipSeat?: () => void;
+  onNavigateChapter?: (chapterId: string) => void;
+  onSearchGlossary?: (query: string) => void;
 }
 
-export const ChapterHero: React.FC<ChapterHeroProps> = ({ chapter, experienceLevel, isRead, role = null, seat = 'biz', onFlipSeat = () => {} }) => {
+export const ChapterHero: React.FC<ChapterHeroProps> = ({
+  chapter, experienceLevel, isRead, role = null, seat = 'biz', onFlipSeat = () => {}, onNavigateChapter, onSearchGlossary,
+}) => {
+  // The hero is one section for automatic term marking (spec P3.5): one `seen` set, filled in
+  // document order. `title`, `enTerm` and `subtitle` are headings and are never marked.
+  const seen = new Set<string>();
+  const prose = (text: string) => (
+    <RichText text={markTerms(text, 'prose', seen)} onNavigateChapter={onNavigateChapter} onSearchGlossary={onSearchGlossary} />
+  );
+  const analogyFirst = !!chapter.heroFigure; // the figure's analogy line renders above the takeaway
+  const analogy = analogyFirst ? prose(chapter.plainAnalogy) : null;
+  const takeaway = prose(chapter.keyTakeaway);
   const analogyHeading = (
     <div className="flex items-center gap-2 text-xs font-bold text-neutral-900 dark:text-[#fafafa]">
       <Sparkles className="w-4 h-4 text-amber-500" />
       <span>เปรียบแบบบ้านๆ (Real-World Analogy)</span>
     </div>
   );
-  const analogyBody = (
+  const analogyBody = analogyFirst ? null : (
     <p className="text-xs sm:text-sm text-neutral-700 dark:text-[#c4c4c4] leading-relaxed font-normal">
-      {chapter.plainAnalogy}
+      {prose(chapter.plainAnalogy)}
     </p>
   );
   const analogyClassName = 'p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-1.5';
@@ -62,10 +77,10 @@ export const ChapterHero: React.FC<ChapterHeroProps> = ({ chapter, experienceLev
           {chapter.subtitle}
         </p>
         {chapter.heroFigure && (
-          <HeroFigure figure={chapter.heroFigure} analogy={chapter.plainAnalogy} role={role} seat={seat} onFlipSeat={onFlipSeat} />
+          <HeroFigure figure={chapter.heroFigure} analogy={analogy} role={role} seat={seat} onFlipSeat={onFlipSeat} />
         )}
         <p className="text-sm text-neutral-800 dark:text-[#d4d4d4] leading-relaxed" data-key-takeaway>
-          <span className="font-semibold">สรุปบทนี้:</span> {chapter.keyTakeaway}
+          <span className="font-semibold">สรุปบทนี้:</span> {takeaway}
         </p>
       </div>
 

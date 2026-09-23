@@ -2,9 +2,15 @@ import { termSide, type GlossaryCategory, type GlossaryTerm } from '../data/glos
 import { termLabelKeys } from '../data/termInventory';
 import type { Role } from '../data/rolePerspective';
 
-/** Search text for a RichText string: chapter-link markup reduced to its label, bold markers removed. */
+/**
+ * Search text for a RichText string: chapter-link and term markup reduced to its label, term
+ * opt-outs and bold markers removed — so a marker inside a definition never breaks search.
+ */
 export const plainSearchText = (text: string) =>
-  text.replace(/\[\[s\d+\|([^\]]+)\]\]/g, '$1').replace(/\*\*/g, '');
+  text
+    .replace(/\[\[(?:s\d+|g:[a-z0-9-]+)\|([^\]]+)\]\]/g, '$1')
+    .replace(/\[\[!g:(?:[a-z0-9-]+|\*)\]\]/g, '')
+    .replace(/\*\*/g, '');
 
 /** Everything the filter reads for one entry, lower-cased. */
 const haystack = (term: GlossaryTerm) =>
