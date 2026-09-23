@@ -1,6 +1,6 @@
 # Design tokens and UI components (daisyUI-style, own implementation)
 
-- Status: **Draft — awaiting owner review**
+- Status: **Implemented** on `feat/design-tokens` (owner approved 2026-09-23). Acceptance: `work/acceptance-design-tokens.md`.
 - Owner decisions 2026-09-23: dark `base-content-muted` = `#8e8e8e`; text split into five tokens
   (`base-content`, `-body`, `-secondary`, `-muted`, `-subtle`); categorical `data-1…5` tokens for diagram series;
   `slate-*` → base tokens accepted (diagram cards become neutral, the one visible surface change).
