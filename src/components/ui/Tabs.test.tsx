@@ -22,6 +22,13 @@ describe('ToggleChip', () => {
     expect(chipClass({ selected: true, shape: 'tab' })).toContain('border-base-content text-base-content font-bold');
   });
 
+  it('unselected card shape keeps a visible frame; unselected pill does not', () => {
+    expect(chipClass({ selected: false, shape: 'card' })).toContain('border-base-border');
+    expect(chipClass({ selected: false, shape: 'card' }).split(' ')).not.toContain('border-transparent');
+    expect(chipClass({ selected: false, shape: 'pill' }).split(' ')).not.toContain('border-base-border');
+    expect(chipClass({ selected: false, shape: 'pill' })).toContain('border-transparent');
+  });
+
   it('solid selection exists only when asked for (a chosen quiz answer)', () => {
     expect(chipClass({ selected: true, selectedStyle: 'solid' })).toContain('bg-primary text-primary-content');
     expect(chipClass({ selected: false, selectedStyle: 'solid' })).not.toContain('bg-primary');

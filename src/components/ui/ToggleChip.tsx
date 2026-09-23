@@ -37,7 +37,11 @@ function tone(selected: boolean, shape: NonNullable<ToggleChipProps['shape']>, s
       ? 'border-base-content text-base-content font-bold'
       : 'border-transparent text-base-content-secondary hover:text-base-content';
   }
-  if (!selected) return 'border border-transparent text-base-content-secondary hover:bg-base-300 hover:text-base-content';
+  if (!selected) {
+    return shape === 'card'
+      ? 'border border-base-border text-base-content-secondary hover:bg-base-300 hover:text-base-content'
+      : 'border border-transparent text-base-content-secondary hover:bg-base-300 hover:text-base-content';
+  }
   return selectedStyle === 'solid'
     ? 'border border-primary bg-primary text-primary-content font-bold'
     : 'border border-base-border-strong bg-base-300 text-base-content font-bold';
