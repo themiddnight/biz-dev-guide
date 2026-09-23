@@ -146,7 +146,48 @@ describe('POST /api/ask-ai fallback with history', () => {
     const history = [{ role: 'user', content: 'PM กับ PjM ต่างกันยังไง' }];
     const data = await (await post(JSON.stringify({ question: 'ช่วยเขียน Acceptance Criteria', history }))).json();
     expect(data.source).toBe('fallback');
-    expect(data.answer).toContain('Acceptance Criteria');
+    expect(data.answer).toContain('ระบบชำระเงิน');
     expect(data.answer).not.toContain('Product Manager');
+  });
+});
+
+describe('POST /api/ask-ai fallback knowledge base', () => {
+  beforeEach(() => vi.stubEnv('GROQ_API_KEY', ''));
+  afterEach(() => vi.unstubAllEnvs());
+
+  const ask = async (body: object) => (await post(JSON.stringify(body))).json();
+
+  it('does not read "ac" inside another word as Acceptance Criteria', async () => {
+    const data = await ask({ question: 'React state กับ cache ต่างกันยังไง' });
+    expect(data.answer).not.toContain('ระบบชำระเงิน');
+  });
+
+  it('still answers "AC" on its own with the Acceptance Criteria example', async () => {
+    const data = await ask({ question: 'ช่วยเขียน AC ให้หน่อย' });
+    expect(data.answer).toContain('ระบบชำระเงิน');
+  });
+
+  it('summarises the chapter being read when no hand-written answer fits', async () => {
+    const context = 'บทที่ 9 · Tech Debt และ Refactor: หนี้ที่มองไม่เห็น\nใจความสำคัญ: จ่ายดอกทุกวัน\n- Interest: ดอกเบี้ยของหนี้';
+    const data = await ask({ question: 'ยกตัวอย่างให้หน่อย', context });
+    expect(data.answer).toContain('**บทที่ 9 · Tech Debt และ Refactor: หนี้ที่มองไม่เห็น**');
+    expect(data.answer).toContain('ใจความสำคัญ: จ่ายดอกทุกวัน');
+    expect(data.answer).toContain('- Interest: ดอกเบี้ยของหนี้');
+  });
+
+  it('keeps a hand-written answer ahead of the chapter summary', async () => {
+    const data = await ask({ question: 'PM กับ PjM ต่างกันยังไง', context: 'บทที่ 2 · PM กับการตัดสินใจ: x' });
+    expect(data.answer).toContain('Product Manager');
+  });
+
+  it('links guide chapters that name the topic when there is no chapter context', async () => {
+    const data = await ask({ question: 'test pyramid คืออะไร' });
+    expect(data.answer).toContain('บทในคู่มือเหล่านี้');
+    expect(data.answer).toMatch(/- \[บทที่ 7 · [^\]]+\]\(#\/ch\/7\): /);
+  });
+
+  it('falls back to the general advice when nothing matches', async () => {
+    const data = await ask({ question: 'กินข้าวยัง' });
+    expect(data.answer).toContain('คำแนะนำเพื่อการทำงานร่วมกัน');
   });
 });

@@ -12,7 +12,7 @@ const CONCEPT_MAX = 200;
 const clip = (text: string, max: number) => (text.length > max ? `${text.slice(0, max - 1).trimEnd()}…` : text);
 
 // RichText markers are for the renderer; the model only needs the words.
-const plain = (text: string) =>
+export const plainText = (text: string) =>
   text
     .replace(/\[\[!g:[^\]]*\]\]/g, '')
     .replace(/\[\[(?:g:[a-z0-9-]+|s\d+)\|([^\]]+?)\]\]/g, '$1')
@@ -32,8 +32,8 @@ export function buildChapterContext(chapter: Chapter): ChapterContext {
     `เปรียบง่ายๆ: ${chapter.plainAnalogy}`,
     `ฝั่ง Business: ${chapter.businessNote}`,
     `ฝั่ง Engineer: ${chapter.engineerNote}`,
-    ...(chapter.coreConcepts ?? []).map((c) => clip(`- ${c.heading}: ${plain(c.detail)}`, CONCEPT_MAX)),
+    ...(chapter.coreConcepts ?? []).map((c) => clip(`- ${c.heading}: ${plainText(c.detail)}`, CONCEPT_MAX)),
     ...(chapter.checklist?.length ? [`เช็กลิสต์: ${chapter.checklist.join(' / ')}`] : []),
   ];
-  return { label, text: clip(lines.map(plain).join('\n'), CONTEXT_MAX) };
+  return { label, text: clip(lines.map(plainText).join('\n'), CONTEXT_MAX) };
 }
