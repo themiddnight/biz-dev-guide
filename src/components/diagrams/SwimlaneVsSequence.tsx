@@ -15,16 +15,16 @@ import { FIGURES } from '../figures';
 export const SwimlaneVsSequence: React.FC = () => (
   <details
     id={S5_JUMP_TARGET_IDS.behavior}
-    className="group scroll-mt-4 rounded-2xl bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] overflow-hidden"
+    className="group scroll-mt-4 rounded-box bg-base-100 border border-base-border overflow-hidden"
   >
-    <summary className={`${TAP_Y} flex items-center justify-between gap-2 p-3.5 sm:p-4 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f] transition-colors`}>
-      <span className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
+    <summary className={`${TAP_Y} flex items-center justify-between gap-2 p-box-dense cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden bg-base-300 hover:bg-base-border transition-colors`}>
+      <span className="text-xs sm:text-sm font-bold text-base-content">
         {SWIMLANE_VS_SEQUENCE.summary}
       </span>
-      <ChevronDown className="w-4 h-4 shrink-0 text-neutral-400 dark:text-[#737373] transition-transform group-open:rotate-180" />
+      <ChevronDown className="w-4 h-4 shrink-0 text-base-content-muted transition-transform group-open:rotate-180" />
     </summary>
-    <div className="p-3.5 sm:p-5 space-y-4 border-t border-neutral-100 dark:border-[#262626]">
-      <p className="text-xs sm:text-sm text-neutral-600 dark:text-[#a3a3a3] leading-relaxed">
+    <div className="p-box-dense space-y-4 border-t border-base-border">
+      <p className="text-xs sm:text-sm text-base-content-secondary leading-relaxed">
         <RichText text={SWIMLANE_VS_SEQUENCE.intro} />
       </p>
 
@@ -34,14 +34,14 @@ export const SwimlaneVsSequence: React.FC = () => (
           return (
             <div
               key={col.figureKey}
-              className="p-3.5 rounded-xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-2"
+              className="p-3.5 rounded-xl bg-base-300 border border-base-border space-y-2"
             >
               <div>
-                <h5 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">{col.title}</h5>
-                <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e]">{col.sub}</p>
+                <h5 className="text-xs sm:text-sm font-bold text-base-content">{col.title}</h5>
+                <p className="text-[11px] sm:text-xs text-base-content-muted">{col.sub}</p>
               </div>
               <Figure className="w-full" />
-              <p className="text-[11px] text-neutral-500 dark:text-[#8e8e8e] leading-relaxed">
+              <p className="text-[11px] text-base-content-muted leading-relaxed">
                 <RichText text={col.caption} />
               </p>
             </div>

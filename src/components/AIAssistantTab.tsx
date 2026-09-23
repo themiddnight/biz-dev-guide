@@ -15,7 +15,10 @@ import {
   RefreshCw,
   WifiOff
 } from 'lucide-react';
-import { TAP, TAP_GAP, TAP_POSITIONED } from './ui/tapTarget';
+import { TAP, TAP_GAP } from './ui/tapTarget';
+import { Button } from './ui/Button';
+import { IconBadge } from './ui/IconBadge';
+import { Alert } from './ui/Alert';
 
 interface AIAssistantTabProps {
   initialPrompt?: string;
@@ -120,45 +123,41 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-5 sm:space-y-6 pb-16">
+    <div className="max-w-4xl mx-auto space-y-section pb-16">
       {isOffline && (
-        <div
-          role="status"
-          className="flex items-start gap-2.5 p-4 rounded-2xl border border-amber-300 dark:border-amber-500/40 bg-amber-50 dark:bg-amber-500/10 text-amber-900 dark:text-amber-200 text-xs sm:text-sm"
-        >
-          <WifiOff className="w-4 h-4 mt-0.5 shrink-0" aria-hidden="true" />
+        <Alert color="warning" live icon={<WifiOff className="w-4 h-4" />}>
           <p>
             <strong className="font-semibold">โหมดออฟไลน์:</strong> ยังไม่ได้เชื่อมต่อ AI จริง คำตอบเป็นคำแนะนำทั่วไป
           </p>
-        </div>
+        </Alert>
       )}
 
       {/* Header Info */}
-      <div className="bg-white dark:bg-[#141414] p-5 sm:p-6 rounded-2xl sm:rounded-3xl border border-neutral-200 dark:border-[#262626] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-2xs">
+      <div className="bg-base-100 p-box-spacious rounded-box border border-base-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-2xs">
         <div className="space-y-1">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-neutral-100 dark:bg-[#1f1f1f] text-neutral-800 dark:text-[#d4d4d4] text-[11px] sm:text-xs font-semibold border border-neutral-200 dark:border-[#333333]">
-            <Sparkles className="w-3 h-3 text-amber-500" />
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-base-300 text-base-content-body text-[11px] sm:text-xs font-semibold border border-base-border">
+            <Sparkles className="w-3 h-3 text-warning" />
             <span>{lastSource === 'gemini' ? 'AI Bridge Assistant Powered by Gemini' : 'AI Bridge Assistant'}</span>
           </div>
-          <h2 className="text-lg sm:text-2xl font-bold text-neutral-900 dark:text-[#fafafa]">
+          <h2 className="text-lg sm:text-2xl font-bold text-base-content">
             ถาม AI เพิ่มเติม &amp; ปรึกษาสถานการณ์จริง
           </h2>
-          <p className="text-xs sm:text-sm text-neutral-500 dark:text-[#8e8e8e]">
+          <p className="text-xs sm:text-sm text-base-content-muted">
             ถามข้อสงสัย หาทางออก และแปลศัพท์ข้ามสายงานได้ทันที
           </p>
         </div>
 
         {/* Perspective selector */}
-        <div className="flex items-center gap-1 bg-neutral-100 dark:bg-[#1a1a1a] p-1 rounded-xl border border-neutral-200 dark:border-[#262626] shrink-0 shadow-2xs">
-          <span className="text-[11px] font-semibold text-neutral-500 dark:text-[#737373] px-2">มุมมอง:</span>
+        <div className="flex items-center gap-1 bg-base-300 p-1 rounded-xl border border-base-border shrink-0 shadow-2xs">
+          <span className="text-[11px] font-semibold text-base-content-muted px-2">มุมมอง:</span>
           {(['both', 'business', 'engineer'] as const).map((r) => (
             <button
               key={r}
               onClick={() => setRolePerspective(r)}
               className={`${TAP} px-2.5 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer ${
                 rolePerspective === r
-                  ? 'bg-white dark:bg-[#262626] text-neutral-900 dark:text-white shadow-2xs font-bold'
-                  : 'text-neutral-500 dark:text-[#737373] hover:text-neutral-900 dark:hover:text-white'
+                  ? 'bg-base-100 text-base-content shadow-2xs font-bold'
+                  : 'text-base-content-muted hover:text-base-content'
               }`}
             >
               {r === 'both' ? 'ทั้งคู่' : r === 'business' ? 'Business' : 'Engineer'}
@@ -169,8 +168,8 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
 
       {/* Quick Prompt Chips */}
       <div className="space-y-2">
-        <div className="flex items-center gap-1.5 text-xs font-semibold text-neutral-500 dark:text-[#8e8e8e]">
-          <Lightbulb className="w-3.5 h-3.5 text-amber-500" />
+        <div className="flex items-center gap-1.5 text-xs font-semibold text-base-content-muted">
+          <Lightbulb className="w-3.5 h-3.5 text-warning" />
           <span>คำถามยอดฮิตที่เลือกถามได้ทันที:</span>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -178,7 +177,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
             <button
               key={idx}
               onClick={() => handleSend(prompt)}
-              className={`${TAP_GAP[8]} text-xs px-3 py-1.5 rounded-xl bg-white dark:bg-[#141414] hover:bg-neutral-50 dark:hover:bg-[#1c1c1c] text-neutral-700 dark:text-[#c4c4c4] border border-neutral-200 dark:border-[#262626] hover:border-neutral-400 dark:hover:border-[#404040] transition-all text-left cursor-pointer shadow-2xs`}
+              className={`${TAP_GAP[8]} text-xs px-3 py-1.5 rounded-xl bg-base-100 hover:bg-base-300 text-base-content-body border border-base-border hover:border-base-border-strong transition-all text-left cursor-pointer shadow-2xs`}
             >
               {prompt}
             </button>
@@ -187,7 +186,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
       </div>
 
       {/* Chat Conversation Thread */}
-      <div className="bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] rounded-2xl sm:rounded-3xl p-4 sm:p-6 min-h-[420px] max-h-[600px] overflow-y-auto space-y-4 shadow-2xs">
+      <div className="bg-base-100 border border-base-border rounded-box p-box-spacious min-h-[420px] max-h-[600px] overflow-y-auto space-y-4 shadow-2xs">
         {messages.map((msg) => {
           const isAi = msg.role === 'assistant';
           return (
@@ -195,19 +194,13 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
               key={msg.id}
               className={`flex items-start gap-3 ${isAi ? '' : 'flex-row-reverse'}`}
             >
-              <div
-                className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-white ${
-                  isAi ? 'bg-neutral-900 dark:bg-white dark:text-[#0a0a0a]' : 'bg-neutral-700 dark:bg-[#333333]'
-                }`}
-              >
-                {isAi ? <Bot className="w-4 h-4" /> : <User className="w-4 h-4" />}
-              </div>
+              <IconBadge size="md">{isAi ? <Bot className="w-4 h-4" /> : <User className="w-4 h-4" />}</IconBadge>
 
               <div
-                className={`max-w-[85%] sm:max-w-[75%] rounded-2xl p-4 text-xs sm:text-sm leading-relaxed space-y-2 ${
+                className={`max-w-[85%] sm:max-w-[75%] rounded-box p-4 text-xs sm:text-sm leading-relaxed space-y-2 ${
                   isAi
-                    ? 'bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] text-neutral-800 dark:text-[#e5e5e5]'
-                    : 'bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] shadow-xs'
+                    ? 'bg-base-300 border border-base-border text-base-content'
+                    : 'bg-base-300 text-base-content border border-base-border'
                 }`}
               >
                 {isAi ? (
@@ -215,15 +208,15 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
                     <Markdown
                       remarkPlugins={[remarkGfm]}
                       components={{
-                        h1: ({ children }) => <h1 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-[#fafafa] mt-3 mb-1.5 border-b border-neutral-200 dark:border-[#262626] pb-1">{children}</h1>,
-                        h2: ({ children }) => <h2 className="text-sm sm:text-base font-bold text-neutral-900 dark:text-[#fafafa] mt-2.5 mb-1">{children}</h2>,
-                        h3: ({ children }) => <h3 className="text-xs sm:text-sm font-bold text-neutral-800 dark:text-[#d4d4d4] mt-2 mb-0.5">{children}</h3>,
-                        p: ({ children }) => <p className="mb-2 last:mb-0 leading-relaxed text-neutral-700 dark:text-[#d4d4d4]">{children}</p>,
-                        ul: ({ children }) => <ul className="list-disc pl-5 mb-2 space-y-1 text-neutral-700 dark:text-[#d4d4d4]">{children}</ul>,
-                        ol: ({ children }) => <ol className="list-decimal pl-5 mb-2 space-y-1 text-neutral-700 dark:text-[#d4d4d4]">{children}</ol>,
+                        h1: ({ children }) => <h1 className="text-base sm:text-lg font-bold text-base-content mt-3 mb-1.5 border-b border-base-border pb-1">{children}</h1>,
+                        h2: ({ children }) => <h2 className="text-sm sm:text-base font-bold text-base-content mt-2.5 mb-1">{children}</h2>,
+                        h3: ({ children }) => <h3 className="text-xs sm:text-sm font-bold text-base-content-body mt-2 mb-0.5">{children}</h3>,
+                        p: ({ children }) => <p className="mb-2 last:mb-0 leading-relaxed text-base-content-body">{children}</p>,
+                        ul: ({ children }) => <ul className="list-disc pl-5 mb-2 space-y-1 text-base-content-body">{children}</ul>,
+                        ol: ({ children }) => <ol className="list-decimal pl-5 mb-2 space-y-1 text-base-content-body">{children}</ol>,
                         li: ({ children }) => <li className="leading-relaxed">{children}</li>,
                         blockquote: ({ children }) => (
-                          <blockquote className="border-l-4 border-neutral-400 dark:border-[#555555] pl-3 italic text-neutral-700 dark:text-[#c4c4c4] my-2 bg-neutral-100/60 dark:bg-[#202020] py-1.5 rounded-r-lg">
+                          <blockquote className="border-l-4 border-base-border-strong pl-3 italic text-base-content-body my-2 bg-base-100 py-1.5 rounded-r-lg">
                             {children}
                           </blockquote>
                         ),
@@ -231,25 +224,25 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
                           const isInline = !String(children).includes('\n') && !className;
                           if (isInline) {
                             return (
-                              <code className="px-1.5 py-0.5 rounded bg-neutral-200 dark:bg-[#262626] text-neutral-900 dark:text-[#e5e5e5] text-[11px] sm:text-xs" {...props}>
+                              <code className="px-1.5 py-0.5 rounded bg-base-border text-base-content text-[11px] sm:text-xs" {...props}>
                                 {children}
                               </code>
                             );
                           }
                           return (
-                            <div className="my-2.5 rounded-xl overflow-hidden border border-neutral-200 dark:border-[#262626] bg-[#0a0a0a] text-neutral-100 p-3 text-xs overflow-x-auto">
+                            <div className="my-2.5 rounded-xl overflow-hidden border border-base-border bg-neutral text-neutral-content p-3 text-xs overflow-x-auto">
                               <code {...props}>{children}</code>
                             </div>
                           );
                         },
                         table: ({ children }) => (
-                          <div className="my-2.5 overflow-x-auto rounded-xl border border-neutral-200 dark:border-[#262626]">
+                          <div className="my-2.5 overflow-x-auto rounded-xl border border-base-border">
                             <table className="w-full text-left border-collapse text-xs">{children}</table>
                           </div>
                         ),
-                        th: ({ children }) => <th className="bg-neutral-100 dark:bg-[#222222] p-2.5 font-bold border-b border-neutral-200 dark:border-[#262626] text-neutral-900 dark:text-[#fafafa]">{children}</th>,
-                        td: ({ children }) => <td className="p-2.5 border-b border-neutral-100 dark:border-[#262626] text-neutral-700 dark:text-[#c4c4c4]">{children}</td>,
-                        strong: ({ children }) => <strong className="font-bold text-neutral-900 dark:text-[#fafafa]">{children}</strong>,
+                        th: ({ children }) => <th className="bg-base-300 p-2.5 font-bold border-b border-base-border text-base-content">{children}</th>,
+                        td: ({ children }) => <td className="p-2.5 border-b border-base-border text-base-content-body">{children}</td>,
+                        strong: ({ children }) => <strong className="font-bold text-base-content">{children}</strong>,
                       }}
                     >
                       {msg.content}
@@ -262,10 +255,10 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
                 )}
 
                 {isAi && (
-                  <div className="flex items-center justify-between pt-2 border-t border-neutral-200/60 dark:border-[#262626] text-[11px] text-neutral-500 dark:text-[#8e8e8e]">
+                  <div className="flex items-center justify-between pt-2 border-t border-base-border text-[11px] text-base-content-muted">
                     <span className="flex items-center gap-1">
                       {msg.source === 'gemini' ? (
-                        <span className="text-amber-600 dark:text-amber-400 font-semibold">● Gemini Model</span>
+                        <span className="text-warning font-semibold">● Gemini Model</span>
                       ) : (
                         <span>{msg.source ? '● โหมดออฟไลน์ (คำแนะนำทั่วไป)' : '● Expert Assistant'}</span>
                       )}
@@ -273,12 +266,12 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
                     </span>
                     <button
                       onClick={() => copyToClipboard(msg.content, msg.id)}
-                      className={`${TAP} hover:text-neutral-900 dark:hover:text-white flex items-center gap-1 cursor-pointer transition-colors`}
+                      className={`${TAP} hover:text-base-content flex items-center gap-1 cursor-pointer transition-colors`}
                     >
                       {copiedId === msg.id ? (
                         <>
-                          <Check className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
-                          <span className="text-emerald-600 dark:text-emerald-400 font-semibold">คัดลอกแล้ว</span>
+                          <Check className="w-3 h-3 text-success" />
+                          <span className="text-success font-semibold">คัดลอกแล้ว</span>
                         </>
                       ) : (
                         <>
@@ -296,11 +289,9 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
 
         {isLoading && (
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-neutral-900 dark:bg-white dark:text-[#0a0a0a] flex items-center justify-center text-white shrink-0">
-              <Bot className="w-4 h-4" />
-            </div>
-            <div className="p-3 rounded-2xl bg-neutral-100 dark:bg-[#1a1a1a] border border-neutral-200 dark:border-[#262626] text-xs text-neutral-600 dark:text-[#a3a3a3] flex items-center gap-2">
-              <Loader2 className="w-4 h-4 animate-spin text-neutral-500" />
+            <IconBadge size="md"><Bot className="w-4 h-4" /></IconBadge>
+            <div className="p-3 rounded-box bg-base-300 border border-base-border text-xs text-base-content-secondary flex items-center gap-2">
+              <Loader2 className="w-4 h-4 animate-spin text-base-content-muted" />
               <span>กำลังคิดคำตอบ...</span>
             </div>
           </div>
@@ -321,12 +312,15 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
           onChange={(e) => setInputQuestion(e.target.value)}
           placeholder="พิมพ์คำถามของคุณ เช่น 'ทำไม Dev ถึงบ่นเรื่อง Flaky test?' หรือ 'วิธีเขียน User story ที่ดี'..."
           disabled={isLoading}
-          className="w-full pl-4 sm:pl-5 pr-28 py-3.5 bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] rounded-xl sm:rounded-2xl text-xs sm:text-sm text-neutral-900 dark:text-[#fafafa] placeholder-neutral-400 dark:placeholder-[#555555] focus:outline-none focus:ring-1 focus:ring-neutral-400 dark:focus:ring-neutral-600 shadow-2xs"
+          className="w-full pl-4 sm:pl-5 pr-28 py-3.5 bg-base-100 border border-base-border rounded-box text-xs sm:text-sm text-base-content placeholder-base-content-subtle focus:outline-none focus:ring-1 focus:ring-base-border-strong shadow-2xs"
         />
-        <button
+        <Button
           type="submit"
+          color="primary" variant="solid"
+          size="sm"
+          tap="positioned"
           disabled={!inputQuestion.trim() || isLoading}
-          className={`${TAP_POSITIONED} absolute right-2 px-3.5 py-2 bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:hover:bg-neutral-200 dark:text-[#0a0a0a] disabled:opacity-40 rounded-lg sm:rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer disabled:cursor-not-allowed`}
+          className="absolute right-2"
         >
           {isLoading ? (
             <Loader2 className="w-4 h-4 animate-spin" />
@@ -336,7 +330,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
               <Send className="w-3.5 h-3.5" />
             </>
           )}
-        </button>
+        </Button>
       </form>
     </div>
   );

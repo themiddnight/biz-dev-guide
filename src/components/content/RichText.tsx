@@ -89,7 +89,7 @@ export const RichText: React.FC<RichTextProps> = ({ text, onNavigateChapter, onS
 
         if (part.startsWith('**') && part.endsWith('**') && part.length > 4) {
           return (
-            <strong key={idx} className="font-semibold text-neutral-900 dark:text-[#e5e5e5]">
+            <strong key={idx} className="font-semibold text-base-content">
               {part.slice(2, -2)}
             </strong>
           );
@@ -109,7 +109,7 @@ export const RichText: React.FC<RichTextProps> = ({ text, onNavigateChapter, onS
                 event.preventDefault();
                 onNavigateChapter(chapterId);
               }}
-              className={`inline-block -my-3.5 py-3.5 sm:my-0 sm:py-0 font-medium text-neutral-900 dark:text-white underline decoration-neutral-400 dark:decoration-[#525252] underline-offset-2 hover:decoration-neutral-900 dark:hover:decoration-white transition-colors`}
+              className={`inline-block -my-3.5 py-3.5 sm:my-0 sm:py-0 font-medium text-base-content underline decoration-base-content-subtle underline-offset-2 hover:decoration-base-content transition-colors`}
             >
               {label}
             </a>

@@ -42,7 +42,7 @@ export interface FigurePanelsProps {
 }
 
 const FOCUS_RING =
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 dark:focus-visible:ring-white';
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary';
 
 /* Literal class strings so Tailwind can see them. */
 const WIDE_GRID: Record<FigurePanelsProps['columns'], string> = {

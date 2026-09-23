@@ -30,3 +30,31 @@ describe('TrackPanel primary button', () => {
     expect(html).not.toContain('อ่านต่อ');
   });
 });
+
+
+describe('TrackPanel hierarchy (spec §10.1, §10.2)', () => {
+  const html = render(['s2']);
+  const activeRow = html.match(/<button[^>]*data-track-item="s2"[^>]*>/)![0];
+  const primary = html.match(/<button[^>]*data-track-primary[^>]*>/)![0];
+
+  it('the active row is soft and stays aria-current; no row becomes aria-pressed', () => {
+    expect(activeRow).toContain('aria-current="true"');
+    expect(html).not.toContain('aria-pressed');
+    expect(activeRow).toContain('bg-base-300');
+    expect(activeRow).not.toMatch(/(?<![\w:/-])bg-primary(?![\w/-])/);
+  });
+
+  it('the track button is an outline full-width button, not a primary fill', () => {
+    expect(primary).toContain('border-base-border-strong');
+    expect(primary).toContain('w-full');
+    expect(primary).not.toMatch(/(?<![\w:/-])bg-primary(?![\w/-])/);
+  });
+
+  it('the panel is a bg-base-300 inset surface nested in the sidebar card (box-dense)', () => {
+    const panel = html.match(/<div[^>]*data-track-panel[^>]*>/)![0];
+    expect(panel).toMatch(/(?<![\w:/-])bg-base-300(?![\w/-])/);
+    expect(panel).not.toMatch(/(?<![\w:/-])bg-base-100(?![\w/-])/);
+    expect(panel).toContain('p-box-dense');
+    expect(panel).toContain('rounded-box');
+  });
+});

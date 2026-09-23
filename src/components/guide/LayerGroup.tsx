@@ -17,18 +17,18 @@ export const LayerGroupView: React.FC<LayerGroupViewProps> = ({ group, isExpande
         type="button"
         aria-expanded={isExpanded}
         onClick={onToggle}
-        className={`${TAP} w-full flex items-center justify-between gap-3 py-2 border-b border-neutral-200 dark:border-[#262626] text-left cursor-pointer`}
+        className={`${TAP} w-full flex items-center justify-between gap-3 py-2 border-b border-base-border text-left cursor-pointer`}
       >
-        <span className="text-sm sm:text-base font-extrabold text-neutral-900 dark:text-[#fafafa]">
+        <span className="text-sm sm:text-base font-extrabold text-base-content">
           {LAYER_META[group.layer].name}
-          <span className="ml-2 text-xs font-medium text-neutral-500 dark:text-[#8e8e8e]">
+          <span className="ml-2 text-xs font-medium text-base-content-muted">
             · {group.sections.length} หัวข้อ · ≈ {group.minutes} นาที
           </span>
         </span>
         {isExpanded ? <ChevronUp className="w-4 h-4 shrink-0" /> : <ChevronDown className="w-4 h-4 shrink-0" />}
       </button>
       {!isExpanded && (
-        <p className="mt-1.5 text-xs text-neutral-500 dark:text-[#737373]" data-layer-preview>
+        <p className="mt-1.5 text-xs text-base-content-muted" data-layer-preview>
           {group.sections.map(k => SECTION_META[k].chip).join(' · ')}
         </p>
       )}

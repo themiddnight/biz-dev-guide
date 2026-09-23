@@ -319,24 +319,24 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#fafafa] dark:bg-[#0a0a0a] text-neutral-900 dark:text-[#e5e5e5] font-sans antialiased transition-colors duration-200">
+    <div className="min-h-screen bg-base-200 font-sans antialiased transition-colors duration-200">
       {/* Toast Alert for XP / Badges */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 bg-neutral-950 dark:bg-[#141414] text-white rounded-[4px] shadow-2xl border border-neutral-800 dark:border-[#262626] animate-slideUp">
-          <div className="w-7 h-7 rounded-[3px] bg-white text-neutral-950 flex items-center justify-center font-bold shrink-0 text-xs">
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 bg-neutral text-neutral-content rounded-selector shadow-2xl border border-neutral animate-slideUp">
+          <div className="w-7 h-7 rounded-selector bg-neutral-content text-neutral flex items-center justify-center font-bold shrink-0 text-xs">
             <Zap className="w-3.5 h-3.5 fill-current" />
           </div>
           <div className="pr-2">
-            <div className="font-bold text-xs sm:text-sm text-white">
+            <div className="font-bold text-xs sm:text-sm text-neutral-content">
               {toastMessage.title}
             </div>
-            <div className="text-[11px] text-neutral-400 font-normal">
+            <div className="text-[11px] text-neutral-content/70 font-normal">
               {toastMessage.subtitle}
             </div>
           </div>
-          <button 
+          <button
             onClick={() => setToastMessage(null)}
-            className="text-neutral-500 hover:text-white cursor-pointer p-1"
+            className="text-neutral-content/60 hover:text-neutral-content cursor-pointer p-1"
             aria-label="Close notification"
           >
             <X className="w-3.5 h-3.5" />
@@ -361,7 +361,7 @@ export default function App() {
       />
 
       {/* Main Content Area */}
-      <main className="max-w-[1600px] mx-auto px-3 sm:px-6 lg:px-8 pt-6 sm:pt-8">
+      <main className="max-w-[1600px] mx-auto px-page pt-6 sm:pt-8">
         {activeTab === 'guide' && (
           <GuideTab
             chapters={CHAPTERS}
@@ -420,13 +420,13 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-200 dark:border-slate-800/80 mt-16 py-8 text-center text-xs text-slate-500 dark:text-slate-400">
+      <footer className="border-t border-base-border mt-16 py-8 text-center text-xs text-base-content-muted">
         <div className="max-w-7xl mx-auto px-4 space-y-2">
-          <p className="font-semibold text-slate-700 dark:text-slate-300">
+          <p className="font-semibold text-base-content-body">
             จุดที่ business กับ engineering มาเจอกัน — Interactive Knowledge &amp; Collaboration Platform
           </p>
           <p>คู่มือกลาง แชร์ต่อได้ — ปรับปรุงเพิ่มเองได้ตามงานที่เจอจริง</p>
-          <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+          <p className="text-base-content-secondary max-w-2xl mx-auto">
             ช่วยให้ Business กับ Engineering เข้าใจกันง่ายขึ้น พร้อมเครื่องมือ AI และระบบ Interactive Gamification
           </p>
         </div>

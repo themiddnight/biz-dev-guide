@@ -13,8 +13,8 @@ interface HeroFigureProps {
 }
 
 const SeatLine: React.FC<{ side: Role; line: string }> = ({ side, line }) => (
-  <p className="text-xs sm:text-sm text-neutral-700 dark:text-[#c4c4c4] leading-relaxed break-words">
-    <span className="font-semibold text-neutral-900 dark:text-[#fafafa]" data-seat-label>
+  <p className="text-xs sm:text-sm text-base-content-body leading-relaxed break-words">
+    <span className="font-semibold text-base-content" data-seat-label>
       {ROLE_META[side].icon} เก้าอี้{ROLE_META[side].side}
     </span>{' '}
     <span data-seat-line={side}>{line}</span>
@@ -28,7 +28,7 @@ export const HeroFigure: React.FC<HeroFigureProps> = ({ figure, analogy, role, s
   return (
     <figure data-hero-figure className="space-y-2">
       <Figure />
-      <figcaption className="text-xs sm:text-sm font-semibold text-neutral-800 dark:text-[#e5e5e5]">
+      <figcaption className="text-xs sm:text-sm font-semibold text-base-content">
         {figure.caption}
       </figcaption>
       {role ? (
@@ -38,7 +38,7 @@ export const HeroFigure: React.FC<HeroFigureProps> = ({ figure, analogy, role, s
             type="button"
             data-seat-flip
             onClick={onFlipSeat}
-            className={`${TAP} cursor-pointer text-xs font-semibold text-neutral-600 dark:text-[#a3a3a3] underline underline-offset-2 hover:text-neutral-900 dark:hover:text-[#fafafa]`}
+            className={`${TAP} cursor-pointer text-xs font-semibold text-base-content-secondary underline underline-offset-2 hover:text-base-content`}
           >
             {seat === role ? 'นั่งเก้าอี้อีกฝั่ง' : 'กลับเก้าอี้ตัวเอง'}
           </button>
@@ -51,7 +51,7 @@ export const HeroFigure: React.FC<HeroFigureProps> = ({ figure, analogy, role, s
         </div>
       )}
       {analogy && (
-        <p data-analogy className="text-xs sm:text-sm text-neutral-600 dark:text-[#a3a3a3]">
+        <p data-analogy className="text-xs sm:text-sm text-base-content-secondary">
           💡 {analogy}
         </p>
       )}

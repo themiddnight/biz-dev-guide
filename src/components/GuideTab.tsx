@@ -29,7 +29,7 @@ import { SectionOutline } from './guide/SectionOutline';
 import { TrackPanel } from './guide/TrackPanel';
 import { chapterLevelResetLabel, chapterLevelScopeLabel } from './guide/rolePerspectiveUi';
 import { TrackNextCard, TrackEndCard } from './guide/TrackFooter';
-import { getTrackNext, resolveTrack, type TrackKey } from '../data/readingTracks';
+import { getTrackNext, resolveTrack, type TrackKey, type TrackNext } from '../data/readingTracks';
 import { planChapterLevelChoice } from '../lib/rolePrefs';
 import { ROLE_META, otherRole, resolveChapterLevel, getActiveTrackKey, type LevelInputs, type LevelMode, type Role } from '../data/rolePerspective';
 import { FirstVisitCard, type FirstVisitMode } from './guide/FirstVisitCard';
@@ -51,9 +51,24 @@ import {
   SlidersHorizontal
 } from 'lucide-react';
 import { TAP, TAP_GAP } from './ui/tapTarget';
+import { Button } from './ui/Button';
+import { IconBadge } from './ui/IconBadge';
+import { Tabs } from './ui/Tabs';
 
 /** Glossary terms the index search matches for s15, computed once. */
 const GLOSSARY_TERMS = GLOSSARY.map(g => g.term);
+
+const ROLE_FILTERS = [
+  { value: 'all', label: 'ทั้งหมด' },
+  { value: 'pm', label: 'PM' },
+  { value: 'ux', label: 'UX' },
+  { value: 'ba', label: 'BA' },
+  { value: 'sa', label: 'SA' },
+  { value: 'eng', label: 'Dev' },
+  { value: 'qa', label: 'QA' },
+  { value: 'friction', label: 'ขัดแย้ง' },
+  { value: 'biz', label: 'ธุรกิจ' },
+] as const;
 
 interface GuideTabProps {
   chapters: Chapter[];
@@ -80,6 +95,19 @@ interface GuideTabProps {
   onNavigateChapter: (chapterId: string, section?: SectionKey) => void;
   onReplaceSection: (section: SectionKey | null) => void;
   onRequestedSectionApplied: () => void;
+}
+
+/**
+ * The "next chapter" button beside the reader is the one place GuideTab picks a Button
+ * color/variant conditionally (spec §9/§10.1): on a track's last chapter it must not be a
+ * second primary solid beside TrackEndCard. Extracted so the choice is unit-testable without a
+ * full GuideTab render (the static literal-props guard in hierarchy.test.ts cannot see a
+ * conditional color/variant).
+ */
+export function nextChapterButtonStyle(kind: TrackNext['kind']): { color: 'primary' | 'neutral'; variant: 'solid' | 'outline' } {
+  return kind === 'end'
+    ? { color: 'neutral', variant: 'outline' }
+    : { color: 'primary', variant: 'solid' };
 }
 
 export const GuideTab: React.FC<GuideTabProps> = ({
@@ -346,43 +374,40 @@ export const GuideTab: React.FC<GuideTabProps> = ({
       {showFirstVisit ? (
         <FirstVisitCard chapters={chapters} onChoose={handleFirstVisitChoice} onSkip={handleFirstVisitSkip} />
       ) : (
-      <div className="bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xs">
+      <div className="bg-base-100 border border-base-border rounded-box p-box-spacious shadow-2xs">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="space-y-1.5 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-neutral-100 dark:bg-[#1f1f1f] text-neutral-800 dark:text-[#d4d4d4] text-[11px] sm:text-xs font-semibold border border-neutral-200 dark:border-[#333333]">
-              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+            <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-base-300 text-base-content-body text-[11px] sm:text-xs font-semibold border border-base-border">
+              <Sparkles className="w-3.5 h-3.5 text-warning" />
               <span>โหมดอ่านทีละบท พร้อมสารบัญกระโดดข้ามได้ตลอดเวลา</span>
             </div>
-            <h2 className="text-lg sm:text-2xl font-extrabold text-neutral-900 dark:text-[#fafafa] tracking-tight">
+            <h2 className="text-lg sm:text-2xl font-extrabold text-base-content tracking-tight">
               คู่มือสองโลก Business ↔ Engineering ({chapters.length} บท เริ่มจากศูนย์)
             </h2>
-            <p className="text-xs sm:text-sm text-neutral-500 dark:text-[#8e8e8e] leading-relaxed font-normal">
+            <p className="text-xs sm:text-sm text-base-content-muted leading-relaxed font-normal">
               มีตั้งแต่จุดเริ่มต้นสำหรับมือใหม่ ศัพท์เทคนิคแปลเป็นภาษาคน ตัวอย่างบทสนทนาจริงในที่ทำงาน แผนภาพจำลองระบบ และทางออกของข้อขัดแย้ง
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2 shrink-0">
             {/* Open Table of Contents Button */}
-            <button
-              onClick={openIndex}
-              className={`${TAP_GAP[8]} inline-flex items-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:hover:bg-neutral-200 dark:text-[#0a0a0a] text-xs sm:text-sm font-semibold shadow-xs transition-all cursor-pointer`}
-            >
+            <Button color="neutral" variant="outline" size="md" tap="gap-8" onClick={openIndex}>
               <List className="w-4 h-4" />
               <span>สารบัญทั้ง {chapters.length} บท (Index)</span>
-            </button>
+            </Button>
 
             <button
               onClick={onStartQuiz}
-              className={`${TAP_GAP[8]} inline-flex items-center gap-2 px-3 sm:px-3.5 py-2 sm:py-2.5 rounded-xl bg-neutral-100 dark:bg-[#1a1a1a] border border-neutral-200 dark:border-[#262626] text-neutral-700 dark:text-[#d4d4d4] text-xs sm:text-sm font-medium hover:bg-neutral-200/70 dark:hover:bg-[#222222] transition-all cursor-pointer`}
+              className={`${TAP_GAP[8]} inline-flex items-center gap-2 px-3 sm:px-3.5 py-2 sm:py-2.5 rounded-xl bg-base-300 border border-base-border text-base-content-body text-xs sm:text-sm font-medium hover:bg-base-border transition-all cursor-pointer`}
             >
-              <GraduationCap className="w-4 h-4 text-amber-500" />
+              <GraduationCap className="w-4 h-4 text-warning" />
               <span>ทำควิซสะสม XP</span>
             </button>
 
             {/* Quick jump to the glossary (chapter 15) */}
             <button
               onClick={() => handleSelectChapter('s15')}
-              className={`${TAP_GAP[8]} inline-flex items-center gap-2 px-3 sm:px-3.5 py-2 sm:py-2.5 rounded-xl bg-neutral-100 dark:bg-[#1a1a1a] border border-neutral-200 dark:border-[#262626] text-neutral-700 dark:text-[#d4d4d4] text-xs sm:text-sm font-medium hover:bg-neutral-200/70 dark:hover:bg-[#222222] transition-all cursor-pointer`}
+              className={`${TAP_GAP[8]} inline-flex items-center gap-2 px-3 sm:px-3.5 py-2 sm:py-2.5 rounded-xl bg-base-300 border border-base-border text-base-content-body text-xs sm:text-sm font-medium hover:bg-base-border transition-all cursor-pointer`}
             >
               <span aria-hidden="true">📖</span>
               <span>Glossary</span>
@@ -391,14 +416,14 @@ export const GuideTab: React.FC<GuideTabProps> = ({
         </div>
 
         {/* Global Progress Bar */}
-        <div className="mt-4 pt-3.5 border-t border-neutral-100 dark:border-[#262626] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs">
-          <div className="flex items-center gap-2 text-neutral-600 dark:text-[#a3a3a3] font-medium text-[11px] sm:text-xs">
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+        <div className="mt-4 pt-3.5 border-t border-base-border flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs">
+          <div className="flex items-center gap-2 text-base-content-secondary font-medium text-[11px] sm:text-xs">
+            <CheckCircle2 className="w-3.5 h-3.5 text-success" />
             <span>ความคืบหน้าการอ่าน: อ่านจบแล้ว {readChapters.length} จาก {chapters.length} บท ({percentCompleted}%)</span>
           </div>
-          <div className="w-full sm:w-64 h-1.5 sm:h-2 rounded-full bg-neutral-100 dark:bg-[#262626] overflow-hidden">
+          <div className="w-full sm:w-64 h-1.5 sm:h-2 rounded-full bg-base-300 overflow-hidden">
             <div 
-              className="h-full bg-neutral-900 dark:bg-white rounded-full transition-all duration-500"
+              className="h-full bg-primary rounded-full transition-all duration-500"
               style={{ width: `${percentCompleted}%` }}
             />
           </div>
@@ -411,62 +436,52 @@ export const GuideTab: React.FC<GuideTabProps> = ({
         
         {/* Left Column: Persistent Sticky Index on Desktop (Hidden on smaller screens, accessed via drawer/modal) */}
         <div className="hidden lg:block lg:col-span-4 sticky top-20 space-y-4">
-          <div className="bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] rounded-2xl sm:rounded-3xl p-3.5 shadow-2xs space-y-3.5 max-h-[calc(100vh-6rem)] overflow-hidden flex flex-col">
-            <div className="flex items-center justify-between pb-2 border-b border-neutral-100 dark:border-[#262626]">
+          <div className="bg-base-100 border border-base-border rounded-box p-3.5 shadow-2xs space-y-3.5 max-h-[calc(100vh-6rem)] overflow-hidden flex flex-col">
+            <div className="flex items-center justify-between pb-2 border-b border-base-border">
               <div className="flex items-center gap-2">
-                <List className="w-4 h-4 text-neutral-900 dark:text-white" />
-                <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">สารบัญบทเรียน ({chapters.length} บท)</h3>
+                <List className="w-4 h-4 text-base-content" />
+                <h3 className="text-xs sm:text-sm font-bold text-base-content">สารบัญบทเรียน ({chapters.length} บท)</h3>
               </div>
-              <span className="text-[11px] font-semibold text-neutral-500 dark:text-[#8e8e8e]">
+              <span className="text-[11px] font-semibold text-base-content-muted">
                 บทที่ {activeIndex + 1}/{chapters.length}
               </span>
             </div>
 
+            {/* One scroll region below the header: TrackPanel can be taller than the card, so the chapter list must not be the only scroller */}
+            <div data-sidebar-scroll className="flex-1 min-h-0 overflow-y-auto pr-1 space-y-3.5 scrollbar-thin">
             <TrackPanel chapters={chapters} trackKey={trackKey} readChapters={readChapters} activeChapterId={activeChapterId} onSelectChapter={handleSelectChapter} onStartQuiz={onStartQuiz} />
 
-            <h3 data-all-chapters-heading className="text-xs font-bold text-neutral-500 dark:text-[#8e8e8e]">ทุกบท ({chapters.length})</h3>
+            <h3 data-all-chapters-heading className="text-xs font-bold text-base-content-muted">ทุกบท ({chapters.length})</h3>
 
+            {/* Search + role filter stay pinned while the chapter list scrolls beneath them */}
+            <div data-sidebar-controls className="sticky top-0 z-10 bg-base-100 pb-2 space-y-3.5">
             {/* Quick Search in Index */}
             <div className="relative">
-              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-[#737373]" />
+              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-base-content-muted" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="ค้นหาบท หรือ คำศัพท์..."
-                className="w-full pl-8 pr-3 py-1.5 bg-neutral-50 dark:bg-[#1a1a1a] border border-neutral-200 dark:border-[#262626] rounded-xl text-xs text-neutral-900 dark:text-[#fafafa] placeholder-neutral-400 dark:placeholder-[#555555] focus:outline-none focus:ring-1 focus:ring-neutral-400 dark:focus:ring-neutral-600"
+                className="w-full pl-8 pr-3 py-1.5 bg-base-300 border border-base-border rounded-xl text-xs text-base-content placeholder-base-content-subtle focus:outline-none focus:ring-1 focus:ring-base-border-strong"
               />
             </div>
 
             {/* Role Filter Chips */}
-            <div className="flex items-center gap-1 shrink-0 overflow-x-auto pb-1 scrollbar-none text-[11px]">
-              {[
-                { id: 'all', label: 'ทั้งหมด' },
-                { id: 'pm', label: 'PM' },
-                { id: 'ux', label: 'UX' },
-                { id: 'ba', label: 'BA' },
-                { id: 'sa', label: 'SA' },
-                { id: 'eng', label: 'Dev' },
-                { id: 'qa', label: 'QA' },
-                { id: 'friction', label: 'ขัดแย้ง' },
-                { id: 'biz', label: 'ธุรกิจ' },
-              ].map((tag) => (
-                <button
-                  key={tag.id}
-                  onClick={() => setSelectedRole(tag.id)}
-                  className={`${TAP} px-2.5 py-1 rounded-lg font-medium whitespace-nowrap transition-all cursor-pointer ${
-                    selectedRole === tag.id
-                      ? 'bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] font-bold shadow-xs'
-                      : 'bg-neutral-100 dark:bg-[#1f1f1f] text-neutral-600 dark:text-[#a3a3a3] hover:bg-neutral-200 dark:hover:bg-[#262626]'
-                  }`}
-                >
-                  {tag.label}
-                </button>
-              ))}
+            <Tabs<string>
+              variant="pills"
+              size="xs"
+              scroll
+              aria-label="กรองตามสายงาน"
+              items={ROLE_FILTERS}
+              value={selectedRole}
+              onChange={setSelectedRole}
+              className="shrink-0"
+            />
             </div>
 
             {/* Chapter List Scrollable */}
-            <div className="space-y-1.5 overflow-y-auto pr-1 flex-1 scrollbar-thin">
+            <div className="space-y-1.5">
               {indexEmpty}
               {filteredChapters.map((chapter) => {
                 const isActive = chapter.id === activeChapterId;
@@ -479,41 +494,41 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                     onClick={() => handleSelectChapter(chapter.id)}
                     className={`${TAP} w-full text-left p-2.5 rounded-xl border transition-all cursor-pointer flex items-start gap-2.5 ${
                       isActive
-                        ? 'bg-neutral-100 dark:bg-[#1f1f1f] border-neutral-300 dark:border-[#3a3a3a] shadow-xs'
-                        : 'bg-neutral-50/50 dark:bg-[#141414]/60 border-neutral-200/60 dark:border-[#262626] hover:border-neutral-300 dark:hover:border-[#333333] hover:bg-neutral-100/70 dark:hover:bg-[#1a1a1a]'
+                        ? 'bg-base-300 border-base-border-strong shadow-xs'
+                        : 'bg-base-100 border-base-border hover:border-base-border-strong hover:bg-base-300'
                     }`}
                   >
-                    <div className={`w-6 h-6 rounded-lg text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 ${
-                      isActive
-                        ? 'bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] shadow-xs'
-                        : isRead
-                        ? 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 font-semibold border border-emerald-300/60 dark:border-emerald-800/60'
-                        : 'bg-neutral-200 dark:bg-[#262626] text-neutral-700 dark:text-[#a3a3a3] border border-neutral-300/60 dark:border-[#333333]'
-                    }`}>
+                    <IconBadge
+                      size="sm"
+                      variant={isActive ? 'outline' : 'soft'}
+                      color={isRead && !isActive ? 'success' : 'neutral'}
+                      label={`บทที่ ${chapter.num}`}
+                      className="mt-0.5"
+                    >
                       {isRead && !isActive ? <Check className="w-3.5 h-3.5" /> : chapter.num}
-                    </div>
+                    </IconBadge>
 
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-1">
                         <span className={`text-xs truncate ${
                           isActive 
-                            ? 'text-neutral-900 dark:text-white font-bold' 
-                            : 'text-neutral-800 dark:text-[#c4c4c4] font-medium'
+                            ? 'text-base-content font-bold' 
+                            : 'text-base-content-body font-medium'
                         }`}>
                           {chapter.title}
                         </span>
                         {isBookmarked && (
-                          <BookmarkCheck className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                          <BookmarkCheck className="w-3.5 h-3.5 text-warning shrink-0" />
                         )}
                       </div>
-                      <div className="flex items-center gap-1.5 mt-0.5 text-[10px] text-neutral-500 dark:text-[#737373]">
+                      <div className="flex items-center gap-1.5 mt-0.5 text-[10px] text-base-content-muted">
                         <span className="uppercase font-semibold">{chapter.roleTag}</span>
                         <span>•</span>
                         <span>{chapter.readTime}</span>
                         {isRead && (
                           <>
                             <span>•</span>
-                            <span className="text-emerald-600 dark:text-emerald-400 font-semibold">อ่านแล้ว</span>
+                            <span className="text-success font-semibold">อ่านแล้ว</span>
                           </>
                         )}
                       </div>
@@ -522,15 +537,16 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                 );
               })}
             </div>
+            </div>
           </div>
         </div>
 
         {/* Right Column: Active Chapter Reader Card ("บทละหน้า") */}
-        <div className="lg:col-span-8 space-y-4 sm:space-y-6">
+        <div className="lg:col-span-8 space-y-section">
           {/* Chapter Top Navigation Bar */}
-          <div className="bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-2xs">
+          <div className="bg-base-100 border border-base-border rounded-box p-box shadow-2xs">
             {showResumedLine && (
-              <p data-resumed className="mb-2 text-xs text-neutral-500 dark:text-[#8e8e8e] truncate">
+              <p data-resumed className="mb-2 text-xs text-base-content-muted truncate">
                 อ่านต่อจากครั้งก่อน · บทที่ {activeChapter.num}
               </p>
             )}
@@ -542,8 +558,8 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                   onClick={() => prevChapter && handleSelectChapter(prevChapter.id)}
                   className={`${TAP} p-2 rounded-xl border flex items-center gap-1 text-xs font-semibold transition-all ${
                     prevChapter
-                      ? 'border-neutral-200 dark:border-[#262626] hover:bg-neutral-100 dark:hover:bg-[#1f1f1f] text-neutral-700 dark:text-[#d4d4d4] cursor-pointer'
-                      : 'border-neutral-100 dark:border-[#1c1c1c] text-neutral-300 dark:text-[#444444] cursor-not-allowed'
+                      ? 'border-base-border hover:bg-base-300 text-base-content-body cursor-pointer'
+                      : 'border-base-border text-base-content-subtle cursor-not-allowed'
                   }`}
                   title={prevChapter ? `บทก่อนหน้า: ${prevChapter.title}` : 'นี่คือบทแรก'}
                 >
@@ -554,7 +570,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                 {/* Mobile Table of Contents Toggle */}
                 <button
                   onClick={openIndex}
-                  className={`${TAP} lg:hidden px-3 py-2 rounded-xl bg-neutral-100 dark:bg-[#1f1f1f] hover:bg-neutral-200 text-neutral-700 dark:text-[#d4d4d4] text-xs font-semibold flex items-center gap-1.5 cursor-pointer`}
+                  className={`${TAP} lg:hidden px-3 py-2 rounded-xl bg-base-300 hover:bg-base-border text-base-content-body text-xs font-semibold flex items-center gap-1.5 cursor-pointer`}
                 >
                   <List className="w-3.5 h-3.5" />
                   <span>สารบัญ ({activeChapter.num}/{chapters.length})</span>
@@ -562,10 +578,10 @@ export const GuideTab: React.FC<GuideTabProps> = ({
 
                 {/* Current Chapter Indicator on Desktop */}
                 <div className="hidden lg:flex items-center gap-2 pl-2">
-                  <span className="px-2.5 py-1 rounded-lg bg-neutral-100 dark:bg-[#1f1f1f] text-neutral-800 dark:text-[#d4d4d4] text-xs font-bold border border-neutral-200 dark:border-[#333333]">
+                  <span className="px-2.5 py-1 rounded-lg bg-base-300 text-base-content-body text-xs font-bold border border-base-border">
                     บทที่ {activeChapter.num} จาก {chapters.length}
                   </span>
-                  <span className="text-xs text-neutral-600 dark:text-[#8e8e8e] font-medium truncate max-w-[200px]">
+                  <span className="text-xs text-base-content-secondary font-medium truncate max-w-[200px]">
                     {activeChapter.title}
                   </span>
                 </div>
@@ -579,12 +595,12 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                     onClick={() => onToggleReadChapter(activeChapter.id)}
                     className={`${TAP} px-3 py-2 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
                       isCurrentRead
-                        ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300'
-                        : 'bg-neutral-50 dark:bg-[#1a1a1a] border-neutral-200 dark:border-[#262626] text-neutral-700 dark:text-[#d4d4d4] hover:bg-neutral-100 dark:hover:bg-[#222222]'
+                        ? 'bg-success/10 border-success/25 text-success'
+                        : 'bg-base-300 border-base-border text-base-content-body hover:bg-base-border'
                     }`}
                     title="ทำเครื่องหมายว่าอ่านและเข้าใจบทนี้แล้ว (+30 XP)"
                   >
-                    <CheckCircle2 className={`w-3.5 h-3.5 ${isCurrentRead ? 'text-emerald-600 dark:text-emerald-400' : 'text-neutral-400'}`} />
+                    <CheckCircle2 className={`w-3.5 h-3.5 ${isCurrentRead ? 'text-success' : 'text-base-content-muted'}`} />
                     <span className="hidden md:inline">{isCurrentRead ? 'อ่านแล้ว' : 'ทำเครื่องหมายว่าอ่านแล้ว'}</span>
                   </button>
                 )}
@@ -594,8 +610,8 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                   onClick={() => onToggleBookmark(activeChapter.id)}
                   className={`${TAP} p-2 rounded-xl border transition-all cursor-pointer ${
                     isCurrentBookmarked
-                      ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-300 dark:border-amber-700 text-amber-600 dark:text-amber-400'
-                      : 'bg-neutral-50 dark:bg-[#1a1a1a] border-neutral-200 dark:border-[#262626] text-neutral-500 hover:text-neutral-800 dark:hover:text-[#fafafa]'
+                      ? 'bg-warning/10 border-warning/25 text-warning'
+                      : 'bg-base-300 border-base-border text-base-content-muted hover:text-base-content'
                   }`}
                   title={isCurrentBookmarked ? 'ลบบุ๊กมาร์ก' : 'บันทึกบทนี้ (+15 XP)'}
                 >
@@ -603,25 +619,22 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                 </button>
 
                 {/* Next Chapter Button */}
-                <button
+                <Button
+                  {...nextChapterButtonStyle(trackNext.kind)}
+                  size="sm"
                   disabled={!nextChapter}
                   onClick={() => nextChapter && handleSelectChapter(nextChapter.id)}
-                  className={`${TAP} p-2 rounded-xl border flex items-center gap-1 text-xs font-semibold transition-all ${
-                    nextChapter
-                      ? 'border-neutral-200 dark:border-[#262626] bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] hover:opacity-90 cursor-pointer shadow-xs'
-                      : 'border-neutral-100 dark:border-[#1c1c1c] text-neutral-300 dark:text-[#444444] cursor-not-allowed'
-                  }`}
                   title={nextChapter ? `บทถัดไป: ${nextChapter.title}` : 'นี่คือบทสุดท้าย'}
                 >
                   <span className="hidden sm:inline">บทถัดไป</span>
                   <ChevronRight className="w-4 h-4" />
-                </button>
+                </Button>
               </div>
             </div>
           </div>
 
           {/* Chapter Main Content Reader Card */}
-          <div id={CHAPTER_START_ID} className="bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-7 shadow-2xs space-y-5 sm:space-y-6">
+          <div id={CHAPTER_START_ID} className="bg-base-100 border border-base-border rounded-box p-box-spacious shadow-2xs space-y-section">
             
             <ChapterHero
               chapter={activeChapter}
@@ -635,47 +648,36 @@ export const GuideTab: React.FC<GuideTabProps> = ({
             />
 
             {/* ADAPTIVE LENS CONTROLLER BANNER */}
-            <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-2 sm:space-y-2.5">
+            <div className="p-box-dense rounded-box bg-base-300 border border-base-border space-y-2 sm:space-y-2.5">
               {role === null ? (
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="text-xs font-bold text-neutral-800 dark:text-[#e5e5e5] flex items-center gap-1.5">
-                      <SlidersHorizontal className="w-3.5 h-3.5 text-neutral-600 dark:text-[#a3a3a3]" />
+                    <span className="text-xs font-bold text-base-content flex items-center gap-1.5">
+                      <SlidersHorizontal className="w-3.5 h-3.5 text-base-content-secondary" />
                       <span>Active Mode:</span>
                     </span>
-                    <span className="text-[11px] sm:text-xs font-semibold px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300">
+                    <span className="text-[11px] sm:text-xs font-semibold px-2 py-0.5 rounded-md bg-success/10 text-success">
                       {chapterLevel === 'beginner' ? '🌱 Beginner' : '⚡ Experienced'}
                     </span>
                   </div>
 
                   {/* Quick Switch Buttons */}
-                  <div className="flex items-center gap-1.5 self-start sm:self-auto">
-                    <button
-                      onClick={() => onExperienceLevelChange && onExperienceLevelChange('beginner')}
-                      className={`${TAP} px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer transition-all ${
-                        chapterLevel === 'beginner'
-                          ? 'bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] shadow-xs font-bold'
-                          : 'bg-white dark:bg-[#1f1f1f] text-neutral-600 dark:text-[#a3a3a3] border border-neutral-200 dark:border-[#333333] hover:bg-neutral-100 dark:hover:bg-[#262626]'
-                      }`}
-                    >
-                      🌱 ใหม่กับเรื่องนี้
-                    </button>
-                    <button
-                      onClick={() => onExperienceLevelChange && onExperienceLevelChange('experienced')}
-                      className={`${TAP} px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer transition-all ${
-                        chapterLevel === 'experienced'
-                          ? 'bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] shadow-xs font-bold'
-                          : 'bg-white dark:bg-[#1f1f1f] text-neutral-600 dark:text-[#a3a3a3] border border-neutral-200 dark:border-[#333333] hover:bg-neutral-100 dark:hover:bg-[#262626]'
-                      }`}
-                    >
-                      ⚡ ทำงานข้ามทีมมาแล้ว
-                    </button>
-                  </div>
+                  <Tabs<ExperienceLevel>
+                    variant="segmented"
+                    aria-label="สลับเลนส์เนื้อหา"
+                    className="self-start sm:self-auto"
+                    items={[
+                      { value: 'beginner', label: '🌱 ใหม่กับเรื่องนี้' },
+                      { value: 'experienced', label: '⚡ ทำงานข้ามทีมมาแล้ว' },
+                    ]}
+                    value={chapterLevel}
+                    onChange={lvl => onExperienceLevelChange?.(lvl)}
+                  />
                 </div>
               ) : (
                 <div data-role-lens={role} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <p className="text-xs font-bold text-neutral-800 dark:text-[#e5e5e5] flex items-start gap-1.5" data-role-lens-status>
-                    <SlidersHorizontal className="w-3.5 h-3.5 mt-0.5 shrink-0 text-neutral-600 dark:text-[#a3a3a3]" />
+                  <p className="text-xs font-bold text-base-content flex items-start gap-1.5" data-role-lens-status>
+                    <SlidersHorizontal className="w-3.5 h-3.5 mt-0.5 shrink-0 text-base-content-secondary" />
                     <span>
                       {activeChapter.home === 'shared'
                         ? 'บทนี้เป็นงานที่สองฝั่งทำร่วมกัน'
@@ -688,33 +690,27 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                   </p>
 
                   {/* Per-chapter level switch (this chapter only) */}
-                  <div className="flex flex-wrap items-center gap-1.5 self-start sm:self-auto" role="group" aria-label="ระดับของบทนี้">
-                    {([['beginner', '🌱 มือใหม่'], ['experienced', '⚡ คุ้นงานแล้ว']] as const).map(([lvl, label]) => (
-                      <button
-                        key={lvl}
-                        type="button"
-                        data-chapter-level={lvl}
-                        aria-pressed={chapterLevel === lvl}
-                        onClick={() => handleChapterLevelPick(lvl)}
-                        className={`${TAP} px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer transition-all ${
-                          chapterLevel === lvl
-                            ? 'bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] shadow-xs font-bold'
-                            : 'bg-white dark:bg-[#1f1f1f] text-neutral-600 dark:text-[#a3a3a3] border border-neutral-200 dark:border-[#333333] hover:bg-neutral-100 dark:hover:bg-[#262626]'
-                        }`}
-                      >
-                        {label}
-                      </button>
-                    ))}
+                  <div className="flex flex-wrap items-center gap-1.5 self-start sm:self-auto">
+                    <Tabs<ExperienceLevel>
+                      variant="segmented"
+                      aria-label="ระดับของบทนี้"
+                      items={[
+                        { value: 'beginner', label: '🌱 มือใหม่' },
+                        { value: 'experienced', label: '⚡ คุ้นงานแล้ว' },
+                      ]}
+                      value={chapterLevel}
+                      onChange={handleChapterLevelPick}
+                    />
                     {levelSource === 'chapter' && (
                       <>
-                        <span data-chapter-level-scope className="text-xs text-neutral-500 dark:text-[#8e8e8e]">
+                        <span data-chapter-level-scope className="text-xs text-base-content-muted">
                           {chapterLevelScopeLabel(role)}
                         </span>
                         <button
                           type="button"
                           data-chapter-level-reset
                           onClick={() => onChapterLevelChange?.(activeChapter.id, null)}
-                          className={`${TAP} text-xs font-semibold text-neutral-500 dark:text-[#8e8e8e] hover:underline cursor-pointer`}
+                          className={`${TAP} text-xs font-semibold text-base-content-muted hover:underline cursor-pointer`}
                         >
                           {chapterLevelResetLabel(levelMode)}
                         </button>
@@ -724,7 +720,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                 </div>
               )}
 
-              <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-[#8e8e8e] leading-relaxed">
+              <p className="text-[11px] sm:text-xs text-base-content-muted leading-relaxed">
                 {chapterLevel === 'beginner'
                   ? `💡 โหมดมือใหม่: เปิด ${coreHint} ไว้ก่อน ส่วนอื่นพับไว้ในชั้น "นำไปใช้" และ "เจาะลึก"`
                   : `⚡ โหมดทำงานข้ามทีม: เปิด ${coreHint} ไว้ก่อน วิธีรับมือ Friction อยู่ในชั้น "นำไปใช้"`}
@@ -771,24 +767,26 @@ export const GuideTab: React.FC<GuideTabProps> = ({
             ))}
 
             {/* Chapter Footer Actions */}
-            <div className="pt-5 border-t border-neutral-100 dark:border-[#262626] space-y-3.5">
+            <div className="pt-5 border-t border-base-border space-y-3.5">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <button
                   onClick={() => onAskAIWithPrompt(`ช่วยอธิบายบทที่ ${activeChapter.num} "${activeChapter.title}" ให้ฟังอย่างละเอียด พร้อมยกตัวอย่างเคสจริงในบริษัทเทคให้เห็นภาพ`)}
-                  className={`${TAP} inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-neutral-100 dark:bg-[#1f1f1f] text-neutral-900 dark:text-[#fafafa] hover:bg-neutral-200 dark:hover:bg-[#262626] text-xs sm:text-sm font-semibold border border-neutral-200 dark:border-[#333333] transition-colors cursor-pointer`}
+                  className={`${TAP} inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-base-300 text-base-content hover:bg-base-border text-xs sm:text-sm font-semibold border border-base-border transition-colors cursor-pointer`}
                 >
-                  <Bot className="w-4 h-4 text-neutral-700 dark:text-[#a3a3a3]" />
+                  <Bot className="w-4 h-4 text-base-content-secondary" />
                   <span>ถาม AI เพิ่มเรื่องบทนี้</span>
                 </button>
 
                 {onToggleReadChapter && !isCurrentRead && (
-                  <button
+                  <Button
+                    color="success"
+                    variant="soft"
+                    size="md"
                     onClick={() => {
                       onToggleReadChapter(activeChapter.id);
                       if (trackNext.kind === 'next') handleSelectChapter(trackNext.chapterId);
                       else if (trackNext.kind === 'not-in-track' && nextChapter) handleSelectChapter(nextChapter.id);
                     }}
-                    className={`${TAP} inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer`}
                   >
                     <CheckCircle2 className="w-4 h-4" />
                     <span>
@@ -798,7 +796,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                         ? 'อ่านจบแล้ว! (+30 XP)'
                         : 'อ่านจบแล้ว! ไปบทถัดไป (+30 XP)'}
                     </span>
-                  </button>
+                  </Button>
                 )}
               </div>
 
@@ -807,13 +805,13 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                 {prevChapter ? (
                   <button
                     onClick={() => handleSelectChapter(prevChapter.id)}
-                    className={`${TAP} p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-neutral-200 dark:border-[#262626] hover:border-neutral-400 dark:hover:border-[#404040] text-left transition-all cursor-pointer bg-neutral-50/70 dark:bg-[#181818] group`}
+                    className={`${TAP} p-box-dense rounded-box border border-base-border hover:border-base-border-strong text-left transition-all cursor-pointer bg-base-300 group`}
                   >
-                    <div className="flex items-center gap-1 text-[11px] text-neutral-500 dark:text-[#737373] group-hover:text-neutral-900 dark:group-hover:text-white transition-colors">
+                    <div className="flex items-center gap-1 text-[11px] text-base-content-muted group-hover:text-base-content transition-colors">
                       <ArrowLeft className="w-3.5 h-3.5" />
                       <span>บทก่อนหน้า</span>
                     </div>
-                    <div className="font-bold text-xs sm:text-sm text-neutral-900 dark:text-[#fafafa] mt-1 truncate">
+                    <div className="font-bold text-xs sm:text-sm text-base-content mt-1 truncate">
                       บทที่ {prevChapter.num}: {prevChapter.title}
                     </div>
                   </button>
@@ -827,13 +825,13 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                   nextChapter && (
                     <button
                       onClick={() => handleSelectChapter(nextChapter.id)}
-                      className={`${TAP} p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-neutral-200 dark:border-[#262626] hover:border-neutral-400 dark:hover:border-[#404040] text-right transition-all cursor-pointer bg-neutral-50/70 dark:bg-[#181818] group`}
+                      className={`${TAP} p-box-dense rounded-box border border-base-border hover:border-base-border-strong text-right transition-all cursor-pointer bg-base-300 group`}
                     >
-                      <div className="flex items-center justify-end gap-1 text-[11px] text-neutral-900 dark:text-white font-semibold">
+                      <div className="flex items-center justify-end gap-1 text-[11px] text-base-content font-semibold">
                         <span>บทถัดไป</span>
                         <ArrowRight className="w-3.5 h-3.5" />
                       </div>
-                      <div className="font-bold text-xs sm:text-sm text-neutral-900 dark:text-[#fafafa] mt-1 truncate">
+                      <div className="font-bold text-xs sm:text-sm text-base-content mt-1 truncate">
                         บทที่ {nextChapter.num}: {nextChapter.title}
                       </div>
                     </button>
@@ -848,74 +846,60 @@ export const GuideTab: React.FC<GuideTabProps> = ({
 
       {/* Slide-over Drawer / Modal for Table of Contents (Index) on all screens */}
       {isIndexOpen && (
-        <div className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-xs transition-opacity animate-fadeIn">
-          <div className="w-full max-w-md bg-white dark:bg-[#141414] h-full shadow-2xl flex flex-col overflow-hidden border-l border-neutral-200 dark:border-[#262626] animate-slideLeft">
+        <div className="fixed inset-0 z-50 flex justify-end bg-neutral/60 backdrop-blur-xs transition-opacity animate-fadeIn">
+          <div className="w-full max-w-md bg-base-100 h-full shadow-2xl flex flex-col overflow-hidden border-l border-base-border animate-slideLeft">
             
             {/* Drawer Header */}
-            <div className="p-4 sm:p-5 border-b border-neutral-200 dark:border-[#262626] flex items-center justify-between">
+            <div className="p-box border-b border-base-border flex items-center justify-between">
               <div>
-                <h3 className="font-bold text-base text-neutral-900 dark:text-[#fafafa] flex items-center gap-2">
-                  <List className="w-4 h-4 text-neutral-600 dark:text-[#a3a3a3]" />
+                <h3 className="font-bold text-base text-base-content flex items-center gap-2">
+                  <List className="w-4 h-4 text-base-content-secondary" />
                   <span>สารบัญทั้ง {chapters.length} บท</span>
                 </h3>
-                <p className="text-xs text-neutral-500 dark:text-[#8e8e8e] mt-0.5">
+                <p className="text-xs text-base-content-muted mt-0.5">
                   อ่านแล้ว {readChapters.length}/{chapters.length} บท • เลือกเพื่อกระโดดข้ามทันที
                 </p>
               </div>
               <button
                 onClick={closeIndex}
-                className={`${TAP} p-2 rounded-xl text-neutral-400 hover:text-neutral-700 dark:hover:text-[#fafafa] hover:bg-neutral-100 dark:hover:bg-[#1f1f1f] cursor-pointer`}
+                className={`${TAP} p-2 rounded-xl text-base-content-muted hover:text-base-content-body hover:bg-base-300 cursor-pointer`}
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Drawer Search & Filter */}
-            <div className="p-4 border-b border-neutral-100 dark:border-[#262626] space-y-3 bg-neutral-50 dark:bg-[#181818]">
+            <div className="p-4 border-b border-base-border space-y-3 bg-base-300">
               <TrackPanel chapters={chapters} trackKey={trackKey} readChapters={readChapters} activeChapterId={activeChapterId} onSelectChapter={handleSelectChapter} onStartQuiz={onStartQuiz} />
 
-              <h3 data-all-chapters-heading className="text-xs font-bold text-neutral-500 dark:text-[#8e8e8e]">ทุกบท ({chapters.length})</h3>
+              <h3 data-all-chapters-heading className="text-xs font-bold text-base-content-muted">ทุกบท ({chapters.length})</h3>
 
               <div className="relative">
-                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-[#737373]" />
+                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-base-content-muted" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="ค้นหาชื่อบท, คำศัพท์ เช่น C4, DoR, API..."
-                  className="w-full pl-9 pr-3 py-2 bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#333333] rounded-xl text-xs text-neutral-900 dark:text-[#fafafa] placeholder-neutral-400 dark:placeholder-[#666666] focus:outline-none focus:ring-1 focus:ring-neutral-400 dark:focus:ring-[#666666]"
+                  className="w-full pl-9 pr-3 py-2 bg-base-100 border border-base-border rounded-xl text-xs text-base-content placeholder-base-content-subtle focus:outline-none focus:ring-1 focus:ring-base-border-strong"
                 />
               </div>
 
-              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 max-sm:-mt-2.5 max-sm:pt-2.5 max-sm:-mb-2.5 max-sm:pb-3.5 scrollbar-none text-xs">
-                {[
-                  { id: 'all', label: 'ทั้งหมด' },
-                  { id: 'pm', label: 'PM' },
-                  { id: 'ux', label: 'UX' },
-                  { id: 'ba', label: 'BA' },
-                  { id: 'sa', label: 'SA' },
-                  { id: 'eng', label: 'Dev' },
-                  { id: 'qa', label: 'QA' },
-                  { id: 'friction', label: 'ขัดแย้ง' },
-                  { id: 'biz', label: 'ธุรกิจ' },
-                ].map((tag) => (
-                  <button
-                    key={tag.id}
-                    onClick={() => setSelectedRole(tag.id)}
-                    className={`${TAP} px-3 py-1 rounded-lg font-medium whitespace-nowrap transition-all cursor-pointer text-[11px] ${
-                      selectedRole === tag.id
-                        ? 'bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] font-bold'
-                        : 'bg-neutral-200/80 dark:bg-[#262626] text-neutral-700 dark:text-[#a3a3a3] hover:bg-neutral-300 dark:hover:bg-[#333333]'
-                    }`}
-                  >
-                    {tag.label}
-                  </button>
-                ))}
+              <div className="pb-1 max-sm:-mt-2.5 max-sm:pt-2.5 max-sm:-mb-2.5 max-sm:pb-3.5">
+                <Tabs<string>
+                  variant="pills"
+                  size="xs"
+                  scroll
+                  aria-label="กรองตามสายงาน"
+                  items={ROLE_FILTERS}
+                  value={selectedRole}
+                  onChange={setSelectedRole}
+                />
               </div>
             </div>
 
             {/* Chapter Items List */}
-            <div className="p-3.5 overflow-y-auto flex-1 space-y-1.5 divide-y divide-neutral-100 dark:divide-[#262626]">
+            <div className="p-3.5 overflow-y-auto flex-1 space-y-1.5 divide-y divide-base-border">
               {indexEmpty}
               {filteredChapters.map((chapter) => {
                 const isActive = chapter.id === activeChapterId;
@@ -928,41 +912,41 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                     onClick={() => handleSelectChapter(chapter.id)}
                     className={`pt-2 first:pt-0 p-3 rounded-xl transition-all cursor-pointer flex items-start gap-3 ${
                       isActive
-                        ? 'bg-neutral-100 dark:bg-[#1f1f1f] border border-neutral-300 dark:border-[#404040]'
-                        : 'hover:bg-neutral-50 dark:hover:bg-[#181818]'
+                        ? 'bg-base-300 border border-base-border-strong'
+                        : 'hover:bg-base-300'
                     }`}
                   >
-                    <div className={`w-7 h-7 rounded-lg text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 ${
-                      isActive
-                        ? 'bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a]'
-                        : isRead
-                        ? 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300'
-                        : 'bg-neutral-100 dark:bg-[#262626] text-neutral-700 dark:text-[#a3a3a3]'
-                    }`}>
+                    <IconBadge
+                      size="md"
+                      variant={isActive ? 'outline' : 'soft'}
+                      color={isRead && !isActive ? 'success' : 'neutral'}
+                      label={`บทที่ ${chapter.num}`}
+                      className="mt-0.5"
+                    >
                       {isRead && !isActive ? <Check className="w-3.5 h-3.5" /> : chapter.num}
-                    </div>
+                    </IconBadge>
 
                     <div className="min-w-0 flex-1 space-y-0.5">
                       <div className="flex items-center justify-between gap-1">
                         <span className={`text-xs sm:text-sm font-bold truncate ${
-                          isActive ? 'text-neutral-900 dark:text-white' : 'text-neutral-800 dark:text-[#d4d4d4]'
+                          isActive ? 'text-base-content' : 'text-base-content-body'
                         }`}>
                           {chapter.title}
                         </span>
                         {isBookmarked && (
-                          <BookmarkCheck className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                          <BookmarkCheck className="w-3.5 h-3.5 text-warning shrink-0" />
                         )}
                       </div>
-                      <p className="text-[11px] text-neutral-500 dark:text-[#8e8e8e] line-clamp-1 font-normal">
+                      <p className="text-[11px] text-base-content-muted line-clamp-1 font-normal">
                         {chapter.subtitle}
                       </p>
-                      <div className="flex items-center gap-2 pt-1 text-[10px] text-neutral-500 dark:text-[#737373] font-normal">
-                        <span className="px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-[#262626] uppercase text-neutral-700 dark:text-[#a3a3a3]">
+                      <div className="flex items-center gap-2 pt-1 text-[10px] text-base-content-muted font-normal">
+                        <span className="px-1.5 py-0.5 rounded bg-base-300 uppercase text-base-content-secondary">
                           {chapter.roleTag}
                         </span>
                         <span>{chapter.readTime}</span>
                         {isRead && (
-                          <span className="text-emerald-700 dark:text-emerald-400 font-semibold">• อ่านแล้ว</span>
+                          <span className="text-success font-semibold">• อ่านแล้ว</span>
                         )}
                       </div>
                     </div>
@@ -972,14 +956,9 @@ export const GuideTab: React.FC<GuideTabProps> = ({
             </div>
 
             {/* Drawer Footer */}
-            <div className="p-4 border-t border-neutral-200 dark:border-[#262626] bg-neutral-50 dark:bg-[#181818] flex items-center justify-between text-xs">
-              <span className="text-neutral-500 dark:text-[#8e8e8e] text-[11px]">สะสม XP จากการอ่านและการทำควิซ</span>
-              <button
-                onClick={closeIndex}
-                className={`${TAP} px-4 py-2 bg-neutral-900 dark:bg-white text-white dark:text-[#0a0a0a] font-semibold rounded-xl cursor-pointer`}
-              >
-                ปิดสารบัญ
-              </button>
+            <div className="p-4 border-t border-base-border bg-base-300 flex items-center justify-between text-xs">
+              <span className="text-base-content-muted text-[11px]">สะสม XP จากการอ่านและการทำควิซ</span>
+              <Button color="neutral" variant="ghost" size="md" onClick={closeIndex}>ปิดสารบัญ</Button>
             </div>
 
           </div>
