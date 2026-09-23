@@ -304,7 +304,7 @@ export const chapters16_19: Chapter[] = [
     title: 'OKR, KPI และค่าเสียโอกาส',
     enTerm: 'Opportunity Cost',
     subtitle: 'ฟีเจอร์เล็กๆ ไม่เคยฟรี เพราะทุกงานที่รับเพิ่ม คืองานอื่นที่ไม่ได้ทำ',
-    chapterOpening: 'OKR (Objectives and Key Results) คือเป้าของทีม วัดด้วย KR (Key Results) ส่วน KPI (Key Performance Indicator) คือตัวเลขที่ฝั่ง Business เฝ้าดูว่าธุรกิจยังปกติไหม',
+    chapterOpening: 'สองโลกต้องตกลงเป้าร่วมกัน OKR (Objectives and Key Results) คือเป้าของทีม วัดด้วย KR (Key Results) ส่วน KPI (Key Performance Indicator) คือตัวเลขสุขภาพธุรกิจ',
     roleTag: 'biz',
     home: 'biz',
     businessNote: 'บอกทีมว่างานใหม่ต้องแลกกับเป้าข้อไหน ก่อนขอให้ "แทรกงานเล็กๆ"',
