@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { TAP, TAP_GAP, TAP_POSITIONED, TAP_Y } from './tapTarget';
+import { DISCLOSURE_SUMMARY } from './Disclosure';
 
 /**
  * Guard: every `<button>`, `<a>`, `<summary>` and `role="button"` element under src/components
@@ -67,6 +68,8 @@ const TAP_REF = /\$\{(TAP|TAP_Y|TAP_POSITIONED|TAP_GAP\[\d+\])\}/;
 const LITERAL_OK = /-my-3\.5 py-3\.5 sm:my-0 sm:py-0|min-h-\[44px\]/;
 // The ui/ class builders: each always includes a ring (ui/*.test.tsx prove it for every combination).
 const UI_BUILDER = /\b(?:buttonClass|chipClass|tapClass)\(/;
+// The ui/ class constants that embed a ring (asserted below).
+const UI_CLASS = /\bDISCLOSURE_SUMMARY\b/;
 
 /** The class helpers (`segmentClass(…)`) a tag uses, as the source right after their definition. */
 function helperBodies(tag: string, src: string): string[] {
@@ -79,7 +82,7 @@ function helperBodies(tag: string, src: string): string[] {
 
 /** A tag is covered directly, or through a class helper defined in the file with a ring. */
 function covered(tag: string, src: string): boolean {
-  if (TAP_REF.test(tag) || LITERAL_OK.test(tag) || UI_BUILDER.test(tag)) return true;
+  if (TAP_REF.test(tag) || LITERAL_OK.test(tag) || UI_BUILDER.test(tag) || UI_CLASS.test(tag)) return true;
   return helperBodies(tag, src).some(body => TAP_REF.test(body));
 }
 
@@ -181,5 +184,9 @@ describe('mobile tap targets', () => {
     for (const cls of [TAP, TAP_Y, TAP_POSITIONED]) expect(cls).toContain('max-sm:before:min-h-11');
     expect(TAP).toContain('max-sm:before:min-w-11');
     expect(TAP_POSITIONED).not.toContain('relative');
+  });
+
+  it('the shared disclosure summary carries the TAP_Y ring', () => {
+    expect(DISCLOSURE_SUMMARY).toContain(TAP_Y);
   });
 });

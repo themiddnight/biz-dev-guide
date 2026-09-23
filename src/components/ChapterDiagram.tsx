@@ -28,10 +28,10 @@ import {
   Compass,
   FileCode2,
   Users,
-  AlertCircle,
-  ChevronDown
+  AlertCircle
 } from 'lucide-react';
 import { TAP, TAP_Y } from './ui/tapTarget';
+import { DISCLOSURE_SUMMARY, DisclosureChevron } from './ui/Disclosure';
 
 interface ChapterDiagramProps {
   chapterId: string;
@@ -559,11 +559,11 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
         </div>
         {/* Sync vs Async simulator (moved from former chapter 15 diagram), closed by default */}
         <details className="group rounded-box bg-base-100 border border-base-border overflow-hidden">
-          <summary className={`${TAP_Y} flex items-center justify-between gap-2 p-box-dense cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden bg-base-300 hover:bg-base-border transition-colors`}>
+          <summary className={DISCLOSURE_SUMMARY}>
             <span className="text-xs sm:text-sm font-bold text-base-content">
               Sync vs Async: Polling / Webhook / WebSocket
             </span>
-            <ChevronDown className="w-4 h-4 shrink-0 text-base-content-muted transition-transform group-open:rotate-180" />
+            <DisclosureChevron />
           </summary>
           <div className="p-box-dense border-t border-base-border">
             <ProtocolSimulator />

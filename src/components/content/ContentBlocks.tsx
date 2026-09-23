@@ -1,10 +1,11 @@
 import React from 'react';
-import { ChevronDown, ExternalLink } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 import { ChapterContentSection, ContentBlock, ContentPlacement, FigureKey } from '../../types';
 import { FIGURES, FigureProps } from '../figures';
 import { ContentTable } from './ContentTable';
 import { RichText } from './RichText';
-import { TAP, TAP_Y } from '../ui/tapTarget';
+import { TAP } from '../ui/tapTarget';
+import { DISCLOSURE_SUMMARY, DisclosureChevron } from '../ui/Disclosure';
 
 interface ContentBlocksProps {
   sections: ChapterContentSection[];
@@ -24,11 +25,6 @@ const blockTitleClass = 'text-xs sm:text-sm font-bold text-base-content';
 const introClass = 'text-xs sm:text-sm text-base-content-secondary leading-relaxed';
 const detailsClass =
   'group rounded-xl border border-base-border bg-base-100 overflow-hidden';
-const summaryClass = `${TAP_Y} flex items-center justify-between gap-2 p-box-dense cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden bg-base-300 hover:bg-base-border transition-colors`;
-
-const SummaryChevron = () => (
-  <ChevronDown className="w-4 h-4 shrink-0 text-base-content-muted transition-transform group-open:rotate-180" />
-);
 
 // Guards against keys missing at runtime (e.g. stale data) even though FIGURES is typed as complete.
 const getFigure = (key: FigureKey): React.FC<FigureProps> | undefined => FIGURES[key];
@@ -111,9 +107,9 @@ const Block: React.FC<BlockProps> = ({ block, onNavigateChapter }) => {
     case 'details':
       return (
         <details className={detailsClass}>
-          <summary className={summaryClass}>
+          <summary className={DISCLOSURE_SUMMARY}>
             <span className={blockTitleClass}>{block.summary}</span>
-            <SummaryChevron />
+            <DisclosureChevron />
           </summary>
           <div className="p-box-dense space-y-4 border-t border-base-border">
             {block.body.map(child => (
@@ -126,9 +122,9 @@ const Block: React.FC<BlockProps> = ({ block, onNavigateChapter }) => {
     case 'sources':
       return (
         <details className={detailsClass}>
-          <summary className={summaryClass}>
+          <summary className={DISCLOSURE_SUMMARY}>
             <span className={blockTitleClass}>{block.title ?? 'แหล่งอ้างอิง'}</span>
-            <SummaryChevron />
+            <DisclosureChevron />
           </summary>
           <div className="p-box-dense space-y-3 border-t border-base-border">
             <ul className="pl-5 space-y-1 list-disc text-xs sm:text-sm text-base-content-body">

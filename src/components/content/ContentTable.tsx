@@ -1,6 +1,5 @@
 import React from 'react';
-import { ChevronDown } from 'lucide-react';
-import { TAP_Y } from '../ui/tapTarget';
+import { DISCLOSURE_SUMMARY, DisclosureChevron } from '../ui/Disclosure';
 import { ContentBlock } from '../../types';
 import { RichText } from './RichText';
 
@@ -131,9 +130,9 @@ export const ContentTable: React.FC<ContentTableProps> = ({ block, onNavigateCha
   if (block.collapsed) {
     return (
       <details className="group rounded-xl border border-base-border bg-base-100 overflow-hidden">
-        <summary className={`${TAP_Y} flex items-center justify-between gap-2 p-box-dense cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden bg-base-300 hover:bg-base-border transition-colors`}>
+        <summary className={DISCLOSURE_SUMMARY}>
           <span className={titleClass}>{block.title ?? 'ตาราง'}</span>
-          <ChevronDown className="w-4 h-4 shrink-0 text-base-content-muted transition-transform group-open:rotate-180" />
+          <DisclosureChevron />
         </summary>
         <div className="p-box-dense border-t border-base-border">{body}</div>
       </details>
