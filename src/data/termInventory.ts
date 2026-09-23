@@ -43,6 +43,7 @@ export const TERM_FIELDS: readonly TermField[] = [
   { field: 'title', get: c => [c.title] },
   { field: 'enTerm', get: c => texts(c.enTerm) },
   { field: 'subtitle', get: c => [c.subtitle] },
+  { field: 'chapterOpening', get: c => [c.chapterOpening] },
   { field: 'keyTakeaway', get: c => [c.keyTakeaway] },
   { field: 'plainAnalogy', get: c => [c.plainAnalogy] },
   { field: 'beginnerPrimer.whatIsIt', get: c => texts(c.beginnerPrimer?.whatIsIt) },

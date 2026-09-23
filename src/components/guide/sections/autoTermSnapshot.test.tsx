@@ -51,12 +51,11 @@ describe('automatic term markers on real chapters (beginner Core)', () => {
     ]);
   });
 
+  // The chapter opening (Phase 4) expands SRE, SLA and SLO in full, so the hero spends no marker on them.
   it('s10, formal register: three abbreviations in the opening', () => {
     expect(beginnerCoreMarkers('s10')).toEqual([
       'hero: logging-monitoring-alerting (Monitoring)',
       'hero: incident (Incident)',
-      'hero: slo (SLO)',
-      'hero: sla (SLA)',
       'primer: slo (SLO)',
       'primer: incident (Incident)',
       'primer: logging-monitoring-alerting (Monitoring)',

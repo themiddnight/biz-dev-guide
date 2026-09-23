@@ -50,6 +50,11 @@ describe('copy budgets', () => {
         }
         if (seats && seats.biz === seats.eng) v.push(`${at('heroFigure.seats')}: biz equals eng`);
       }
+      // Chapter opening (term-definitions spec P4.2, D13): one required line under the subtitle.
+      if (!ch.chapterOpening?.trim()) v.push(`${at('chapterOpening')}: missing`);
+      over(v, at('chapterOpening'), ch.chapterOpening, 160);
+      if (ch.chapterOpening?.includes('\n')) v.push(`${at('chapterOpening')}: contains a newline`);
+      bannedOpener(v, at('chapterOpening'), ch.chapterOpening ?? '');
       over(v, at('keyTakeaway'), ch.keyTakeaway, 100);
       over(v, at('businessNote'), ch.businessNote, 100);
       over(v, at('engineerNote'), ch.engineerNote, 100);

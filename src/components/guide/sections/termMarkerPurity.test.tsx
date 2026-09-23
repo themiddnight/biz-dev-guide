@@ -102,7 +102,7 @@ describe('term markers survive a StrictMode double render', () => {
       const concepts = coreConceptTerms(chapter);
       const cases = {
         hero: [renderToStaticMarkup(<ChapterHero chapter={chapter} experienceLevel="beginner" isRead={false} />),
-          chapter.heroFigure ? [hero.plainAnalogy, hero.keyTakeaway] : [hero.keyTakeaway, hero.plainAnalogy]],
+          [hero.chapterOpening, ...(chapter.heroFigure ? [hero.plainAnalogy, hero.keyTakeaway] : [hero.keyTakeaway, hero.plainAnalogy])]],
         primer: [renderToStaticMarkup(<PrimerSection chapter={chapter} isOpen onToggle={noop} ctx={ctx} />),
           primer ? [primer.whatIsIt, primer.whyItMatters, primer.realWorldScenario] : []],
         jargon: [renderToStaticMarkup(<JargonSection chapter={chapter} isOpen onToggle={noop} ctx={ctx} />),

@@ -76,6 +76,9 @@ export const ChapterHero: React.FC<ChapterHeroProps> = ({
         <p className="text-xs sm:text-sm text-neutral-500 dark:text-[#8e8e8e] leading-relaxed font-normal">
           {chapter.subtitle}
         </p>
+        <p className="text-xs sm:text-sm text-neutral-500 dark:text-[#8e8e8e] leading-relaxed font-normal" data-chapter-opening>
+          {prose(marked.chapterOpening)}
+        </p>
         {chapter.heroFigure && (
           <HeroFigure figure={chapter.heroFigure} analogy={analogy} role={role} seat={seat} onFlipSeat={onFlipSeat} />
         )}

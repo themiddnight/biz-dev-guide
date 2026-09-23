@@ -217,6 +217,12 @@ export interface Chapter {
   title: string;
   enTerm?: string; // canonical English name, shown as a tag and matched by search
   subtitle: string;
+  /**
+   * One Thai line under the subtitle (term-definitions spec P4.1): why this chapter matters and how
+   * it connects to the guide's promise, true for a reader arriving from any track or a cold link, and
+   * what every abbreviation in title/subtitle/enTerm/keyTakeaway stands for. A `RichText` string.
+   */
+  chapterOpening: string;
   roleTag: 'all' | 'pm' | 'ux' | 'ba' | 'sa' | 'eng' | 'qa' | 'devops' | 'support' | 'friction' | 'ai' | 'biz';
   home: ChapterHome; // which side does this work (role perspective, spec P1.1)
   businessNote: string;

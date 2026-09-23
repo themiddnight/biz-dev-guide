@@ -181,6 +181,7 @@ function markedByField(chapter: Chapter): Map<string, string[]> {
   const cards = otherSideTerms(chapter, ROLES);
   const concepts = coreConceptTerms(chapter);
   return new Map([
+    ['chapterOpening', [hero.chapterOpening]],
     ['keyTakeaway', [hero.keyTakeaway]],
     ['plainAnalogy', [hero.plainAnalogy]],
     ['beginnerPrimer.whatIsIt', primer ? [primer.whatIsIt] : []],
@@ -218,10 +219,26 @@ function heroInRenderOrder<T extends { field: string }>(chapter: Chapter, occurr
   return out;
 }
 
+/**
+ * The chapter's headings. They are never marked (P3.5); the opening line directly under them is
+ * their definition (spec P4.2), so a heading's term counts as defined when the opening defines it.
+ */
+const HEADING_FIELDS: ReadonlySet<string> = new Set(['title', 'enTerm', 'subtitle']);
+
+/** Whether `text` defines `term` in place: expanded in parentheses on either side, or marked. */
+const definedIn_ = (term: string, text: string, markerIds: ReadonlySet<string>) => {
+  const t = escapeRe(term);
+  const expanded = new RegExp(`(?<![A-Za-z0-9])${t}\\s*\\(|\\(\\s*${t}\\s*\\)`).test(text);
+  return expanded || resolveTerm(term).some(id => markerIds.has(id));
+};
+
+const markerIdsOf = (markedText: string) => new Set([...markedText.matchAll(MARKER_ID_RE)].map(m => m[1]));
+
 /** Every abbreviation occurrence of one chapter, in beginner Core render order, and whether that occurrence is defined. */
 const chapterEvents = (chapterId: string): TrackEvent[] => {
   const chapter = CHAPTERS.find(c => c.id === chapterId)!;
   const marked = markedByField(chapter);
+  const openingIds = markerIdsOf(heroTerms(chapter).chapterOpening);
   const nth = new Map<string, number>();
   return heroInRenderOrder(chapter, beginnerVisibleTexts(chapter)).flatMap(({ field, text }) => {
     if (FOLDED_FOR_BEGINNERS.has(field)) return [];
@@ -237,11 +254,9 @@ const chapterEvents = (chapterId: string): TrackEvent[] => {
     }
     const terms = [...extractAbbreviations(text), ...extractTrackedTerms(text)];
     return terms.map(term => {
-      const t = escapeRe(term);
-      const expanded = new RegExp(`(?<![A-Za-z0-9])${t}\\s*\\(|\\(\\s*${t}\\s*\\)`).test(text);
       const isCard = field === 'jargonList.term' && namesTerm(text, term);
-      const isMarked = resolveTerm(term).some(id => markerIds.has(id));
-      return { term, at: `${chapterId}/${field}`, defined: expanded || isCard || isMarked };
+      const byOpening = HEADING_FIELDS.has(field) && definedIn_(term, chapter.chapterOpening, openingIds);
+      return { term, at: `${chapterId}/${field}`, defined: definedIn_(term, text, markerIds) || isCard || byOpening };
     });
   });
 };
@@ -282,9 +297,10 @@ function trackGaps(track: TrackKey): { term: string; line: string }[] {
  * not an allowance: the assertion is equality, so a new gap fails (a regression) and a closed gap
  * fails too (update the list on purpose).
  * - `guardrailLimited`: the term has a glossary entry, but its first use in the track sits where no
- *   marker is placed — a title, subtitle, enTerm or heading (Phase 4's chapter openings are the
- *   planned fix), or a field not wired yet (`formalDefinition`, `diagramDescription`, diagram
- *   content blocks). Fixing one of these means wiring a field or rewriting an opening, not content.
+ *   marker is placed — a core-concept heading, or a field not wired yet (`diagramTitle`,
+ *   `diagramDescription`, diagram content blocks). Title, subtitle and enTerm terms are defined by
+ *   the chapter opening under them (Phase 4, `HEADING_FIELDS`), which closed 16 / 13 / 19 / 12 down
+ *   to 2 / 1 / 5 / 2 — the s1 opening also names BA, UX and QA, s11's FAQ, s18's KR.
  * - `missingFromGlossary`: no glossary entry resolves the term, so nothing could ever mark it. A
  *   cheap content fix: add the entry. Empty since D20/D21 — every earlier "never defined" line
  *   (SA, SMS, OTP, QR, Refactor, ...) resolves, and is now marked in a dialogue line or arrow chain.
@@ -292,81 +308,31 @@ function trackGaps(track: TrackKey): { term: string; line: string }[] {
 const KNOWN_GAPS_V2: Record<TrackKey, { guardrailLimited: readonly string[]; missingFromGlossary: readonly string[] }> = {
   beginner: {
     guardrailLimited: [
-      'track beginner: "QA" first seen at s1/jargonList.formalDefinition, defined only later at s1/coreConcepts.detail',
-      'track beginner: "UX" first seen at s1/diagramDescription, defined only later at s3/beginnerPrimer.whatIsIt',
-      'track beginner: "BA" first seen at s1/diagramDescription, defined only later at s4/beginnerPrimer.whatIsIt',
-      'track beginner: "UX/UI" first seen at s3/title, never defined',
-      'track beginner: "Sketch" first seen at s3/subtitle, defined only later at s3/keyTakeaway',
-      'track beginner: "NFR" first seen at s4/title, defined only later at s4/beginnerPrimer.realWorldScenario',
       'track beginner: "FURPS+" first seen at s4/coreConcepts.heading, never defined',
-      'track beginner: "DoR" first seen at s6/title, defined only later at s6/plainAnalogy',
-      'track beginner: "DoD" first seen at s6/title, defined only later at s6/plainAnalogy',
-      'track beginner: "Agile" first seen at s6/enTerm, defined only later at s6/beginnerPrimer.whatIsIt',
       'track beginner: "Gate" first seen at s6/diagramDescription, never defined',
-      'track beginner: "Test Pyramid" first seen at s7/title, defined only later at s7/coreConcepts.heading',
-      'track beginner: "Pyramid" first seen at s7/title, defined only later at s7/beginnerPrimer.whatIsIt',
-      'track beginner: "FAQ" first seen at s11/coreConcepts.heading, never defined',
-      'track beginner: "BRD" first seen at s14/subtitle, defined only later at s14/plainAnalogy',
-      'track beginner: "ADR" first seen at s14/subtitle, defined only later at s14/plainAnalogy',
     ],
     missingFromGlossary: [],
   },
   experienced: {
     guardrailLimited: [
-      'track experienced: "FAQ" first seen at s11/coreConcepts.heading, never defined',
-      'track experienced: "QA" first seen at s1/jargonList.formalDefinition, defined only later at s1/coreConcepts.detail',
-      'track experienced: "UX" first seen at s1/diagramDescription, defined only in s3 (not in this track)',
-      'track experienced: "BA" first seen at s1/diagramDescription, defined only in s4 (not in this track)',
-      'track experienced: "DoR" first seen at s6/title, defined only later at s6/plainAnalogy',
-      'track experienced: "DoD" first seen at s6/title, defined only later at s6/plainAnalogy',
-      'track experienced: "Agile" first seen at s6/enTerm, defined only later at s6/beginnerPrimer.whatIsIt',
       'track experienced: "Gate" first seen at s6/diagramDescription, never defined',
-      'track experienced: "Tech Debt" first seen at s9/title, defined only in s15 (not in this track)',
-      'track experienced: "Refactor" first seen at s9/title, defined only later at s9/perspectives.saysVsHears',
-      'track experienced: "SDLC" first seen at s13/enTerm, defined only later at s13/beginnerPrimer.whatIsIt',
-      'track experienced: "BRD" first seen at s14/subtitle, defined only later at s14/plainAnalogy',
-      'track experienced: "ADR" first seen at s14/subtitle, defined only later at s14/plainAnalogy',
     ],
     missingFromGlossary: [],
   },
   biz: {
     guardrailLimited: [
-      'track biz: "PM" first seen at s2/title, defined only later at s2/plainAnalogy',
-      'track biz: "QA" first seen at s1/jargonList.formalDefinition, defined only later at s1/coreConcepts.detail',
-      'track biz: "UX" first seen at s1/diagramDescription, defined only in s3 (not in this track)',
-      'track biz: "BA" first seen at s1/diagramDescription, defined only later at s4/beginnerPrimer.whatIsIt',
-      'track biz: "BRD" first seen at s14/subtitle, defined only later at s14/plainAnalogy',
-      'track biz: "ADR" first seen at s14/subtitle, defined only later at s14/plainAnalogy',
-      'track biz: "NFR" first seen at s4/title, defined only later at s4/beginnerPrimer.realWorldScenario',
       'track biz: "FURPS+" first seen at s4/coreConcepts.heading, never defined',
-      'track biz: "DoR" first seen at s6/title, defined only later at s6/plainAnalogy',
-      'track biz: "Agile" first seen at s6/enTerm, defined only later at s6/beginnerPrimer.whatIsIt',
       'track biz: "Gate" first seen at s6/diagramDescription, never defined',
-      'track biz: "Tech Debt" first seen at s9/title, defined only in s15 (not in this track)',
-      'track biz: "Refactor" first seen at s9/title, defined only later at s9/perspectives.saysVsHears',
-      'track biz: "SRE" first seen at s10/title, defined only later at s10/beginnerPrimer.whatIsIt',
-      'track biz: "SLO" first seen at s10/subtitle, defined only later at s10/keyTakeaway',
       'track biz: "L1" first seen at s10/diagramTitle, defined only in s5 (not in this track)',
       'track biz: "L2" first seen at s10/diagramTitle, defined only in s5 (not in this track)',
       'track biz: "L3" first seen at s10/diagramTitle, never defined',
-      'track biz: "FAQ" first seen at s11/coreConcepts.heading, never defined',
     ],
     missingFromGlossary: [],
   },
   eng: {
     guardrailLimited: [
-      'track eng: "QA" first seen at s1/jargonList.formalDefinition, defined only later at s1/coreConcepts.detail',
-      'track eng: "UX" first seen at s1/diagramDescription, defined only in s3 (not in this track)',
-      'track eng: "BA" first seen at s1/diagramDescription, defined only later at s4/beginnerPrimer.whatIsIt',
-      'track eng: "OKR" first seen at s18/title, defined only later at s18/beginnerPrimer.whatIsIt',
-      'track eng: "KPI" first seen at s18/title, defined only later at s18/beginnerPrimer.whatIsIt',
-      'track eng: "KR" first seen at s18/jargonList.meetingExample, defined only later at s18/perspectives.measuredBy',
-      'track eng: "NFR" first seen at s4/title, defined only later at s4/beginnerPrimer.realWorldScenario',
       'track eng: "FURPS+" first seen at s4/coreConcepts.heading, never defined',
-      'track eng: "FAQ" first seen at s11/coreConcepts.heading, never defined',
       'track eng: "SLO" first seen at s19/coreConcepts.heading, defined only later at s19/coreConcepts.detail',
-      'track eng: "Tech Debt" first seen at s9/title, defined only in s15 (not in this track)',
-      'track eng: "Refactor" first seen at s9/title, defined only later at s9/perspectives.saysVsHears',
     ],
     missingFromGlossary: [],
   },
@@ -388,7 +354,7 @@ describe('term coverage v2: a definition at or before first use, per reading tra
       EVENTS.get(chapterId)!.find(e => e.term === term && e.at === `${chapterId}/${field}`);
     expect(at('s1', 'PM', 'beginnerPrimer.whatIsIt')?.defined).toBe(true); // D20: the arrow chain
     expect(at('s18', 'KR', 'perspectives.measuredBy')?.defined).toBe(true);
-    expect(at('s11', 'KPI', 'keyTakeaway')?.defined).toBe(true);
+    expect(at('s11', 'KPI', 'chapterOpening')?.defined).toBe(true); // expanded in the opening, above the takeaway
     expect(trackGaps('experienced').some(g => g.term === 'KPI')).toBe(false);
   });
 
@@ -405,6 +371,96 @@ describe('term coverage v2: a definition at or before first use, per reading tra
   it('terms a track never defines anywhere, per track', () => {
     const never = (track: TrackKey) => trackGaps(track).filter(g => !g.line.includes('defined only later')).length;
     expect({ beginner: never('beginner'), experienced: never('experienced'), biz: never('biz'), eng: never('eng') })
-      .toEqual({ beginner: 4, experienced: 5, biz: 8, eng: 4 });
+      .toEqual({ beginner: 2, experienced: 1, biz: 5, eng: 1 });
+  });
+});
+
+/**
+ * Phase 4 (term-definitions spec P4.2, tests): the chapter opening is the definition of the
+ * chapter's own headline. The mechanical half only — whether the line is true, plain and worth
+ * reading is the owner's review (D18).
+ */
+describe('chapter openings (Phase 4)', () => {
+  const HEADLINE_FIELDS = ['title', 'subtitle', 'enTerm', 'keyTakeaway'] as const;
+
+  /** What counts as an expansion of an entry: its parentheticals (and their `/` parts), its label when that is not the key, and its spelled-out aliases. */
+  const expansionsOf = (id: string, key: string) => {
+    const entry = GLOSSARY.find(g => g.id === id)!;
+    const inParens = [...entry.term.matchAll(/\(([^)]*)\)/g)].flatMap(m => [m[1], ...m[1].split('/')]);
+    const label = entry.term.replace(/\([^)]*\)/g, ' ').replace(/\s+/g, ' ').trim();
+    const spelledOut = (entry.aliases ?? []).filter(a => /\s/.test(a));
+    return [...inParens, label, ...spelledOut]
+      .map(s => s.trim().toLowerCase())
+      .filter(s => s.length > 2 && s !== key.toLowerCase());
+  };
+
+  /**
+   * `term` is expanded in `chapter`'s opening: `TERM (its glossary expansion)`, or the guide's
+   * Thai-name-first pattern `ชื่อไทย (TERM)` (audit §4.1: `หนี้ทางเทคนิค (Technical Debt)`), or a
+   * resolvable term marker on it.
+   */
+  const openingExpands = (chapter: Chapter, term: string) => {
+    const ids = resolveTerm(term);
+    const t = escapeRe(term);
+    const after = chapter.chapterOpening.match(new RegExp(`(?<![A-Za-z0-9])${t}\\s*\\(([^)]*)\\)`));
+    if (after && ids.some(id => expansionsOf(id, term).some(exp => after[1].toLowerCase().includes(exp)))) return true;
+    if (new RegExp(`[^\\s(]\\s*\\(\\s*${t}\\s*\\)`).test(chapter.chapterOpening)) return true;
+    const marked = markerIdsOf(heroTerms(chapter).chapterOpening);
+    return ids.some(id => marked.has(id));
+  };
+
+  const headlineAbbreviations = (chapter: Chapter) =>
+    [...new Set(HEADLINE_FIELDS.flatMap(f => (chapter[f] ? extractAbbreviations(chapter[f]!) : [])))];
+
+  it('every abbreviation in a chapter\'s title, subtitle, enTerm or keyTakeaway is expanded in its opening', () => {
+    const missing = CHAPTERS.flatMap(chapter =>
+      headlineAbbreviations(chapter).filter(term => !openingExpands(chapter, term)).map(term => `${chapter.id}: ${term}`));
+    expect(missing).toEqual([]);
+  });
+
+  it('every headline abbreviation has a glossary entry, so its expansion is checkable', () => {
+    const unresolved = CHAPTERS.flatMap(chapter =>
+      headlineAbbreviations(chapter).filter(term => resolveTerm(term).length === 0).map(term => `${chapter.id}: ${term}`));
+    expect(unresolved).toEqual([]);
+  });
+
+  it('the checker is not vacuous: the 12 chapters with a headline abbreviation are all checked', () => {
+    const checked = CHAPTERS.filter(c => headlineAbbreviations(c).length > 0).map(c => c.id);
+    for (const id of ['s2', 's3', 's4', 's5', 's6', 's7', 's8', 's10', 's13', 's14', 's18', 's19']) expect(checked, id).toContain(id);
+    const s4 = CHAPTERS.find(c => c.id === 's4')!;
+    expect(openingExpands({ ...s4, chapterOpening: 'BA กับ NFR' }, 'NFR')).toBe(true); // bare -> auto-marked, still a definition
+    expect(openingExpands({ ...s4, chapterOpening: '[[!g:*]]BA กับ NFR' }, 'NFR')).toBe(false); // opted out and bare
+    expect(openingExpands({ ...s4, chapterOpening: '[[!g:*]]NFR (ระบบเร็วไหม)' }, 'NFR')).toBe(false); // a gloss that is not the expansion
+  });
+
+  it('s10 expands SRE, SLA and SLO in full (acceptance 3)', () => {
+    const s10 = CHAPTERS.find(c => c.id === 's10')!.chapterOpening;
+    expect(s10).toContain('SRE (Site Reliability Engineering)');
+    expect(s10).toContain('SLA (Service Level Agreement)');
+    expect(s10).toContain('SLO (Service Level Objective)');
+  });
+
+  it('s13\'s opening is plain Thai, not the enTerm (acceptance 4)', () => {
+    const s13 = CHAPTERS.find(c => c.id === 's13')!.chapterOpening;
+    expect(s13).not.toContain('Augmented');
+    expect(s13).toContain('SDLC (Software Development Life Cycle)');
+  });
+
+  /**
+   * Weak by construction (spec P4 tests): it catches an empty or boilerplate line, not a bad one.
+   * Parentheticals are removed first, so `Site Reliability Engineering` cannot pass for the promise.
+   */
+  it('every opening names the guide\'s promise or links a chapter', () => {
+    const PROMISE_PHRASES = ['สองโลก', 'Business', 'Engineering'];
+    const unconnected = CHAPTERS.filter(c => {
+      const text = c.chapterOpening.replace(/\([^)]*\)/g, ' ');
+      return !/\[\[s\d+\|/.test(text) && !PROMISE_PHRASES.some(p => text.includes(p));
+    }).map(c => c.id);
+    expect(unconnected).toEqual([]);
+  });
+
+  it('no opening points at "the previous chapter": reading order is per track (D14)', () => {
+    const trackBound = CHAPTERS.filter(c => /บทก่อน|บทที่แล้ว|บทที่ผ่านมา/.test(c.chapterOpening)).map(c => c.id);
+    expect(trackBound).toEqual([]);
   });
 });
