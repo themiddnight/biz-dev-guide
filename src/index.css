@@ -62,8 +62,8 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* No monospace in content: code-like elements use the body font (kbd keeps the preflight monospace). */
-code, samp, pre {
+/* No monospace in content: code-like elements and kbd use the standard body font */
+code, samp, pre, kbd {
   font-family: inherit;
 }
 

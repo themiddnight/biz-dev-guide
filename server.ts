@@ -56,6 +56,104 @@ const SYSTEM_INSTRUCTION = `คุณคือ "AI Bridge Specialist" ผู้�
 - ใช้ภาษาไทยที่เป็นมิตร ชัดเจน ตรงประเด็น และกระชับ
 - ใช้ภาษาพูดง่ายๆ แบบคนอธิบายให้ฟัง ไม่ใช่ภาษาตำรา`;
 
+// Cache available Groq models to prevent hardcoding issues when models change
+let cachedGroqModels: { models: string[]; fetchedAt: number } = { models: [], fetchedAt: 0 };
+
+async function getAvailableGroqModels(apiKey: string): Promise<string[]> {
+  const now = Date.now();
+  // Cache for 30 minutes
+  if (cachedGroqModels.models.length > 0 && now - cachedGroqModels.fetchedAt < 30 * 60 * 1000) {
+    return cachedGroqModels.models;
+  }
+
+  try {
+    const res = await fetch("https://api.groq.com/openai/v1/models", {
+      headers: { Authorization: `Bearer ${apiKey}` },
+    });
+    if (res.ok) {
+      const data: any = await res.json();
+      if (Array.isArray(data?.data)) {
+        // Exclude audio/guard models, prioritize chat/text models
+        const textModels = data.data
+          .map((m: any) => m.id as string)
+          .filter((id: string) => !id.includes("whisper") && !id.includes("guard") && !id.includes("safeguard"));
+        if (textModels.length > 0) {
+          cachedGroqModels = { models: textModels, fetchedAt: now };
+          return textModels;
+        }
+      }
+    }
+  } catch (_e) {
+    // Ignore and use fallback list below
+  }
+
+  // Fallback candidate list if list API is unreachable
+  return [
+    "qwen/qwen3.8-27b",
+    "openai/gpt-oss-120b",
+    "openai/gpt-oss-20b",
+    "llama-3.3-70b-versatile",
+  ];
+}
+
+// Helper for Groq Cloud API
+async function callGroq(question: string, role: string, context?: string): Promise<string | null> {
+  const apiKey = process.env.GROQ_API_KEY?.trim();
+  if (!apiKey) return null;
+
+  const userRoleText = role === 'business' ? 'ฝั่ง Business' : role === 'engineer' ? 'ฝั่ง Engineer' : 'ทั้งสองฝั่ง';
+  const userContent = `[ผู้ใช้งานระบุมุมมอง: ${userRoleText}]\n${context ? `[บริบทเพิ่มเติม]: ${context}\n` : ''}\n[คำถาม]: ${question}\n\nตอบให้ชัด แบ่งเป็นข้อคิดกับวิธีแก้ที่ใช้ได้จริงในที่ทำงาน:`;
+
+  // 1. If user explicitly specified GROQ_MODEL in env, prioritize it
+  const envModel = process.env.GROQ_MODEL?.trim();
+  const availableModels = await getAvailableGroqModels(apiKey);
+  const candidateModels = envModel 
+    ? [envModel, ...availableModels.filter((m) => m !== envModel)]
+    : availableModels;
+
+  for (const model of candidateModels) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 7000);
+
+      const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: "system", content: SYSTEM_INSTRUCTION },
+            { role: "user", content: userContent },
+          ],
+          temperature: 0.6,
+          max_tokens: 1024,
+        }),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (res.ok) {
+        const data: any = await res.json();
+        const text = data?.choices?.[0]?.message?.content?.trim();
+        if (text) {
+          return text;
+        }
+      } else {
+        const err = await res.text().catch(() => "");
+        console.warn(`[Groq ${model}] Failed (${res.status}):`, err.slice(0, 100));
+      }
+    } catch (e: any) {
+      console.warn(`[Groq ${model}] Error:`, e?.message || e);
+    }
+  }
+
+  return null;
+}
+
 // AI Q&A API
 app.post("/api/ask-ai", async (req, res) => {
   try {
@@ -64,10 +162,23 @@ app.post("/api/ask-ai", async (req, res) => {
       return res.status(400).json({ error: "พิมพ์คำถามก่อน" });
     }
 
-    // Attempt Gemini call
-    try {
-      const ai = getGeminiClient();
-      const prompt = `${SYSTEM_INSTRUCTION}
+    // 1. Attempt Groq call if GROQ_API_KEY is configured
+    if (process.env.GROQ_API_KEY?.trim()) {
+      try {
+        const groqAnswer = await callGroq(question, role, context);
+        if (groqAnswer) {
+          return res.json({ answer: groqAnswer, source: "groq" });
+        }
+      } catch (err: any) {
+        console.warn("[AI Bridge] Groq invocation failed, trying next provider:", err?.message || err);
+      }
+    }
+
+    // 2. Attempt Gemini call if GEMINI_API_KEY is configured
+    if (process.env.GEMINI_API_KEY?.trim()) {
+      try {
+        const ai = getGeminiClient();
+        const prompt = `${SYSTEM_INSTRUCTION}
 
 [ผู้ใช้งานระบุมุมมอง: ${role === 'business' ? 'ฝั่ง Business' : role === 'engineer' ? 'ฝั่ง Engineer' : 'ทั้งสองฝั่ง'}]
 ${context ? `[บริบทเพิ่มเติม]: ${context}` : ''}
@@ -76,35 +187,39 @@ ${context ? `[บริบทเพิ่มเติม]: ${context}` : ''}
 
 ตอบให้ชัด แบ่งเป็นข้อคิดกับวิธีแก้ที่ใช้ได้จริงในที่ทำงาน:`;
 
-      const candidateModels = ["gemini-3.6-flash", "gemini-3.8-flash", "gemini-flash-latest"];
-      let response: any = null;
-      let lastModelError: any = null;
+        const candidateModels = ["gemini-3.8-flash", "gemini-3.1-flash-lite"];
+        let response: any = null;
 
-      for (const model of candidateModels) {
-        try {
-          response = await ai.models.generateContent({
-            model,
-            contents: prompt,
-          });
-          if (response && response.text) {
+        const callWithTimeout = async (model: string, timeoutMs: number) => {
+          try {
+            const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), timeoutMs));
+            const apiPromise = ai.models.generateContent({ model, contents: prompt });
+            return await Promise.race([apiPromise, timeoutPromise]);
+          } catch (_err) {
+            return null;
+          }
+        };
+
+        for (const model of candidateModels) {
+          const res: any = await callWithTimeout(model, 3500);
+          if (res && res.text) {
+            response = res;
             break;
           }
-        } catch (mErr: any) {
-          lastModelError = mErr;
-          console.warn(`Model ${model} unavailable, trying next candidate:`, mErr?.message);
         }
-      }
 
-      if (!response || !response.text) {
-        throw lastModelError || new Error("Failed to generate content with available Gemini models");
+        if (response && response.text) {
+          const answer = response.text || "ขออภัย ยังตอบไม่ได้ ลองใหม่อีกครั้ง";
+          return res.json({ answer, source: "gemini" });
+        }
+      } catch (_geminiError: any) {
+        console.log("[AI Bridge] Gemini call failed or unavailable");
       }
+    }
 
-      const answer = response.text || "ขออภัย ยังตอบไม่ได้ ลองใหม่อีกครั้ง";
-      return res.json({ answer, source: "gemini" });
-    } catch (geminiError: any) {
-      console.warn("Gemini API call failed or key missing, falling back to expert knowledge base:", geminiError.message);
-      
-      // Fallback expert rule-based responses if API key is not yet set
+    console.log("[AI Bridge] Serving request via expert knowledge base fallback");
+    
+    // 3. Fallback expert rule-based responses
       const lower = question.toLowerCase();
       let fallbackAnswer = "";
 
@@ -126,7 +241,7 @@ ${context ? `[บริบทเพิ่มเติม]: ${context}` : ''}
 - **Project Manager (PjM):** ดูแลเรื่อง **"ทำให้เสร็จทันเมื่อไหร่ และบริหารคน/เวลาอย่างไร (How & When)"** วาง Timeline, คุม Resource, บริหารความเสี่ยง, Fast-tracking หรือ Replanning
 
 *เปรียบแบบบ้านๆ:* PM คือคนที่เลือกว่า "ทริปนี้เราจะไปเที่ยวภูเขาหรือทะเลดีกว่ากัน" ส่วน PjM คือคนที่ "จองตั๋ว กะเวลารถออก และเช็คว่าทุกคนถึงโรงแรมตรงเวลาไหม"`;
-      } else if (lower.includes("tech debt") || lower.includes("หนี้")) {
+      } else if (lower.includes("tech debt") || lower.includes("หนี้") || lower.includes("refactor")) {
         fallbackAnswer = `**ทำไมงาน Technical Debt ถึงไม่เคยได้เข้า Sprint สักที?**
 
 - **สาเหตุหลัก:** ทีม Dev มักขอในภาษาเทคนิค เช่น "ขอเวลา Refactor 2 สัปดาห์" ซึ่งฝั่ง Business คำนวณความคุ้มค่าไม่ได้ และจะแพ้ Feature ใหม่ที่มีตัวเลขรายได้ชัดเจนเสมอ
@@ -134,8 +249,56 @@ ${context ? `[บริบทเพิ่มเติม]: ${context}` : ''}
   1. แปลงเป็นความเสี่ยงหรือต้นทุนที่วัดได้ เช่น *"ถ้าไม่แก้ตรงนี้ ทุกครั้งที่ Deploy ระบบมีโอกาสล่ม 15% คิดเป็นความเสียหาย X บาท"*
   2. ใช้กรอบของ Martin Fowler (Tech Debt Quadrant): แยกหนี้ที่ตั้งใจ+รอบคอบ ออกจากหนี้ที่ประมาท
   3. ขอกันเวลาคงที่ เช่น 15–20% ของ Capacity ทุก Sprint ไว้ดูแลระบบ`;
+      } else if (lower.includes("acceptance criteria") || lower.includes("ac") || lower.includes("user story") || lower.includes("ชำระเงิน") || lower.includes("payment")) {
+        fallbackAnswer = `**ตัวอย่าง Acceptance Criteria (AC) สำหรับระบบชำระเงิน (Given-When-Then):**
+
+1. **กรณีชำระเงินสำเร็จ (Happy Path):**
+   - **Given:** ลูกค้ามียอดเงินเพียงพอและเลือกชำระผ่านบัตรเครดิต
+   - **When:** ลูกค้ายืนยันรหัส OTP ถูกต้องภายใน 3 นาที
+   - **Then:** ระบบต้องตัดยอดเงิน, อัปเดตสถานะคำสั่งซื้อเป็น "Paid", ส่งใบเสร็จผ่านอีเมลภายใน 5 วินาที และนำผู้ใช้ไปยังหน้าสรุปคำสั่งซื้อ
+
+2. **กรณีเงินไม่พอหรือบัตรถูกปฏิเสธ (Unhappy Path):**
+   - **Given:** บัตรของลูกค้าหมดอายุหรือวงเงินไม่พอ
+   - **When:** Payment Gateway ส่งสถานะ Declined
+   - **Then:** ระบบต้องไม่หักสต็อกสินค้า, แสดงข้อความแจ้งเตือนที่เข้าใจง่าย (ไม่ใช่ Error Code), และเปิดให้ลูกค้าเลือกช่องทางชำระเงินอื่นได้ทันที
+
+3. **กรณีเน็ตหลุด / Timeout (Idempotency):**
+   - **Then:** การกดปุ่มซ้ำต้องไม่เกิดการตัดเงินเบิ้ล (Idempotency Key ป้องกันการชำระซ้ำซ้อน)`;
+      } else if (lower.includes("deadline") || lower.includes("เถียง") || lower.includes("กำหนดส่ง")) {
+        fallbackAnswer = `**เมื่อ PM กับ Dev มีความเห็นไม่ตรงกันเรื่อง Deadline ควรแก้ปัญหาอย่างไร?**
+
+1. **ทำความเข้าใจ Root Cause:**
+   - Business มองว่าพลาดโอกาสทางการตลาดหรือสัญญาที่ตกลงกับคู่ค้าไว้
+   - Dev กังวลเรื่องความเสถียรและไม่อยากปล่อยงานที่รู้ว่าต้องมาตามแก้บั๊กทั้งคืน
+
+2. **เทคนิคการเจรจา (Iron Triangle):**
+   - กฎเหล็กของโปรเจกต์เทค: **Scope, Time, Cost/Quality** — เมื่อเวลา (Time) ล็อคแน่น สิ่งที่ขยับได้มีเพียงอย่างเดียวคือ "ขอบเขตงาน (Scope)"
+   - หลีกเลี่ยงประโยค: *"ทำไมทำไม่ทัน?"*
+   - ให้เปลี่ยนเป็น: *"ถ้าเส้นตายวันที่ X ขยับไม่ได้ มีฟังก์ชันไหนใน Scope นี้ที่เราเลื่อนไปทำใน Phase 2 ได้บ้าง เพื่อให้ส่งมอบของที่มีคุณภาพได้ทันเวลา?"*
+
+3. **แบ่งของเป็น Slice แนวดิ่ง (Vertical Slice):**
+   - ทำ Core flow ให้ใช้งานได้จริง 1 เส้นทางก่อน ส่วนลูกเล่นและ Edge cases ค่อยทยอยปล่อยตามมา`;
+      } else if (lower.includes("nfr") || lower.includes("scalability") || lower.includes("ขยายตัว")) {
+        fallbackAnswer = `**NFR (Non-Functional Requirements) เรื่อง Scalability อธิบายแบบภาษาบ้านๆ:**
+
+- **ความหมาย:** ไม่ใช่แค่ "ระบบทำงานได้ไหม" แต่คือ "เมื่อคนมาใช้งานพร้อมกัน 10,000 คน ระบบยังทำงานได้เร็วเหมือนตอนมีคนเดียวไหม"
+- **เปรียบเทียบในชีวิตจริง:**
+  - Functional Requirement = ร้านก๋วยเตี๋ยวทำก๋วยเตี๋ยวต้มยำได้รสชาติถูกต้อง
+  - Scalability (NFR) = เมื่อมีทัวร์ลง 10 คันรถบัสพร้อมกัน ร้านยังเสิร์ฟก๋วยเตี๋ยวร้อนๆ ได้ภายใน 5 นาทีโดยครัวไม่ไหม้และเด็กเสิร์ฟไม่หนีกลับบ้าน
+- **สิ่งที่ Business และ Tech ต้องคุยกัน:**
+  - Peak Traffic อยู่ช่วงเวลาไหน? (เช่น 11:15 น. ทุกวันที่ 1 และ 16)
+  - ยอมรับเวลารอได้สูงสุดกี่วินาที? (SLO / Latency)`;
+      } else if (lower.includes("trunk") || lower.includes("git-flow") || lower.includes("branch")) {
+        fallbackAnswer = `**เปรียบเทียบ Trunk-based Development vs Git-flow:**
+
+- **Trunk-based Development:**
+  - **วิธีทำ:** ทุกคนรวมโค้ดเข้า branch หลัก (main/trunk) บ่อยๆ (วันละหลายครั้ง) โดยใช้ Feature Flags ปิดฟีเจอร์ที่ยังไม่เสร็จ
+  - **เหมาะสำหรับ:** ทีมขนาดเล็กถึงกลาง, ทีมที่ทำ CI/CD เต็มรูปแบบ, สตาร์ทอัพที่ต้องการปล่อยของเร็วและลดปัญหา Merge Conflict ก้อนใหญ่
+- **Git-flow:**
+  - **วิธีทำ:** แบ่ง branch ตามรอบ Release (develop, release, hotfix, feature) มีขั้นตอนการทดสอบและอนุมัติชัดเจน
+  - **เหมาะสำหรับ:** ซอฟต์แวร์แบบดั้งเดิมที่มีรอบ Release นานๆ (เช่น แอปพลิเคชันฝังตัว หรือระบบองค์กรที่ต้องรอตรวจสอบความปลอดภัยเป็นรอบ)`;
       } else {
-        fallbackAnswer = `**คำแนะนำ:**
+        fallbackAnswer = `**คำแนะนำเพื่อการทำงานร่วมกัน:**
 
 เรื่องนี้เป็นปัญหาคลาสสิกที่เกิดจากความต่างของเป้าหมาย:
 - **ฝั่ง Business:** แข่งกับเวลา ตลาด และความต้องการลูกค้าที่เปลี่ยนเร็ว ต้องการความยืดหยุ่นและการทดลอง
@@ -150,9 +313,8 @@ ${context ? `[บริบทเพิ่มเติม]: ${context}` : ''}
       return res.json({ 
         answer: fallbackAnswer, 
         source: "fallback",
-        note: "ตอนนี้ใช้คำตอบสำเร็จรูปในเครื่อง (เพิ่ม GEMINI_API_KEY ใน Settings เพื่อใช้ Gemini AI)" 
+        note: "ให้คำแนะนำจากคลังความรู้ผู้เชี่ยวชาญ (Bridge Knowledge Base)" 
       });
-    }
   } catch (err: any) {
     res.status(500).json({ error: err.message || "มีบางอย่างผิดพลาด ลองใหม่อีกครั้ง" });
   }

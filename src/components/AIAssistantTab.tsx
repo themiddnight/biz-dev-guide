@@ -109,9 +109,9 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
     }
   };
 
-  // Source of the most recent server answer ('gemini' | 'fallback' | undefined before any answer).
+  // Source of the most recent server answer ('groq' | 'gemini' | 'fallback' | undefined before any answer).
   const lastSource = [...messages].reverse().find((m) => m.role === 'assistant' && m.source)?.source;
-  const isOffline = lastSource !== undefined && lastSource !== 'gemini';
+  const isOffline = lastSource !== undefined && lastSource !== 'gemini' && lastSource !== 'groq';
 
   const copyToClipboard = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
@@ -124,7 +124,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
       {isOffline && (
         <Alert color="warning" live icon={<WifiOff className="w-4 h-4" />}>
           <p>
-            <strong className="font-semibold">โหมดออฟไลน์:</strong> ยังไม่ได้เชื่อมต่อ AI จริง คำตอบเป็นคำแนะนำทั่วไป
+            <strong className="font-semibold">โหมดคลังความรู้ผู้เชี่ยวชาญ:</strong> ให้คำแนะนำจากคลังความรู้เฉพาะทางของคู่มือ
           </p>
         </Alert>
       )}
@@ -134,7 +134,13 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
         <div className="space-y-1">
           <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-base-300 text-base-content-body text-[11px] sm:text-xs font-semibold border border-base-border">
             <Sparkles className="w-3 h-3 text-warning" />
-            <span>{lastSource === 'gemini' ? 'AI Bridge Assistant Powered by Gemini' : 'AI Bridge Assistant'}</span>
+            <span>
+              {lastSource === 'groq'
+                ? 'AI Bridge Assistant Powered by Groq'
+                : lastSource === 'gemini'
+                ? 'AI Bridge Assistant Powered by Gemini'
+                : 'AI Bridge Assistant'}
+            </span>
           </div>
           <h2 className="text-lg sm:text-2xl font-bold text-base-content">
             ถาม AI เพิ่มเติม &amp; ปรึกษาสถานการณ์จริง
@@ -254,10 +260,12 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
                 {isAi && (
                   <div className="flex items-center justify-between pt-2 border-t border-base-border text-[11px] text-base-content-muted">
                     <span className="flex items-center gap-1">
-                      {msg.source === 'gemini' ? (
+                      {msg.source === 'groq' ? (
+                        <span className="text-success font-semibold">● Groq AI</span>
+                      ) : msg.source === 'gemini' ? (
                         <span className="text-warning font-semibold">● Gemini Model</span>
                       ) : (
-                        <span>{msg.source ? '● โหมดออฟไลน์ (คำแนะนำทั่วไป)' : '● Expert Assistant'}</span>
+                        <span>{msg.source ? '● คลังความรู้ผู้เชี่ยวชาญ' : '● Expert Assistant'}</span>
                       )}
                       <span>• {msg.timestamp}</span>
                     </span>
