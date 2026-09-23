@@ -51,10 +51,7 @@ export function violations(src: string): { line: number; text: string }[] {
  * Ratchet (spec §12): files not yet migrated, with their exact violation count. A migration task
  * fixes a file and deletes its line here in the same commit; a count that drifts either way fails.
  */
-const BASELINE: Record<string, number> = {
-  'components/ChapterDiagram.tsx': 669,
-  'components/ProtocolSimulator.tsx': 103,
-};
+const BASELINE: Record<string, number> = {};
 
 describe('colour tokens only', () => {
   const files = [...sourceFiles(join(SRC, 'components')), join(SRC, 'App.tsx')].map(f => {
