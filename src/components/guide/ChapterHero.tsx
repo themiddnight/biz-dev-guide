@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Clock, Check, Sparkles } from 'lucide-react';
+import { Clock, Check, Sparkles, ChevronDown } from 'lucide-react';
 import type { Chapter, ExperienceLevel } from '../../types';
 import { HeroFigure } from './HeroFigure';
 import type { Role } from '../../data/rolePerspective';
@@ -94,8 +94,11 @@ export const ChapterHero: React.FC<ChapterHeroProps> = ({
           {analogyBody}
         </div>
       ) : (
-        <details className={analogyClassName} data-analogy>
-          <summary className="-my-3.5 py-3.5 sm:my-0 sm:py-0 cursor-pointer">{analogyHeading}</summary>
+        <details className={`group ${analogyClassName}`} data-analogy>
+          <summary className="-my-3.5 py-3.5 sm:my-0 sm:py-0 flex items-center justify-between gap-2 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden">
+            {analogyHeading}
+            <ChevronDown className="w-4 h-4 shrink-0 text-base-content-muted transition-transform group-open:rotate-180" />
+          </summary>
           {analogyBody}
         </details>
       )}
