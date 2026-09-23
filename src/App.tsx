@@ -8,6 +8,7 @@ import { CHAPTERS } from './data/chaptersData';
 import { formatChapterHash } from './lib/chapterRoute';
 import { useChapterRoute } from './hooks/useChapterRoute';
 import { QUIZ_QUESTIONS } from './data/quizQuestions';
+import type { ChapterContext } from './lib/chapterContext';
 import { Header } from './components/Header';
 import { GuideTab } from './components/GuideTab';
 import { AIAssistantTab } from './components/AIAssistantTab';
@@ -91,6 +92,7 @@ export default function App() {
   };
 
   const [aiPromptPrefill, setAiPromptPrefill] = useState('');
+  const [aiChapterContext, setAiChapterContext] = useState<ChapterContext | null>(null);
   const [toastMessage, setToastMessage] = useState<{ title: string; subtitle: string } | null>(null);
 
   // Theme state: light | dark | system (defaults to dark for Variation 4)
@@ -179,9 +181,10 @@ export default function App() {
     );
   };
 
-  // Ask AI handler
-  const handleAskAIWithPrompt = (prompt: string) => {
+  // Ask AI handler. An ask without a chapter (the quiz) clears the old one rather than answer from it.
+  const handleAskAIWithPrompt = (prompt: string, chapterContext?: ChapterContext) => {
     setAiPromptPrefill(prompt);
+    setAiChapterContext(chapterContext ?? null);
     setActiveTab('ai');
   };
 
@@ -264,6 +267,8 @@ export default function App() {
         {activeTab === 'ai' && (
           <AIAssistantTab
             initialPrompt={aiPromptPrefill}
+            chapterContext={aiChapterContext}
+            onClearChapterContext={() => setAiChapterContext(null)}
           />
         )}
 

@@ -4,7 +4,13 @@
 interface AskAiInput {
   question?: unknown;
   role?: string;
-  context?: string;
+  context?: unknown;
+  history?: unknown;
+}
+
+interface HistoryMessage {
+  role: "user" | "assistant";
+  content: string;
 }
 
 interface AskAiResult {
@@ -20,7 +26,8 @@ const SYSTEM_INSTRUCTION = `คุณคือ "AI Bridge Specialist" ผู้�
 - ใช้คำอุปมาแบบบ้านๆ (Real-world analogies) เพื่อให้คนที่ไม่ใช่เทคนิคเข้าใจง่าย
 - ให้คำแนะนำที่เอาไปใช้ได้เลย (Actionable advice) เช่น รูปประโยคที่ควรพูดในที่ประชุม หรือขั้นตอนตกลงร่วมกัน
 - ใช้ภาษาไทยที่เป็นมิตร ชัดเจน ตรงประเด็น และกระชับ
-- ใช้ภาษาพูดง่ายๆ แบบคนอธิบายให้ฟัง ไม่ใช่ภาษาตำรา`;
+- ใช้ภาษาพูดง่ายๆ แบบคนอธิบายให้ฟัง ไม่ใช่ภาษาตำรา
+- ถ้ามี [บริบทเพิ่มเติม] จากบทในคู่มือ ให้ตอบโดยยึดเนื้อหานั้นเป็นหลัก แล้วค่อยเสริมด้วยความรู้ทั่วไป`;
 
 // Models tried in order, all checked to answer Thai well. Groq's /models list is not usable
 // here: it is unordered and led by allam-2-7b (an Arabic model that answers Thai with gibberish)
@@ -32,11 +39,28 @@ const GROQ_MAX_TOKENS = 4096;
 // A full answer takes 2-5 s; leave room before giving up on a model and trying the next.
 const GROQ_TIMEOUT_MS = 20_000;
 
+// History and context come from the client, so they are bounded here too: every request must fit
+// Groq's free tier of 8,000 tokens a minute per model.
+const HISTORY_TURNS = 4;
+const HISTORY_ITEM_MAX = 2000;
+const CONTEXT_MAX = 2000;
+
+// Malformed turns are dropped, not rejected: history only improves an answer.
+function sanitizeHistory(raw: unknown): HistoryMessage[] {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .filter((m): m is HistoryMessage =>
+      (m?.role === "user" || m?.role === "assistant") && typeof m.content === "string" && m.content.trim() !== "")
+    .slice(-HISTORY_TURNS)
+    .map(({ role, content }) => ({ role, content: content.slice(0, HISTORY_ITEM_MAX) }));
+}
+
 // Helper for Groq Cloud API
 async function callGroq(
   question: string,
   role: string,
-  context?: string,
+  context: string,
+  history: HistoryMessage[],
 ): Promise<{ text: string; model: string } | null> {
   const apiKey = process.env.GROQ_API_KEY?.trim();
   if (!apiKey) return null;
@@ -65,6 +89,7 @@ async function callGroq(
           model,
           messages: [
             { role: "system", content: SYSTEM_INSTRUCTION },
+            ...history,
             { role: "user", content: userContent },
           ],
           temperature: 0.6,
@@ -98,7 +123,7 @@ async function callGroq(
 
 export async function askAi(input: unknown): Promise<AskAiResult> {
   try {
-    const { question, role = "both", context = "" } = (input ?? {}) as AskAiInput;
+    const { question, role = "both", context, history } = (input ?? {}) as AskAiInput;
     if (!question || typeof question !== "string") {
       return { status: 400, body: { error: "พิมพ์คำถามก่อน" } };
     }
@@ -106,7 +131,12 @@ export async function askAi(input: unknown): Promise<AskAiResult> {
     // 1. Attempt Groq call if GROQ_API_KEY is configured
     if (process.env.GROQ_API_KEY?.trim()) {
       try {
-        const groqAnswer = await callGroq(question, role, context);
+        const groqAnswer = await callGroq(
+          question,
+          role,
+          typeof context === "string" ? context.slice(0, CONTEXT_MAX) : "",
+          sanitizeHistory(history),
+        );
         if (groqAnswer) {
           return { status: 200, body: { answer: groqAnswer.text, source: "groq", model: groqAnswer.model } };
         }

@@ -13,15 +13,24 @@ import {
   Check, 
   Lightbulb, 
   RefreshCw,
-  WifiOff
+  WifiOff,
+  BookOpen,
+  X
 } from 'lucide-react';
 import { TAP, TAP_GAP } from './ui/tapTarget';
 import { Button } from './ui/Button';
 import { IconBadge } from './ui/IconBadge';
 import { Alert } from './ui/Alert';
+import { badgeClass } from './ui/Badge';
+import { cn } from './ui/cn';
+import { buildChatHistory } from '../lib/chatHistory';
+import type { ChapterContext } from '../lib/chapterContext';
 
 interface AIAssistantTabProps {
   initialPrompt?: string;
+  /** Guide chapter the answers draw on; owned by App so a removal survives a tab switch. */
+  chapterContext?: ChapterContext | null;
+  onClearChapterContext?: () => void;
 }
 
 // Footer label for an answer: the provider, plus the exact model when the server reported one.
@@ -32,6 +41,8 @@ export function answerSourceLabel(source?: ChatMessage['source'], model?: string
 
 export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
   initialPrompt = '',
+  chapterContext,
+  onClearChapterContext,
 }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
@@ -65,6 +76,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
   const handleSend = async (questionText?: string) => {
     const q = questionText || inputQuestion;
     if (!q.trim() || isLoading) return;
+    const history = buildChatHistory(messages);
 
     const userMsg: ChatMessage = {
       id: Date.now().toString(),
@@ -84,6 +96,8 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
         body: JSON.stringify({
           question: q,
           role: rolePerspective,
+          history,
+          context: chapterContext?.text,
         }),
       });
 
@@ -307,40 +321,57 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
         )}
       </div>
 
-      {/* Input Form */}
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleSend();
-        }}
-        className="relative flex items-center"
-      >
-        <input
-          type="text"
-          value={inputQuestion}
-          onChange={(e) => setInputQuestion(e.target.value)}
-          placeholder="พิมพ์คำถามของคุณ เช่น 'ทำไม Dev ถึงบ่นเรื่อง Flaky test?' หรือ 'วิธีเขียน User story ที่ดี'..."
-          disabled={isLoading}
-          className="w-full pl-4 sm:pl-5 pr-28 py-3.5 bg-base-100 border border-base-border rounded-box text-xs sm:text-sm text-base-content placeholder-base-content-subtle focus:outline-none focus:ring-1 focus:ring-base-border-strong shadow-2xs"
-        />
-        <Button
-          type="submit"
-          color="primary" variant="solid"
-          size="sm"
-          tap="positioned"
-          disabled={!inputQuestion.trim() || isLoading}
-          className="absolute right-2"
+      <div className="space-y-2">
+        {chapterContext && (
+          <div className={cn(badgeClass({ size: 'md' }), 'max-w-full font-medium text-base-content-body')}>
+            <BookOpen className="w-3.5 h-3.5 shrink-0 text-base-content-muted" />
+            <span className="min-w-0 truncate">อิงเนื้อหา: {chapterContext.label}</span>
+            <button
+              type="button"
+              onClick={onClearChapterContext}
+              aria-label="เลิกอิงเนื้อหาบทนี้"
+              className={`${TAP} shrink-0 rounded-full p-0.5 text-base-content-muted hover:text-base-content hover:bg-base-border transition-colors cursor-pointer`}
+            >
+              <X className="w-3 h-3" />
+            </button>
+          </div>
+        )}
+
+        {/* Input Form */}
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSend();
+          }}
+          className="relative flex items-center"
         >
-          {isLoading ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : (
-            <>
-              <span>ส่งคำถาม</span>
-              <Send className="w-3.5 h-3.5" />
-            </>
-          )}
-        </Button>
-      </form>
+          <input
+            type="text"
+            value={inputQuestion}
+            onChange={(e) => setInputQuestion(e.target.value)}
+            placeholder="พิมพ์คำถามของคุณ เช่น 'ทำไม Dev ถึงบ่นเรื่อง Flaky test?' หรือ 'วิธีเขียน User story ที่ดี'..."
+            disabled={isLoading}
+            className="w-full pl-4 sm:pl-5 pr-28 py-3.5 bg-base-100 border border-base-border rounded-box text-xs sm:text-sm text-base-content placeholder-base-content-subtle focus:outline-none focus:ring-1 focus:ring-base-border-strong shadow-2xs"
+          />
+          <Button
+            type="submit"
+            color="primary" variant="solid"
+            size="sm"
+            tap="positioned"
+            disabled={!inputQuestion.trim() || isLoading}
+            className="absolute right-2"
+          >
+            {isLoading ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <>
+                <span>ส่งคำถาม</span>
+                <Send className="w-3.5 h-3.5" />
+              </>
+            )}
+          </Button>
+        </form>
+      </div>
     </div>
   );
 };

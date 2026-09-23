@@ -5,6 +5,7 @@ import { S5_JUMP_TARGET_IDS, DiagramJumpTarget } from '../data/diagramFamilies';
 import { GlossaryFilter } from './glossary/GlossaryPanel';
 import { GLOSSARY, GlossaryCategory } from '../data/glossary';
 import { filterIndexChapters } from '../lib/chapterSearch';
+import { buildChapterContext, type ChapterContext } from '../lib/chapterContext';
 import { IndexEmptyState } from './guide/IndexEmptyState';
 import { SECTION_COMPONENTS, type GuideSectionContext, type OtherSideView } from './guide/sections/registry';
 import {
@@ -87,7 +88,7 @@ interface GuideTabProps {
   readChapters?: string[];
   onToggleBookmark: (chapterId: string) => void;
   onToggleReadChapter?: (chapterId: string) => void;
-  onAskAIWithPrompt: (prompt: string) => void;
+  onAskAIWithPrompt: (prompt: string, chapterContext?: ChapterContext) => void;
   onStartQuiz: () => void;
   activeChapterId: string;
   requestedSection: RequestedSection | null;
@@ -751,7 +752,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
             <div className="pt-5 border-t border-base-border space-y-3.5">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <button
-                  onClick={() => onAskAIWithPrompt(`ช่วยอธิบายบทที่ ${activeChapter.num} "${activeChapter.title}" ให้ฟังอย่างละเอียด พร้อมยกตัวอย่างเคสจริงในบริษัทเทคให้เห็นภาพ`)}
+                  onClick={() => onAskAIWithPrompt(`ช่วยอธิบายบทที่ ${activeChapter.num} "${activeChapter.title}" ให้ฟังอย่างละเอียด พร้อมยกตัวอย่างเคสจริงในบริษัทเทคให้เห็นภาพ`, buildChapterContext(activeChapter))}
                   className={`${TAP} inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-base-300 text-base-content hover:bg-base-border text-xs sm:text-sm font-semibold border border-base-border transition-colors cursor-pointer`}
                 >
                   <Bot className="w-4 h-4 text-base-content-secondary" />
