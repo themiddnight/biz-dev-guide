@@ -61,9 +61,9 @@ async function callGroq(
   role: string,
   context: string,
   history: HistoryMessage[],
-): Promise<{ text: string; model: string } | null> {
+): Promise<{ text: string; model: string } | { rateLimited: boolean }> {
   const apiKey = process.env.GROQ_API_KEY?.trim();
-  if (!apiKey) return null;
+  if (!apiKey) return { rateLimited: false };
 
   const userRoleText = role === 'business' ? 'ฝั่ง Business' : role === 'engineer' ? 'ฝั่ง Engineer' : 'ทั้งสองฝั่ง';
   const userContent = `[ผู้ใช้งานระบุมุมมอง: ${userRoleText}]\n${context ? `[บริบทเพิ่มเติม]: ${context}\n` : ''}\n[คำถาม]: ${question}\n\nตอบให้ชัด แบ่งเป็นข้อคิดกับวิธีแก้ที่ใช้ได้จริงในที่ทำงาน:`;
@@ -74,6 +74,7 @@ async function callGroq(
     ? [envModel, ...GROQ_MODELS.filter((m) => m !== envModel)]
     : GROQ_MODELS;
 
+  let rateLimited = false;
   for (const model of candidateModels) {
     try {
       const controller = new AbortController();
@@ -110,6 +111,7 @@ async function callGroq(
           return { text: answer, model };
         }
       } else {
+        if (res.status === 429) rateLimited = true;
         const err = await res.text().catch(() => "");
         console.warn(`[Groq ${model}] Failed (${res.status}):`, err.slice(0, 100));
       }
@@ -118,7 +120,7 @@ async function callGroq(
     }
   }
 
-  return null;
+  return { rateLimited };
 }
 
 export async function askAi(input: unknown): Promise<AskAiResult> {
@@ -127,6 +129,10 @@ export async function askAi(input: unknown): Promise<AskAiResult> {
     if (!question || typeof question !== "string") {
       return { status: 400, body: { error: "พิมพ์คำถามก่อน" } };
     }
+
+    // Set when a Groq model refused with 429, so the client can say the free quota ran out
+    // rather than that the AI is offline.
+    let rateLimited = false;
 
     // 1. Attempt Groq call if GROQ_API_KEY is configured
     if (process.env.GROQ_API_KEY?.trim()) {
@@ -137,9 +143,10 @@ export async function askAi(input: unknown): Promise<AskAiResult> {
           typeof context === "string" ? context.slice(0, CONTEXT_MAX) : "",
           sanitizeHistory(history),
         );
-        if (groqAnswer) {
+        if ("text" in groqAnswer) {
           return { status: 200, body: { answer: groqAnswer.text, source: "groq", model: groqAnswer.model } };
         }
+        rateLimited = groqAnswer.rateLimited;
       } catch (err: any) {
         console.warn("[AI Bridge] Groq invocation failed, using the knowledge base:", err?.message || err);
       }
@@ -244,6 +251,7 @@ export async function askAi(input: unknown): Promise<AskAiResult> {
           answer: fallbackAnswer,
           source: "fallback",
           note: "ให้คำแนะนำจากคลังความรู้ผู้เชี่ยวชาญ (Bridge Knowledge Base)",
+          ...(rateLimited && { reason: "rate_limited" }),
         },
       };
   } catch (err: any) {

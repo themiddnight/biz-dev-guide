@@ -39,6 +39,13 @@ export function answerSourceLabel(source?: ChatMessage['source'], model?: string
   return source ? 'คลังความรู้ผู้เชี่ยวชาญ' : 'Expert Assistant';
 }
 
+// Banner text for a knowledge-base answer: say plainly when it is because the free quota ran out.
+export function fallbackNotice(reason?: ChatMessage['fallbackReason']): string {
+  return reason === 'rate_limited'
+    ? 'ตอนนี้ AI ถูกใช้ครบโควตาฟรีชั่วคราว คำตอบนี้มาจากคลังความรู้ในตัว ลองถามใหม่อีกครั้งในอีกประมาณ 1 นาที'
+    : 'โหมดคลังความรู้ผู้เชี่ยวชาญ: ให้คำแนะนำจากคลังความรู้เฉพาะทางของคู่มือ';
+}
+
 export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
   initialPrompt = '',
   chapterContext,
@@ -113,6 +120,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         source: data.source,
         model: data.model,
+        fallbackReason: data.reason,
       };
 
       setMessages((prev) => [...prev, aiMsg]);
@@ -131,7 +139,8 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
   };
 
   // Source of the most recent server answer ('groq' | 'fallback' | undefined before any answer).
-  const lastSource = [...messages].reverse().find((m) => m.role === 'assistant' && m.source)?.source;
+  const lastAnswer = [...messages].reverse().find((m) => m.role === 'assistant' && m.source);
+  const lastSource = lastAnswer?.source;
   const isOffline = lastSource === 'fallback';
 
   const copyToClipboard = (text: string, id: string) => {
@@ -144,9 +153,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
     <div className="max-w-4xl mx-auto space-y-section pb-16">
       {isOffline && (
         <Alert color="warning" live icon={<WifiOff className="w-4 h-4" />}>
-          <p>
-            <strong className="font-semibold">โหมดคลังความรู้ผู้เชี่ยวชาญ:</strong> ให้คำแนะนำจากคลังความรู้เฉพาะทางของคู่มือ
-          </p>
+          <p>{fallbackNotice(lastAnswer?.fallbackReason)}</p>
         </Alert>
       )}
 
@@ -371,6 +378,9 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
             )}
           </Button>
         </form>
+        <p className="px-1 text-[11px] text-base-content-muted">
+          AI ตัวนี้ใช้ Groq แบบฟรี จำกัดจำนวนคำถามต่อนาทีและต่อวัน ถ้าถามถี่เกินไป ระบบจะสลับ model หรือตอบจากคลังความรู้ในตัวแทน
+        </p>
       </div>
     </div>
   );

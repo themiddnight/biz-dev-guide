@@ -66,6 +66,21 @@ describe('POST /api/ask-ai with Groq', () => {
     expect(triedModels(fetchMock)).toEqual(['openai/gpt-oss-20b']);
   });
 
+  it('says the fallback answer is due to the free quota when every model returns 429', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockImplementation(async () => new Response('rate limited', { status: 429 })));
+
+    const data = await (await post(JSON.stringify({ question: 'PM กับ PjM' }))).json();
+    expect(data).toMatchObject({ source: 'fallback', reason: 'rate_limited' });
+  });
+
+  it('gives no quota reason when Groq fails for another cause', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockImplementation(async () => new Response('down', { status: 503 })));
+
+    const data = await (await post(JSON.stringify({ question: 'PM กับ PjM' }))).json();
+    expect(data.source).toBe('fallback');
+    expect(data).not.toHaveProperty('reason');
+  });
+
   it('marks an answer cut off by the token cap', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(groqReply('1. ข้อแรก\n2. **', 'length')));
 

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { AIAssistantTab, answerSourceLabel } from './AIAssistantTab';
+import { AIAssistantTab, answerSourceLabel, fallbackNotice } from './AIAssistantTab';
 
 describe('AIAssistantTab hierarchy (spec §10.1, §10.3, §10.5)', () => {
   const html = renderToStaticMarkup(<AIAssistantTab />);
@@ -26,5 +26,20 @@ describe('answerSourceLabel', () => {
     expect(answerSourceLabel('groq')).toBe('Groq AI');
     expect(answerSourceLabel('fallback')).toBe('คลังความรู้ผู้เชี่ยวชาญ');
     expect(answerSourceLabel()).toBe('Expert Assistant');
+  });
+});
+
+describe('fallbackNotice', () => {
+  it('says the free quota ran out when the server reports a rate limit', () => {
+    expect(fallbackNotice('rate_limited')).toMatch(/โควตาฟรี/);
+  });
+  it('keeps the plain knowledge-base notice otherwise', () => {
+    expect(fallbackNotice()).toMatch(/^โหมดคลังความรู้ผู้เชี่ยวชาญ/);
+  });
+});
+
+describe('free-tier note', () => {
+  it('is always shown under the input', () => {
+    expect(renderToStaticMarkup(<AIAssistantTab />)).toContain('AI ตัวนี้ใช้ Groq แบบฟรี');
   });
 });
