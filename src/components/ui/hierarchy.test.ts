@@ -43,15 +43,11 @@ const PRIMARY_SOLID_MAX: Record<string, number> = {
   'components/AIAssistantTab.tsx': 1,
   'components/GuideTab.tsx': 1,
   'components/guide/TrackFooter.tsx': 1,
-  'components/GamificationTab.tsx': 1,
 };
 
 /** §10.4: the progress fills, the only unprefixed `bg-primary` left outside ui/. */
 export const PROGRESS_FILL: Record<string, number> = {
-  'components/Header.tsx': 1,
-  'components/GuideTab.tsx': 1,
   'components/QuizTab.tsx': 1,
-  'components/GamificationTab.tsx': 1,
 };
 
 const count = (src: string, re: RegExp) => (src.match(re) ?? []).length;

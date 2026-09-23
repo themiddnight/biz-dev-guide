@@ -89,7 +89,6 @@ interface GuideTabProps {
   onToggleReadChapter?: (chapterId: string) => void;
   onAskAIWithPrompt: (prompt: string) => void;
   onStartQuiz: () => void;
-  onEarnXp?: (chapterId: string, amount: number, reason: string) => void;
   activeChapterId: string;
   requestedSection: RequestedSection | null;
   onNavigateChapter: (chapterId: string, section?: SectionKey) => void;
@@ -128,7 +127,6 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   onToggleReadChapter,
   onAskAIWithPrompt,
   onStartQuiz,
-  onEarnXp,
   onReplaceSection,
   onRequestedSectionApplied,
   activeChapterId,
@@ -341,7 +339,6 @@ export const GuideTab: React.FC<GuideTabProps> = ({
 
   const sectionCtx: GuideSectionContext = {
     chapters,
-    onEarnXp,
     onNavigateChapter: handleSelectChapter,
     onDiagramJump: handleDiagramJump,
     onScrollToPlaybook: handleScrollToPlaybook,
@@ -365,8 +362,6 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   const indexEmpty = filteredChapters.length === 0 && (
     <IndexEmptyState query={searchQuery} roleFiltered={selectedRole !== 'all'} onClear={clearIndexFilters} />
   );
-
-  const percentCompleted = Math.round((readChapters.length / chapters.length) * 100);
 
   return (
     <div className="space-y-6 pb-20">
@@ -401,7 +396,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
               className={`${TAP_GAP[8]} inline-flex items-center gap-2 px-3 sm:px-3.5 py-2 sm:py-2.5 rounded-xl bg-base-300 border border-base-border text-base-content-body text-xs sm:text-sm font-medium hover:bg-base-border transition-all cursor-pointer`}
             >
               <GraduationCap className="w-4 h-4 text-warning" />
-              <span>ทำควิซสะสม XP</span>
+              <span>ทำควิซทบทวนความรู้</span>
             </button>
 
             {/* Quick jump to the glossary (chapter 15) */}
@@ -412,20 +407,6 @@ export const GuideTab: React.FC<GuideTabProps> = ({
               <span aria-hidden="true">📖</span>
               <span>Glossary</span>
             </button>
-          </div>
-        </div>
-
-        {/* Global Progress Bar */}
-        <div className="mt-4 pt-3.5 border-t border-base-border flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs">
-          <div className="flex items-center gap-2 text-base-content-secondary font-medium text-[11px] sm:text-xs">
-            <CheckCircle2 className="w-3.5 h-3.5 text-success" />
-            <span>ความคืบหน้าการอ่าน: อ่านจบแล้ว {readChapters.length} จาก {chapters.length} บท ({percentCompleted}%)</span>
-          </div>
-          <div className="w-full sm:w-64 h-1.5 sm:h-2 rounded-full bg-base-300 overflow-hidden">
-            <div 
-              className="h-full bg-primary rounded-full transition-all duration-500"
-              style={{ width: `${percentCompleted}%` }}
-            />
           </div>
         </div>
       </div>
@@ -598,7 +579,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                         ? 'bg-success/10 border-success/25 text-success'
                         : 'bg-base-300 border-base-border text-base-content-body hover:bg-base-border'
                     }`}
-                    title="ทำเครื่องหมายว่าอ่านและเข้าใจบทนี้แล้ว (+30 XP)"
+                    title="ทำเครื่องหมายว่าอ่านและเข้าใจบทนี้แล้ว"
                   >
                     <CheckCircle2 className={`w-3.5 h-3.5 ${isCurrentRead ? 'text-success' : 'text-base-content-muted'}`} />
                     <span className="hidden md:inline">{isCurrentRead ? 'อ่านแล้ว' : 'ทำเครื่องหมายว่าอ่านแล้ว'}</span>
@@ -613,7 +594,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                       ? 'bg-warning/10 border-warning/25 text-warning'
                       : 'bg-base-300 border-base-border text-base-content-muted hover:text-base-content'
                   }`}
-                  title={isCurrentBookmarked ? 'ลบบุ๊กมาร์ก' : 'บันทึกบทนี้ (+15 XP)'}
+                  title={isCurrentBookmarked ? 'ลบบุ๊กมาร์ก' : 'บุ๊กมาร์กบทนี้'}
                 >
                   {isCurrentBookmarked ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
                 </button>
@@ -791,10 +772,10 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                     <CheckCircle2 className="w-4 h-4" />
                     <span>
                       {trackNext.kind === 'next'
-                        ? 'อ่านจบแล้ว! ไปบทถัดไปใน track (+30 XP)'
+                        ? 'อ่านจบแล้ว! ไปบทถัดไปใน track'
                         : trackNext.kind === 'end'
-                        ? 'อ่านจบแล้ว! (+30 XP)'
-                        : 'อ่านจบแล้ว! ไปบทถัดไป (+30 XP)'}
+                        ? 'อ่านจบแล้ว!'
+                        : 'อ่านจบแล้ว! ไปบทถัดไป'}
                     </span>
                   </Button>
                 )}
@@ -857,7 +838,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                   <span>สารบัญทั้ง {chapters.length} บท</span>
                 </h3>
                 <p className="text-xs text-base-content-muted mt-0.5">
-                  อ่านแล้ว {readChapters.length}/{chapters.length} บท • เลือกเพื่อกระโดดข้ามทันที
+                  เลือกเพื่อกระโดดข้ามทันที
                 </p>
               </div>
               <button
@@ -956,8 +937,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
             </div>
 
             {/* Drawer Footer */}
-            <div className="p-4 border-t border-base-border bg-base-300 flex items-center justify-between text-xs">
-              <span className="text-base-content-muted text-[11px]">สะสม XP จากการอ่านและการทำควิซ</span>
+            <div className="p-4 border-t border-base-border bg-base-300 flex items-center justify-end text-xs">
               <Button color="neutral" variant="ghost" size="md" onClick={closeIndex}>ปิดสารบัญ</Button>
             </div>
 

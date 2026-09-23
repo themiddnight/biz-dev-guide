@@ -104,7 +104,7 @@ export type ChapterContentSection =
 
 export type ContentPlacement = NonNullable<ChapterContentSection['placement']>;
 
-export type TabType = 'guide' | 'ai' | 'quiz' | 'gamification' | 'simulator';
+export type TabType = 'guide' | 'ai' | 'quiz' | 'simulator';
 
 export interface ChapterConcept {
   heading: string;
@@ -258,31 +258,13 @@ export interface QuizQuestion {
     isCorrect: boolean;
     explanation: string;
   }[];
-  xp: number;
   forRole: Role | 'both'; // 'both' = role literacy for everyone; otherwise a seat-specific scenario (spec P5.1)
   chapterId?: string; // chapter behind the question, opened by อ่านบทที่เกี่ยวข้อง
 }
 
-export interface Badge {
-  id: string;
-  title: string;
-  description: string;
-  icon: string;
-  category: 'reading' | 'quiz' | 'ai' | 'exploration';
-  unlocked: boolean;
-  unlockedAt?: string;
-}
-
 export interface UserStats {
-  xp: number;
-  level: number;
-  levelTitle: string;
-  quizzesCompleted: number;
-  correctAnswers: number;
-  aiQuestionsAsked: number;
   readChapters: string[];
   bookmarks: string[];
-  xpClaims: string[]; // keys of XP awards already paid out (see lib/xp.ts)
 }
 
 export interface ChatMessage {

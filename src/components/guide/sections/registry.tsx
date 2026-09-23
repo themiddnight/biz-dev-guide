@@ -26,7 +26,6 @@ export type OtherSideView = Role | 'both';
 
 export interface GuideSectionContext {
   chapters: Chapter[];                                      // GlossaryPanel needs the chapter list (not in spec §1.7; required by the glossary block)
-  onEarnXp?: (chapterId: string, amount: number, reason: string) => void;
   onNavigateChapter: (chapterId: string) => void;
   onDiagramJump: (t: DiagramJumpTarget) => void;
   onScrollToPlaybook: (chapterId: string) => void;
@@ -53,7 +52,6 @@ export const FrictionSection: React.FC<SectionProps> = ({ chapter, isOpen, onTog
     chapterTitle={chapter.title}
     isOpen={isOpen}
     onToggle={onToggle}
-    onEarnXp={ctx.onEarnXp && ((amount, reason) => ctx.onEarnXp?.(chapter.id, amount, reason))}
   />
 );
 

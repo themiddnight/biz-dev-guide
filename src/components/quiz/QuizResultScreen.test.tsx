@@ -18,7 +18,6 @@ const render = (score: number, missed = missedItems(BASICS, answers)) =>
     <QuizResultScreen
       score={score}
       total={8}
-      awardedXp={25}
       missed={missed}
       onRestart={noop}
       onAskAI={noop}
@@ -56,7 +55,7 @@ describe('QuizResultScreen', () => {
   it('the saved-result pill and both action buttons survive every band', () => {
     for (const [score, missed] of [[1, missedItems(BASICS, answers)], [4, []], [8, []]] as const) {
       const html = render(score, missed as never);
-      expect(html).toContain('ทำครบแล้ว! บันทึกผลแล้ว');
+      expect(html).toContain('ทำครบแล้ว · ใช้ทบทวนเท่านั้น ไม่บันทึกคะแนน');
       expect(html).toContain('ทำแบบทดสอบอีกครั้ง');
       expect(html).toContain('ถาม AI ทบทวนข้อที่ยังไม่แม่น');
     }

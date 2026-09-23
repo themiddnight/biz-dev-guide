@@ -10,8 +10,6 @@ import {
   XCircle,
   ArrowRight,
   HelpCircle,
-  Award,
-  Zap,
   Bot,
   BookOpen
 } from 'lucide-react';
@@ -19,22 +17,15 @@ import { Button } from './ui/Button';
 import { ToggleChip } from './ui/ToggleChip';
 import { TAP } from './ui/tapTarget';
 
-type AnswerQuiz = (questionId: number, correct: boolean) => number; // pays XP now; returns XP actually awarded
-type CompleteQuiz = (score: number, roundSize: number) => void; // stats and badges only
-
 interface QuizTabProps {
   questions: QuizQuestion[]; // the full bank; the tab picks the round
   role: Role | null;
-  onAnswer: AnswerQuiz;
-  onCompleteQuiz: CompleteQuiz;
   onAskAIWithPrompt: (prompt: string) => void;
   onOpenChapter: (chapterId: string) => void;
 }
 
 interface QuizRunProps {
   questions: QuizQuestion[]; // one round
-  onAnswer: AnswerQuiz;
-  onCompleteQuiz: CompleteQuiz;
   onRunStarted: (started: boolean) => void;
   onAskAIWithPrompt: (prompt: string) => void;
   onOpenChapter: (chapterId: string) => void;
@@ -59,8 +50,6 @@ const ROUND_KEY = 'be_guide_quiz_round';
 export const QuizTab: React.FC<QuizTabProps> = ({
   questions,
   role,
-  onAnswer,
-  onCompleteQuiz,
   onAskAIWithPrompt,
   onOpenChapter,
 }) => {
@@ -113,8 +102,6 @@ export const QuizTab: React.FC<QuizTabProps> = ({
       <QuizRun
         key={round}
         questions={roundQuestions}
-        onAnswer={onAnswer}
-        onCompleteQuiz={onCompleteQuiz}
         onRunStarted={setRunStarted}
         onAskAIWithPrompt={onAskAIWithPrompt}
         onOpenChapter={onOpenChapter}
@@ -125,8 +112,6 @@ export const QuizTab: React.FC<QuizTabProps> = ({
 
 const QuizRun: React.FC<QuizRunProps> = ({
   questions,
-  onAnswer,
-  onCompleteQuiz,
   onRunStarted,
   onAskAIWithPrompt,
   onOpenChapter,
@@ -134,7 +119,6 @@ const QuizRun: React.FC<QuizRunProps> = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOptionIndex, setSelectedOptionIndex] = useState<number | null>(null);
   const [score, setScore] = useState(0);
-  const [awardedXp, setAwardedXp] = useState(0);
   const [answers, setAnswers] = useState<QuizAnswer[]>([]);
   const [isFinished, setIsFinished] = useState(false);
   const [shuffledOptions, setShuffledOptions] = useState(() => shuffleOptions(questions));
@@ -151,9 +135,6 @@ const QuizRun: React.FC<QuizRunProps> = ({
     // chosenText, not the shuffled index: the shuffle is re-rolled on restart (spec P2.2).
     setAnswers((prev) => [...prev, { questionId: currentQ.id, correct: isCorrect, chosenText: currentOptions[idx].text }]);
     onRunStarted(true);
-    // XP is paid on the answer, not at the end, so leaving mid-round keeps it.
-    const awarded = onAnswer(currentQ.id, isCorrect);
-    if (awarded > 0) setAwardedXp((prev) => prev + awarded);
   };
 
   const handleNext = () => {
@@ -162,8 +143,6 @@ const QuizRun: React.FC<QuizRunProps> = ({
       setSelectedOptionIndex(null);
     } else {
       setIsFinished(true);
-      // score already includes the last answer (updated in handleSelectOption).
-      onCompleteQuiz(score, questions.length);
     }
   };
 
@@ -171,7 +150,6 @@ const QuizRun: React.FC<QuizRunProps> = ({
     setCurrentIndex(0);
     setSelectedOptionIndex(null);
     setScore(0);
-    setAwardedXp(0);
     setAnswers([]);
     onRunStarted(false);
     setIsFinished(false);
@@ -183,7 +161,6 @@ const QuizRun: React.FC<QuizRunProps> = ({
       <QuizResultScreen
         score={score}
         total={questions.length}
-        awardedXp={awardedXp}
         missed={missedItems(questions, answers)}
         onRestart={handleRestart}
         onAskAI={() => onAskAIWithPrompt('ช่วยสรุปข้อคิดและทบทวนสิ่งที่ควรระวังจากแบบทดสอบเรื่อง Business vs Engineering')}
@@ -197,20 +174,13 @@ const QuizRun: React.FC<QuizRunProps> = ({
   return (
     <div className="max-w-3xl mx-auto space-y-section pb-16">
       {/* Quiz Top Progress */}
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <span className="text-[11px] font-bold text-base-content-muted uppercase tracking-wider">
-            คำถามข้อที่ {currentIndex + 1} จาก {questions.length}
-          </span>
-          <h2 className="text-base sm:text-xl font-bold text-base-content">
-            {currentQ.category}
-          </h2>
-        </div>
-
-        <div className="flex items-center gap-1.5 bg-warning/10 text-warning px-3 py-1 rounded-full text-xs font-bold border border-warning/25">
-          <Zap className="w-3.5 h-3.5 fill-warning text-warning" />
-          <span>+{currentQ.xp} XP</span>
-        </div>
+      <div>
+        <span className="text-[11px] font-bold text-base-content-muted uppercase tracking-wider">
+          คำถามข้อที่ {currentIndex + 1} จาก {questions.length}
+        </span>
+        <h2 className="text-base sm:text-xl font-bold text-base-content">
+          {currentQ.category}
+        </h2>
       </div>
 
       {/* Progress Line */}

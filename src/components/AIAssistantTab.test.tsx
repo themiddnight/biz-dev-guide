@@ -3,7 +3,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { AIAssistantTab } from './AIAssistantTab';
 
 describe('AIAssistantTab hierarchy (spec §10.1, §10.3, §10.5)', () => {
-  const html = renderToStaticMarkup(<AIAssistantTab onQuestionAsked={() => {}} />);
+  const html = renderToStaticMarkup(<AIAssistantTab />);
   const send = html.match(/<button[^>]*type="submit"[^>]*>/)?.[0] ?? '';
 
   it('send is the one primary solid and still submits the form', () => {
