@@ -12,6 +12,9 @@ const SRC = join(process.cwd(), 'src');
 const MIGRATED: string[] = [
   'App.tsx',
   'components/Header.tsx',
+  'components/GuideTab.tsx',
+  'components/guide/TrackPanel.tsx',
+  'components/guide/TrackFooter.tsx',
 ];
 
 /** Responsive combos that §5/§7.6 replace with tokens. */

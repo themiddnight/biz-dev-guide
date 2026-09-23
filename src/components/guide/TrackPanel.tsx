@@ -2,7 +2,8 @@ import React from 'react';
 import { Check } from 'lucide-react';
 import type { Chapter } from '../../types';
 import { TRACK_META, getTrackMinutes, getTrackProgress, resolveTrack, trackPrimaryLabel, type TrackKey } from '../../data/readingTracks';
-import { TAP, TAP_GAP } from '../ui/tapTarget';
+import { Button } from '../ui/Button';
+import { ToggleChip } from '../ui/ToggleChip';
 
 interface TrackPanelProps {
   chapters: Chapter[];
@@ -39,31 +40,33 @@ export const TrackPanel: React.FC<TrackPanelProps> = ({ chapters, trackKey, read
           const isRead = readChapters.includes(id);
           return (
             <li key={id}>
-              <button
-                type="button"
+              <ToggleChip
+                selected={isActive}
+                shape="card"
+                tap="gap-4"
                 data-track-item={id}
-                aria-current={isActive ? 'true' : undefined}
+                aria-current={isActive ? 'true' : false}
                 onClick={() => onSelectChapter(id)}
-                className={`${TAP_GAP[4]} w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-left text-xs cursor-pointer ${
-                  isActive ? 'bg-primary text-primary-content' : 'text-base-content-body hover:bg-base-300'
-                }`}
+                className="flex items-center gap-2 px-2 py-1.5 text-xs"
               >
                 <span className="w-5 shrink-0 text-[10px] opacity-70" aria-label={`บทที่ ${chapter.num}`}>{chapter.num}</span>
                 <span className="flex-1 truncate" title={chapter.title}>{chapter.title}</span>
                 {isRead && <Check className="w-3.5 h-3.5 shrink-0 text-success" aria-label="อ่านแล้ว" />}
-              </button>
+              </ToggleChip>
             </li>
           );
         })}
       </ol>
-      <button
-        type="button"
+      <Button
+        color="primary"
+        variant="soft"
+        size="sm"
+        block
         data-track-primary
         onClick={() => (firstUnreadId === null ? onStartQuiz() : onSelectChapter(firstUnreadId))}
-        className={`${TAP} w-full px-3 py-2 rounded-lg bg-primary text-primary-content text-xs font-bold cursor-pointer`}
       >
         {trackPrimaryLabel(read, firstUnreadId)}
-      </button>
+      </Button>
     </div>
   );
 };

@@ -51,9 +51,24 @@ import {
   SlidersHorizontal
 } from 'lucide-react';
 import { TAP, TAP_GAP } from './ui/tapTarget';
+import { Button } from './ui/Button';
+import { IconBadge } from './ui/IconBadge';
+import { Tabs } from './ui/Tabs';
 
 /** Glossary terms the index search matches for s15, computed once. */
 const GLOSSARY_TERMS = GLOSSARY.map(g => g.term);
+
+const ROLE_FILTERS = [
+  { value: 'all', label: 'ทั้งหมด' },
+  { value: 'pm', label: 'PM' },
+  { value: 'ux', label: 'UX' },
+  { value: 'ba', label: 'BA' },
+  { value: 'sa', label: 'SA' },
+  { value: 'eng', label: 'Dev' },
+  { value: 'qa', label: 'QA' },
+  { value: 'friction', label: 'ขัดแย้ง' },
+  { value: 'biz', label: 'ธุรกิจ' },
+] as const;
 
 interface GuideTabProps {
   chapters: Chapter[];
@@ -346,7 +361,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
       {showFirstVisit ? (
         <FirstVisitCard chapters={chapters} onChoose={handleFirstVisitChoice} onSkip={handleFirstVisitSkip} />
       ) : (
-      <div className="bg-base-100 border border-base-border rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xs">
+      <div className="bg-base-100 border border-base-border rounded-box p-box-spacious shadow-2xs">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="space-y-1.5 max-w-2xl">
             <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-base-300 text-base-content-body text-[11px] sm:text-xs font-semibold border border-base-border">
@@ -363,13 +378,10 @@ export const GuideTab: React.FC<GuideTabProps> = ({
 
           <div className="flex flex-wrap items-center gap-2 shrink-0">
             {/* Open Table of Contents Button */}
-            <button
-              onClick={openIndex}
-              className={`${TAP_GAP[8]} inline-flex items-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-primary hover:bg-primary/90 text-primary-content text-xs sm:text-sm font-semibold shadow-xs transition-all cursor-pointer`}
-            >
+            <Button color="neutral" variant="outline" size="md" tap="gap-8" onClick={openIndex}>
               <List className="w-4 h-4" />
               <span>สารบัญทั้ง {chapters.length} บท (Index)</span>
-            </button>
+            </Button>
 
             <button
               onClick={onStartQuiz}
@@ -411,7 +423,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
         
         {/* Left Column: Persistent Sticky Index on Desktop (Hidden on smaller screens, accessed via drawer/modal) */}
         <div className="hidden lg:block lg:col-span-4 sticky top-20 space-y-4">
-          <div className="bg-base-100 border border-base-border rounded-2xl sm:rounded-3xl p-3.5 shadow-2xs space-y-3.5 max-h-[calc(100vh-6rem)] overflow-hidden flex flex-col">
+          <div className="bg-base-100 border border-base-border rounded-box p-3.5 shadow-2xs space-y-3.5 max-h-[calc(100vh-6rem)] overflow-hidden flex flex-col">
             <div className="flex items-center justify-between pb-2 border-b border-base-border">
               <div className="flex items-center gap-2">
                 <List className="w-4 h-4 text-base-content" />
@@ -439,31 +451,16 @@ export const GuideTab: React.FC<GuideTabProps> = ({
             </div>
 
             {/* Role Filter Chips */}
-            <div className="flex items-center gap-1 shrink-0 overflow-x-auto pb-1 scrollbar-none text-[11px]">
-              {[
-                { id: 'all', label: 'ทั้งหมด' },
-                { id: 'pm', label: 'PM' },
-                { id: 'ux', label: 'UX' },
-                { id: 'ba', label: 'BA' },
-                { id: 'sa', label: 'SA' },
-                { id: 'eng', label: 'Dev' },
-                { id: 'qa', label: 'QA' },
-                { id: 'friction', label: 'ขัดแย้ง' },
-                { id: 'biz', label: 'ธุรกิจ' },
-              ].map((tag) => (
-                <button
-                  key={tag.id}
-                  onClick={() => setSelectedRole(tag.id)}
-                  className={`${TAP} px-2.5 py-1 rounded-lg font-medium whitespace-nowrap transition-all cursor-pointer ${
-                    selectedRole === tag.id
-                      ? 'bg-primary text-primary-content font-bold shadow-xs'
-                      : 'bg-base-300 text-base-content-secondary hover:bg-base-border'
-                  }`}
-                >
-                  {tag.label}
-                </button>
-              ))}
-            </div>
+            <Tabs<string>
+              variant="pills"
+              size="xs"
+              scroll
+              aria-label="กรองตามสายงาน"
+              items={ROLE_FILTERS}
+              value={selectedRole}
+              onChange={setSelectedRole}
+              className="shrink-0"
+            />
 
             {/* Chapter List Scrollable */}
             <div className="space-y-1.5 overflow-y-auto pr-1 flex-1 scrollbar-thin">
@@ -483,15 +480,15 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                         : 'bg-base-100 border-base-border hover:border-base-border-strong hover:bg-base-300'
                     }`}
                   >
-                    <div className={`w-6 h-6 rounded-lg text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 ${
-                      isActive
-                        ? 'bg-primary text-primary-content shadow-xs'
-                        : isRead
-                        ? 'bg-success/10 text-success font-semibold border border-success/40'
-                        : 'bg-base-border text-base-content-secondary border border-base-border-strong'
-                    }`}>
+                    <IconBadge
+                      size="sm"
+                      variant={isActive ? 'outline' : 'soft'}
+                      color={isRead && !isActive ? 'success' : 'neutral'}
+                      label={`บทที่ ${chapter.num}`}
+                      className="mt-0.5"
+                    >
                       {isRead && !isActive ? <Check className="w-3.5 h-3.5" /> : chapter.num}
-                    </div>
+                    </IconBadge>
 
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-1">
@@ -526,9 +523,9 @@ export const GuideTab: React.FC<GuideTabProps> = ({
         </div>
 
         {/* Right Column: Active Chapter Reader Card ("บทละหน้า") */}
-        <div className="lg:col-span-8 space-y-4 sm:space-y-6">
+        <div className="lg:col-span-8 space-y-section">
           {/* Chapter Top Navigation Bar */}
-          <div className="bg-base-100 border border-base-border rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-2xs">
+          <div className="bg-base-100 border border-base-border rounded-box p-box shadow-2xs">
             {showResumedLine && (
               <p data-resumed className="mb-2 text-xs text-base-content-muted truncate">
                 อ่านต่อจากครั้งก่อน · บทที่ {activeChapter.num}
@@ -603,25 +600,23 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                 </button>
 
                 {/* Next Chapter Button */}
-                <button
+                <Button
+                  color={trackNext.kind === 'end' ? 'neutral' : 'primary'}
+                  variant={trackNext.kind === 'end' ? 'outline' : 'solid'}
+                  size="sm"
                   disabled={!nextChapter}
                   onClick={() => nextChapter && handleSelectChapter(nextChapter.id)}
-                  className={`${TAP} p-2 rounded-xl border flex items-center gap-1 text-xs font-semibold transition-all ${
-                    nextChapter
-                      ? 'border-base-border bg-primary text-primary-content hover:opacity-90 cursor-pointer shadow-xs'
-                      : 'border-base-border text-base-content-subtle cursor-not-allowed'
-                  }`}
                   title={nextChapter ? `บทถัดไป: ${nextChapter.title}` : 'นี่คือบทสุดท้าย'}
                 >
                   <span className="hidden sm:inline">บทถัดไป</span>
                   <ChevronRight className="w-4 h-4" />
-                </button>
+                </Button>
               </div>
             </div>
           </div>
 
           {/* Chapter Main Content Reader Card */}
-          <div id={CHAPTER_START_ID} className="bg-base-100 border border-base-border rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-7 shadow-2xs space-y-5 sm:space-y-6">
+          <div id={CHAPTER_START_ID} className="bg-base-100 border border-base-border rounded-box p-box-spacious shadow-2xs space-y-section">
             
             <ChapterHero
               chapter={activeChapter}
@@ -635,7 +630,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
             />
 
             {/* ADAPTIVE LENS CONTROLLER BANNER */}
-            <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-base-300 border border-base-border space-y-2 sm:space-y-2.5">
+            <div className="p-box-dense rounded-box bg-base-300 border border-base-border space-y-2 sm:space-y-2.5">
               {role === null ? (
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <div className="flex items-center gap-1.5 flex-wrap">
@@ -649,28 +644,17 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                   </div>
 
                   {/* Quick Switch Buttons */}
-                  <div className="flex items-center gap-1.5 self-start sm:self-auto">
-                    <button
-                      onClick={() => onExperienceLevelChange && onExperienceLevelChange('beginner')}
-                      className={`${TAP} px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer transition-all ${
-                        chapterLevel === 'beginner'
-                          ? 'bg-primary text-primary-content shadow-xs font-bold'
-                          : 'bg-base-100 text-base-content-secondary border border-base-border hover:bg-base-300'
-                      }`}
-                    >
-                      🌱 ใหม่กับเรื่องนี้
-                    </button>
-                    <button
-                      onClick={() => onExperienceLevelChange && onExperienceLevelChange('experienced')}
-                      className={`${TAP} px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer transition-all ${
-                        chapterLevel === 'experienced'
-                          ? 'bg-primary text-primary-content shadow-xs font-bold'
-                          : 'bg-base-100 text-base-content-secondary border border-base-border hover:bg-base-300'
-                      }`}
-                    >
-                      ⚡ ทำงานข้ามทีมมาแล้ว
-                    </button>
-                  </div>
+                  <Tabs<ExperienceLevel>
+                    variant="segmented"
+                    aria-label="สลับเลนส์เนื้อหา"
+                    className="self-start sm:self-auto"
+                    items={[
+                      { value: 'beginner', label: '🌱 ใหม่กับเรื่องนี้' },
+                      { value: 'experienced', label: '⚡ ทำงานข้ามทีมมาแล้ว' },
+                    ]}
+                    value={chapterLevel}
+                    onChange={lvl => onExperienceLevelChange?.(lvl)}
+                  />
                 </div>
               ) : (
                 <div data-role-lens={role} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
@@ -688,23 +672,17 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                   </p>
 
                   {/* Per-chapter level switch (this chapter only) */}
-                  <div className="flex flex-wrap items-center gap-1.5 self-start sm:self-auto" role="group" aria-label="ระดับของบทนี้">
-                    {([['beginner', '🌱 มือใหม่'], ['experienced', '⚡ คุ้นงานแล้ว']] as const).map(([lvl, label]) => (
-                      <button
-                        key={lvl}
-                        type="button"
-                        data-chapter-level={lvl}
-                        aria-pressed={chapterLevel === lvl}
-                        onClick={() => handleChapterLevelPick(lvl)}
-                        className={`${TAP} px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer transition-all ${
-                          chapterLevel === lvl
-                            ? 'bg-primary text-primary-content shadow-xs font-bold'
-                            : 'bg-base-100 text-base-content-secondary border border-base-border hover:bg-base-300'
-                        }`}
-                      >
-                        {label}
-                      </button>
-                    ))}
+                  <div className="flex flex-wrap items-center gap-1.5 self-start sm:self-auto">
+                    <Tabs<ExperienceLevel>
+                      variant="segmented"
+                      aria-label="ระดับของบทนี้"
+                      items={[
+                        { value: 'beginner', label: '🌱 มือใหม่' },
+                        { value: 'experienced', label: '⚡ คุ้นงานแล้ว' },
+                      ]}
+                      value={chapterLevel}
+                      onChange={handleChapterLevelPick}
+                    />
                     {levelSource === 'chapter' && (
                       <>
                         <span data-chapter-level-scope className="text-xs text-base-content-muted">
@@ -782,13 +760,15 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                 </button>
 
                 {onToggleReadChapter && !isCurrentRead && (
-                  <button
+                  <Button
+                    color="success"
+                    variant="soft"
+                    size="md"
                     onClick={() => {
                       onToggleReadChapter(activeChapter.id);
                       if (trackNext.kind === 'next') handleSelectChapter(trackNext.chapterId);
                       else if (trackNext.kind === 'not-in-track' && nextChapter) handleSelectChapter(nextChapter.id);
                     }}
-                    className={`${TAP} inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-success hover:bg-success/90 text-success-content text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer`}
                   >
                     <CheckCircle2 className="w-4 h-4" />
                     <span>
@@ -798,7 +778,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                         ? 'อ่านจบแล้ว! (+30 XP)'
                         : 'อ่านจบแล้ว! ไปบทถัดไป (+30 XP)'}
                     </span>
-                  </button>
+                  </Button>
                 )}
               </div>
 
@@ -807,7 +787,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                 {prevChapter ? (
                   <button
                     onClick={() => handleSelectChapter(prevChapter.id)}
-                    className={`${TAP} p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-base-border hover:border-base-border-strong text-left transition-all cursor-pointer bg-base-300 group`}
+                    className={`${TAP} p-box-dense rounded-box border border-base-border hover:border-base-border-strong text-left transition-all cursor-pointer bg-base-300 group`}
                   >
                     <div className="flex items-center gap-1 text-[11px] text-base-content-muted group-hover:text-base-content transition-colors">
                       <ArrowLeft className="w-3.5 h-3.5" />
@@ -827,7 +807,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                   nextChapter && (
                     <button
                       onClick={() => handleSelectChapter(nextChapter.id)}
-                      className={`${TAP} p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-base-border hover:border-base-border-strong text-right transition-all cursor-pointer bg-base-300 group`}
+                      className={`${TAP} p-box-dense rounded-box border border-base-border hover:border-base-border-strong text-right transition-all cursor-pointer bg-base-300 group`}
                     >
                       <div className="flex items-center justify-end gap-1 text-[11px] text-base-content font-semibold">
                         <span>บทถัดไป</span>
@@ -852,7 +832,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
           <div className="w-full max-w-md bg-base-100 h-full shadow-2xl flex flex-col overflow-hidden border-l border-base-border animate-slideLeft">
             
             {/* Drawer Header */}
-            <div className="p-4 sm:p-5 border-b border-base-border flex items-center justify-between">
+            <div className="p-box border-b border-base-border flex items-center justify-between">
               <div>
                 <h3 className="font-bold text-base text-base-content flex items-center gap-2">
                   <List className="w-4 h-4 text-base-content-secondary" />
@@ -887,30 +867,16 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                 />
               </div>
 
-              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 max-sm:-mt-2.5 max-sm:pt-2.5 max-sm:-mb-2.5 max-sm:pb-3.5 scrollbar-none text-xs">
-                {[
-                  { id: 'all', label: 'ทั้งหมด' },
-                  { id: 'pm', label: 'PM' },
-                  { id: 'ux', label: 'UX' },
-                  { id: 'ba', label: 'BA' },
-                  { id: 'sa', label: 'SA' },
-                  { id: 'eng', label: 'Dev' },
-                  { id: 'qa', label: 'QA' },
-                  { id: 'friction', label: 'ขัดแย้ง' },
-                  { id: 'biz', label: 'ธุรกิจ' },
-                ].map((tag) => (
-                  <button
-                    key={tag.id}
-                    onClick={() => setSelectedRole(tag.id)}
-                    className={`${TAP} px-3 py-1 rounded-lg font-medium whitespace-nowrap transition-all cursor-pointer text-[11px] ${
-                      selectedRole === tag.id
-                        ? 'bg-primary text-primary-content font-bold'
-                        : 'bg-base-border text-base-content-secondary hover:bg-base-border-strong'
-                    }`}
-                  >
-                    {tag.label}
-                  </button>
-                ))}
+              <div className="pb-1 max-sm:-mt-2.5 max-sm:pt-2.5 max-sm:-mb-2.5 max-sm:pb-3.5">
+                <Tabs<string>
+                  variant="pills"
+                  size="xs"
+                  scroll
+                  aria-label="กรองตามสายงาน"
+                  items={ROLE_FILTERS}
+                  value={selectedRole}
+                  onChange={setSelectedRole}
+                />
               </div>
             </div>
 
@@ -932,15 +898,15 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                         : 'hover:bg-base-300'
                     }`}
                   >
-                    <div className={`w-7 h-7 rounded-lg text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 ${
-                      isActive
-                        ? 'bg-primary text-primary-content'
-                        : isRead
-                        ? 'bg-success/10 text-success'
-                        : 'bg-base-300 text-base-content-secondary'
-                    }`}>
+                    <IconBadge
+                      size="md"
+                      variant={isActive ? 'outline' : 'soft'}
+                      color={isRead && !isActive ? 'success' : 'neutral'}
+                      label={`บทที่ ${chapter.num}`}
+                      className="mt-0.5"
+                    >
                       {isRead && !isActive ? <Check className="w-3.5 h-3.5" /> : chapter.num}
-                    </div>
+                    </IconBadge>
 
                     <div className="min-w-0 flex-1 space-y-0.5">
                       <div className="flex items-center justify-between gap-1">
@@ -974,12 +940,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
             {/* Drawer Footer */}
             <div className="p-4 border-t border-base-border bg-base-300 flex items-center justify-between text-xs">
               <span className="text-base-content-muted text-[11px]">สะสม XP จากการอ่านและการทำควิซ</span>
-              <button
-                onClick={closeIndex}
-                className={`${TAP} px-4 py-2 bg-primary text-primary-content font-semibold rounded-xl cursor-pointer`}
-              >
-                ปิดสารบัญ
-              </button>
+              <Button color="neutral" variant="ghost" size="md" onClick={closeIndex}>ปิดสารบัญ</Button>
             </div>
 
           </div>
