@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
+import { nextChapterButtonStyle } from '../GuideTab';
 
 /**
  * Guard (spec §5, §7.6, §9-10) for files already migrated in Phase 3: layout comes from the radius
@@ -94,5 +95,24 @@ describe('Phase 3 hierarchy and layout tokens', () => {
     const guide = files.find(f => f.file === 'components/GuideTab.tsx')!.src;
     expect(guide).toMatch(/color="success"\s+variant="soft"/);
     expect(guide).not.toMatch(/color="success"\s+variant="solid"/);
+  });
+
+  it('the Guide next-chapter button is not a second primary solid on a track\'s last chapter (§9/§10.1)', () => {
+    // GuideTab picks this Button's color/variant conditionally on trackNext.kind, so the static
+    // literal-props regex above cannot see it; this pins the extracted decision itself.
+    const guide = files.find(f => f.file === 'components/GuideTab.tsx')!.src;
+    const literalPrimarySolids = count(guide, PRIMARY_SOLID);
+
+    const endStyle = nextChapterButtonStyle('end');
+    expect(endStyle).not.toEqual({ color: 'primary', variant: 'solid' });
+    const endTotal = literalPrimarySolids + (endStyle.color === 'primary' && endStyle.variant === 'solid' ? 1 : 0);
+    expect(endTotal).toBeLessThanOrEqual(PRIMARY_SOLID_MAX['components/GuideTab.tsx']);
+
+    for (const kind of ['next', 'not-in-track'] as const) {
+      const style = nextChapterButtonStyle(kind);
+      expect(style).toEqual({ color: 'primary', variant: 'solid' });
+      const total = literalPrimarySolids + 1;
+      expect(total).toBe(PRIMARY_SOLID_MAX['components/GuideTab.tsx']);
+    }
   });
 });
