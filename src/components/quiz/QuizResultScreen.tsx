@@ -2,6 +2,7 @@ import React from 'react';
 import { Sparkles, RotateCcw, Trophy, Target, Zap, Bot, BookOpen } from 'lucide-react';
 import { CHAPTERS } from '../../data/chaptersData';
 import { resultCopy, scoreBand, type MissedItem } from '../../lib/quizResult';
+import { Button } from '../ui/Button';
 import { TAP } from '../ui/tapTarget';
 
 interface QuizResultScreenProps {
@@ -50,7 +51,7 @@ export const QuizResultScreen: React.FC<QuizResultScreenProps> = ({
       </div>
 
       {/* Score & XP Card */}
-      <div className="grid grid-cols-2 gap-4 max-w-md mx-auto p-6 bg-base-100 rounded-2xl sm:rounded-3xl border border-base-border shadow-2xs">
+      <div className="grid grid-cols-2 gap-4 max-w-md mx-auto p-6 bg-base-100 rounded-box border border-base-border shadow-2xs">
         <div className="space-y-1">
           <span className="text-xs text-base-content-muted font-medium">คะแนนที่ได้</span>
           <div className="text-3xl font-extrabold text-base-content">
@@ -83,7 +84,7 @@ export const QuizResultScreen: React.FC<QuizResultScreenProps> = ({
             return (
               <div
                 key={item.question.id}
-                className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-base-100 border border-base-border space-y-2 shadow-2xs"
+                className="p-box rounded-box bg-base-100 border border-base-border space-y-2 shadow-2xs"
               >
                 <p className="text-xs sm:text-sm font-bold text-base-content break-words">
                   {item.question.question}
@@ -116,21 +117,15 @@ export const QuizResultScreen: React.FC<QuizResultScreenProps> = ({
 
       {/* Actions */}
       <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
-        <button
-          onClick={onRestart}
-          className={`${TAP} w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl sm:rounded-2xl bg-primary text-primary-content text-xs sm:text-sm font-semibold hover:opacity-90 transition-all cursor-pointer shadow-xs`}
-        >
+        <Button color="primary" variant="solid" size="lg" onClick={onRestart} className="w-full sm:w-auto">
           <RotateCcw className="w-4 h-4" />
           <span>ทำแบบทดสอบอีกครั้ง</span>
-        </button>
+        </Button>
 
-        <button
-          onClick={onAskAI}
-          className={`${TAP} w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl sm:rounded-2xl bg-base-300 text-base-content border border-base-border text-xs sm:text-sm font-semibold hover:bg-base-border transition-all cursor-pointer`}
-        >
+        <Button color="neutral" variant="soft" size="lg" onClick={onAskAI} className="w-full sm:w-auto">
           <Bot className="w-4 h-4" />
           <span>ถาม AI ทบทวนข้อที่ยังไม่แม่น</span>
-        </button>
+        </Button>
       </div>
     </div>
   );

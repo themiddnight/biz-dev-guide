@@ -65,4 +65,11 @@ describe('QuizResultScreen', () => {
   it('a middling score is told it passed but should review', () => {
     expect(render(4, [])).toContain('ผ่านแล้ว แต่ยังมีจุดที่ควรทบทวน');
   });
+
+  it('retake is the one primary solid; asking AI is a soft button (§10.1)', () => {
+    const html = render(3);
+    expect(html.match(/bg-primary text-primary-content border-primary/g)).toHaveLength(1);
+    expect(html).toMatch(/bg-primary text-primary-content[^>]*>(?:(?!<\/button>).)*ทำแบบทดสอบอีกครั้ง/s);
+    expect(html).toMatch(/bg-base-300 text-base-content border-transparent[^>]*>(?:(?!<\/button>).)*ถาม AI ทบทวนข้อที่ยังไม่แม่น/s);
+  });
 });

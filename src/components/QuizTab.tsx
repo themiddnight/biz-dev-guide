@@ -5,17 +5,19 @@ import { QUIZ_ROUNDS, QUIZ_ROUND_META, QuizRound, defaultQuizRound, getQuizRound
 import { readStorage, removeStorage, writeStorage } from '../lib/storage';
 import { missedItems, type QuizAnswer } from '../lib/quizResult';
 import { QuizResultScreen } from './quiz/QuizResultScreen';
-import { 
-  CheckCircle2, 
-  XCircle, 
-  ArrowRight, 
-  HelpCircle, 
+import {
+  CheckCircle2,
+  XCircle,
+  ArrowRight,
+  HelpCircle,
   Award,
   Zap,
   Bot,
   BookOpen
 } from 'lucide-react';
-import { TAP, TAP_GAP } from './ui/tapTarget';
+import { Button } from './ui/Button';
+import { ToggleChip } from './ui/ToggleChip';
+import { TAP } from './ui/tapTarget';
 
 type AnswerQuiz = (questionId: number, correct: boolean) => number; // pays XP now; returns XP actually awarded
 type CompleteQuiz = (score: number, roundSize: number) => void; // stats and badges only
@@ -84,7 +86,7 @@ export const QuizTab: React.FC<QuizTabProps> = ({
   const roundQuestions = useMemo(() => getQuizRound(questions, round), [questions, round]);
 
   return (
-    <div className="space-y-5 sm:space-y-6">
+    <div className="space-y-section">
       <div
         role="group"
         aria-label="เลือกชุดคำถาม"
@@ -94,20 +96,16 @@ export const QuizTab: React.FC<QuizTabProps> = ({
           const selected = r === round;
           const count = getQuizRound(questions, r).length;
           return (
-            <button
+            <ToggleChip
               key={r}
-              type="button"
-              aria-pressed={selected}
+              selected={selected}
+              shape="pill"
+              tap="gap-8"
               data-quiz-round={r}
               onClick={() => chooseRound(r)}
-              className={`${TAP_GAP[8]} px-3 py-1.5 rounded-full border text-xs font-semibold transition-colors cursor-pointer ${
-                selected
-                  ? 'bg-primary text-primary-content border-primary'
-                  : 'bg-base-100 text-base-content-body border-base-border hover:border-base-border-strong'
-              }`}
             >
               {QUIZ_ROUND_META[r].label}{r === role ? ' (สายคุณ)' : ''} · {count} ข้อ
-            </button>
+            </ToggleChip>
           );
         })}
       </div>
@@ -197,7 +195,7 @@ const QuizRun: React.FC<QuizRunProps> = ({
   const isAnswered = selectedOptionIndex !== null;
 
   return (
-    <div className="max-w-3xl mx-auto space-y-5 sm:space-y-6 pb-16">
+    <div className="max-w-3xl mx-auto space-y-section pb-16">
       {/* Quiz Top Progress */}
       <div className="flex items-center justify-between gap-4">
         <div>
@@ -224,13 +222,13 @@ const QuizRun: React.FC<QuizRunProps> = ({
       </div>
 
       {/* Scenario Card */}
-      <div className="p-4 sm:p-6 bg-base-100 rounded-2xl sm:rounded-3xl border border-base-border shadow-2xs space-y-3">
+      <div className="p-box-spacious bg-base-100 rounded-box border border-base-border shadow-2xs space-y-3">
         <div className="flex items-center gap-2">
           <span className="px-2.5 py-0.5 rounded-full bg-base-300 text-base-content-body text-[11px] sm:text-xs font-semibold border border-base-border">
             สถานการณ์จำลอง (Role: {currentQ.role})
           </span>
         </div>
-        <p className="text-xs sm:text-sm text-base-content-body italic bg-base-300 p-3 sm:p-3.5 rounded-xl border border-base-border leading-relaxed">
+        <p className="text-xs sm:text-sm text-base-content-body italic bg-base-300 p-box-dense rounded-xl border border-base-border leading-relaxed">
           &ldquo;{currentQ.scenario}&rdquo;
         </p>
         <h3 className="text-xs sm:text-base font-bold text-base-content pt-1">
@@ -239,7 +237,7 @@ const QuizRun: React.FC<QuizRunProps> = ({
       </div>
 
       {/* Options List */}
-      <div className="space-y-2.5 sm:space-y-3">
+      <div className="space-y-stack">
         {currentOptions.map((option, idx) => {
           const isSelected = selectedOptionIndex === idx;
           let btnStyle = 'border-base-border bg-base-100 text-base-content hover:border-base-border-strong';
@@ -259,7 +257,7 @@ const QuizRun: React.FC<QuizRunProps> = ({
               key={`${currentQ.id}-${option.text}`}
               onClick={() => handleSelectOption(idx)}
               disabled={isAnswered}
-              className={`${TAP} w-full p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border text-left text-xs sm:text-sm font-medium transition-all flex items-start justify-between gap-3 cursor-pointer disabled:cursor-default ${btnStyle}`}
+              className={`${TAP} w-full p-box rounded-box border text-left text-xs sm:text-sm font-medium transition-all flex items-start justify-between gap-3 cursor-pointer disabled:cursor-default ${btnStyle}`}
             >
               <div className="flex items-start gap-3">
                 <span className={`w-6 h-6 rounded-lg text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 ${
@@ -290,7 +288,7 @@ const QuizRun: React.FC<QuizRunProps> = ({
 
       {/* Explanation Box after answer */}
       {isAnswered && (
-        <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-base-300 border border-base-border space-y-1.5 animate-fadeIn">
+        <div className="p-box rounded-box bg-base-300 border border-base-border space-y-1.5 animate-fadeIn">
           <div className="flex items-center gap-1.5 text-xs font-bold text-base-content">
             <HelpCircle className="w-4 h-4 text-engineer" />
             <span>เฉลย:</span>
@@ -305,23 +303,21 @@ const QuizRun: React.FC<QuizRunProps> = ({
       {isAnswered && (
         <div className="flex flex-wrap items-center justify-end gap-2 pt-2">
           {currentQ.chapterId && (
-            <button
-              type="button"
+            <Button
+              color="neutral"
+              variant="soft"
+              size="lg"
               data-quiz-chapter={currentQ.chapterId}
               onClick={() => onOpenChapter(currentQ.chapterId!)}
-              className={`${TAP} inline-flex items-center gap-2 px-4 py-3 rounded-xl sm:rounded-2xl bg-base-300 text-base-content border border-base-border text-xs sm:text-sm font-semibold hover:bg-base-border transition-all cursor-pointer`}
             >
               <BookOpen className="w-4 h-4" />
               <span>อ่านบทที่เกี่ยวข้อง</span>
-            </button>
+            </Button>
           )}
-          <button
-            onClick={handleNext}
-            className={`${TAP} inline-flex items-center gap-2 px-6 py-3 rounded-xl sm:rounded-2xl bg-primary hover:bg-primary/90 text-primary-content text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer`}
-          >
+          <Button color="primary" variant="solid" size="lg" onClick={handleNext}>
             <span>{currentIndex + 1 === questions.length ? 'ดูผล' : 'คำถามข้อถัดไป'}</span>
             <ArrowRight className="w-4 h-4" />
-          </button>
+          </Button>
         </div>
       )}
     </div>
