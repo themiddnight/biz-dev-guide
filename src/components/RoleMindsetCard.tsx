@@ -37,7 +37,7 @@ export const RoleMindsetCard: React.FC<RoleMindsetCardProps> = ({
       {/* Header Button */}
       <button
         onClick={onToggle}
-        className={`${TAP} w-full p-3 sm:p-4 flex items-center justify-between bg-base-300 text-left cursor-pointer select-none transition-colors hover:bg-base-300`}
+        className={`${TAP} w-full p-3 sm:p-4 flex items-center justify-between bg-base-300 text-left cursor-pointer select-none transition-colors hover:bg-base-border`}
       >
         <div className="flex items-center gap-2.5 sm:gap-3">
           <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-success text-success-content flex items-center justify-center font-bold text-xs sm:text-sm shadow-xs shrink-0">

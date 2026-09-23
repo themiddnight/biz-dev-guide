@@ -214,7 +214,7 @@ export const FrictionFaqSection: React.FC<FrictionFaqSectionProps> = ({
               key={faq.id}
               type="button"
               onClick={() => jumpTo(faq.id)}
-              className={`${TAP_GAP[6]} ${chipClass} cursor-pointer text-left bg-base-300 border-base-border text-base-content-body hover:bg-base-300`}
+              className={`${TAP_GAP[6]} ${chipClass} cursor-pointer text-left bg-base-300 border-base-border text-base-content-body hover:bg-base-border`}
             >
               <span className="text-base-content-muted mr-1">{idx + 1}.</span>
               {faq.question}

@@ -17,7 +17,7 @@ export const SwimlaneVsSequence: React.FC = () => (
     id={S5_JUMP_TARGET_IDS.behavior}
     className="group scroll-mt-4 rounded-2xl bg-base-100 border border-base-border overflow-hidden"
   >
-    <summary className={`${TAP_Y} flex items-center justify-between gap-2 p-3.5 sm:p-4 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden bg-base-300 hover:bg-base-300 transition-colors`}>
+    <summary className={`${TAP_Y} flex items-center justify-between gap-2 p-3.5 sm:p-4 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden bg-base-300 hover:bg-base-border transition-colors`}>
       <span className="text-xs sm:text-sm font-bold text-base-content">
         {SWIMLANE_VS_SEQUENCE.summary}
       </span>

@@ -24,7 +24,7 @@ const blockTitleClass = 'text-xs sm:text-sm font-bold text-base-content';
 const introClass = 'text-xs sm:text-sm text-base-content-secondary leading-relaxed';
 const detailsClass =
   'group rounded-xl border border-base-border bg-base-100 overflow-hidden';
-const summaryClass = `${TAP_Y} flex items-center justify-between gap-2 p-3 sm:p-3.5 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden bg-base-300 hover:bg-base-300 transition-colors`;
+const summaryClass = `${TAP_Y} flex items-center justify-between gap-2 p-3 sm:p-3.5 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden bg-base-300 hover:bg-base-border transition-colors`;
 
 const SummaryChevron = () => (
   <ChevronDown className="w-4 h-4 shrink-0 text-base-content-muted transition-transform group-open:rotate-180" />
