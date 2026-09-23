@@ -559,7 +559,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
         </div>
         {/* Sync vs Async simulator (moved from former chapter 15 diagram), closed by default */}
         <details className="group rounded-box bg-base-100 border border-base-border overflow-hidden">
-          <summary className={`${TAP_Y} flex items-center justify-between gap-2 p-box-dense cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden bg-base-300 hover:bg-base-300 transition-colors`}>
+          <summary className={`${TAP_Y} flex items-center justify-between gap-2 p-box-dense cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden bg-base-300 hover:bg-base-border transition-colors`}>
             <span className="text-xs sm:text-sm font-bold text-base-content">
               Sync vs Async: Polling / Webhook / WebSocket
             </span>

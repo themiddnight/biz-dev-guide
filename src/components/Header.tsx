@@ -7,7 +7,6 @@ import {
   Bot,
   Sparkles,
   Trophy,
-  Award,
   Zap,
   Sun,
   Moon,

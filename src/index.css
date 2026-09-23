@@ -199,7 +199,7 @@ code, samp, pre {
 }
 
 /* Static figure port scope (SVG -> JSX). Figures reference var(--fig-*) only,
-   so they never shadow the app's own --text-muted / --border-color tokens. */
+   so they never shadow the app's own --color-base-content-muted / --color-base-border tokens. */
 .fig-scope {
   --fig-bg: #ffffff;
   --fig-surface-2: #eeeef0;
