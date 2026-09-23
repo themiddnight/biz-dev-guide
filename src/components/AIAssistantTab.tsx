@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Markdown from 'react-markdown';
+import Markdown, { type Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { ChatMessage } from '../types';
 import { 
@@ -7,12 +7,10 @@ import {
   Send, 
   Sparkles, 
   Loader2, 
-  HelpCircle, 
   User, 
   Copy, 
   Check, 
   Lightbulb, 
-  RefreshCw,
   WifiOff,
   BookOpen,
   X
@@ -32,6 +30,55 @@ interface AIAssistantTabProps {
   chapterContext?: ChapterContext | null;
   onClearChapterContext?: () => void;
 }
+
+const QUICK_PROMPTS = [
+  'ลูกค้าขอ "เพิ่มปุ่มเดียว" ช่วยอธิบายงานใต้น้ำให้ฟังหน่อย',
+  'ช่วยเขียน Acceptance Criteria ให้ระบบชำระเงิน',
+  'PM กับ Dev เถียงกันเรื่อง Deadline ควรแก้ปัญหายังไง?',
+  'อธิบาย NFR เรื่อง Scalability แบบภาษาบ้านๆ',
+  'เปรียบเทียบ Trunk-based กับ Git-flow เหมาะกับทีมแบบไหน?',
+];
+
+// Built once: a fresh object per render would rebuild every answer's element tree.
+const MARKDOWN_COMPONENTS: Components = {
+  h1: ({ children }) => <h1 className="text-base sm:text-lg font-bold text-base-content mt-3 mb-1.5 border-b border-base-border pb-1">{children}</h1>,
+  h2: ({ children }) => <h2 className="text-sm sm:text-base font-bold text-base-content mt-2.5 mb-1">{children}</h2>,
+  h3: ({ children }) => <h3 className="text-xs sm:text-sm font-bold text-base-content-body mt-2 mb-0.5">{children}</h3>,
+  p: ({ children }) => <p className="mb-2 last:mb-0 leading-relaxed text-base-content-body">{children}</p>,
+  ul: ({ children }) => <ul className="list-disc pl-5 mb-2 space-y-1 text-base-content-body">{children}</ul>,
+  ol: ({ children }) => <ol className="list-decimal pl-5 mb-2 space-y-1 text-base-content-body">{children}</ol>,
+  li: ({ children }) => <li className="leading-relaxed">{children}</li>,
+  blockquote: ({ children }) => (
+    <blockquote className="border-l-4 border-base-border-strong pl-3 italic text-base-content-body my-2 bg-base-100 py-1.5 rounded-r-lg">
+      {children}
+    </blockquote>
+  ),
+  code: ({ className, children, ...props }: any) => {
+    const isInline = !String(children).includes('\n') && !className;
+    if (isInline) {
+      return (
+        <code className="px-1.5 py-0.5 rounded bg-base-border text-base-content text-[11px] sm:text-xs" {...props}>
+          {children}
+        </code>
+      );
+    }
+    return (
+      <div className="my-2.5 rounded-xl overflow-hidden border border-base-border bg-neutral text-neutral-content p-3 text-xs overflow-x-auto">
+        <code {...props}>{children}</code>
+      </div>
+    );
+  },
+  table: ({ children }) => (
+    <div className="my-2.5 overflow-x-auto rounded-xl border border-base-border">
+      <table className="w-full text-left border-collapse text-xs">{children}</table>
+    </div>
+  ),
+  th: ({ children }) => <th className="bg-base-300 p-2.5 font-bold border-b border-base-border text-base-content">{children}</th>,
+  td: ({ children }) => <td className="p-2.5 border-b border-base-border text-base-content-body">{children}</td>,
+  strong: ({ children }) => <strong className="font-bold text-base-content">{children}</strong>,
+};
+
+const clockTime = () => new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
 // Footer label for an answer: the provider, plus the exact model when the server reported one.
 export function answerSourceLabel(source?: ChatMessage['source'], model?: string): string {
@@ -72,14 +119,6 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  const quickPrompts = [
-    'ลูกค้าขอ "เพิ่มปุ่มเดียว" ช่วยอธิบายงานใต้น้ำให้ฟังหน่อย',
-    'ช่วยเขียน Acceptance Criteria ให้ระบบชำระเงิน',
-    'PM กับ Dev เถียงกันเรื่อง Deadline ควรแก้ปัญหายังไง?',
-    'อธิบาย NFR เรื่อง Scalability แบบภาษาบ้านๆ',
-    'เปรียบเทียบ Trunk-based กับ Git-flow เหมาะกับทีมแบบไหน?',
-  ];
-
   const handleSend = async (questionText?: string) => {
     const q = questionText || inputQuestion;
     if (!q.trim() || isLoading) return;
@@ -89,7 +128,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
       id: Date.now().toString(),
       role: 'user',
       content: q,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      timestamp: clockTime(),
     };
 
     setMessages((prev) => [...prev, userMsg]);
@@ -117,7 +156,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
         id: (Date.now() + 1).toString(),
         role: 'assistant',
         content: data.answer,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp: clockTime(),
         source: data.source,
         model: data.model,
         fallbackReason: data.reason,
@@ -130,7 +169,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
         id: (Date.now() + 1).toString(),
         role: 'assistant',
         content: `ขออภัย รับคำตอบไม่สำเร็จ: ${err.message || 'ลองเช็กการเชื่อมต่อ'}`,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp: clockTime(),
       };
       setMessages((prev) => [...prev, errorMsg]);
     } finally {
@@ -202,7 +241,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
           <span>คำถามยอดฮิตที่เลือกถามได้ทันที:</span>
         </div>
         <div className="flex flex-wrap gap-2">
-          {quickPrompts.map((prompt, idx) => (
+          {QUICK_PROMPTS.map((prompt, idx) => (
             <button
               key={idx}
               onClick={() => handleSend(prompt)}
@@ -225,54 +264,12 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
             >
               <IconBadge size="md">{isAi ? <Bot className="w-4 h-4" /> : <User className="w-4 h-4" />}</IconBadge>
 
-              <div
-                className={`max-w-[85%] sm:max-w-[75%] rounded-box p-4 text-xs sm:text-sm leading-relaxed space-y-2 ${
-                  isAi
-                    ? 'bg-base-300 border border-base-border text-base-content'
-                    : 'bg-base-300 text-base-content border border-base-border'
-                }`}
-              >
+              <div className="max-w-[85%] sm:max-w-[75%] rounded-box p-4 text-xs sm:text-sm leading-relaxed space-y-2 bg-base-300 border border-base-border text-base-content">
                 {isAi ? (
                   <div className="markdown-body space-y-2.5 leading-relaxed break-words text-xs sm:text-sm">
                     <Markdown
                       remarkPlugins={[remarkGfm]}
-                      components={{
-                        h1: ({ children }) => <h1 className="text-base sm:text-lg font-bold text-base-content mt-3 mb-1.5 border-b border-base-border pb-1">{children}</h1>,
-                        h2: ({ children }) => <h2 className="text-sm sm:text-base font-bold text-base-content mt-2.5 mb-1">{children}</h2>,
-                        h3: ({ children }) => <h3 className="text-xs sm:text-sm font-bold text-base-content-body mt-2 mb-0.5">{children}</h3>,
-                        p: ({ children }) => <p className="mb-2 last:mb-0 leading-relaxed text-base-content-body">{children}</p>,
-                        ul: ({ children }) => <ul className="list-disc pl-5 mb-2 space-y-1 text-base-content-body">{children}</ul>,
-                        ol: ({ children }) => <ol className="list-decimal pl-5 mb-2 space-y-1 text-base-content-body">{children}</ol>,
-                        li: ({ children }) => <li className="leading-relaxed">{children}</li>,
-                        blockquote: ({ children }) => (
-                          <blockquote className="border-l-4 border-base-border-strong pl-3 italic text-base-content-body my-2 bg-base-100 py-1.5 rounded-r-lg">
-                            {children}
-                          </blockquote>
-                        ),
-                        code: ({ className, children, ...props }: any) => {
-                          const isInline = !String(children).includes('\n') && !className;
-                          if (isInline) {
-                            return (
-                              <code className="px-1.5 py-0.5 rounded bg-base-border text-base-content text-[11px] sm:text-xs" {...props}>
-                                {children}
-                              </code>
-                            );
-                          }
-                          return (
-                            <div className="my-2.5 rounded-xl overflow-hidden border border-base-border bg-neutral text-neutral-content p-3 text-xs overflow-x-auto">
-                              <code {...props}>{children}</code>
-                            </div>
-                          );
-                        },
-                        table: ({ children }) => (
-                          <div className="my-2.5 overflow-x-auto rounded-xl border border-base-border">
-                            <table className="w-full text-left border-collapse text-xs">{children}</table>
-                          </div>
-                        ),
-                        th: ({ children }) => <th className="bg-base-300 p-2.5 font-bold border-b border-base-border text-base-content">{children}</th>,
-                        td: ({ children }) => <td className="p-2.5 border-b border-base-border text-base-content-body">{children}</td>,
-                        strong: ({ children }) => <strong className="font-bold text-base-content">{children}</strong>,
-                      }}
+                      components={MARKDOWN_COMPONENTS}
                     >
                       {msg.content}
                     </Markdown>

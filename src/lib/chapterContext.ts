@@ -9,7 +9,7 @@ export interface ChapterContext {
 const CONTEXT_MAX = 1500;
 const CONCEPT_MAX = 200;
 
-const clip = (text: string, max: number) => (text.length > max ? `${text.slice(0, max - 1).trimEnd()}…` : text);
+export const clip = (text: string, max: number) => (text.length > max ? `${text.slice(0, max - 1).trimEnd()}…` : text);
 
 // RichText markers are for the renderer; the model only needs the words.
 export const plainText = (text: string) =>

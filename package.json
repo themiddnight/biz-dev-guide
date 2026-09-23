@@ -8,7 +8,7 @@
     "build": "vite build && esbuild server.ts --bundle --platform=node --format=cjs --packages=external --log-override:empty-import-meta=error --sourcemap --outfile=build/server.cjs",
     "start": "node build/server.cjs",
     "preview": "vite preview",
-    "clean": "rm -rf dist server.js",
+    "clean": "rm -rf dist build",
     "lint": "tsc --noEmit && knip",
     "knip": "knip",
     "test": "vitest run"

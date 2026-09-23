@@ -5,7 +5,8 @@ export interface ChatHistoryItem {
   content: string;
 }
 
-const HISTORY_TURNS = 4;
+// Shared with server/ask-ai.ts, which applies the same bound to what clients send.
+export const HISTORY_TURNS = 4;
 // A full Thai answer is ~1,400 tokens and Groq's free tier allows 8,000 tokens a minute per model,
 // so a follow-up carries only the head of each earlier answer.
 const ANSWER_MAX = 1200;

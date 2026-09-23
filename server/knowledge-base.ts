@@ -6,7 +6,7 @@ import { chapters6_10 } from "../src/data/chapters/chapters6_10";
 import { chapters11_15 } from "../src/data/chapters/chapters11_15";
 import { chapters16_19 } from "../src/data/chapters/chapters16_19";
 import { GLOSSARY } from "../src/data/glossary";
-import { plainText } from "../src/lib/chapterContext";
+import { clip, plainText } from "../src/lib/chapterContext";
 import { formatChapterHash } from "../src/lib/chapterRoute";
 import { mentions, suggestChapters } from "../src/lib/chapterSuggest";
 
@@ -17,12 +17,9 @@ const CHAPTERS = [...chapters1_5, ...chapters6_10, ...chapters11_15, ...chapters
 
 const TAKEAWAY_MAX = 220;
 
-const has = (q: string, keyword: string) => q.includes(keyword);
-const hasWord = mentions;
-
 function cannedAnswer(question: string): string | null {
   const q = question.toLowerCase();
-  if (has(q, "ปุ่มเดียว") || has(q, "แค่เพิ่ม") || has(q, "button")) {
+  if (q.includes("ปุ่มเดียว") || q.includes("แค่เพิ่ม") || q.includes("button")) {
     return `**ทำไม "แค่เพิ่มปุ่มเดียว" ถึงใช้เวลาเป็นสัปดาห์?**
 
 1. **สิ่งที่ตาเห็น vs งานใต้น้ำ:**
@@ -34,7 +31,7 @@ function cannedAnswer(question: string): string | null {
 3. **เอาไปใช้ยังไง (สิ่งที่ควรพูดในห้องประชุม):**
    - ถามว่า: *"เวอร์ชันที่เร็วและเล็กที่สุด (MVP) ของปุ่มนี้ ตัดเงื่อนไขอะไรออกไปก่อนได้บ้างเพื่อให้ส่งได้เร็วขึ้น?"*`;
   }
-  if (hasWord(q, "pm") && hasWord(q, "pjm")) {
+  if (mentions(q, "pm") && mentions(q, "pjm")) {
     return `**PM (Product Manager) vs PjM (Project Manager) ต่างกันอย่างไร?**
 
 - **Product Manager (PM):** ดูแลเรื่อง **"ทำอะไร เพื่อใคร และทำไม (What & Why)"** เป็นคนตัดสินใจเดิมพันทิศทาง จัดลำดับ Backlog วัดผลทางธุรกิจ รับมือกับความไม่แน่นอน
@@ -42,7 +39,7 @@ function cannedAnswer(question: string): string | null {
 
 *เปรียบแบบบ้านๆ:* PM คือคนที่เลือกว่า "ทริปนี้เราจะไปเที่ยวภูเขาหรือทะเลดีกว่ากัน" ส่วน PjM คือคนที่ "จองตั๋ว กะเวลารถออก และเช็คว่าทุกคนถึงโรงแรมตรงเวลาไหม"`;
   }
-  if (has(q, "tech debt") || has(q, "หนี้") || has(q, "refactor")) {
+  if (q.includes("tech debt") || q.includes("หนี้") || q.includes("refactor")) {
     return `**ทำไมงาน Technical Debt ถึงไม่เคยได้เข้า Sprint สักที?**
 
 - **สาเหตุหลัก:** ทีม Dev มักขอในภาษาเทคนิค เช่น "ขอเวลา Refactor 2 สัปดาห์" ซึ่งฝั่ง Business คำนวณความคุ้มค่าไม่ได้ และจะแพ้ Feature ใหม่ที่มีตัวเลขรายได้ชัดเจนเสมอ
@@ -51,7 +48,7 @@ function cannedAnswer(question: string): string | null {
   2. ใช้กรอบของ Martin Fowler (Tech Debt Quadrant): แยกหนี้ที่ตั้งใจ+รอบคอบ ออกจากหนี้ที่ประมาท
   3. ขอกันเวลาคงที่ เช่น 15–20% ของ Capacity ทุก Sprint ไว้ดูแลระบบ`;
   }
-  if (has(q, "acceptance criteria") || hasWord(q, "ac") || has(q, "user story") || has(q, "ชำระเงิน") || has(q, "payment")) {
+  if (q.includes("acceptance criteria") || mentions(q, "ac") || q.includes("user story") || q.includes("ชำระเงิน") || q.includes("payment")) {
     return `**ตัวอย่าง Acceptance Criteria (AC) สำหรับระบบชำระเงิน (Given-When-Then):**
 
 1. **กรณีชำระเงินสำเร็จ (Happy Path):**
@@ -67,7 +64,7 @@ function cannedAnswer(question: string): string | null {
 3. **กรณีเน็ตหลุด / Timeout (Idempotency):**
    - **Then:** การกดปุ่มซ้ำต้องไม่เกิดการตัดเงินเบิ้ล (Idempotency Key ป้องกันการชำระซ้ำซ้อน)`;
   }
-  if (has(q, "deadline") || has(q, "เถียง") || has(q, "กำหนดส่ง")) {
+  if (q.includes("deadline") || q.includes("เถียง") || q.includes("กำหนดส่ง")) {
     return `**เมื่อ PM กับ Dev มีความเห็นไม่ตรงกันเรื่อง Deadline ควรแก้ปัญหาอย่างไร?**
 
 1. **ทำความเข้าใจ Root Cause:**
@@ -82,7 +79,7 @@ function cannedAnswer(question: string): string | null {
 3. **แบ่งของเป็น Slice แนวดิ่ง (Vertical Slice):**
    - ทำ Core flow ให้ใช้งานได้จริง 1 เส้นทางก่อน ส่วนลูกเล่นและ Edge cases ค่อยทยอยปล่อยตามมา`;
   }
-  if (hasWord(q, "nfr") || has(q, "scalability") || has(q, "ขยายตัว")) {
+  if (mentions(q, "nfr") || q.includes("scalability") || q.includes("ขยายตัว")) {
     return `**NFR (Non-Functional Requirements) เรื่อง Scalability อธิบายแบบภาษาบ้านๆ:**
 
 - **ความหมาย:** ไม่ใช่แค่ "ระบบทำงานได้ไหม" แต่คือ "เมื่อคนมาใช้งานพร้อมกัน 10,000 คน ระบบยังทำงานได้เร็วเหมือนตอนมีคนเดียวไหม"
@@ -93,7 +90,7 @@ function cannedAnswer(question: string): string | null {
   - Peak Traffic อยู่ช่วงเวลาไหน? (เช่น 11:15 น. ทุกวันที่ 1 และ 16)
   - ยอมรับเวลารอได้สูงสุดกี่วินาที? (SLO / Latency)`;
   }
-  if (has(q, "trunk") || has(q, "git-flow") || has(q, "branch")) {
+  if (q.includes("trunk") || q.includes("git-flow") || q.includes("branch")) {
     return `**เปรียบเทียบ Trunk-based Development vs Git-flow:**
 
 - **Trunk-based Development:**
@@ -131,10 +128,9 @@ function chapterContextAnswer(context: string): string {
 function suggestionAnswer(question: string): string | null {
   const found = suggestChapters(question, CHAPTERS, GLOSSARY);
   if (found.length === 0) return null;
-  const clip = (t: string) => (t.length > TAKEAWAY_MAX ? `${t.slice(0, TAKEAWAY_MAX - 1).trimEnd()}…` : t);
   return [
     "**AI ยังตอบไม่ได้ตอนนี้ แต่บทในคู่มือเหล่านี้พูดถึงเรื่องที่ถามอยู่:**",
-    found.map((c) => `- [บทที่ ${c.num} · ${c.title}](${formatChapterHash(c.num)}): ${clip(plainText(c.keyTakeaway))}`).join("\n"),
+    found.map((c) => `- [บทที่ ${c.num} · ${c.title}](${formatChapterHash(c.num)}): ${clip(plainText(c.keyTakeaway), TAKEAWAY_MAX)}`).join("\n"),
     "_กดชื่อบทเพื่อเปิดอ่าน หรือลองถามใหม่อีกครั้งในอีกสักครู่_",
   ].join("\n\n");
 }

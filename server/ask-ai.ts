@@ -1,6 +1,7 @@
 // The /api/ask-ai logic, shared by the Express server (local dev, Cloud Run) and the Vercel
 // function in api/ask-ai.ts, which is what serves the route on Vercel. Answers come from Groq;
 // without a key, or when every Groq model fails, a built-in knowledge base answers instead.
+import { HISTORY_TURNS, type ChatHistoryItem } from "../src/lib/chatHistory";
 import { fallbackAnswer } from "./knowledge-base";
 
 interface AskAiInput {
@@ -8,11 +9,6 @@ interface AskAiInput {
   role?: string;
   context?: unknown;
   history?: unknown;
-}
-
-interface HistoryMessage {
-  role: "user" | "assistant";
-  content: string;
 }
 
 interface AskAiResult {
@@ -43,15 +39,14 @@ const GROQ_TIMEOUT_MS = 20_000;
 
 // History and context come from the client, so they are bounded here too: every request must fit
 // Groq's free tier of 8,000 tokens a minute per model.
-const HISTORY_TURNS = 4;
 const HISTORY_ITEM_MAX = 2000;
 const CONTEXT_MAX = 2000;
 
 // Malformed turns are dropped, not rejected: history only improves an answer.
-function sanitizeHistory(raw: unknown): HistoryMessage[] {
+function sanitizeHistory(raw: unknown): ChatHistoryItem[] {
   if (!Array.isArray(raw)) return [];
   return raw
-    .filter((m): m is HistoryMessage =>
+    .filter((m): m is ChatHistoryItem =>
       (m?.role === "user" || m?.role === "assistant") && typeof m.content === "string" && m.content.trim() !== "")
     .slice(-HISTORY_TURNS)
     .map(({ role, content }) => ({ role, content: content.slice(0, HISTORY_ITEM_MAX) }));
@@ -62,7 +57,7 @@ async function callGroq(
   question: string,
   role: string,
   context: string,
-  history: HistoryMessage[],
+  history: ChatHistoryItem[],
 ): Promise<{ text: string; model: string } | { rateLimited: boolean }> {
   const apiKey = process.env.GROQ_API_KEY?.trim();
   if (!apiKey) return { rateLimited: false };
@@ -132,22 +127,12 @@ export async function askAi(input: unknown): Promise<AskAiResult> {
       return { status: 400, body: { error: "พิมพ์คำถามก่อน" } };
     }
 
-    // Set when a Groq model refused with 429, so the client can say the free quota ran out
-    // rather than that the AI is offline.
-    let rateLimited = false;
     const chapterContext = typeof context === "string" ? context.slice(0, CONTEXT_MAX).trim() : "";
 
-    // 1. Attempt Groq call if GROQ_API_KEY is configured
-    if (process.env.GROQ_API_KEY?.trim()) {
-      try {
-        const groqAnswer = await callGroq(question, role, chapterContext, sanitizeHistory(history));
-        if ("text" in groqAnswer) {
-          return { status: 200, body: { answer: groqAnswer.text, source: "groq", model: groqAnswer.model } };
-        }
-        rateLimited = groqAnswer.rateLimited;
-      } catch (err: any) {
-        console.warn("[AI Bridge] Groq invocation failed, using the knowledge base:", err?.message || err);
-      }
+    // 1. Groq, when GROQ_API_KEY is configured
+    const groqAnswer = await callGroq(question, role, chapterContext, sanitizeHistory(history));
+    if ("text" in groqAnswer) {
+      return { status: 200, body: { answer: groqAnswer.text, source: "groq", model: groqAnswer.model } };
     }
 
     console.log("[AI Bridge] Serving request via expert knowledge base fallback");
@@ -158,8 +143,8 @@ export async function askAi(input: unknown): Promise<AskAiResult> {
       body: {
         answer: fallbackAnswer(question, chapterContext),
         source: "fallback",
-        note: "ให้คำแนะนำจากคลังความรู้ผู้เชี่ยวชาญ (Bridge Knowledge Base)",
-        ...(rateLimited && { reason: "rate_limited" }),
+        // A Groq model refused with 429: the client says the free quota ran out, not that the AI is offline
+        ...(groqAnswer.rateLimited && { reason: "rate_limited" }),
       },
     };
   } catch (err: any) {
