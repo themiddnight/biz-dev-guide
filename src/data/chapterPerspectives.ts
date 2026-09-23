@@ -208,9 +208,9 @@ export const CHAPTER_PERSPECTIVES: Record<string, ChapterPerspectives> = {
       measuredBy: 'ของใหม่ถึงมือลูกค้าตามวันที่ประกาศ และลูกค้าไม่เจอแอปดับตอนปล่อย',
       fears: ['ประกาศแคมเปญไปแล้ว แต่ปล่อยของใหม่ไม่ได้เพราะรอรอบ Deploy', 'ปล่อยของใหม่แล้วพัง ลูกค้าเห็นก่อนทีมจะรู้ตัว'],
       saysVsHears: [
-        { youSay: 'ขอ 1 Sprint ทำ Pipeline ก่อน',
+        { youSay: 'ขอ 1 Sprint ทำ Pipeline ก่อน[[!g:sales-pipeline]]',
           theyHear: 'จะไม่มีฟีเจอร์ใหม่ 2 สัปดาห์ เพราะงานหลังบ้าน',
-          sayInstead: 'ทำ Pipeline เสร็จ จะปล่อยงานได้ทุกวันแทนเดือนละครั้ง และย้อนกลับได้ในไม่กี่นาที' },
+          sayInstead: '[[!g:sales-pipeline]]ทำ Pipeline เสร็จ จะปล่อยงานได้ทุกวันแทนเดือนละครั้ง และย้อนกลับได้ในไม่กี่นาที' },
         { youSay: 'ขึ้นไปแล้ว แต่ยังซ่อนไว้หลัง Feature Flag',
           theyHear: 'งานยังไม่เสร็จ แต่บอกว่าปล่อยแล้ว',
           sayInstead: 'โค้ดขึ้นระบบแล้ว วันนี้เปิดให้ลูกค้า 5% ถ้าไม่มี Error จะเปิดครบวันศุกร์' },

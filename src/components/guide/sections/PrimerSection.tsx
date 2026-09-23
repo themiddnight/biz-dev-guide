@@ -1,15 +1,15 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Lightbulb, ChevronDown, ChevronUp } from 'lucide-react';
 import type { SectionProps } from './registry';
 import { RichText } from '../../content/RichText';
-import { markTerms } from '../../../lib/autoTerms';
+import { primerTerms } from '../../../lib/sectionTerms';
 
 export const PrimerSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggle, ctx }) => {
-  if (!chapter.beginnerPrimer) return null;
-  // One `seen` set per section render: each glossary term is marked once in this section (spec P3.5).
-  const seen = new Set<string>();
+  // Each glossary term is marked once in this section (spec P3.5), computed purely from the chapter.
+  const marked = useMemo(() => primerTerms(chapter), [chapter]);
+  if (!marked) return null;
   const prose = (text: string) => (
-    <RichText text={markTerms(text, 'prose', seen)} onNavigateChapter={ctx.onNavigateChapter} onSearchGlossary={ctx.onSearchGlossary} />
+    <RichText text={text} onNavigateChapter={ctx.onNavigateChapter} onSearchGlossary={ctx.onSearchGlossary} />
   );
   return (
     <div className="border border-neutral-200 dark:border-[#262626] rounded-2xl overflow-hidden bg-white dark:bg-[#141414] shadow-2xs">
@@ -41,7 +41,7 @@ export const PrimerSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggl
               <span>สิ่งนี้คืออะไร? (What is it?)</span>
             </div>
             <p className="text-neutral-600 dark:text-[#a3a3a3] leading-relaxed pl-3 font-normal text-xs sm:text-sm">
-              {prose(chapter.beginnerPrimer.whatIsIt)}
+              {prose(marked.whatIsIt)}
             </p>
           </div>
 
@@ -51,7 +51,7 @@ export const PrimerSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggl
               <span>ทำไมถึงสำคัญมาก? ถ้าไม่มีจะเกิดอะไรขึ้น? (Why it matters?)</span>
             </div>
             <p className="text-neutral-600 dark:text-[#a3a3a3] leading-relaxed pl-3 font-normal text-xs sm:text-sm">
-              {prose(chapter.beginnerPrimer.whyItMatters)}
+              {prose(marked.whyItMatters)}
             </p>
           </div>
 
@@ -61,7 +61,7 @@ export const PrimerSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggl
               <span>เทียบกับเรื่องในชีวิตประจำวัน (Real-World Analogy)</span>
             </div>
             <p className="text-neutral-600 dark:text-[#a3a3a3] leading-relaxed font-normal text-xs">
-              {prose(chapter.beginnerPrimer.realWorldScenario)}
+              {prose(marked.realWorldScenario)}
             </p>
           </div>
         </div>

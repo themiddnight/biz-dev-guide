@@ -5,27 +5,31 @@ import { termPattern } from '../data/termInventory';
  * Automatic inline-term markers (term-definitions spec P3.5, D16). `markTerms` inserts
  * `[[g:<glossary-id>|label]]` around glossary terms in a prose string, immediately before
  * `RichText` parses it. Markers carry an id and the label as written — never definition text.
+ * The per-section walk (which strings, in which order, sharing one `seen` set) lives in
+ * `src/lib/sectionTerms.ts`, a pure function of the chapter the section components memoise.
  *
  * Field scope (guardrail 1). The call sites pass the kind; nothing is marked unless it is `prose`.
  * - `prose` (marked): `beginnerPrimer.whatIsIt` / `whyItMatters` / `realWorldScenario`,
  *   `coreConcepts[].detail`, `coreConcepts[].bulletPoints[]`, `jargonList[].humanTranslation`,
- *   `keyTakeaway`, `plainAnalogy`, `businessNote`, `engineerNote`, `perspectives.*.measuredBy`,
- *   `perspectives.*.fears[]`, `perspectives.*.askThem[]`.
+ *   `jargonList[].meetingExample`, `keyTakeaway`, `plainAnalogy`, `businessNote`, `engineerNote`,
+ *   `perspectives.*.measuredBy`, `perspectives.*.fears[]`, `perspectives.*.askThem[]`, and the
+ *   `perspectives.*.saysVsHears[]` lines (`youSay` / `theyHear` / `sayInstead`). Dialogue and quoted
+ *   speech are prose (D21): on the eng track every early `Sprint` is inside a spoken line.
  * - `heading` (returned unchanged): `title`, `subtitle`, `enTerm`, `diagramTitle`,
  *   `coreConcepts[].heading`, `jargonList[].term`, `checklist[]`, `realWorldWorkflow[].step`,
  *   `commonPitfalls[].pitfall`, every section header string in the components, and every glossary
- *   `term` label. Also `diagramDescription`: it renders inside the diagram section's toggle
- *   `<button>`, and a term button cannot nest inside another button.
- * - `quote` (returned unchanged): `dialogueExample` lines, `jargonList[].meetingExample`,
- *   `frictionPlaybook` script lines, and `perspectives.*.saysVsHears[]` — the lines a person says
- *   (`youSay` / `theyHear` / `sayInstead`), which is the spec's own example of speech
- *   (`chapterPerspectives.ts:435`, `'บั๊กนี้ Severity ต่ำ ไว้ Sprint หน้าได้'`).
- * - Not wired yet: `ContentBlock` body and table-cell text (`ContentBlocks.tsx`) and
- *   `jargonList[].formalDefinition` render without `markTerms`.
+ *   `term` label.
+ * - Not wired yet (spec Phase 3, deferrals): `ContentBlock` body and table-cell text
+ *   (`ContentBlocks.tsx`), `jargonList[].formalDefinition`, `dialogueExample` and `frictionPlaybook`
+ *   lines, and `diagramDescription` — it renders inside the diagram section's toggle `<button>`, and
+ *   a term button cannot nest inside another button.
+ *
+ * A glossary key that means something else in one string (`Pipeline` in "Leaky Pipeline", `L1`–`L3`
+ * as C4 zoom levels) is opted out in that string with `[[!g:id]]` (guardrail 7), not excluded here.
  *
  * Deliberately not read: `role` and `chapterLevel` (D17). Every reader gets the same markers.
  */
-export type FieldKind = 'prose' | 'heading' | 'quote';
+export type FieldKind = 'prose' | 'heading';
 
 interface Candidate {
   key: string;
@@ -34,16 +38,6 @@ interface Candidate {
   /** Lower-cased forms that, found in parentheses right after a match, mean the text expands it. */
   expansions: string[];
 }
-
-/**
- * Keys the glossary answers to that mean something else in this guide's prose, so an automatic
- * match would open the wrong definition. Search still finds them; only auto-marking skips them.
- * - `Pipeline` is an alias of `sales-pipeline`, but the chapters use it for the Leaky Pipeline (s1)
- *   and the CI/CD pipeline.
- * - `L1` / `L2` / `L3` are support tiers in `support-ticket-support-tier`, but s5 uses them for the
- *   C4 zoom levels (`chapters1_5.ts:587, 600`).
- */
-export const AUTO_MATCH_EXCLUDED_KEYS: ReadonlySet<string> = new Set(['Pipeline', 'L1', 'L2', 'L3']);
 
 /**
  * Guardrail 5: an abbreviation — all caps (`PM`, `C4`, `P&L`, `CI/CD`) or an all-caps compound
@@ -66,7 +60,7 @@ const keysOf = (entry: GlossaryTerm): string[] => {
   const label = entry.term.replace(/\([^)]*\)/g, ' ').replace(/\s+/g, ' ').trim();
   const parts = label.split('/').map(s => s.trim()).filter(Boolean);
   const compact = label.replace(/\s*\/\s*/g, '/');
-  return [...new Set([...parts, label, compact, ...(entry.aliases ?? [])])].filter(k => !AUTO_MATCH_EXCLUDED_KEYS.has(k));
+  return [...new Set([...parts, label, compact, ...(entry.aliases ?? [])])];
 };
 
 /** Guardrail 4: candidates sorted longest key first, so `CI/CD` beats `CI` and `Test Pyramid` beats `Pyramid`. */
@@ -84,19 +78,13 @@ const AUTHORED_RE = /\[\[g:([a-z0-9-]+)\|[^\]]+?\]\]/g;
 
 /**
  * Runs the matcher never looks inside (guardrails 2 and 8): existing markers and chapter links,
- * bold runs (the `RichText` bold token cannot hold a nested marker), quoted runs, backtick code,
- * and arrow chains — short tokens joined by `->`, `→` or `➔` (`PO ➔ UX ➔ BA`).
+ * bold runs (the `RichText` bold token cannot hold a nested marker), and backtick code. Quoted
+ * speech (D21) and arrow chains such as `ผู้บริหาร → PM → Designer` (D20) are prose and are scanned.
  */
 const PROTECTED_RES: readonly RegExp[] = [
   /\[\[(?:g:[a-z0-9-]+|s\d+)\|[^\]]+?\]\]/g,
   /\*\*[^*]+?\*\*/g,
-  /"[^"\n]*"/g,
-  /“[^”\n]*”/g,
-  /'[^'\n]*'/g,
-  /‘[^’\n]*’/g,
-  /「[^」\n]*」/g,
   /`[^`\n]*`/g,
-  /\S+(?:\s*(?:->|→|➔)\s*\S+)+/g,
 ];
 
 type Span = [start: number, end: number];
@@ -122,9 +110,10 @@ export function collectTermIds(text: string): string[] {
 }
 
 /**
- * Insert `[[g:id|label]]` markers for glossary terms found in `text`. Pure string -> string;
- * `seen` (term ids) is owned by the section component and fresh on every section render, so each
- * term is marked once per section (guardrail 3).
+ * Insert `[[g:id|label]]` markers for glossary terms found in `text`. String -> string; it adds the
+ * ids it marks to `seen`, so each term is marked once per `seen` set (guardrail 3). Never pass a set
+ * that outlives one call of a pure section walk (`sectionTerms.ts`): a set shared across renders is
+ * already full on React's StrictMode second render, which then marks nothing.
  */
 export function markTerms(text: string, kind: FieldKind, seen: Set<string>): string {
   return kind === 'prose' ? scan(text, seen) : text;

@@ -7,25 +7,24 @@ const mark = (text: string, seen = new Set<string>()) => markTerms(text, 'prose'
 const ids = (marked: string) => [...marked.matchAll(/\[\[g:([a-z0-9-]+)\|([^\]]+)\]\]/g)].map(m => `${m[1]}|${m[2]}`);
 
 describe('markTerms guardrails', () => {
-  it('1. prose only: heading and quote kinds return the input unchanged', () => {
+  it('1. prose only: the heading kind returns the input unchanged', () => {
     const text = 'Sprint ของทีม KPI และ QA [[!g:sprint]]';
     expect(markTerms(text, 'heading', new Set())).toBe(text);
-    expect(markTerms(text, 'quote', new Set())).toBe(text);
     expect(ids(markTerms('Sprint ของทีม', 'prose', new Set()))).toEqual(['sprint|Sprint']);
   });
 
-  it('2. quoted and code-like runs inside a prose field are untouched', () => {
-    expect(ids(mark('ทีมบอกว่า "ไว้ Sprint หน้า" แล้วก็เงียบ'))).toEqual([]);
-    expect(ids(mark('ทีมบอกว่า “ไว้ Sprint หน้า” แล้วก็เงียบ'))).toEqual([]);
-    expect(ids(mark("ทีมบอกว่า 'ไว้ Sprint หน้า' แล้วก็เงียบ"))).toEqual([]);
-    expect(ids(mark('ทีมบอกว่า 「ไว้ Sprint หน้า」 แล้วก็เงียบ'))).toEqual([]);
+  it('2. code-like runs are untouched; quoted speech (D21) and arrow chains (D20) are prose', () => {
     expect(ids(mark('รัน `npm run QA` ก่อน'))).toEqual([]);
-    // Arrow chains, `->`, `→` and `➔`: the s1 primer's hand-off chain (chapters1_5.ts:20).
-    expect(ids(mark('ตั้งแต่ผู้บริหาร → PM → Designer → SA → Dev เพราะแต่ละคนตีความ'))).toEqual([]);
-    expect(ids(mark('ลูกค้าแจ้ง -> QA ตรวจ'))).toEqual([]);
-    expect(ids(mark('Business Concept ➔ PO ➔ UX ➔ BA'))).toEqual([]);
-    // The same term outside the quote is still marked.
-    expect(ids(mark('"ไว้ Sprint หน้า" คือคำที่ได้ยินทุก Sprint'))).toEqual(['sprint|Sprint']);
+    expect(ids(mark('ทีมบอกว่า "ไว้ Sprint หน้า" แล้วก็เงียบ'))).toEqual(['sprint|Sprint']);
+    expect(ids(mark('ทีมบอกว่า “ไว้ Sprint หน้า” แล้วก็เงียบ'))).toEqual(['sprint|Sprint']);
+    expect(ids(mark("ทีมบอกว่า 'ไว้ Sprint หน้า' แล้วก็เงียบ"))).toEqual(['sprint|Sprint']);
+    // The spec's own dialogue example (chapterPerspectives.ts:435), a `youSay` line.
+    expect(ids(mark('บั๊กนี้ Severity ต่ำ ไว้ Sprint หน้าได้'))).toEqual(['sprint|Sprint']);
+    // The s1 primer's hand-off chain (chapters1_5.ts:20), the audit's #1 worst offender.
+    expect(ids(mark('ตั้งแต่ผู้บริหาร → PM → Designer → SA → Dev เพราะแต่ละคนตีความ'))).toEqual(['pm-vs-pjm|PM', 'sa|SA']);
+    expect(ids(mark('ลูกค้าแจ้ง -> QA ตรวจ'))).toEqual(['qa|QA']);
+    // Still first occurrence only: a quoted repeat of a marked term is not marked again.
+    expect(ids(mark('ทุก Sprint มีคนพูดว่า "ไว้ Sprint หน้า"'))).toEqual(['sprint|Sprint']);
   });
 
   it('3. first occurrence per section: one `seen` set marks a term once', () => {
@@ -91,9 +90,13 @@ describe('markTerms guardrails', () => {
     expect(mark(once)).toBe(once); // idempotent: no marker inside a marker
   });
 
-  it('keys that mean something else in this guide are never auto-matched', () => {
-    expect(ids(mark('Leaky Pipeline คืออาการที่โจทย์เพี้ยน'))).toEqual([]);
-    expect(ids(mark('ผู้บริหารดู L1 ส่วน Dev ดู L3'))).toEqual([]);
+  it('a key that means something else in one string is opted out in that string, not in code', () => {
+    const s1 = CHAPTERS.find(c => c.id === 's1')!.beginnerPrimer!.whatIsIt; // "Leaky Pipeline"
+    const s5 = CHAPTERS.find(c => c.id === 's5')!.plainAnalogy; // L1-L3 as C4 zoom levels
+    expect(ids(mark(s1)).some(id => id.startsWith('sales-pipeline|'))).toBe(false);
+    expect(ids(mark(s5)).some(id => id.startsWith('support-ticket-support-tier|'))).toBe(false);
+    // Where `Pipeline` does mean the sales pipeline, it is marked (chapterPerspectives.ts, s16 askThem).
+    expect(ids(mark('ดีลไหนใน Pipeline ที่ขอฟีเจอร์'))).toEqual(['sales-pipeline|Pipeline']);
   });
 
   it('collectTermIds names every term once, ignoring `seen`', () => {

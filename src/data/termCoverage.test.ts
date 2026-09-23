@@ -5,7 +5,9 @@ import {
   beginnerVisibleTexts, extractAbbreviations, extractTrackedTerms, glossaryKeys, namesTerm, resolveTerm,
 } from './termInventory';
 import { searchGlossaryTerms } from '../lib/glossarySearch';
-import { collectTermIds, markTerms, type FieldKind } from '../lib/autoTerms';
+import { coreConceptTerms, heroTerms, jargonTerms, otherSideTerms, primerTerms } from '../lib/sectionTerms';
+import { ROLES } from './rolePerspective';
+import type { Chapter } from '../types';
 import { TRACK_CHAPTER_NUMS, type TrackKey } from './readingTracks';
 
 /**
@@ -165,51 +167,81 @@ describe('beginner-visible abbreviation coverage', () => {
 });
 
 /**
- * v2 (term-definitions spec D11, Phase 3): the at-or-before form. How the components mark each
- * `TERM_FIELDS` field — the section whose `seen` set it shares, and the kind it is marked with —
- * mirroring `ChapterHero`, `PrimerSection`, `JargonSection`, `OtherSideSection` and
- * `CoreConceptsSection`. A field absent here is never marked (headings, quotes, unwired fields).
+ * v2 (term-definitions spec D11, Phase 3): the at-or-before form. The markers come from the same
+ * pure section walks the components render (`src/lib/sectionTerms.ts`), not from a hand-kept
+ * mirror, so a rewired component cannot drift from this guard. The model is a beginner's default
+ * view with every Core section open: the other-side box in `both` mode, and core-concept bullets
+ * folded — a beginner does not see them until they tap `ดูรายละเอียด`, so they are neither a first
+ * use nor a definition here. A field with no entry below is never marked (headings, unwired fields).
  */
-const MARKED_FIELDS: Record<string, { section: string; kind: FieldKind }> = {
-  keyTakeaway: { section: 'hero', kind: 'prose' },
-  plainAnalogy: { section: 'hero', kind: 'prose' },
-  'beginnerPrimer.whatIsIt': { section: 'primer', kind: 'prose' },
-  'beginnerPrimer.whyItMatters': { section: 'primer', kind: 'prose' },
-  'beginnerPrimer.realWorldScenario': { section: 'primer', kind: 'prose' },
-  'jargonList.humanTranslation': { section: 'jargon', kind: 'prose' },
-  businessNote: { section: 'otherSide', kind: 'prose' },
-  engineerNote: { section: 'otherSide', kind: 'prose' },
-  'perspectives.measuredBy': { section: 'otherSide', kind: 'prose' },
-  'perspectives.fears': { section: 'otherSide', kind: 'prose' },
-  'perspectives.askThem': { section: 'otherSide', kind: 'prose' },
-  'coreConcepts.detail': { section: 'coreConcepts', kind: 'prose' },
-  'coreConcepts.bulletPoints': { section: 'coreConcepts', kind: 'prose' },
-};
+function markedByField(chapter: Chapter): Map<string, string[]> {
+  const hero = heroTerms(chapter);
+  const primer = primerTerms(chapter);
+  const jargon = jargonTerms(chapter);
+  const cards = otherSideTerms(chapter, ROLES);
+  const concepts = coreConceptTerms(chapter);
+  return new Map([
+    ['keyTakeaway', [hero.keyTakeaway]],
+    ['plainAnalogy', [hero.plainAnalogy]],
+    ['beginnerPrimer.whatIsIt', primer ? [primer.whatIsIt] : []],
+    ['beginnerPrimer.whyItMatters', primer ? [primer.whyItMatters] : []],
+    ['beginnerPrimer.realWorldScenario', primer ? [primer.realWorldScenario] : []],
+    ['jargonList.humanTranslation', jargon.map(card => card.humanTranslation)],
+    ['jargonList.meetingExample', jargon.flatMap(card => (card.meetingExample === undefined ? [] : [card.meetingExample]))],
+    // Each card carries its reader's note: the biz card is read by eng (`engineerNote`), and back.
+    ['businessNote', cards.filter(card => card.side === 'eng').map(card => card.note)],
+    ['engineerNote', cards.filter(card => card.side === 'biz').map(card => card.note)],
+    ['perspectives.measuredBy', cards.map(card => card.measuredBy)],
+    ['perspectives.fears', cards.flatMap(card => card.fears)],
+    ['perspectives.saysVsHears', cards.flatMap(card => card.saysVsHears.flatMap(row => [row.youSay, row.theyHear, row.sayInstead]))],
+    ['perspectives.askThem', cards.flatMap(card => card.askThem)],
+    ['coreConcepts.detail', concepts.map(concept => concept.detail)],
+  ]);
+}
+
+/** Fields a beginner's default view keeps folded: not walked at all. */
+const FOLDED_FOR_BEGINNERS: ReadonlySet<string> = new Set(['coreConcepts.bulletPoints']);
 
 const MARKER_ID_RE = /\[\[g:([a-z0-9-]+)\|[^\]]+\]\]/g;
+/** What the reader sees of a string: markers become their labels, opt-outs vanish. */
+const visibleText = (text: string) => text.replace(/\[\[!g:(?:[a-z0-9-]+|\*)\]\]/g, '').replace(/\[\[g:[a-z0-9-]+\|([^\]]+)\]\]/g, '$1');
 
 interface TrackEvent { term: string; at: string; defined: boolean }
+
+/** `ChapterHero` renders `plainAnalogy` above `keyTakeaway` when the chapter has a hero figure (`heroTerms` marks it first too). */
+function heroInRenderOrder<T extends { field: string }>(chapter: Chapter, occurrences: T[]): T[] {
+  if (!chapter.heroFigure) return occurrences;
+  const out = [...occurrences];
+  const takeaway = out.findIndex(o => o.field === 'keyTakeaway');
+  const analogy = out.findIndex(o => o.field === 'plainAnalogy');
+  [out[takeaway], out[analogy]] = [out[analogy], out[takeaway]];
+  return out;
+}
 
 /** Every abbreviation occurrence of one chapter, in beginner Core render order, and whether that occurrence is defined. */
 const chapterEvents = (chapterId: string): TrackEvent[] => {
   const chapter = CHAPTERS.find(c => c.id === chapterId)!;
-  // `JargonSection` seeds its set with the cards' own subjects.
-  const seen = new Map([['jargon', new Set((chapter.jargonList ?? []).flatMap(card => collectTermIds(card.term)))]]);
-  return beginnerVisibleTexts(chapter).flatMap(({ field, text }) => {
-    const marking = MARKED_FIELDS[field];
+  const marked = markedByField(chapter);
+  const nth = new Map<string, number>();
+  return heroInRenderOrder(chapter, beginnerVisibleTexts(chapter)).flatMap(({ field, text }) => {
+    if (FOLDED_FOR_BEGINNERS.has(field)) return [];
     const markerIds = new Set<string>();
-    if (marking) {
-      if (!seen.has(marking.section)) seen.set(marking.section, new Set());
-      const marked = markTerms(text, marking.kind, seen.get(marking.section)!);
-      for (const m of marked.matchAll(MARKER_ID_RE)) markerIds.add(m[1]);
+    const fieldTexts = marked.get(field);
+    if (fieldTexts) {
+      const i = nth.get(field) ?? 0;
+      nth.set(field, i + 1);
+      const markedText = fieldTexts[i] ?? '';
+      // The walk and `TERM_FIELDS` must name the same string, or the guard would credit the wrong marker.
+      if (visibleText(markedText) !== visibleText(text)) throw new Error(`${chapterId}/${field}[${i}]: marked walk out of step with TERM_FIELDS`);
+      for (const m of markedText.matchAll(MARKER_ID_RE)) markerIds.add(m[1]);
     }
     const terms = [...extractAbbreviations(text), ...extractTrackedTerms(text)];
     return terms.map(term => {
       const t = escapeRe(term);
       const expanded = new RegExp(`(?<![A-Za-z0-9])${t}\\s*\\(|\\(\\s*${t}\\s*\\)`).test(text);
       const isCard = field === 'jargonList.term' && namesTerm(text, term);
-      const marked = resolveTerm(term).some(id => markerIds.has(id));
-      return { term, at: `${chapterId}/${field}`, defined: expanded || isCard || marked };
+      const isMarked = resolveTerm(term).some(id => markerIds.has(id));
+      return { term, at: `${chapterId}/${field}`, defined: expanded || isCard || isMarked };
     });
   });
 };
@@ -221,7 +253,7 @@ const definedIn = (term: string) =>
   CHAPTERS.filter(c => EVENTS.get(c.id)!.some(e => e.term === term && e.defined)).map(c => c.id);
 
 /** One line per abbreviation whose first appearance in `track` has no definition at or before it. */
-function trackGaps(track: TrackKey): string[] {
+function trackGaps(track: TrackKey): { term: string; line: string }[] {
   const ids = TRACK_CHAPTER_NUMS[track].map(num => CHAPTERS.find(c => c.num === num)!.id);
   const first = new Map<string, TrackEvent>();
   const laterDefinition = new Map<string, string>();
@@ -234,132 +266,145 @@ function trackGaps(track: TrackKey): string[] {
     .filter(e => !e.defined)
     .map(({ term, at }) => {
       const later = laterDefinition.get(term);
-      if (later) return `track ${track}: "${term}" first seen at ${at}, defined only later at ${later}`;
+      if (later) return { term, line: `track ${track}: "${term}" first seen at ${at}, defined only later at ${later}` };
       const elsewhere = definedIn(term).filter(id => !ids.includes(id));
-      return elsewhere.length > 0
-        ? `track ${track}: "${term}" first seen at ${at}, defined only in ${elsewhere.join(', ')} (not in this track)`
-        : `track ${track}: "${term}" first seen at ${at}, never defined`;
+      return {
+        term,
+        line: elsewhere.length > 0
+          ? `track ${track}: "${term}" first seen at ${at}, defined only in ${elsewhere.join(', ')} (not in this track)`
+          : `track ${track}: "${term}" first seen at ${at}, never defined`,
+      };
     });
 }
 
 /**
- * What the v2 walk still finds once Phase 3's markers exist, pinned literally per track. This is a
- * ratchet, not an allowance: the assertion is equality, so a new gap fails (a regression) and a
- * closed gap fails too (update the list on purpose). Every line is a place where the first use of a
- * term sits in a field the D16 guardrails never mark — a title, subtitle, enTerm or heading (Phase
- * 4's chapter openings are the planned fix), a quoted line (`meetingExample`, `saysVsHears`), an
- * arrow chain, or a field not yet wired (`formalDefinition`, diagram content blocks,
- * `diagramDescription`) — so no marker can sit at that point without weakening a guardrail.
+ * What the v2 walk still finds, pinned literally per track and split by cause. This is a ratchet,
+ * not an allowance: the assertion is equality, so a new gap fails (a regression) and a closed gap
+ * fails too (update the list on purpose).
+ * - `guardrailLimited`: the term has a glossary entry, but its first use in the track sits where no
+ *   marker is placed — a title, subtitle, enTerm or heading (Phase 4's chapter openings are the
+ *   planned fix), or a field not wired yet (`formalDefinition`, `diagramDescription`, diagram
+ *   content blocks). Fixing one of these means wiring a field or rewriting an opening, not content.
+ * - `missingFromGlossary`: no glossary entry resolves the term, so nothing could ever mark it. A
+ *   cheap content fix: add the entry. Empty since D20/D21 — every earlier "never defined" line
+ *   (SA, SMS, OTP, QR, Refactor, ...) resolves, and is now marked in a dialogue line or arrow chain.
  */
-const KNOWN_GAPS_V2: Record<TrackKey, readonly string[]> = {
-  beginner: [
-    'track beginner: "PM" first seen at s1/beginnerPrimer.whatIsIt, defined only later at s2/keyTakeaway',
-    'track beginner: "SA" first seen at s1/beginnerPrimer.whatIsIt, never defined',
-    'track beginner: "QA" first seen at s1/jargonList.formalDefinition, defined only later at s1/coreConcepts.detail',
-    'track beginner: "Sprint" first seen at s1/jargonList.meetingExample, defined only later at s2/coreConcepts.bulletPoints',
-    'track beginner: "UX" first seen at s1/diagramDescription, defined only later at s3/beginnerPrimer.whatIsIt',
-    'track beginner: "BA" first seen at s1/diagramDescription, defined only later at s4/beginnerPrimer.whatIsIt',
-    'track beginner: "SMS" first seen at s2/jargonList.meetingExample, never defined',
-    'track beginner: "Microservices" first seen at s2/jargonList.meetingExample, defined only in s5, s15 (not in this track)',
-    'track beginner: "UX/UI" first seen at s3/title, never defined',
-    'track beginner: "Sketch" first seen at s3/subtitle, defined only later at s3/keyTakeaway',
-    'track beginner: "NFR" first seen at s4/title, defined only later at s4/beginnerPrimer.realWorldScenario',
-    'track beginner: "OTP" first seen at s4/jargonList.meetingExample, never defined',
-    'track beginner: "FURPS+" first seen at s4/coreConcepts.heading, never defined',
-    'track beginner: "DoR" first seen at s6/title, defined only later at s6/keyTakeaway',
-    'track beginner: "DoD" first seen at s6/title, defined only later at s6/keyTakeaway',
-    'track beginner: "QR" first seen at s6/jargonList.meetingExample, never defined',
-    'track beginner: "Gate" first seen at s6/diagramDescription, never defined',
-    'track beginner: "Test Pyramid" first seen at s7/title, defined only later at s7/coreConcepts.heading',
-    'track beginner: "Pyramid" first seen at s7/title, defined only later at s7/beginnerPrimer.whatIsIt',
-    'track beginner: "CI" first seen at s7/jargonList.meetingExample, defined only in s8 (not in this track)',
-    'track beginner: "FAQ" first seen at s11/coreConcepts.heading, never defined',
-    'track beginner: "BRD" first seen at s14/subtitle, defined only later at s14/plainAnalogy',
-    'track beginner: "ADR" first seen at s14/subtitle, defined only later at s14/plainAnalogy',
-  ],
-  experienced: [
-    'track experienced: "Sprint" first seen at s11/jargonList.meetingExample, defined only later at s6/beginnerPrimer.whatIsIt',
-    'track experienced: "PM" first seen at s11/perspectives.saysVsHears, defined only later at s12/coreConcepts.bulletPoints',
-    'track experienced: "FAQ" first seen at s11/coreConcepts.heading, never defined',
-    'track experienced: "SA" first seen at s1/beginnerPrimer.whatIsIt, never defined',
-    'track experienced: "QA" first seen at s1/jargonList.formalDefinition, defined only later at s1/coreConcepts.detail',
-    'track experienced: "UX" first seen at s1/diagramDescription, defined only later at s12/coreConcepts.bulletPoints',
-    'track experienced: "BA" first seen at s1/diagramDescription, defined only in s4 (not in this track)',
-    'track experienced: "DoR" first seen at s6/title, defined only later at s6/keyTakeaway',
-    'track experienced: "DoD" first seen at s6/title, defined only later at s6/keyTakeaway',
-    'track experienced: "Agile" first seen at s6/enTerm, defined only later at s6/beginnerPrimer.whatIsIt',
-    'track experienced: "QR" first seen at s6/jargonList.meetingExample, never defined',
-    'track experienced: "Gate" first seen at s6/diagramDescription, never defined',
-    'track experienced: "Tech Debt" first seen at s9/title, defined only in s15 (not in this track)',
-    'track experienced: "Refactor" first seen at s9/title, never defined',
-    'track experienced: "SDLC" first seen at s13/enTerm, defined only later at s13/beginnerPrimer.whatIsIt',
-    'track experienced: "BRD" first seen at s14/subtitle, defined only later at s14/plainAnalogy',
-    'track experienced: "ADR" first seen at s14/subtitle, defined only later at s14/plainAnalogy',
-  ],
-  biz: [
-    'track biz: "PM" first seen at s2/title, defined only later at s2/keyTakeaway',
-    'track biz: "SMS" first seen at s2/jargonList.meetingExample, never defined',
-    'track biz: "Sprint" first seen at s2/jargonList.meetingExample, defined only later at s2/coreConcepts.bulletPoints',
-    'track biz: "Microservices" first seen at s2/jargonList.meetingExample, defined only in s5, s15 (not in this track)',
-    'track biz: "SA" first seen at s1/beginnerPrimer.whatIsIt, never defined',
-    'track biz: "QA" first seen at s1/jargonList.formalDefinition, defined only later at s1/coreConcepts.detail',
-    'track biz: "UX" first seen at s1/diagramDescription, defined only in s3, s12 (not in this track)',
-    'track biz: "BA" first seen at s1/diagramDescription, defined only later at s4/beginnerPrimer.whatIsIt',
-    'track biz: "BRD" first seen at s14/subtitle, defined only later at s14/plainAnalogy',
-    'track biz: "ADR" first seen at s14/subtitle, defined only later at s14/plainAnalogy',
-    'track biz: "NFR" first seen at s4/title, defined only later at s4/beginnerPrimer.realWorldScenario',
-    'track biz: "OTP" first seen at s4/jargonList.meetingExample, never defined',
-    'track biz: "FURPS+" first seen at s4/coreConcepts.heading, never defined',
-    'track biz: "DoR" first seen at s6/title, defined only later at s6/keyTakeaway',
-    'track biz: "QR" first seen at s6/jargonList.meetingExample, never defined',
-    'track biz: "Gate" first seen at s6/diagramDescription, never defined',
-    'track biz: "Tech Debt" first seen at s9/title, defined only in s15 (not in this track)',
-    'track biz: "Refactor" first seen at s9/title, never defined',
-    'track biz: "SRE" first seen at s10/title, defined only later at s10/beginnerPrimer.whatIsIt',
-    'track biz: "SLO" first seen at s10/subtitle, defined only later at s10/keyTakeaway',
-    'track biz: "L1" first seen at s10/diagramTitle, defined only in s5 (not in this track)',
-    'track biz: "L2" first seen at s10/diagramTitle, defined only in s5 (not in this track)',
-    'track biz: "L3" first seen at s10/diagramTitle, never defined',
-    'track biz: "FAQ" first seen at s11/coreConcepts.heading, never defined',
-  ],
-  eng: [
-    'track eng: "Sprint" first seen at s16/perspectives.saysVsHears, defined only later at s2/coreConcepts.bulletPoints',
-    'track eng: "PM" first seen at s1/beginnerPrimer.whatIsIt, defined only later at s2/keyTakeaway',
-    'track eng: "SA" first seen at s1/beginnerPrimer.whatIsIt, never defined',
-    'track eng: "QA" first seen at s1/jargonList.formalDefinition, defined only later at s1/coreConcepts.detail',
-    'track eng: "UX" first seen at s1/diagramDescription, defined only in s3, s12 (not in this track)',
-    'track eng: "BA" first seen at s1/diagramDescription, defined only later at s4/beginnerPrimer.whatIsIt',
-    'track eng: "SMS" first seen at s2/jargonList.meetingExample, never defined',
-    'track eng: "Microservices" first seen at s2/jargonList.meetingExample, defined only in s5, s15 (not in this track)',
-    'track eng: "OKR" first seen at s18/title, defined only later at s18/beginnerPrimer.whatIsIt',
-    'track eng: "KPI" first seen at s18/title, defined only later at s18/beginnerPrimer.whatIsIt',
-    'track eng: "KR" first seen at s18/jargonList.meetingExample, defined only later at s18/perspectives.measuredBy',
-    'track eng: "NFR" first seen at s4/title, defined only later at s4/beginnerPrimer.realWorldScenario',
-    'track eng: "OTP" first seen at s4/jargonList.meetingExample, never defined',
-    'track eng: "FURPS+" first seen at s4/coreConcepts.heading, never defined',
-    'track eng: "FAQ" first seen at s11/coreConcepts.heading, never defined',
-    'track eng: "SLO" first seen at s19/coreConcepts.heading, defined only later at s19/coreConcepts.detail',
-    'track eng: "Tech Debt" first seen at s9/title, defined only in s15 (not in this track)',
-    'track eng: "Refactor" first seen at s9/title, never defined',
-  ],
+const KNOWN_GAPS_V2: Record<TrackKey, { guardrailLimited: readonly string[]; missingFromGlossary: readonly string[] }> = {
+  beginner: {
+    guardrailLimited: [
+      'track beginner: "QA" first seen at s1/jargonList.formalDefinition, defined only later at s1/coreConcepts.detail',
+      'track beginner: "UX" first seen at s1/diagramDescription, defined only later at s3/beginnerPrimer.whatIsIt',
+      'track beginner: "BA" first seen at s1/diagramDescription, defined only later at s4/beginnerPrimer.whatIsIt',
+      'track beginner: "UX/UI" first seen at s3/title, never defined',
+      'track beginner: "Sketch" first seen at s3/subtitle, defined only later at s3/keyTakeaway',
+      'track beginner: "NFR" first seen at s4/title, defined only later at s4/beginnerPrimer.realWorldScenario',
+      'track beginner: "FURPS+" first seen at s4/coreConcepts.heading, never defined',
+      'track beginner: "DoR" first seen at s6/title, defined only later at s6/plainAnalogy',
+      'track beginner: "DoD" first seen at s6/title, defined only later at s6/plainAnalogy',
+      'track beginner: "Agile" first seen at s6/enTerm, defined only later at s6/beginnerPrimer.whatIsIt',
+      'track beginner: "Gate" first seen at s6/diagramDescription, never defined',
+      'track beginner: "Test Pyramid" first seen at s7/title, defined only later at s7/coreConcepts.heading',
+      'track beginner: "Pyramid" first seen at s7/title, defined only later at s7/beginnerPrimer.whatIsIt',
+      'track beginner: "FAQ" first seen at s11/coreConcepts.heading, never defined',
+      'track beginner: "BRD" first seen at s14/subtitle, defined only later at s14/plainAnalogy',
+      'track beginner: "ADR" first seen at s14/subtitle, defined only later at s14/plainAnalogy',
+    ],
+    missingFromGlossary: [],
+  },
+  experienced: {
+    guardrailLimited: [
+      'track experienced: "FAQ" first seen at s11/coreConcepts.heading, never defined',
+      'track experienced: "QA" first seen at s1/jargonList.formalDefinition, defined only later at s1/coreConcepts.detail',
+      'track experienced: "UX" first seen at s1/diagramDescription, defined only in s3 (not in this track)',
+      'track experienced: "BA" first seen at s1/diagramDescription, defined only in s4 (not in this track)',
+      'track experienced: "DoR" first seen at s6/title, defined only later at s6/plainAnalogy',
+      'track experienced: "DoD" first seen at s6/title, defined only later at s6/plainAnalogy',
+      'track experienced: "Agile" first seen at s6/enTerm, defined only later at s6/beginnerPrimer.whatIsIt',
+      'track experienced: "Gate" first seen at s6/diagramDescription, never defined',
+      'track experienced: "Tech Debt" first seen at s9/title, defined only in s15 (not in this track)',
+      'track experienced: "Refactor" first seen at s9/title, defined only later at s9/perspectives.saysVsHears',
+      'track experienced: "SDLC" first seen at s13/enTerm, defined only later at s13/beginnerPrimer.whatIsIt',
+      'track experienced: "BRD" first seen at s14/subtitle, defined only later at s14/plainAnalogy',
+      'track experienced: "ADR" first seen at s14/subtitle, defined only later at s14/plainAnalogy',
+    ],
+    missingFromGlossary: [],
+  },
+  biz: {
+    guardrailLimited: [
+      'track biz: "PM" first seen at s2/title, defined only later at s2/plainAnalogy',
+      'track biz: "QA" first seen at s1/jargonList.formalDefinition, defined only later at s1/coreConcepts.detail',
+      'track biz: "UX" first seen at s1/diagramDescription, defined only in s3 (not in this track)',
+      'track biz: "BA" first seen at s1/diagramDescription, defined only later at s4/beginnerPrimer.whatIsIt',
+      'track biz: "BRD" first seen at s14/subtitle, defined only later at s14/plainAnalogy',
+      'track biz: "ADR" first seen at s14/subtitle, defined only later at s14/plainAnalogy',
+      'track biz: "NFR" first seen at s4/title, defined only later at s4/beginnerPrimer.realWorldScenario',
+      'track biz: "FURPS+" first seen at s4/coreConcepts.heading, never defined',
+      'track biz: "DoR" first seen at s6/title, defined only later at s6/plainAnalogy',
+      'track biz: "Agile" first seen at s6/enTerm, defined only later at s6/beginnerPrimer.whatIsIt',
+      'track biz: "Gate" first seen at s6/diagramDescription, never defined',
+      'track biz: "Tech Debt" first seen at s9/title, defined only in s15 (not in this track)',
+      'track biz: "Refactor" first seen at s9/title, defined only later at s9/perspectives.saysVsHears',
+      'track biz: "SRE" first seen at s10/title, defined only later at s10/beginnerPrimer.whatIsIt',
+      'track biz: "SLO" first seen at s10/subtitle, defined only later at s10/keyTakeaway',
+      'track biz: "L1" first seen at s10/diagramTitle, defined only in s5 (not in this track)',
+      'track biz: "L2" first seen at s10/diagramTitle, defined only in s5 (not in this track)',
+      'track biz: "L3" first seen at s10/diagramTitle, never defined',
+      'track biz: "FAQ" first seen at s11/coreConcepts.heading, never defined',
+    ],
+    missingFromGlossary: [],
+  },
+  eng: {
+    guardrailLimited: [
+      'track eng: "QA" first seen at s1/jargonList.formalDefinition, defined only later at s1/coreConcepts.detail',
+      'track eng: "UX" first seen at s1/diagramDescription, defined only in s3 (not in this track)',
+      'track eng: "BA" first seen at s1/diagramDescription, defined only later at s4/beginnerPrimer.whatIsIt',
+      'track eng: "OKR" first seen at s18/title, defined only later at s18/beginnerPrimer.whatIsIt',
+      'track eng: "KPI" first seen at s18/title, defined only later at s18/beginnerPrimer.whatIsIt',
+      'track eng: "KR" first seen at s18/jargonList.meetingExample, defined only later at s18/perspectives.measuredBy',
+      'track eng: "NFR" first seen at s4/title, defined only later at s4/beginnerPrimer.realWorldScenario',
+      'track eng: "FURPS+" first seen at s4/coreConcepts.heading, never defined',
+      'track eng: "FAQ" first seen at s11/coreConcepts.heading, never defined',
+      'track eng: "SLO" first seen at s19/coreConcepts.heading, defined only later at s19/coreConcepts.detail',
+      'track eng: "Tech Debt" first seen at s9/title, defined only in s15 (not in this track)',
+      'track eng: "Refactor" first seen at s9/title, defined only later at s9/perspectives.saysVsHears',
+    ],
+    missingFromGlossary: [],
+  },
 };
+
+/** A track's gap lines, split the way `KNOWN_GAPS_V2` is. */
+const gapsByCause = (track: TrackKey) => ({
+  guardrailLimited: trackGaps(track).filter(g => resolveTerm(g.term).length > 0).map(g => g.line),
+  missingFromGlossary: trackGaps(track).filter(g => resolveTerm(g.term).length === 0).map(g => g.line),
+});
 
 describe('term coverage v2: a definition at or before first use, per reading track', () => {
   it.each(Object.keys(TRACK_CHAPTER_NUMS) as TrackKey[])('track %s: exactly the pinned gaps, no new one', track => {
-    expect(trackGaps(track)).toEqual(KNOWN_GAPS_V2[track]);
+    expect(gapsByCause(track)).toEqual(KNOWN_GAPS_V2[track]);
   });
 
-  it('an inline marker counts as a definition at the point of use (acceptance 2, 3)', () => {
+  it('an inline marker counts as a definition at the point of use (acceptance 1, 2, 3)', () => {
     const at = (chapterId: string, term: string, field: string) =>
       EVENTS.get(chapterId)!.find(e => e.term === term && e.at === `${chapterId}/${field}`);
+    expect(at('s1', 'PM', 'beginnerPrimer.whatIsIt')?.defined).toBe(true); // D20: the arrow chain
     expect(at('s18', 'KR', 'perspectives.measuredBy')?.defined).toBe(true);
     expect(at('s11', 'KPI', 'keyTakeaway')?.defined).toBe(true);
-    expect(trackGaps('experienced').some(line => line.includes('"KPI"'))).toBe(false);
+    expect(trackGaps('experienced').some(g => g.term === 'KPI')).toBe(false);
   });
 
-  it('terms never defined anywhere in the track, per track (audit §2.3 was 11 / 9 / 10 / 10)', () => {
-    const never = (track: TrackKey) => trackGaps(track).filter(line => !line.includes('defined only later')).length;
+  it('eng track: Sprint and PM resolve at first contact (verification 4, D20, D21)', () => {
+    const engGaps = trackGaps('eng').map(g => g.term);
+    expect(engGaps).not.toContain('Sprint'); // first met in s16's dialogue line, now marked there
+    expect(engGaps).not.toContain('PM'); // first met in s1's arrow chain
+  });
+
+  // A headline number, not the audit's metric: per track, the gap lines whose term gets no marker,
+  // expansion or jargon card anywhere in the track ("never defined" and "not in this track"), in the
+  // beginner view modelled above. Audit §2.3's 11 / 9 / 10 / 10 counted other fields and states, so
+  // the two are not comparable.
+  it('terms a track never defines anywhere, per track', () => {
+    const never = (track: TrackKey) => trackGaps(track).filter(g => !g.line.includes('defined only later')).length;
     expect({ beginner: never('beginner'), experienced: never('experienced'), biz: never('biz'), eng: never('eng') })
-      .toEqual({ beginner: 10, experienced: 7, biz: 14, eng: 9 });
+      .toEqual({ beginner: 4, experienced: 5, biz: 8, eng: 4 });
   });
 });

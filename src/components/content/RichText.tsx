@@ -26,14 +26,38 @@ const LINK_RE = /^\[\[(s\d+)\|([^\]]+)\]\]$/;
 const TERM_RE = /^\[\[g:([a-z0-9-]+)\|([^\]]+)\]\]$/;
 const OPT_OUT_RE = /^\[\[!g:(?:[a-z0-9-]+|\*)\]\]$/;
 
+const splitParts = (text: string) => text.split(TOKEN_RE).filter(part => part !== '');
+
+/**
+ * Each term marker's stable key, by part index: its glossary id and which occurrence of that id it
+ * is in this text (`sprint#0`). Open panels are keyed by it, not by the part index, so bold, links
+ * or words added before a marker never move an open definition onto another term (review S1).
+ */
+function termKeysByPart(parts: readonly string[]): Map<number, string> {
+  const keys = new Map<number, string>();
+  const occurrences = new Map<string, number>();
+  parts.forEach((part, idx) => {
+    const id = TERM_RE.exec(part)?.[1];
+    if (!id) return;
+    const n = occurrences.get(id) ?? 0;
+    occurrences.set(id, n + 1);
+    keys.set(idx, `${id}#${n}`);
+  });
+  return keys;
+}
+
+/** The open-state keys of `text`'s term markers, in document order. */
+export const termMarkerKeys = (text: string): string[] => [...termKeysByPart(splitParts(text)).values()];
+
 export const RichText: React.FC<RichTextProps> = ({ text, onNavigateChapter, onSearchGlossary }) => {
-  const parts = text.split(TOKEN_RE).filter(part => part !== '');
+  const parts = splitParts(text);
   const baseId = useId();
-  // Open term panels, by part index. Local state: opening one never scrolls, navigates or touches the hash.
-  const [openTerms, setOpenTerms] = useState<readonly number[]>([]);
-  const panelId = (idx: number) => `${baseId}-term-${idx}`;
-  const toggle = (idx: number) =>
-    setOpenTerms(open => (open.includes(idx) ? open.filter(i => i !== idx) : [...open, idx].sort((a, b) => a - b)));
+  const termKeys = termKeysByPart(parts);
+  // Open term panels, by term key. Local state: opening one never scrolls, navigates or touches the hash.
+  const [openTerms, setOpenTerms] = useState<readonly string[]>([]);
+  const panelId = (key: string) => `${baseId}-term-${key.replace('#', '-')}`;
+  const toggle = (key: string) =>
+    setOpenTerms(open => (open.includes(key) ? open.filter(k => k !== key) : [...open, key]));
 
   return (
     <>
@@ -50,14 +74,15 @@ export const RichText: React.FC<RichTextProps> = ({ text, onNavigateChapter, onS
         if (termMarker) {
           const [, termId, label] = termMarker;
           if (!lookupTerm(termId)) return <React.Fragment key={idx}>{label}</React.Fragment>;
+          const termKey = termKeys.get(idx)!;
           return (
             <InlineTermTrigger
               key={idx}
               termId={termId}
               label={label}
-              open={openTerms.includes(idx)}
-              panelId={panelId(idx)}
-              onToggle={() => toggle(idx)}
+              open={openTerms.includes(termKey)}
+              panelId={panelId(termKey)}
+              onToggle={() => toggle(termKey)}
             />
           );
         }
@@ -93,14 +118,15 @@ export const RichText: React.FC<RichTextProps> = ({ text, onNavigateChapter, onS
 
         return <React.Fragment key={idx}>{part}</React.Fragment>;
       })}
-      {openTerms.map(idx => {
-        const term = lookupTerm(TERM_RE.exec(parts[idx] ?? '')?.[1] ?? '');
+      {/* Open panels in document order; a key whose marker is gone from the text renders nothing. */}
+      {[...termKeys.values()].filter(key => openTerms.includes(key)).map(key => {
+        const term = lookupTerm(key.split('#')[0]);
         if (!term) return null;
         return (
           <InlineTermPanel
-            key={`panel-${idx}`}
+            key={`panel-${key}`}
             term={term}
-            panelId={panelId(idx)}
+            panelId={panelId(key)}
             onNavigateChapter={onNavigateChapter}
             onSearchGlossary={onSearchGlossary}
           />

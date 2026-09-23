@@ -1,24 +1,23 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { getInlineSectionsAt } from '../../../data/sectionLayers';
 import { InlineSections } from '../InlineSections';
 import type { SectionProps } from './registry';
 import { RichText } from '../../content/RichText';
-import { markTerms } from '../../../lib/autoTerms';
+import { coreConceptTerms } from '../../../lib/sectionTerms';
 
 export const CoreConceptsSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggle, ctx }) => {
   // Beginners see each concept compact (heading + detail); bullets and inline sections sit behind a toggle.
   // Toggles are keyed by concept index, so they belong to one chapter and reset when it changes.
   const [more, setMore] = useState<{ chapterId: string; open: Record<number, boolean> }>({ chapterId: chapter.id, open: {} });
   const moreOpen = more.chapterId === chapter.id ? more.open : {};
+  // Markers are a pure function of the chapter, never of which concepts are unfolded: every detail
+  // first, then every bullet (`coreConceptTerms`). Unfolding one concept cannot move a marker in another.
+  const marked = useMemo(() => coreConceptTerms(chapter), [chapter]);
   if (!chapter.coreConcepts || chapter.coreConcepts.length === 0) return null;
   const compact = ctx.chapterLevel === 'beginner';
-  // One `seen` set per section render, filled in document order: each glossary term is marked once
-  // in this section (spec P3.5). Hidden bullets are not marked, so a marker is never spent on text
-  // the reader cannot see.
-  const seen = new Set<string>();
   const prose = (text: string) => (
-    <RichText text={markTerms(text, 'prose', seen)} onNavigateChapter={ctx.onNavigateChapter} onSearchGlossary={ctx.onSearchGlossary} />
+    <RichText text={text} onNavigateChapter={ctx.onNavigateChapter} onSearchGlossary={ctx.onSearchGlossary} />
   );
   return (
     <div className="border border-neutral-200 dark:border-[#262626] rounded-2xl overflow-hidden bg-white dark:bg-[#141414] shadow-2xs">
@@ -58,8 +57,8 @@ export const CoreConceptsSection: React.FC<SectionProps> = ({ chapter, isOpen, o
                   <span className="w-1.5 h-1.5 rounded-full bg-neutral-900 dark:bg-white inline-block"></span>
                   <span>{concept.heading}</span>
                 </div>
-                <p className="text-xs sm:text-sm text-neutral-600 dark:text-[#a3a3a3] leading-relaxed pl-3 font-normal">
-                  {prose(concept.detail)}
+                <p data-concept-detail={cIdx} className="text-xs sm:text-sm text-neutral-600 dark:text-[#a3a3a3] leading-relaxed pl-3 font-normal">
+                  {prose(marked[cIdx].detail)}
                 </p>
                 {compact && hasMore && (
                   <button
@@ -74,8 +73,8 @@ export const CoreConceptsSection: React.FC<SectionProps> = ({ chapter, isOpen, o
                 )}
                 {showMore && concept.bulletPoints && concept.bulletPoints.length > 0 && (
                   <ul className="pt-1 pl-7 space-y-1.5 list-disc text-xs sm:text-sm text-neutral-600 dark:text-[#a3a3a3] font-normal">
-                    {concept.bulletPoints.map((bp, bpIdx) => (
-                      <li key={bpIdx} className="leading-relaxed">{prose(bp)}</li>
+                    {concept.bulletPoints.map((_, bpIdx) => (
+                      <li key={bpIdx} className="leading-relaxed">{prose(marked[cIdx].bulletPoints[bpIdx])}</li>
                     ))}
                   </ul>
                 )}

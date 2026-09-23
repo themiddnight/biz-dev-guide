@@ -17,7 +17,7 @@ export const chapters1_5: Chapter[] = [
     diagramTitle: 'The Leaky Translation Pipeline (8 จุดที่งานเปลี่ยนมือ)',
     diagramDescription: 'บริบทหายไปทีละนิดทุกครั้งที่เปลี่ยนมือ ตั้งแต่ Business Concept ➔ PO ➔ UX ➔ BA ➔ SA ➔ Dev ➔ QA ➔ Deployment',
     beginnerPrimer: {
-      whatIsIt: 'Leaky Pipeline คืออาการที่โจทย์ธุรกิจเพี้ยนไปทีละนิดทุกครั้งที่งานเปลี่ยนมือ ตั้งแต่ผู้บริหาร → PM → Designer → SA → Dev เพราะแต่ละคนตีความตามมุมของตัวเอง',
+      whatIsIt: '[[!g:sales-pipeline]]Leaky Pipeline คืออาการที่โจทย์ธุรกิจเพี้ยนไปทีละนิดทุกครั้งที่งานเปลี่ยนมือ ตั้งแต่ผู้บริหาร → PM → Designer → SA → Dev เพราะแต่ละคนตีความตามมุมของตัวเอง',
       whyItMatters: 'ความผิดพลาดที่แพงที่สุดไม่ใช่บั๊ก แต่คือการทำของผิดชิ้นออกมาได้เนี้ยบ (Building the wrong thing right) ทีมทุ่มเทเป็นปี แต่เปิดตัวแล้วไม่มีใครใช้',
       realWorldScenario: 'ฝ่ายขาย: "ลูกค้าอยากส่งของให้เพื่อนเร็วขึ้น" -> ผู้จัดการ: "ทำปุ่มส่งด่วน" -> ดีไซเนอร์วาดปุ่มแดงกลางจอ -> Dev ต่อ API ซับซ้อนอยู่ 3 สัปดาห์ -> ที่แท้ลูกค้าแค่อยากให้แอปจำที่อยู่เดิม'
     },
@@ -584,7 +584,7 @@ export const chapters1_5: Chapter[] = [
     businessNote: 'ขอดูแผนผัง Level 1 (System Context) ให้เข้าใจว่าระบบเราคุยกับใคร และเงินกับข้อมูลวิ่งไปทางไหน',
     engineerNote: 'ใช้ C4 Model และเขียนกำกับทุกกล่องทุกเส้น ให้ตั้งแต่เด็กฝึกงานถึงผู้บริหารดูภาพเดียวกันรู้เรื่อง',
     keyTakeaway: 'แผนผังที่ดีคือแผนผังที่คนนอกทีมดูแล้วชี้ได้ว่า ถ้าเซิร์ฟเวอร์ตัวนี้พัง ลูกค้ากลุ่มไหนโดนผลกระทบ',
-    plainAnalogy: 'เหมือนซูม Google Maps: L1 ทั้งประเทศ, L2 ถนนหลัก, L3 ตึก, L4 สายไฟในบ้าน',
+    plainAnalogy: '[[!g:support-ticket-support-tier]]เหมือนซูม Google Maps: L1 ทั้งประเทศ, L2 ถนนหลัก, L3 ตึก, L4 สายไฟในบ้าน',
     readTime: '13 นาที',
     diagramTitle: 'Interactive C4 Architecture Model (การซูม 4 ระดับ)',
     diagramDescription: 'ลองซูมแผนผังระบบ 4 ระดับ: Level 1 (Context), Level 2 (Containers), Level 3 (Components), และ Level 4 (Code/Classes)',
@@ -597,7 +597,7 @@ export const chapters1_5: Chapter[] = [
       {
         term: 'C4 Model',
         formalDefinition: 'กรอบการวาดผังสถาปัตยกรรมซอฟต์แวร์ของ Simon Brown แบ่งเป็น Context, Containers, Components และ Code',
-        humanTranslation: 'ผังเดียวกันแต่เลือกระดับให้ตรงคนอ่าน: ผู้บริหารดู L1, Dev ดู L3–L4',
+        humanTranslation: '[[!g:support-ticket-support-tier]]ผังเดียวกันแต่เลือกระดับให้ตรงคนอ่าน: ผู้บริหารดู L1, Dev ดู L3–L4',
         meetingExample: '"ประชุมกับผู้บริหาร ใช้ C4 Level 1 พอครับ อย่าเพิ่งเปิด Level 3 เดี๋ยวหลุดโฟกัส"'
       },
       {

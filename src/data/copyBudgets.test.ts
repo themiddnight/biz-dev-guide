@@ -2,7 +2,8 @@ import { describe, it, expect } from 'vitest';
 import { CHAPTERS } from './chaptersData';
 
 // Length budgets and bans from docs/specs/2026-09-22-concise-copy.md §3–§5 and R5.
-const len = (s: string) => [...s].length;
+// An author opt-out (`[[!g:id]]`, term-definitions guardrail 7) never renders, so it costs no budget.
+const len = (s: string) => [...s.replace(/\[\[!g:(?:[a-z0-9-]+|\*)\]\]/g, '')].length;
 const BANNED_OPENERS = ['ทำความเข้าใจ', 'หัวใจของ', 'กฎเหล็ก', 'ศิลปะการ', 'ทำการ'];
 
 type Violation = string;

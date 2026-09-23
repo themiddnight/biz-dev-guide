@@ -41,9 +41,13 @@ function beginnerCoreMarkers(chapterId: string): string[] {
 }
 
 describe('automatic term markers on real chapters (beginner Core)', () => {
-  it('s1, plain register: the PM → Designer → SA → Dev arrow chain stays unmarked', () => {
+  it('s1, plain register: PM and SA in the PM → Designer → SA → Dev arrow chain are marked (D20, acceptance 1)', () => {
     expect(beginnerCoreMarkers('s1')).toEqual([
+      'primer: pm-vs-pjm (PM)',
+      'primer: sa (SA)',
       'primer: api (API)',
+      'jargon: sprint (Sprint)',
+      'jargon: wireframe (Wireframe)',
     ]);
   });
 
@@ -56,8 +60,11 @@ describe('automatic term markers on real chapters (beginner Core)', () => {
       'primer: slo (SLO)',
       'primer: incident (Incident)',
       'primer: logging-monitoring-alerting (Monitoring)',
+      'jargon: rollback (Rollback)',
+      'jargon: sprint (Sprint)',
       'otherSide: sla (SLA)',
       'otherSide: logging-monitoring-alerting (Monitoring)',
+      'otherSide: slo (SLO)',
     ]);
   });
 
@@ -69,6 +76,12 @@ describe('automatic term markers on real chapters (beginner Core)', () => {
       'primer: mvp (MVP)',
       'primer: non-functional-requirement (NFR)',
       'primer: sdk (SDK)',
+      'primer: refactoring (Refactor)',
+      'primer: technical-debt (Tech Debt)',
+      'otherSide: mvp (MVP)',
+      'otherSide: sla (SLA)',
+      'otherSide: refactoring (Refactor)',
+      'otherSide: edge-case (Edge Case)',
     ]);
   });
 });

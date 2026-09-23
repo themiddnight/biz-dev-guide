@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Clock, Check, Sparkles } from 'lucide-react';
 import type { Chapter, ExperienceLevel } from '../../types';
 import { HeroFigure } from './HeroFigure';
 import type { Role } from '../../data/rolePerspective';
 import { RichText } from '../content/RichText';
-import { markTerms } from '../../lib/autoTerms';
+import { heroTerms } from '../../lib/sectionTerms';
 
 interface ChapterHeroProps {
   chapter: Chapter;
@@ -20,15 +20,15 @@ interface ChapterHeroProps {
 export const ChapterHero: React.FC<ChapterHeroProps> = ({
   chapter, experienceLevel, isRead, role = null, seat = 'biz', onFlipSeat = () => {}, onNavigateChapter, onSearchGlossary,
 }) => {
-  // The hero is one section for automatic term marking (spec P3.5): one `seen` set, filled in
-  // document order. `title`, `enTerm` and `subtitle` are headings and are never marked.
-  const seen = new Set<string>();
+  // The hero is one section for automatic term marking (spec P3.5), computed purely from the
+  // chapter. `title`, `enTerm` and `subtitle` are headings and are never marked.
+  const marked = useMemo(() => heroTerms(chapter), [chapter]);
   const prose = (text: string) => (
-    <RichText text={markTerms(text, 'prose', seen)} onNavigateChapter={onNavigateChapter} onSearchGlossary={onSearchGlossary} />
+    <RichText text={text} onNavigateChapter={onNavigateChapter} onSearchGlossary={onSearchGlossary} />
   );
   const analogyFirst = !!chapter.heroFigure; // the figure's analogy line renders above the takeaway
-  const analogy = analogyFirst ? prose(chapter.plainAnalogy) : null;
-  const takeaway = prose(chapter.keyTakeaway);
+  const analogy = analogyFirst ? prose(marked.plainAnalogy) : null;
+  const takeaway = prose(marked.keyTakeaway);
   const analogyHeading = (
     <div className="flex items-center gap-2 text-xs font-bold text-neutral-900 dark:text-[#fafafa]">
       <Sparkles className="w-4 h-4 text-amber-500" />
@@ -37,7 +37,7 @@ export const ChapterHero: React.FC<ChapterHeroProps> = ({
   );
   const analogyBody = analogyFirst ? null : (
     <p className="text-xs sm:text-sm text-neutral-700 dark:text-[#c4c4c4] leading-relaxed font-normal">
-      {prose(chapter.plainAnalogy)}
+      {prose(marked.plainAnalogy)}
     </p>
   );
   const analogyClassName = 'p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-neutral-50 dark:bg-[#181818] border border-neutral-200 dark:border-[#262626] space-y-1.5';

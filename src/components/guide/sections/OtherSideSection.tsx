@@ -1,10 +1,9 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import type { Chapter, SideView } from '../../../types';
 import { ROLES, ROLE_META, otherRole, type Role } from '../../../data/rolePerspective';
 import type { GuideSectionContext, OtherSideView, SectionProps } from './registry';
 import { RichText } from '../../content/RichText';
-import { markTerms } from '../../../lib/autoTerms';
+import { otherSideTerms, type SideViewTerms } from '../../../lib/sectionTerms';
 
 const person = (r: Role) => ROLE_META[r].person;
 
@@ -20,18 +19,18 @@ const Label: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 
 /**
  * One side's view, read by the other side. Labels name both roles so `both` mode reads correctly.
- * `seen` is the section's one set (spec P3.5), shared by both cards in `both` mode. `measuredBy`,
- * `fears`, `askThem` and the note are prose; the `saysVsHears` lines are speech and stay unmarked
- * (guardrail 2's own example is a `youSay` line).
+ * `view` arrives already marked (`otherSideTerms`, computed once by the section): the card only
+ * renders strings, so rendering it twice — as StrictMode does — cannot change its markers. Every
+ * field is prose, the `saysVsHears` dialogue lines included (D21).
  */
-const SideViewCard: React.FC<{
-  side: Role; view: SideView; chapter: Chapter; seen: Set<string>;
+export const SideViewCard: React.FC<{
+  view: SideViewTerms;
   ctx: Pick<GuideSectionContext, 'onNavigateChapter' | 'onSearchGlossary'>;
-}> = ({ side, view, chapter, seen, ctx }) => {
+}> = ({ view, ctx }) => {
+  const { side } = view;
   const reader = otherRole(side);
-  const note = reader === 'eng' ? chapter.engineerNote : chapter.businessNote;
   const prose = (text: string) => (
-    <RichText text={markTerms(text, 'prose', seen)} onNavigateChapter={ctx.onNavigateChapter} onSearchGlossary={ctx.onSearchGlossary} />
+    <RichText text={text} onNavigateChapter={ctx.onNavigateChapter} onSearchGlossary={ctx.onSearchGlossary} />
   );
   return (
     <div
@@ -59,13 +58,13 @@ const SideViewCard: React.FC<{
         {view.saysVsHears.map(row => (
           <div key={row.youSay} className="p-3 rounded-lg bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] space-y-1.5 leading-relaxed">
             <p className="text-neutral-700 dark:text-[#c4c4c4]">
-              <span className="font-semibold text-neutral-900 dark:text-[#e5e5e5]">{person(reader)} พูด:</span> {row.youSay}
+              <span className="font-semibold text-neutral-900 dark:text-[#e5e5e5]">{person(reader)} พูด:</span> {prose(row.youSay)}
             </p>
             <p className="text-neutral-600 dark:text-[#a3a3a3]">
-              <span className="font-semibold text-amber-700 dark:text-amber-300">{person(side)} ได้ยินว่า:</span> {row.theyHear}
+              <span className="font-semibold text-amber-700 dark:text-amber-300">{person(side)} ได้ยินว่า:</span> {prose(row.theyHear)}
             </p>
             <p className="text-neutral-700 dark:text-[#c4c4c4]">
-              <span className="font-semibold text-emerald-700 dark:text-emerald-300">พูดแบบนี้แทน:</span> {row.sayInstead}
+              <span className="font-semibold text-emerald-700 dark:text-emerald-300">พูดแบบนี้แทน:</span> {prose(row.sayInstead)}
             </p>
           </div>
         ))}
@@ -79,19 +78,22 @@ const SideViewCard: React.FC<{
       </div>
 
       <p className="pt-3 border-t border-neutral-200 dark:border-[#262626] text-neutral-700 dark:text-[#c4c4c4] leading-relaxed" data-other-side-note={reader}>
-        <span className="font-semibold text-neutral-900 dark:text-[#e5e5e5]">{person(reader)} ควรทำ:</span> {prose(note)}
+        <span className="font-semibold text-neutral-900 dark:text-[#e5e5e5]">{person(reader)} ควรทำ:</span> {prose(view.note)}
       </p>
     </div>
   );
 };
 
 export const OtherSideSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggle, ctx }) => {
-  const perspectives = chapter.perspectives;
-  if (!perspectives) return null;
   const { role, otherSideView, setOtherSideView } = ctx;
+  // The shown cards share one first-occurrence walk (spec P3.5), a pure function of the chapter and
+  // the switch. Never a `seen` set handed to the cards: they would mutate it during render.
+  const cards = useMemo(
+    () => otherSideTerms(chapter, otherSideView === 'both' ? ROLES : [otherSideView]),
+    [chapter, otherSideView],
+  );
+  if (!chapter.perspectives) return null;
   const heading = role ? `${ROLE_META[otherRole(role)].side} มองเรื่องนี้ยังไง` : 'สองฝั่งมองเรื่องนี้ยังไง';
-  const sides: readonly Role[] = otherSideView === 'both' ? ROLES : [otherSideView];
-  const seen = new Set<string>();
 
   return (
     <div className="border border-neutral-200 dark:border-[#262626] rounded-2xl overflow-hidden bg-white dark:bg-[#141414] shadow-2xs">
@@ -134,8 +136,8 @@ export const OtherSideSection: React.FC<SectionProps> = ({ chapter, isOpen, onTo
               </button>
             ))}
           </div>
-          <div className={sides.length > 1 ? 'grid grid-cols-1 md:grid-cols-2 gap-3' : ''}>
-            {sides.map(side => <SideViewCard key={side} side={side} view={perspectives[side]} chapter={chapter} seen={seen} ctx={ctx} />)}
+          <div className={cards.length > 1 ? 'grid grid-cols-1 md:grid-cols-2 gap-3' : ''}>
+            {cards.map(view => <SideViewCard key={view.side} view={view} ctx={ctx} />)}
           </div>
         </div>
       )}

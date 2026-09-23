@@ -6,7 +6,8 @@ import { ROLES } from './rolePerspective';
 import type { SideView } from '../types';
 
 // Budgets from docs/specs/2026-09-22-role-perspective.md P2.3 (characters, [...s].length).
-const len = (s: string) => [...s].length;
+// An author opt-out (`[[!g:id]]`, term-definitions guardrail 7) never renders, so it costs no budget.
+const len = (s: string) => [...s.replace(/\[\[!g:(?:[a-z0-9-]+|\*)\]\]/g, '')].length;
 
 /** Every string in one side view, labelled by field, in a stable order. */
 function fields(view: SideView): [string, string, number][] {
