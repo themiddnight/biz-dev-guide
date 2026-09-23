@@ -322,8 +322,8 @@ export default function App() {
     <div className="min-h-screen bg-base-200 font-sans antialiased transition-colors duration-200">
       {/* Toast Alert for XP / Badges */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 bg-neutral text-neutral-content rounded-[4px] shadow-2xl border border-neutral animate-slideUp">
-          <div className="w-7 h-7 rounded-[3px] bg-neutral-content text-neutral flex items-center justify-center font-bold shrink-0 text-xs">
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 bg-neutral text-neutral-content rounded-selector shadow-2xl border border-neutral animate-slideUp">
+          <div className="w-7 h-7 rounded-selector bg-neutral-content text-neutral flex items-center justify-center font-bold shrink-0 text-xs">
             <Zap className="w-3.5 h-3.5 fill-current" />
           </div>
           <div className="pr-2">
@@ -361,7 +361,7 @@ export default function App() {
       />
 
       {/* Main Content Area */}
-      <main className="max-w-[1600px] mx-auto px-3 sm:px-6 lg:px-8 pt-6 sm:pt-8">
+      <main className="max-w-[1600px] mx-auto px-page pt-6 sm:pt-8">
         {activeTab === 'guide' && (
           <GuideTab
             chapters={CHAPTERS}

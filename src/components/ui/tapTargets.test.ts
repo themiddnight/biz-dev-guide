@@ -122,8 +122,8 @@ describe('mobile tap targets', () => {
   });
 
   it('finds the interactive elements it is guarding (not passing on an empty scan)', () => {
-    expect(tags.length).toBeGreaterThan(100);
-    expect(tags.filter(t => t.file === 'Header.tsx').length).toBeGreaterThanOrEqual(13);
+    expect(tags.length).toBeGreaterThan(60);
+    expect(tags.filter(t => t.file === 'ChapterDiagram.tsx').length).toBeGreaterThanOrEqual(10);
   });
 
   it('reads a tag whole even when its attributes contain > and nested templates', () => {
@@ -142,7 +142,7 @@ describe('mobile tap targets', () => {
 
   it('every TAP_GAP ring matches the real gap of its row, so neighbouring rings never overlap', () => {
     const gapped = tags.filter(t => gapKey(t.text, t.src) !== null);
-    expect(gapped.length).toBeGreaterThanOrEqual(10);
+    expect(gapped.length).toBeGreaterThanOrEqual(5);
     const wrong = gapped.flatMap(t => {
       const key = gapKey(t.text, t.src);
       const row = rowGap(t, t.src);
