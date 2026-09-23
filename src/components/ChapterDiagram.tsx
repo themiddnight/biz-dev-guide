@@ -559,7 +559,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
         </div>
         {/* Sync vs Async simulator (moved from former chapter 15 diagram), closed by default */}
         <details className="group rounded-2xl bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] overflow-hidden">
-          <summary className="flex items-center justify-between gap-2 p-3.5 sm:p-4 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f] transition-colors">
+          <summary className={`${TAP_Y} flex items-center justify-between gap-2 p-3.5 sm:p-4 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f] transition-colors`}>
             <span className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
               Sync vs Async: Polling / Webhook / WebSocket
             </span>

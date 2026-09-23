@@ -1,5 +1,6 @@
 import React from 'react';
 import { ChevronDown } from 'lucide-react';
+import { TAP_Y } from '../ui/tapTarget';
 import { ContentBlock } from '../../types';
 import { RichText } from './RichText';
 
@@ -130,7 +131,7 @@ export const ContentTable: React.FC<ContentTableProps> = ({ block, onNavigateCha
   if (block.collapsed) {
     return (
       <details className="group rounded-xl border border-neutral-200 dark:border-[#262626] bg-white dark:bg-[#141414] overflow-hidden">
-        <summary className="flex items-center justify-between gap-2 p-3 sm:p-3.5 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f] transition-colors">
+        <summary className={`${TAP_Y} flex items-center justify-between gap-2 p-3 sm:p-3.5 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f] transition-colors`}>
           <span className={titleClass}>{block.title ?? 'ตาราง'}</span>
           <ChevronDown className="w-4 h-4 shrink-0 text-neutral-400 dark:text-[#737373] transition-transform group-open:rotate-180" />
         </summary>

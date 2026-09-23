@@ -96,7 +96,7 @@ export const ChapterHero: React.FC<ChapterHeroProps> = ({
         </div>
       ) : (
         <details className={analogyClassName} data-analogy>
-          <summary className="cursor-pointer">{analogyHeading}</summary>
+          <summary className="-my-3.5 py-3.5 sm:my-0 sm:py-0 cursor-pointer">{analogyHeading}</summary>
           {analogyBody}
         </details>
       )}

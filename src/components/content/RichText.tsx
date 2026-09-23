@@ -2,7 +2,6 @@ import React, { useId, useState } from 'react';
 import { formatChapterHash } from '../../lib/chapterRoute';
 import { lookupTerm } from '../../data/glossary';
 import { InlineTermPanel, InlineTermTrigger } from './InlineTerm';
-import { TAP } from '../ui/tapTarget';
 
 /**
  * Renders the restored-content rich text subset without dangerouslySetInnerHTML:
@@ -110,7 +109,7 @@ export const RichText: React.FC<RichTextProps> = ({ text, onNavigateChapter, onS
                 event.preventDefault();
                 onNavigateChapter(chapterId);
               }}
-              className={`${TAP} font-medium text-neutral-900 dark:text-white underline decoration-neutral-400 dark:decoration-[#525252] underline-offset-2 hover:decoration-neutral-900 dark:hover:decoration-white transition-colors`}
+              className={`inline-block -my-3.5 py-3.5 sm:my-0 sm:py-0 font-medium text-neutral-900 dark:text-white underline decoration-neutral-400 dark:decoration-[#525252] underline-offset-2 hover:decoration-neutral-900 dark:hover:decoration-white transition-colors`}
             >
               {label}
             </a>

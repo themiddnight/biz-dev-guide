@@ -29,9 +29,9 @@ interface GlossaryPanelProps {
   role?: Role | null;
 }
 
-// Side and category chip rows sit 16px apart, so each ring takes half of that.
+// Chips within the side and category rows sit gap-1.5 (6px) apart, so each ring takes half of that.
 const chipClass = (active: boolean) =>
-  `${TAP_GAP[16]} shrink-0 px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+  `${TAP_GAP[6]} shrink-0 px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
     active
       ? 'bg-neutral-900 text-white dark:bg-white dark:text-[#0a0a0a] shadow-xs'
       : 'bg-neutral-100 dark:bg-[#1f1f1f] text-neutral-600 dark:text-[#a3a3a3] hover:bg-neutral-200 dark:hover:bg-[#262626]'

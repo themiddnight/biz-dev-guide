@@ -221,7 +221,8 @@ function heroInRenderOrder<T extends { field: string }>(chapter: Chapter, occurr
 
 /**
  * The chapter's headings. They are never marked (P3.5); the opening line directly under them is
- * their definition (spec P4.2), so a heading's term counts as defined when the opening defines it.
+ * their definition (spec P4.2), so a heading's term counts as defined when the opening expands it
+ * (`openingExpands`, the Phase 4 check: the glossary expansion in parentheses, Thai name first, or a marker).
  */
 const HEADING_FIELDS: ReadonlySet<string> = new Set(['title', 'enTerm', 'subtitle']);
 
@@ -234,11 +235,36 @@ const definedIn_ = (term: string, text: string, markerIds: ReadonlySet<string>) 
 
 const markerIdsOf = (markedText: string) => new Set([...markedText.matchAll(MARKER_ID_RE)].map(m => m[1]));
 
+/** What counts as an expansion of an entry: its parentheticals (and their `/` parts), its label when that is not the key, and its spelled-out aliases. */
+const expansionsOf = (id: string, key: string) => {
+  const entry = GLOSSARY.find(g => g.id === id)!;
+  const inParens = [...entry.term.matchAll(/\(([^)]*)\)/g)].flatMap(m => [m[1], ...m[1].split('/')]);
+  const label = entry.term.replace(/\([^)]*\)/g, ' ').replace(/\s+/g, ' ').trim();
+  const spelledOut = (entry.aliases ?? []).filter(a => /\s/.test(a));
+  return [...inParens, label, ...spelledOut]
+    .map(s => s.trim().toLowerCase())
+    .filter(s => s.length > 2 && s !== key.toLowerCase());
+};
+
+/**
+ * `term` is expanded in `chapter`'s opening: `TERM (its glossary expansion)`, or the guide's
+ * Thai-name-first pattern `ชื่อไทย (TERM)` (audit §4.1: `หนี้ทางเทคนิค (Technical Debt)`), or a
+ * resolvable term marker on it.
+ */
+const openingExpands = (chapter: Chapter, term: string) => {
+  const ids = resolveTerm(term);
+  const t = escapeRe(term);
+  const after = chapter.chapterOpening.match(new RegExp(`(?<![A-Za-z0-9])${t}\\s*\\(([^)]*)\\)`));
+  if (after && ids.some(id => expansionsOf(id, term).some(exp => after[1].toLowerCase().includes(exp)))) return true;
+  if (new RegExp(`[^\\s(]\\s*\\(\\s*${t}\\s*\\)`).test(chapter.chapterOpening)) return true;
+  const marked = markerIdsOf(heroTerms(chapter).chapterOpening);
+  return ids.some(id => marked.has(id));
+};
+
 /** Every abbreviation occurrence of one chapter, in beginner Core render order, and whether that occurrence is defined. */
 const chapterEvents = (chapterId: string): TrackEvent[] => {
   const chapter = CHAPTERS.find(c => c.id === chapterId)!;
   const marked = markedByField(chapter);
-  const openingIds = markerIdsOf(heroTerms(chapter).chapterOpening);
   const nth = new Map<string, number>();
   return heroInRenderOrder(chapter, beginnerVisibleTexts(chapter)).flatMap(({ field, text }) => {
     if (FOLDED_FOR_BEGINNERS.has(field)) return [];
@@ -255,7 +281,8 @@ const chapterEvents = (chapterId: string): TrackEvent[] => {
     const terms = [...extractAbbreviations(text), ...extractTrackedTerms(text)];
     return terms.map(term => {
       const isCard = field === 'jargonList.term' && namesTerm(text, term);
-      const byOpening = HEADING_FIELDS.has(field) && definedIn_(term, chapter.chapterOpening, openingIds);
+      // The strict Phase 4 check: the opening must expand this term, not just follow it with any parenthetical.
+      const byOpening = HEADING_FIELDS.has(field) && openingExpands(chapter, term);
       return { term, at: `${chapterId}/${field}`, defined: definedIn_(term, text, markerIds) || isCard || byOpening };
     });
   });
@@ -383,32 +410,6 @@ describe('term coverage v2: a definition at or before first use, per reading tra
 describe('chapter openings (Phase 4)', () => {
   const HEADLINE_FIELDS = ['title', 'subtitle', 'enTerm', 'keyTakeaway'] as const;
 
-  /** What counts as an expansion of an entry: its parentheticals (and their `/` parts), its label when that is not the key, and its spelled-out aliases. */
-  const expansionsOf = (id: string, key: string) => {
-    const entry = GLOSSARY.find(g => g.id === id)!;
-    const inParens = [...entry.term.matchAll(/\(([^)]*)\)/g)].flatMap(m => [m[1], ...m[1].split('/')]);
-    const label = entry.term.replace(/\([^)]*\)/g, ' ').replace(/\s+/g, ' ').trim();
-    const spelledOut = (entry.aliases ?? []).filter(a => /\s/.test(a));
-    return [...inParens, label, ...spelledOut]
-      .map(s => s.trim().toLowerCase())
-      .filter(s => s.length > 2 && s !== key.toLowerCase());
-  };
-
-  /**
-   * `term` is expanded in `chapter`'s opening: `TERM (its glossary expansion)`, or the guide's
-   * Thai-name-first pattern `ชื่อไทย (TERM)` (audit §4.1: `หนี้ทางเทคนิค (Technical Debt)`), or a
-   * resolvable term marker on it.
-   */
-  const openingExpands = (chapter: Chapter, term: string) => {
-    const ids = resolveTerm(term);
-    const t = escapeRe(term);
-    const after = chapter.chapterOpening.match(new RegExp(`(?<![A-Za-z0-9])${t}\\s*\\(([^)]*)\\)`));
-    if (after && ids.some(id => expansionsOf(id, term).some(exp => after[1].toLowerCase().includes(exp)))) return true;
-    if (new RegExp(`[^\\s(]\\s*\\(\\s*${t}\\s*\\)`).test(chapter.chapterOpening)) return true;
-    const marked = markerIdsOf(heroTerms(chapter).chapterOpening);
-    return ids.some(id => marked.has(id));
-  };
-
   const headlineAbbreviations = (chapter: Chapter) =>
     [...new Set(HEADLINE_FIELDS.flatMap(f => (chapter[f] ? extractAbbreviations(chapter[f]!) : [])))];
 
@@ -431,6 +432,9 @@ describe('chapter openings (Phase 4)', () => {
     expect(openingExpands({ ...s4, chapterOpening: 'BA กับ NFR' }, 'NFR')).toBe(true); // bare -> auto-marked, still a definition
     expect(openingExpands({ ...s4, chapterOpening: '[[!g:*]]BA กับ NFR' }, 'NFR')).toBe(false); // opted out and bare
     expect(openingExpands({ ...s4, chapterOpening: '[[!g:*]]NFR (ระบบเร็วไหม)' }, 'NFR')).toBe(false); // a gloss that is not the expansion
+    // The heading rule (`HEADING_FIELDS`) uses this same check, so a loose gloss on a tracked term does not close a heading gap either.
+    expect(definedIn_('Agile', 'Agile (ทำเร็ว)', new Set())).toBe(true);
+    expect(openingExpands({ ...s4, chapterOpening: '[[!g:*]]Agile (ทำเร็ว)' }, 'Agile')).toBe(false);
   });
 
   it('s10 expands SRE, SLA and SLO in full (acceptance 3)', () => {

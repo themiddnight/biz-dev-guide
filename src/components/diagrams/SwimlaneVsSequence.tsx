@@ -1,5 +1,6 @@
 import React from 'react';
 import { ChevronDown } from 'lucide-react';
+import { TAP_Y } from '../ui/tapTarget';
 import { S5_JUMP_TARGET_IDS, SWIMLANE_VS_SEQUENCE } from '../../data/diagramFamilies';
 import { S5_SWIMLANE_SEQUENCE_BLOCKS } from '../../data/chapterContentBlocks';
 import { ContentBlocks } from '../content/ContentBlocks';
@@ -16,7 +17,7 @@ export const SwimlaneVsSequence: React.FC = () => (
     id={S5_JUMP_TARGET_IDS.behavior}
     className="group scroll-mt-4 rounded-2xl bg-white dark:bg-[#141414] border border-neutral-200 dark:border-[#262626] overflow-hidden"
   >
-    <summary className="flex items-center justify-between gap-2 p-3.5 sm:p-4 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f] transition-colors">
+    <summary className={`${TAP_Y} flex items-center justify-between gap-2 p-3.5 sm:p-4 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f] transition-colors`}>
       <span className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-[#fafafa]">
         {SWIMLANE_VS_SEQUENCE.summary}
       </span>

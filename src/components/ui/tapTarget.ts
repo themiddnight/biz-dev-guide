@@ -20,8 +20,8 @@
  *   `TAP_GAP[gap]`: each ring grows by half the gap, so neighbours meet and never overlap. Those
  *   controls stay below 44px; overlapping hit areas are worse than small ones.
  *
- * `tapTargets.test.ts` fails when a `<button>` or `<a>` under `src/components/` uses none of
- * these (or the padding pattern).
+ * `tapTargets.test.ts` fails when a `<button>`, `<a>` or `<summary>` under `src/components/` uses none of
+ * these (or the padding pattern), or when a `TAP_GAP[n]` key differs from its row's real gap.
  */
 
 const RING =

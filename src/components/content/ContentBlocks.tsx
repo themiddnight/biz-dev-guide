@@ -4,7 +4,7 @@ import { ChapterContentSection, ContentBlock, ContentPlacement, FigureKey } from
 import { FIGURES, FigureProps } from '../figures';
 import { ContentTable } from './ContentTable';
 import { RichText } from './RichText';
-import { TAP } from '../ui/tapTarget';
+import { TAP, TAP_Y } from '../ui/tapTarget';
 
 interface ContentBlocksProps {
   sections: ChapterContentSection[];
@@ -24,8 +24,7 @@ const blockTitleClass = 'text-xs sm:text-sm font-bold text-neutral-900 dark:text
 const introClass = 'text-xs sm:text-sm text-neutral-600 dark:text-[#a3a3a3] leading-relaxed';
 const detailsClass =
   'group rounded-xl border border-neutral-200 dark:border-[#262626] bg-white dark:bg-[#141414] overflow-hidden';
-const summaryClass =
-  'flex items-center justify-between gap-2 p-3 sm:p-3.5 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f] transition-colors';
+const summaryClass = `${TAP_Y} flex items-center justify-between gap-2 p-3 sm:p-3.5 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden bg-neutral-50 dark:bg-[#181818] hover:bg-neutral-100/70 dark:hover:bg-[#1f1f1f] transition-colors`;
 
 const SummaryChevron = () => (
   <ChevronDown className="w-4 h-4 shrink-0 text-neutral-400 dark:text-[#737373] transition-transform group-open:rotate-180" />
