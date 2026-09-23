@@ -22,12 +22,10 @@ import { Alert } from './ui/Alert';
 
 interface AIAssistantTabProps {
   initialPrompt?: string;
-  onQuestionAsked: () => void;
 }
 
 export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
   initialPrompt = '',
-  onQuestionAsked,
 }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
@@ -72,7 +70,6 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
     setMessages((prev) => [...prev, userMsg]);
     setInputQuestion('');
     setIsLoading(true);
-    onQuestionAsked();
 
     try {
       const res = await fetch('/api/ask-ai', {

@@ -79,9 +79,6 @@ describe('colour tokens only', () => {
 
   it('bg-primary outside ui/ appears only at the §10.4 progress fills', () => {
     const PROGRESS_FILL = {
-      'components/GamificationTab.tsx': 1,
-      'components/GuideTab.tsx': 1,
-      'components/Header.tsx': 1,
       'components/QuizTab.tsx': 1,
     };
     const fills = Object.fromEntries(files

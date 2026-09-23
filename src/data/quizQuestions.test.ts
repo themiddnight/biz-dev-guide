@@ -52,7 +52,7 @@ describe('quiz questions', () => {
     expect(biz).toHaveLength(6);
     expect(eng.every((q) => q.role === 'Dev')).toBe(true);
     expect(biz.every((q) => ['PM', 'BA', 'Bridge'].includes(q.role))).toBe(true);
-    expect(scenario.every((q) => q.chapterId && q.xp === 25)).toBe(true);
+    expect(scenario.every((q) => q.chapterId)).toBe(true);
   });
 
   it('eng set covers s16, s17, s18, s19, s2 and s11', () => {

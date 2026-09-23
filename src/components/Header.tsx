@@ -1,13 +1,10 @@
 import React from 'react';
-import { ExperienceLevel, TabType, UserStats } from '../types';
-import { LEVEL_TIERS } from '../data/badgesData';
+import { ExperienceLevel, TabType } from '../types';
 import { ROLE_META, type LevelMode, type Role } from '../data/rolePerspective';
 import {
   BookOpen,
   Bot,
   Sparkles,
-  Trophy,
-  Zap,
   Sun,
   Moon,
   Monitor,
@@ -15,7 +12,6 @@ import {
   Handshake
 } from 'lucide-react';
 import { Tabs } from './ui/Tabs';
-import { IconBadge } from './ui/IconBadge';
 
 const ROLE_ITEMS = [
   { value: 'biz', label: `${ROLE_META.biz.icon} Business`, title: ROLE_META.biz.origin },
@@ -46,7 +42,6 @@ const navItems = (chapterCount: number) => [
   { value: 'guide', label: <span className="uppercase tracking-wider">Guide [{chapterCount}]</span>, icon: <BookOpen className="max-sm:hidden w-3.5 h-3.5" /> },
   { value: 'ai', label: <span className="uppercase tracking-wider">AI Bridge</span>, icon: <Bot className="max-sm:hidden w-3.5 h-3.5" /> },
   { value: 'quiz', label: <span className="uppercase tracking-wider">Quiz</span>, icon: <Sparkles className="max-sm:hidden w-3.5 h-3.5 text-warning" /> },
-  { value: 'gamification', label: <span className="uppercase tracking-wider">Dashboard</span>, icon: <Trophy className="max-sm:hidden w-3.5 h-3.5" /> },
 ] as const;
 
 interface HeaderProps {
@@ -58,7 +53,6 @@ interface HeaderProps {
   onChooseRole: (role: Role | null) => void;
   levelMode: LevelMode;
   onLevelModeChange: (mode: LevelMode) => void;
-  userStats: UserStats;
   /** Total chapters, shown on the Guide tab. */
   chapterCount: number;
   theme?: 'light' | 'dark' | 'system';
@@ -74,19 +68,10 @@ export const Header: React.FC<HeaderProps> = ({
   onChooseRole,
   levelMode,
   onLevelModeChange,
-  userStats,
   chapterCount,
   theme = 'system',
   setTheme,
 }) => {
-  const currentTier = LEVEL_TIERS.slice().reverse().find(t => userStats.xp >= t.minXp) || LEVEL_TIERS[0];
-  const nextTierIndex = LEVEL_TIERS.findIndex(t => t.level === currentTier.level + 1);
-  const nextTier = nextTierIndex !== -1 ? LEVEL_TIERS[nextTierIndex] : null;
-
-  const xpProgress = nextTier 
-    ? Math.min(100, Math.round(((userStats.xp - currentTier.minXp) / (nextTier.minXp - currentTier.minXp)) * 100))
-    : 100;
-
   // Role + level controls. Rendered inside the sticky header from md up; below md they sit in a
   // non-sticky strip under it so the sticky header stays short on phones.
   const controls = (
@@ -120,7 +105,7 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <>
       <header className="sticky top-0 z-40 bg-base-100/90 backdrop-blur-md border-b border-base-border transition-colors">
-        {/* Top Banner / Brand & Gamification Ribbon */}
+        {/* Top Banner: Brand + Theme */}
         <div className="max-w-[1600px] mx-auto px-page py-3 flex flex-wrap items-center justify-between gap-3">
           {/* Brand */}
           <div className="flex items-center gap-3">
@@ -137,31 +122,7 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
 
-          {/* Level & XP Capsule + Theme Switcher */}
           <div className="flex items-center gap-stack">
-            {/* Level & XP Capsule */}
-            <div className="flex items-center gap-2.5 bg-base-300 rounded-selector px-2.5 py-1.5 border border-base-border">
-              <IconBadge size="sm">Lv</IconBadge>
-              <div className="flex flex-col min-w-[100px] sm:min-w-[120px]">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-base-content">
-                    {currentTier.level}
-                  </span>
-                  <span className="font-semibold text-base-content-secondary flex items-center gap-0.5 text-[11px]">
-                    <Zap className="w-3 h-3 text-warning fill-warning" />
-                    {userStats.xp} XP
-                  </span>
-                </div>
-                {/* Progress bar */}
-                <div className="w-full bg-base-border h-1 rounded-full overflow-hidden mt-1">
-                  <div 
-                    className="bg-primary h-full rounded-full transition-all duration-500"
-                    style={{ width: `${xpProgress}%` }}
-                  />
-                </div>
-              </div>
-            </div>
-
             {/* Theme Switcher Capsule */}
             {setTheme && (
               <Tabs<'light' | 'dark' | 'system'>

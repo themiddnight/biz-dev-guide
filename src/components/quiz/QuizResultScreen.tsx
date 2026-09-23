@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, RotateCcw, Trophy, Target, Zap, Bot, BookOpen } from 'lucide-react';
+import { Sparkles, RotateCcw, Trophy, Target, Bot, BookOpen } from 'lucide-react';
 import { CHAPTERS } from '../../data/chaptersData';
 import { resultCopy, scoreBand, type MissedItem } from '../../lib/quizResult';
 import { Button } from '../ui/Button';
@@ -8,7 +8,6 @@ import { TAP } from '../ui/tapTarget';
 interface QuizResultScreenProps {
   score: number;
   total: number;
-  awardedXp: number;
   missed: MissedItem[];
   onRestart: () => void;
   onAskAI: () => void;
@@ -20,7 +19,6 @@ interface QuizResultScreenProps {
 export const QuizResultScreen: React.FC<QuizResultScreenProps> = ({
   score,
   total,
-  awardedXp,
   missed,
   onRestart,
   onAskAI,
@@ -44,30 +42,20 @@ export const QuizResultScreen: React.FC<QuizResultScreenProps> = ({
       <div className="space-y-2">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-success/10 text-success text-xs font-semibold border border-success/25">
           <Sparkles className="w-3.5 h-3.5" />
-          <span>ทำครบแล้ว! บันทึกผลแล้ว</span>
+          <span>ทำครบแล้ว · ใช้ทบทวนเท่านั้น ไม่บันทึกคะแนน</span>
         </div>
         <h2 className="text-2xl sm:text-3xl font-extrabold text-base-content">{heading}</h2>
         <p className="text-base-content-secondary text-sm">{subtitle}</p>
       </div>
 
-      {/* Score & XP Card */}
-      <div className="grid grid-cols-2 gap-4 max-w-md mx-auto p-6 bg-base-100 rounded-box border border-base-border shadow-2xs">
+      {/* Score for this round only */}
+      <div className="max-w-xs mx-auto p-6 bg-base-100 rounded-box border border-base-border shadow-2xs">
         <div className="space-y-1">
           <span className="text-xs text-base-content-muted font-medium">คะแนนที่ได้</span>
           <div className="text-3xl font-extrabold text-base-content">
             {score} <span className="text-lg text-base-content-muted font-normal">/ {total}</span>
           </div>
           <span className="text-xs text-base-content-secondary font-medium">{percentage}% ถูกต้อง</span>
-        </div>
-        <div className="space-y-1 border-l border-base-border pl-4">
-          <span className="text-xs text-base-content-muted font-medium">XP ที่ได้รับ</span>
-          <div className="text-3xl font-extrabold text-warning flex items-center justify-center gap-1">
-            <Zap className="w-6 h-6 fill-warning text-warning" />
-            <span>+{awardedXp}</span>
-          </div>
-          <span className="text-xs text-success font-semibold">
-            {awardedXp > 0 ? 'สะสมเข้าโปรไฟล์แล้ว' : 'ข้อที่ตอบถูกเคยได้รับ XP ไปแล้ว'}
-          </span>
         </div>
       </div>
 

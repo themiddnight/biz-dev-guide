@@ -7,7 +7,7 @@ import { QuizTab } from './QuizTab';
 const noop = () => {};
 const render = (role: 'eng' | 'biz' | null) =>
   renderToStaticMarkup(
-    <QuizTab questions={QUIZ_QUESTIONS} role={role} onAnswer={() => 0} onCompleteQuiz={noop} onAskAIWithPrompt={noop} onOpenChapter={noop} />,
+    <QuizTab questions={QUIZ_QUESTIONS} role={role} onAskAIWithPrompt={noop} onOpenChapter={noop} />,
   );
 
 // The tab reads the stored round through the same guarded helper the app uses.

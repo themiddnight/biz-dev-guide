@@ -19,7 +19,6 @@ interface FrictionPlaybookCardProps {
   chapterTitle: string;
   isOpen: boolean;
   onToggle: () => void;
-  onEarnXp?: (amount: number, reason: string) => void;
 }
 
 export const FrictionPlaybookCard: React.FC<FrictionPlaybookCardProps> = ({
@@ -27,10 +26,8 @@ export const FrictionPlaybookCard: React.FC<FrictionPlaybookCardProps> = ({
   chapterTitle,
   isOpen,
   onToggle,
-  onEarnXp,
 }) => {
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
-  const [hasEarnedXp, setHasEarnedXp] = useState(false);
 
   // If no specific playbook exists for this chapter, show a universal friction principle
   if (!playbook) {
@@ -94,12 +91,8 @@ export const FrictionPlaybookCard: React.FC<FrictionPlaybookCardProps> = ({
     );
   }
 
-  const handleSelectDilemma = (optionId: string, isOptimal: boolean) => {
+  const handleSelectDilemma = (optionId: string) => {
     setSelectedOptionId(optionId);
-    if (isOptimal && !hasEarnedXp && onEarnXp) {
-      setHasEarnedXp(true);
-      onEarnXp(20, 'ผ่านสถานการณ์จำลองการเจรจา (Friction Dilemma)');
-    }
   };
 
   return (
@@ -271,9 +264,6 @@ export const FrictionPlaybookCard: React.FC<FrictionPlaybookCardProps> = ({
                   <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-warning" />
                   <span>จำลองสถานการณ์จริงในห้องประชุม (Meeting Dilemma)</span>
                 </div>
-                <span className="text-[10px] sm:text-[11px] font-semibold px-2 py-0.5 rounded-full bg-warning/10 text-warning border border-warning/25">
-                  +20 XP เมื่อตอบถูก
-                </span>
               </div>
 
               {/* Dilemma Dialogue Quote */}
@@ -311,7 +301,7 @@ export const FrictionPlaybookCard: React.FC<FrictionPlaybookCardProps> = ({
                       >
                         <button
                           type="button"
-                          onClick={() => handleSelectDilemma(option.id, option.isOptimal)}
+                          onClick={() => handleSelectDilemma(option.id)}
                           aria-pressed={isSelected}
                           className={`${TAP} w-full flex items-start justify-between gap-2 text-left cursor-pointer rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-engineer`}
                         >
