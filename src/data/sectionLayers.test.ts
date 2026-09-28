@@ -140,13 +140,18 @@ describe('isSectionPresent', () => {
     expect(idsWith('diagram')).not.toContain('s1');
     expect(idsWith('diagram')).not.toContain('s14');
   });
+
+  it('practice in every chapter; meta is ลงมือทำ, 3 minutes (spec A.3)', () => {
+    expect(idsWith('practice')).toHaveLength(CHAPTERS.length);
+    expect(SECTION_META.practice).toEqual({ chip: 'ลงมือทำ', minutes: 3 });
+  });
 });
 
 describe('sectionHasTool', () => {
   it('diagram in all chapters but s1, s14 and s16-s19; friction only in s1, s2, s6', () => {
     expect(CHAPTERS.filter(c => !sectionHasTool(c, 'diagram')).map(c => c.id)).toEqual(['s1', 's14', 's16', 's17', 's18', 's19']);
     expect(CHAPTERS.filter(c => sectionHasTool(c, 'friction')).map(c => c.id)).toEqual(['s1', 's2', 's6']);
-    expect(sectionHasTool(ch('s1'), 'jargon')).toBe(false);
+    expect(sectionHasTool(ch('s1'), 'practice')).toBe(false);
   });
 });
 

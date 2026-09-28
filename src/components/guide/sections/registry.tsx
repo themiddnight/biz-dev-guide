@@ -15,9 +15,8 @@ import { ExamplesSection } from './ExamplesSection';
 import { CoreConceptsSection } from './CoreConceptsSection';
 import { ReferenceSection } from './ReferenceSection';
 import { GlossarySection } from './GlossarySection';
-import { WorkflowSection } from './WorkflowSection';
+import { PracticeSection } from './PracticeSection';
 import { PitfallsSection } from './PitfallsSection';
-import { ChecklistSection } from './ChecklistSection';
 import { OtherSideSection } from './OtherSideSection';
 
 /** Which side the other-side box shows (spec P2.2). Session state in GuideTab, not persisted. */
@@ -66,7 +65,6 @@ export const SECTION_COMPONENTS: Record<SectionKey, React.FC<SectionProps>> = {
   coreConcepts: CoreConceptsSection,
   reference: ReferenceSection,
   glossary: GlossarySection,
-  workflow: WorkflowSection,
+  practice: PracticeSection,
   pitfalls: PitfallsSection,
-  checklist: ChecklistSection,
 };

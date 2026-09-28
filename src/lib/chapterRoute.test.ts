@@ -19,7 +19,7 @@ describe('formatChapterHash', () => {
     for (const num of [1, 15, 19]) {
       const id = `s${num}`;
       expect(parse(formatChapterHash(num))).toEqual({ chapterId: id });
-      expect(parse(formatChapterHash(num, 'checklist'))).toEqual({ chapterId: id, section: 'checklist' });
+      expect(parse(formatChapterHash(num, 'practice'))).toEqual({ chapterId: id, section: 'practice' });
     }
   });
 });
@@ -149,5 +149,12 @@ describe('retired section keys (spec A7)', () => {
   it('primer goes to the chapter top and canonicalises to the bare chapter', () => {
     expect(parse('#/ch/3/primer')).toEqual({ chapterId: 's3', focus: 'top' });
     expect(formatChapterHash(3, parse('#/ch/3/primer')!.section)).toBe('#/ch/3');
+  });
+
+  it('workflow and checklist land on practice', () => {
+    expect(parse('#/ch/3/workflow')).toEqual({ chapterId: 's3', section: 'practice' });
+    expect(parse('#/ch/3/checklist')).toEqual({ chapterId: 's3', section: 'practice' });
+    expect(formatChapterHash(3, parse('#/ch/3/workflow')!.section)).toBe('#/ch/3/practice');
+    expect(popstateCanonicalHash('#/ch/3/checklist', parse('#/ch/3/checklist')!, 3)).toBe('#/ch/3/practice');
   });
 });

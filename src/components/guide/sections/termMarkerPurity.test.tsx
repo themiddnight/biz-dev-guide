@@ -46,20 +46,10 @@ import { CoreConceptsSection } from './CoreConceptsSection';
 import { JargonSection } from './JargonSection';
 import { OtherSideSection } from './OtherSideSection';
 import { ChapterIntro } from '../ChapterIntro';
-import type { GuideSectionContext, OtherSideView } from './registry';
+import type { OtherSideView } from './registry';
+import { ctxFor } from './testCtx';
 
 const noop = () => {};
-const ctxFor = (over: Partial<GuideSectionContext>): GuideSectionContext => ({
-  chapters: CHAPTERS,
-  onNavigateChapter: noop, onDiagramJump: noop, onScrollToPlaybook: noop,
-  onSearchGlossary: noop, onSelectGlossaryCategory: noop,
-  glossaryCategory: 'all', setGlossaryCategory: noop,
-  glossaryQuery: '', setGlossaryQuery: noop,
-  c4Level: 1, setC4Level: noop,
-  checkedChecklist: {}, onToggleChecklistItem: noop,
-  role: null, chapterLevel: 'beginner', otherSideView: 'both', setOtherSideView: noop,
-  ...over,
-});
 
 const rendered = (html: string) => [...html.matchAll(/data-inline-term="([a-z0-9-]+)"/g)].map(m => m[1]);
 const expected = (texts: readonly (string | undefined)[]) =>

@@ -6,22 +6,22 @@ export const LAYERS: readonly Layer[] = ['core', 'apply', 'deep'];
 
 export type SectionKey =
   | 'mindset' | 'otherSide' | 'friction' | 'jargon' | 'dialogue' | 'diagram' | 'faq'
-  | 'examples' | 'coreConcepts' | 'reference' | 'glossary' | 'workflow' | 'pitfalls' | 'checklist';
+  | 'examples' | 'coreConcepts' | 'reference' | 'glossary' | 'practice' | 'pitfalls';
 
 export const SECTION_KEYS: readonly SectionKey[] = [
   'mindset', 'otherSide', 'friction', 'jargon', 'dialogue', 'diagram', 'faq',
-  'examples', 'coreConcepts', 'reference', 'glossary', 'workflow', 'pitfalls', 'checklist',
+  'examples', 'coreConcepts', 'reference', 'glossary', 'practice', 'pitfalls',
 ];
 
 export const LAYER_CONFIG: Record<ExperienceLevel, Record<Layer, readonly SectionKey[]>> = {
   beginner: {
     core: ['jargon', 'otherSide', 'coreConcepts', 'diagram'],
-    apply: ['dialogue', 'examples', 'workflow', 'checklist', 'pitfalls', 'faq', 'friction'],
+    apply: ['dialogue', 'examples', 'practice', 'pitfalls', 'faq', 'friction'],
     deep: ['reference', 'glossary', 'mindset'],
   },
   experienced: {
     core: ['otherSide', 'coreConcepts', 'pitfalls', 'diagram'],
-    apply: ['friction', 'dialogue', 'workflow', 'checklist', 'faq', 'examples'],
+    apply: ['friction', 'dialogue', 'practice', 'faq', 'examples'],
     deep: ['jargon', 'reference', 'glossary', 'mindset'],
   },
 };
@@ -37,8 +37,7 @@ export const SECTION_META: Record<SectionKey, { chip: string; minutes: number }>
   diagram: { chip: 'แผนภาพ', minutes: 3 },
   dialogue: { chip: 'บทสนทนา', minutes: 2 },
   examples: { chip: 'ตัวอย่างจริง', minutes: 3 },
-  workflow: { chip: 'ขั้นตอนงาน', minutes: 2 },
-  checklist: { chip: 'เช็กลิสต์', minutes: 1 },
+  practice: { chip: 'ลงมือทำ', minutes: 3 },
   faq: { chip: 'คำถามที่เจอบ่อย', minutes: 6 },
   friction: { chip: 'รับมือ Friction', minutes: 4 },
   coreConcepts: { chip: 'แนวคิดหลัก', minutes: 3 },
@@ -110,7 +109,7 @@ function hasDiagramContent(chapter: Chapter): boolean {
   );
 }
 
-/** Mirrors the pre-refactor render guards in GuideTab exactly (spec §1.3). */
+/** A section renders iff this returns true. */
 export function isSectionPresent(chapter: Chapter, key: SectionKey): boolean {
   switch (key) {
     case 'mindset': case 'friction': return true;
@@ -123,9 +122,8 @@ export function isSectionPresent(chapter: Chapter, key: SectionKey): boolean {
     case 'coreConcepts': return (chapter.coreConcepts?.length ?? 0) > 0;
     case 'reference': return getReferenceSections(chapter).length > 0;
     case 'glossary': return chapter.id === 's15';
-    case 'workflow': return (chapter.realWorldWorkflow?.length ?? 0) > 0;
+    case 'practice': return (chapter.realWorldWorkflow?.length ?? 0) > 0 || (chapter.checklist?.length ?? 0) > 0;
     case 'pitfalls': return (chapter.commonPitfalls?.length ?? 0) > 0;
-    case 'checklist': return (chapter.checklist?.length ?? 0) > 0;
   }
 }
 

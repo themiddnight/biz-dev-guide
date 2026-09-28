@@ -4,7 +4,8 @@ import { CHAPTERS } from '../../../data/chaptersData';
 import { getChapterLayout } from '../../../data/sectionLayers';
 import { ChapterHero } from '../ChapterHero';
 import { ChapterIntro } from '../ChapterIntro';
-import { SECTION_COMPONENTS, type GuideSectionContext } from './registry';
+import { SECTION_COMPONENTS } from './registry';
+import { ctxFor } from './testCtx';
 
 /**
  * The honesty check on real data (term-definitions spec D16): where the automatic markers land in
@@ -13,16 +14,7 @@ import { SECTION_COMPONENTS, type GuideSectionContext } from './registry';
  * starts marking the wrong thing shows up here as a reviewable diff, not a silent behaviour change.
  */
 const noop = () => {};
-const ctx: GuideSectionContext = {
-  chapters: CHAPTERS,
-  onNavigateChapter: noop, onDiagramJump: noop, onScrollToPlaybook: noop,
-  onSearchGlossary: noop, onSelectGlossaryCategory: noop,
-  glossaryCategory: 'all', setGlossaryCategory: noop,
-  glossaryQuery: '', setGlossaryQuery: noop,
-  c4Level: 1, setC4Level: noop,
-  checkedChecklist: {}, onToggleChecklistItem: noop,
-  role: null, chapterLevel: 'beginner', otherSideView: 'both', setOtherSideView: noop,
-};
+const ctx = ctxFor();
 
 const markersOf = (html: string) =>
   [...html.matchAll(/data-inline-term="([a-z0-9-]+)"[^>]*>([^<]+)<\/button>/g)].map(m => `${m[1]} (${m[2]})`);
