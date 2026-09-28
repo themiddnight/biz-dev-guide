@@ -884,6 +884,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                   variant="pills"
                   size="xs"
                   scroll
+                  fadeFrom="from-base-300"
                   aria-label="กรองตามสายงาน"
                   items={ROLE_FILTERS}
                   value={selectedRole}

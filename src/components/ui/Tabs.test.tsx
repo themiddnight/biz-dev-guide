@@ -4,6 +4,7 @@ import { Tabs, TABS_LAYOUT } from './Tabs';
 import { ToggleChip, chipClass } from './ToggleChip';
 import { TAP_GAP } from './tapTarget';
 import type { Tap } from './types';
+import type { FadeFrom } from './ScrollFade';
 
 const hasRing = (cls: string) => cls.includes('max-sm:before:min-h-11') || Object.values(TAP_GAP).some(g => cls.includes(g));
 const SHAPES = ['chip', 'pill', 'segment', 'tab', 'card'] as const;
@@ -59,8 +60,8 @@ describe('ToggleChip', () => {
 
 describe('Tabs', () => {
   const items = [{ value: 'a', label: 'A' }, { value: 'b', label: 'B', title: 'bee' }, { value: 'c', label: 'C' }] as const;
-  const render = (variant: 'segmented' | 'pills' | 'underline', scroll?: boolean) =>
-    renderToStaticMarkup(<Tabs items={items} value="b" onChange={() => {}} variant={variant} aria-label="pick" scroll={scroll} />);
+  const render = (variant: 'segmented' | 'pills' | 'underline', scroll?: boolean, fadeFrom?: FadeFrom) =>
+    renderToStaticMarkup(<Tabs items={items} value="b" onChange={() => {}} variant={variant} aria-label="pick" scroll={scroll} fadeFrom={fadeFrom} />);
 
   it('is a labelled group with exactly one pressed item', () => {
     const html = render('pills');
@@ -88,5 +89,30 @@ describe('Tabs', () => {
     expect(html).toContain('overflow-x-auto');
     expect(html).toContain('max-sm:-my-2.5 max-sm:py-2.5');
     expect(html).toContain('shrink-0');
+  });
+
+  it('a scrolling strip sits in a fade wrapper with two hidden, decorative, mobile-only edges (F-06)', () => {
+    const html = render('pills', true);
+    expect(html).toMatch(/^<div data-scroll-fade="true" class="relative">/);
+    const fades = html.match(/<span aria-hidden="true" data-fade="(start|end)" class="[^"]*"/g) ?? [];
+    expect(fades).toHaveLength(2);
+    for (const f of fades) {
+      expect(f).toContain('pointer-events-none');
+      expect(f).toContain('sm:hidden');
+      expect(f).toContain('from-base-100');
+      // Before the first measure, both edges are hidden.
+      expect(f.split('"')[5].split(' ')).toContain('hidden');
+    }
+    // The group semantics stay on the scroller, not on the wrapper.
+    expect(html).toMatch(/<div role="group" aria-label="pick" class="[^"]*overflow-x-auto/);
+  });
+
+  it('the fade takes the colour of the surface it sits on', () => {
+    expect(render('pills', true, 'from-base-300')).toContain('from-base-300');
+    expect(render('pills', true, 'from-base-300')).not.toContain('from-base-100');
+  });
+
+  it('a strip that does not scroll gets no fade', () => {
+    expect(render('pills')).not.toContain('data-scroll-fade');
   });
 });

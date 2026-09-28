@@ -3,6 +3,7 @@ import type { Chapter } from '../../types';
 import { LAYER_META, SECTION_META, sectionHasTool, type LayerGroup, type OpenState, type SectionKey } from '../../data/sectionLayers';
 import { SCROLL_ROOM, TAP } from '../ui/tapTarget';
 import { ToggleChip } from '../ui/ToggleChip';
+import { ScrollFade } from '../ui/ScrollFade';
 
 interface SectionOutlineProps {
   chapter: Chapter;
@@ -38,7 +39,7 @@ export const SectionOutline: React.FC<SectionOutlineProps> = ({ chapter, layout,
       className="sticky z-30 -mx-box-spacious px-box-spacious py-2 bg-base-100 border-b border-base-border"
       style={{ top: 'var(--header-h)' }}
     >
-      <div className={`flex flex-nowrap sm:flex-wrap items-center gap-1.5 overflow-x-auto ${SCROLL_ROOM}`}>
+      <ScrollFade className={`flex flex-nowrap sm:flex-wrap items-center gap-1.5 overflow-x-auto ${SCROLL_ROOM}`}>
         {layout.filter(g => g.sections.length > 0).map(group => (
           <React.Fragment key={group.layer}>
             <span data-outline-layer={group.layer} className="shrink-0 text-[10px] font-bold uppercase tracking-wider text-base-content-muted">
@@ -73,7 +74,7 @@ export const SectionOutline: React.FC<SectionOutlineProps> = ({ chapter, layout,
           <span className="text-base-content-subtle">|</span>
           <button type="button" onClick={onCollapseAll} className={`${TAP} text-base-content-muted hover:underline font-semibold cursor-pointer`}>ย่อทั้งหมด</button>
         </span>
-      </div>
+      </ScrollFade>
     </div>
   );
 };

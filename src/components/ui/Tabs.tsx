@@ -3,6 +3,7 @@ import { cn } from './cn';
 import { SCROLL_ROOM } from './tapTarget';
 import { ToggleChip, type ToggleChipProps } from './ToggleChip';
 import type { Tap } from './types';
+import { ScrollFade, type FadeFrom } from './ScrollFade';
 
 /**
  * A labelled group of ToggleChips. The variant picks the gap and the tap ring together, so they
@@ -16,6 +17,8 @@ export interface TabsProps<T extends string> {
   size?: 'xs' | 'sm';
   'aria-label': string;
   scroll?: boolean;
+  /** With `scroll`: the fade colour, matching the surface behind the row (default base-100). */
+  fadeFrom?: FadeFrom;
   className?: string;
 }
 
@@ -26,30 +29,39 @@ export const TABS_LAYOUT: Record<TabsProps<string>['variant'], { group: string; 
   underline: { group: 'flex items-center border-b border-base-border', gapPx: 0, shape: 'tab', tap: 'y' },
 };
 
-export function Tabs<T extends string>({ items, value, onChange, variant, size = 'sm', scroll, className, ...aria }: TabsProps<T>) {
+export function Tabs<T extends string>({ items, value, onChange, variant, size = 'sm', scroll, fadeFrom, className, ...aria }: TabsProps<T>) {
   const layout = TABS_LAYOUT[variant];
-  return (
-    <div
-      role="group"
-      aria-label={aria['aria-label']}
-      className={cn(layout.group, scroll && `overflow-x-auto scrollbar-none ${SCROLL_ROOM}`, className)}
+  const chips = items.map(item => (
+    <ToggleChip
+      key={item.value}
+      data-value={item.value}
+      selected={item.value === value}
+      shape={layout.shape}
+      size={size}
+      tap={layout.tap}
+      title={item.title}
+      onClick={() => onChange(item.value)}
+      className={scroll ? 'shrink-0' : undefined}
     >
-      {items.map(item => (
-        <ToggleChip
-          key={item.value}
-          data-value={item.value}
-          selected={item.value === value}
-          shape={layout.shape}
-          size={size}
-          tap={layout.tap}
-          title={item.title}
-          onClick={() => onChange(item.value)}
-          className={scroll ? 'shrink-0' : undefined}
-        >
-          {item.icon}
-          {item.label}
-        </ToggleChip>
-      ))}
+      {item.icon}
+      {item.label}
+    </ToggleChip>
+  ));
+  if (scroll) {
+    return (
+      <ScrollFade
+        fadeFrom={fadeFrom}
+        role="group"
+        aria-label={aria['aria-label']}
+        className={cn(layout.group, `overflow-x-auto scrollbar-none ${SCROLL_ROOM}`, className)}
+      >
+        {chips}
+      </ScrollFade>
+    );
+  }
+  return (
+    <div role="group" aria-label={aria['aria-label']} className={cn(layout.group, className)}>
+      {chips}
     </div>
   );
 }

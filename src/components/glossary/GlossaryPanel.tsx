@@ -8,6 +8,7 @@ import { searchGlossaryTerms } from '../../lib/glossarySearch';
 import { TAP_GAP, TAP_POSITIONED } from '../ui/tapTarget';
 import { Button } from '../ui/Button';
 import { ToggleChip } from '../ui/ToggleChip';
+import { ScrollFade } from '../ui/ScrollFade';
 import { cn } from '../ui/cn';
 import { fieldClass } from '../ui/Input';
 
@@ -139,8 +140,8 @@ export const GlossaryPanel: React.FC<GlossaryPanelProps> = ({
         ))}
       </div>
 
-      {/* Category chips: scroll horizontally on mobile, wrap from sm */}
-      <div className="flex flex-nowrap sm:flex-wrap gap-1.5 overflow-x-auto sm:overflow-visible pb-1 sm:pb-0 max-sm:-mt-2.5 max-sm:pt-2.5 max-sm:-mb-2.5 max-sm:pb-3.5 -mx-1 px-1">
+      {/* Category chips: scroll horizontally on mobile with a fade on the clipped edge, wrap from sm */}
+      <ScrollFade wrapperClassName="max-sm:-mb-2.5" className="flex flex-nowrap sm:flex-wrap gap-1.5 overflow-x-auto sm:overflow-visible pb-1 sm:pb-0 max-sm:-mt-2.5 max-sm:pt-2.5 max-sm:-mb-2.5 max-sm:pb-3.5 -mx-1 px-1">
         <ToggleChip selected={activeCategory === 'all'} shape="chip" tap="gap-6" onClick={() => setCategory('all')}>
           ทั้งหมด ({side === 'all' ? terms.length : sideCounts[side]})
         </ToggleChip>
@@ -156,7 +157,7 @@ export const GlossaryPanel: React.FC<GlossaryPanelProps> = ({
             {cat.label} ({categoryCounts[cat.key]})
           </ToggleChip>
         ))}
-      </div>
+      </ScrollFade>
 
       <p className="text-[11px] sm:text-xs text-base-content-muted" aria-live="polite">
         แสดง {results.length} จาก {terms.length} คำ
