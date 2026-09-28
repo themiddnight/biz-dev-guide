@@ -49,6 +49,19 @@ describe('normalizeAnswerMarkdown (F-02)', () => {
   it('leaves *** bold italic alone', () => {
     expect(normalizeAnswerMarkdown('***ขั้นตอน:***ทำ')).toBe('***ขั้นตอน:***ทำ');
   });
+
+  it('leaves a ** inside inline code in a table cell unchanged', () => {
+    expect(normalizeAnswerMarkdown('| `2**10` | 1024 |')).toBe('| `2**10` | 1024 |');
+  });
+
+  it('leaves an odd number of ** inside a table-cell code span unchanged', () => {
+    expect(normalizeAnswerMarkdown('| `**kwargs` | ... |')).toBe('| `**kwargs` | ... |');
+  });
+
+  it('does not let a ** inside inline code affect Thai flanking repair later in the paragraph', () => {
+    expect(normalizeAnswerMarkdown('ใช้ `f(**kw)` แล้ว **ขั้นตอน:**ทำ'))
+      .toBe('ใช้ `f(**kw)` แล้ว **ขั้นตอน:** ทำ');
+  });
 });
 
 describe('rehypeLineBreaks', () => {

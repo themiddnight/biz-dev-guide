@@ -28,33 +28,49 @@ function replaceBreaks(line: string): string {
  * Thai puts no space between words, so in `**ขั้นตอน:**ทำ` the closing ** (after punctuation,
  * before a letter) is not right-flanking and never closes. Adds one space after such a closing
  * delimiter, and one space before an opening ** that follows a letter and precedes punctuation.
- * Delimiters pair up in order within the text given (one line, or one table cell).
+ * Delimiters pair up in order within the text given (one line, or one table cell), skipping
+ * inline code spans entirely so a code span's own `**` never affects the count.
  */
 function repairFlanking(text: string): string {
-  let out = '';
-  let last = 0;
+  const segments = text.split(INLINE_CODE);
   let count = 0;
-  for (const m of text.matchAll(BOLD)) {
-    const at = m.index;
-    const before = text[at - 1] ?? '';
-    const after = text[at + 2] ?? '';
-    const opening = count % 2 === 0;
-    count++;
-    out += text.slice(last, at);
-    if (!opening && PUNCT.test(before) && WORD.test(after)) out += '** ';
-    else if (opening && WORD.test(before) && PUNCT.test(after)) out += ' **';
-    else out += '**';
-    last = at + 2;
+  for (let i = 0; i < segments.length; i += 2) {
+    const seg = segments[i];
+    let out = '';
+    let last = 0;
+    for (const m of seg.matchAll(BOLD)) {
+      const at = m.index;
+      const before = seg[at - 1] ?? '';
+      const after = seg[at + 2] ?? '';
+      const opening = count % 2 === 0;
+      count++;
+      out += seg.slice(last, at);
+      if (!opening && PUNCT.test(before) && WORD.test(after)) out += '** ';
+      else if (opening && WORD.test(before) && PUNCT.test(after)) out += ' **';
+      else out += '**';
+      last = at + 2;
+    }
+    segments[i] = out + seg.slice(last);
   }
-  return out + text.slice(last);
+  return segments.join('');
 }
 
-/** A cell with an odd number of ** loses its last one, so no stray ** shows as text. */
+/** A cell with an odd number of ** (outside inline code) loses its last one, so no stray ** shows as text. */
 function balanceCell(cell: string): string {
-  const matches = [...cell.matchAll(BOLD)];
-  if (matches.length % 2 === 0) return cell;
-  const at = matches[matches.length - 1].index;
-  return cell.slice(0, at) + cell.slice(at + 2);
+  const segments = cell.split(INLINE_CODE);
+  let count = 0;
+  for (let i = 0; i < segments.length; i += 2) {
+    count += [...segments[i].matchAll(BOLD)].length;
+  }
+  if (count % 2 === 0) return cell;
+  for (let i = segments.length - 1; i >= 0; i -= 2) {
+    const matches = [...segments[i].matchAll(BOLD)];
+    if (matches.length === 0) continue;
+    const at = matches[matches.length - 1].index;
+    segments[i] = segments[i].slice(0, at) + segments[i].slice(at + 2);
+    break;
+  }
+  return segments.join('');
 }
 
 /** Cells only: in a paragraph, bold may legitimately span lines. */
