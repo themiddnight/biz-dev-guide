@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { AIAssistantTab, answerSourceLabel, fallbackNotice } from './AIAssistantTab';
+import { AIAssistantTab, AnswerMarkdown, answerSourceLabel, fallbackNotice } from './AIAssistantTab';
 
 describe('AIAssistantTab hierarchy (spec §10.1, §10.3, §10.5)', () => {
   const html = renderToStaticMarkup(<AIAssistantTab />);
@@ -42,5 +42,23 @@ describe('fallbackNotice', () => {
 describe('free-tier note', () => {
   it('is always shown under the input', () => {
     expect(renderToStaticMarkup(<AIAssistantTab />)).toContain('AI ตัวนี้ใช้ Groq และ Gemini แบบฟรี');
+  });
+});
+
+describe('AnswerMarkdown (F-02)', () => {
+  // The s09 answer from run 2026-09-25: a <br> list and an unmatched ** in table cells.
+  const S09 = [
+    '| กลยุทธ์ | วิธีทำ |',
+    '|---|---|',
+    '| **“ขยายความเร็ว”** – ทำแคมเปญเร็วขึ้น** | **ขั้นตอน:**1️⃣ วางแผน<br>2️⃣ ทำ<br>3️⃣ วัดผล |',
+  ].join('\n');
+
+  it('renders cell line breaks as <br> with no raw <br> or ** left', () => {
+    const html = renderToStaticMarkup(<AnswerMarkdown content={S09} />);
+    expect(html).toContain('<table');
+    expect(html).not.toContain('&lt;br');
+    expect(html).not.toContain('**');
+    expect(html.match(/<br\/>/g)).toHaveLength(2);
+    expect(html).toMatch(/<strong[^>]*>ขั้นตอน:<\/strong>/);
   });
 });

@@ -22,6 +22,7 @@ import { Alert } from './ui/Alert';
 import { badgeClass } from './ui/Badge';
 import { cn } from './ui/cn';
 import { buildChatHistory } from '../lib/chatHistory';
+import { normalizeAnswerMarkdown, rehypeLineBreaks } from '../lib/answerMarkdown';
 import type { ChapterContext } from '../lib/chapterContext';
 
 interface AIAssistantTabProps {
@@ -77,6 +78,18 @@ const MARKDOWN_COMPONENTS: Components = {
   td: ({ children }) => <td className="p-2.5 border-b border-base-border text-base-content-body">{children}</td>,
   strong: ({ children }) => <strong className="font-bold text-base-content">{children}</strong>,
 };
+
+const REMARK_PLUGINS = [remarkGfm];
+const REHYPE_PLUGINS = [rehypeLineBreaks];
+
+/** An AI answer: model Markdown repaired (spec F-02), then rendered with the chat's components. */
+export function AnswerMarkdown({ content }: { content: string }) {
+  return (
+    <Markdown remarkPlugins={REMARK_PLUGINS} rehypePlugins={REHYPE_PLUGINS} components={MARKDOWN_COMPONENTS}>
+      {normalizeAnswerMarkdown(content)}
+    </Markdown>
+  );
+}
 
 const clockTime = () => new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
@@ -268,12 +281,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
               <div className="max-w-[85%] sm:max-w-[75%] rounded-box p-4 text-xs sm:text-sm leading-relaxed space-y-2 bg-base-300 border border-base-border text-base-content">
                 {isAi ? (
                   <div className="markdown-body space-y-2.5 leading-relaxed break-words text-xs sm:text-sm">
-                    <Markdown
-                      remarkPlugins={[remarkGfm]}
-                      components={MARKDOWN_COMPONENTS}
-                    >
-                      {msg.content}
-                    </Markdown>
+                    <AnswerMarkdown content={msg.content} />
                   </div>
                 ) : (
                   <div className="whitespace-pre-line break-words font-medium">
