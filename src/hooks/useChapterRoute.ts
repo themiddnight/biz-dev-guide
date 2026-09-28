@@ -9,7 +9,7 @@ import {
   popstateCanonicalHash,
   reduceRouteSession,
   resolveInitialChapter,
-  type ChapterRoute,
+  resolvePopstatePendingRoute,
   type RequestedSection,
 } from '../lib/chapterRoute';
 import { readStorage, writeStorage } from '../lib/storage';
@@ -89,12 +89,13 @@ export function useChapterRoute(chapters: Chapter[], opts: { onChapterRoute: () 
       const { hash } = window.location;
       // A bare entry is either the untouched initial page (shows the chapter resolved on load),
       // or one a tab switch just stripped the hash from (shows the chapter + section that was on
-      // screen before the switch, per rememberHashBeforeTabClear). The latter is consumed once.
-      const pending = pendingBareFallbackRef.current;
-      pendingBareFallbackRef.current = null;
-      const route: ChapterRoute | null = isBareHash(hash)
-        ? (pending ? parseChapterHash(pending, chapters) : null) ?? { chapterId: init.chapterId }
-        : parseChapterHash(hash, chapters);
+      // screen before the switch, per rememberHashBeforeTabClear). The latter is consumed only by
+      // the bare popstate that actually uses it — an intervening real chapter-hash popstate (e.g.
+      // an earlier Back) must leave it untouched (spec F-03 consume-once).
+      const { route, clearPending } = resolvePopstatePendingRoute(
+        hash, pendingBareFallbackRef.current, chapters, init.chapterId,
+      );
+      if (clearPending) pendingBareFallbackRef.current = null;
       if (!route) {
         const num = numOf(activeRef.current);
         if (num !== undefined) window.history.replaceState(null, '', formatChapterHash(num));

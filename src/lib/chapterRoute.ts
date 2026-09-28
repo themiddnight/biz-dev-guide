@@ -70,6 +70,25 @@ export function popstateCanonicalHash(hash: string, route: ChapterRoute, num: nu
   return canonical === hash ? null : canonical;
 }
 
+/**
+ * What a popstate should resolve to, given any hash `rememberHashBeforeTabClear` remembered just
+ * before a tab switch stripped it to bare (spec F-03: back from a non-guide tab restores the
+ * chapter + section). The remembered hash is only ever consumed by a *bare* popstate — a real
+ * chapter-hash popstate (e.g. an intervening `Back` that lands on an earlier chapter entry) must
+ * leave it untouched, or one extra back/forward hop discards it before it's used and reintroduces
+ * the bug this exists to fix. `clearPending` tells the caller whether to reset its ref.
+ */
+export function resolvePopstatePendingRoute(
+  hash: string,
+  pending: string | null,
+  chapters: ChapterRef[],
+  initChapterId: string,
+): { route: ChapterRoute | null; clearPending: boolean } {
+  if (!isBareHash(hash)) return { route: parseChapterHash(hash, chapters), clearPending: false };
+  const route = (pending ? parseChapterHash(pending, chapters) : null) ?? { chapterId: initChapterId };
+  return { route, clearPending: true };
+}
+
 /** What a section request does once its chapter is shown (spec A.4 GuideTab, A.5). */
 export type RequestAction = { kind: 'section'; key: SectionKey } | { kind: 'top' } | { kind: 'mindset' };
 

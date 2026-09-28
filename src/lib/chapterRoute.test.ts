@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { CHAPTERS } from '../data/chaptersData';
 import {
   formatChapterHash, initRouteSession, parseChapterHash, planRequest, popstateCanonicalHash,
-  reduceRouteSession, resolveInitialChapter, resolveSectionParam,
+  reduceRouteSession, resolveInitialChapter, resolvePopstatePendingRoute, resolveSectionParam,
 } from './chapterRoute';
 
 const parse = (hash: string) => parseChapterHash(hash, CHAPTERS);
@@ -130,6 +130,43 @@ describe('popstateCanonicalHash', () => {
   it('never writes a hash onto the bare initial entry', () => {
     expect(popstateCanonicalHash('', { chapterId: 's1' }, 1)).toBeNull();
     expect(popstateCanonicalHash('#', { chapterId: 's1' }, 1)).toBeNull();
+  });
+});
+
+describe('resolvePopstatePendingRoute (F-03 consume-once)', () => {
+  it('a bare popstate with nothing pending falls back to the init chapter', () => {
+    expect(resolvePopstatePendingRoute('', null, CHAPTERS, 's1'))
+      .toEqual({ route: { chapterId: 's1' }, clearPending: true });
+    expect(resolvePopstatePendingRoute('#', null, CHAPTERS, 's1'))
+      .toEqual({ route: { chapterId: 's1' }, clearPending: true });
+  });
+
+  it('a bare popstate with a pending hash restores its chapter and section', () => {
+    expect(resolvePopstatePendingRoute('', '#/ch/5/examples', CHAPTERS, 's1'))
+      .toEqual({ route: { chapterId: 's5', section: 'examples' }, clearPending: true });
+  });
+
+  it('a real chapter-hash popstate leaves a pending hash unconsumed', () => {
+    const result = resolvePopstatePendingRoute('#/ch/3', '#/ch/5/examples', CHAPTERS, 's1');
+    expect(result.route).toEqual({ chapterId: 's3' });
+    expect(result.clearPending).toBe(false);
+  });
+
+  it('a chapter hop, then a non-bare popstate, then a bare popstate still restores the pending hash', () => {
+    // chapter 3 -> chapter 5 navigate, tab switch remembers '#/ch/5/examples' and clears the
+    // entry to bare, then Back lands on the earlier #/ch/3 entry (non-bare) before Forward lands
+    // back on the bare, tab-switch-created entry.
+    let pending: string | null = '#/ch/5/examples';
+
+    const back = resolvePopstatePendingRoute('#/ch/3', pending, CHAPTERS, 's1');
+    expect(back.route).toEqual({ chapterId: 's3' });
+    if (back.clearPending) pending = null;
+    expect(pending).toBe('#/ch/5/examples');
+
+    const forward = resolvePopstatePendingRoute('', pending, CHAPTERS, 's1');
+    expect(forward.route).toEqual({ chapterId: 's5', section: 'examples' });
+    if (forward.clearPending) pending = null;
+    expect(pending).toBeNull();
   });
 });
 
