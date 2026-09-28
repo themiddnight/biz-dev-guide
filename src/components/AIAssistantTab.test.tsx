@@ -39,9 +39,32 @@ describe('fallbackNotice', () => {
   });
 });
 
-describe('free-tier note', () => {
-  it('is always shown under the input', () => {
-    expect(renderToStaticMarkup(<AIAssistantTab />)).toContain('AI ตัวนี้ใช้ Groq และ Gemini แบบฟรี');
+describe('mobile chat layout (F-05)', () => {
+  const html = renderToStaticMarkup(<AIAssistantTab />);
+  const classesOf = (marker: string) =>
+    (html.match(new RegExp(`<div ${marker}[^>]*class="([^"]*)"`))?.[1] ?? '').split(' ');
+
+  it('the thread is a scroll box from sm only; below sm the page scrolls', () => {
+    const thread = classesOf('data-chat-thread="true"');
+    expect(thread).toEqual(expect.arrayContaining(['sm:min-h-[420px]', 'sm:max-h-[600px]', 'sm:overflow-y-auto']));
+    const sizing = thread.filter((c) => /(^|:)(min-h|max-h|overflow-y)-/.test(c));
+    expect(sizing.every((c) => c.startsWith('sm:'))).toBe(true);
+  });
+
+  it('the input block sticks to the bottom below sm', () => {
+    const input = classesOf('data-chat-input="true"');
+    expect(input).toEqual(expect.arrayContaining(['max-sm:sticky', 'max-sm:bottom-0', 'max-sm:z-20', 'max-sm:bg-base-200']));
+    expect(input).toContain('max-sm:pb-[max(0.5rem,env(safe-area-inset-bottom))]');
+  });
+
+  it('the free-tier note sits under the input from sm and under the thread below sm, outside the sticky block', () => {
+    const note = 'AI ตัวนี้ใช้ Groq และ Gemini แบบฟรี';
+    expect(html.split(note)).toHaveLength(3);
+    expect(html).toMatch(/<p data-quota-note="mobile" class="sm:hidden[^"]*">AI ตัวนี้ใช้/);
+    expect(html).toMatch(/<p data-quota-note="desktop" class="max-sm:hidden[^"]*">AI ตัวนี้ใช้/);
+    const mobileAt = html.indexOf('data-quota-note="mobile"');
+    expect(mobileAt).toBeGreaterThan(html.indexOf('data-chat-thread'));
+    expect(mobileAt).toBeLessThan(html.indexOf('data-chat-input'));
   });
 });
 

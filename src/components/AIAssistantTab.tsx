@@ -40,6 +40,8 @@ const QUICK_PROMPTS = [
   'เปรียบเทียบ Trunk-based กับ Git-flow เหมาะกับทีมแบบไหน?',
 ];
 
+const QUOTA_NOTE = 'AI ตัวนี้ใช้ Groq และ Gemini แบบฟรี จำกัดจำนวนคำถามต่อนาทีและต่อวัน ถ้าถามถี่เกินไป ระบบจะสลับ model หรือตอบจากคลังความรู้ในตัวแทน';
+
 // Built once: a fresh object per render would rebuild every answer's element tree.
 const MARKDOWN_COMPONENTS: Components = {
   h1: ({ children }) => <h1 className="text-base sm:text-lg font-bold text-base-content mt-3 mb-1.5 border-b border-base-border pb-1">{children}</h1>,
@@ -302,7 +304,8 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
       </div>
 
       {/* Chat Conversation Thread */}
-      <div className="bg-base-100 border border-base-border rounded-box p-box-spacious min-h-[420px] max-h-[600px] overflow-y-auto space-y-4 shadow-2xs">
+      {/* A scroll box from sm only: on a phone it left ~250px for the answer, so the page scrolls instead (F-05) */}
+      <div data-chat-thread className="bg-base-100 border border-base-border rounded-box p-box-spacious sm:min-h-[420px] sm:max-h-[600px] sm:overflow-y-auto space-y-4 shadow-2xs">
         {messages.map((msg) => {
           const isAi = msg.role === 'assistant';
           return (
@@ -369,7 +372,13 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
         )}
       </div>
 
-      <div className="space-y-2">
+      {/* Below sm the note sits here, out of the sticky input block, to keep that block short */}
+      <p data-quota-note="mobile" className="sm:hidden px-1 text-[11px] text-base-content-muted">{QUOTA_NOTE}</p>
+
+      <div
+        data-chat-input
+        className="space-y-2 max-sm:sticky max-sm:bottom-0 max-sm:z-20 max-sm:bg-base-200 max-sm:pt-2 max-sm:pb-[max(0.5rem,env(safe-area-inset-bottom))]"
+      >
         {chapterContext && (
           <div className={cn(badgeClass({ size: 'md' }), 'max-w-full font-medium text-base-content-body')}>
             <BookOpen className="w-3.5 h-3.5 shrink-0 text-base-content-muted" />
@@ -419,9 +428,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
             )}
           </Button>
         </form>
-        <p className="px-1 text-[11px] text-base-content-muted">
-          AI ตัวนี้ใช้ Groq และ Gemini แบบฟรี จำกัดจำนวนคำถามต่อนาทีและต่อวัน ถ้าถามถี่เกินไป ระบบจะสลับ model หรือตอบจากคลังความรู้ในตัวแทน
-        </p>
+        <p data-quota-note="desktop" className="max-sm:hidden px-1 text-[11px] text-base-content-muted">{QUOTA_NOTE}</p>
       </div>
     </div>
   );
