@@ -29,7 +29,10 @@ export default function App() {
     const prev = prevTabRef.current;
     prevTabRef.current = activeTab;
     if (activeTab !== 'guide') {
-      if (window.location.hash) window.history.replaceState(null, '', window.location.pathname + window.location.search);
+      if (window.location.hash) {
+        route.rememberHashBeforeTabClear(window.location.hash);
+        window.history.replaceState(null, '', window.location.pathname + window.location.search);
+      }
       return;
     }
     if (prev !== 'guide' && route.hashInUrl && !window.location.hash) {
