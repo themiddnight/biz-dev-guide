@@ -17,7 +17,9 @@ const LEGACY_RE = /^#s(\d{1,2})$/;
  * Retired section keys that old links, bookmarks and history entries still carry (spec A7).
  * Each key is added in the change that retires it.
  */
-const SECTION_ALIASES: Readonly<Record<string, RequestTarget>> = {};
+const SECTION_ALIASES: Readonly<Record<string, RequestTarget>> = {
+  primer: 'top',
+};
 
 /** A hash section word: a current key, a retired key's new target, or nothing. */
 export function resolveSectionParam(raw: string): { section?: SectionKey; focus?: RouteFocus } {

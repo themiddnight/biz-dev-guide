@@ -647,11 +647,11 @@ export const CHAPTER_CONTENT: Record<string, ChapterContentSection[]> = {
       ],
     },
   ],
-  // Role-perspective spec P4.1: the #A1024 refund as a P&L, right after the s16 primer
+  // Role-perspective spec P4.1: the #A1024 refund as a P&L, right after the s16 core concepts
   s16: [
     {
       placement: 'inline',
-      after: 'primer',
+      after: 'coreConcepts',
       blocks: [
         {
           kind: 'table',

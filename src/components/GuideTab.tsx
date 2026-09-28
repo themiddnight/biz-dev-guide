@@ -25,6 +25,7 @@ import { planRequest, type RequestedSection } from '../lib/chapterRoute';
 import { LayerGroupView } from './guide/LayerGroup';
 import { InlineSections } from './guide/InlineSections';
 import { ChapterHero } from './guide/ChapterHero';
+import { ChapterIntro } from './guide/ChapterIntro';
 import { SectionOutline } from './guide/SectionOutline';
 import { TrackPanel } from './guide/TrackPanel';
 import { chapterLevelResetLabel, chapterLevelScopeLabel } from './guide/rolePerspectiveUi';
@@ -630,6 +631,8 @@ export const GuideTab: React.FC<GuideTabProps> = ({
               onNavigateChapter={handleSelectChapter}
               onSearchGlossary={handleSearchGlossary}
             />
+
+            <ChapterIntro chapter={activeChapter} onNavigateChapter={handleSelectChapter} onSearchGlossary={handleSearchGlossary} />
 
             {/* ADAPTIVE LENS CONTROLLER BANNER */}
             <div className="p-box-dense rounded-box bg-base-300 border border-base-border space-y-2 sm:space-y-2.5">

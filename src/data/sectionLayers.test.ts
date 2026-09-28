@@ -20,17 +20,17 @@ const core = (level: ExperienceLevel, id: string) =>
   getChapterLayout(level, ch(id)).find(g => g.layer === 'core')!.sections;
 
 describe('LAYER_CONFIG', () => {
-  it.each(LEVELS)('%s contains all 15 keys exactly once', level => {
+  it.each(LEVELS)('%s contains every key exactly once', level => {
     const all = LAYERS.flatMap(l => LAYER_CONFIG[level][l]);
-    expect(all).toHaveLength(15);
+    expect(all).toHaveLength(SECTION_KEYS.length);
     expect([...all].sort()).toEqual([...SECTION_KEYS].sort());
   });
   it('isSectionKey accepts keys and rejects others', () => {
     expect(isSectionKey('diagram')).toBe(true);
     expect(isSectionKey('xyz')).toBe(false);
   });
-  it('core puts jargon after the primer for beginners and otherSide first for experienced (P2.2, term-definitions P1)', () => {
-    expect(LAYER_CONFIG.beginner.core).toEqual(['primer', 'jargon', 'otherSide', 'coreConcepts', 'diagram']);
+  it('core leads with jargon for beginners and otherSide for experienced (A.3, term-definitions P1)', () => {
+    expect(LAYER_CONFIG.beginner.core).toEqual(['jargon', 'otherSide', 'coreConcepts', 'diagram']);
     expect(LAYER_CONFIG.beginner.apply).toContain('pitfalls');
     expect(LAYER_CONFIG.beginner.deep).toEqual(['reference', 'glossary', 'mindset']);
     expect(LAYER_CONFIG.experienced.core).toEqual(['otherSide', 'coreConcepts', 'pitfalls', 'diagram']);
@@ -41,7 +41,7 @@ describe('LAYER_CONFIG', () => {
     expect(at('jargon')).toBeLessThan(at('coreConcepts'));
     expect(at('jargon')).toBeLessThan(at('otherSide'));
     expect(at('jargon')).toBeLessThan(at('diagram'));
-    expect(at('primer')).toBeLessThan(at('jargon'));
+    expect(LAYER_CONFIG.beginner.core[0]).toBe('jargon');
   });
   it('no chapter forces a Core section closed (term-definitions D4)', () => {
     expect(CHAPTER_CORE_COLLAPSED.s3).toBeUndefined();
@@ -56,7 +56,7 @@ describe('role-resolved layout', () => {
   };
   it('s6 opens as experienced for eng and beginner for biz', () => {
     expect(coreFor('eng', 's6')).toEqual(['otherSide', 'coreConcepts', 'pitfalls', 'diagram']);
-    expect(coreFor('biz', 's6')).toEqual(['primer', 'jargon', 'otherSide', 'coreConcepts', 'diagram']);
+    expect(coreFor('biz', 's6')).toEqual(['jargon', 'otherSide', 'coreConcepts', 'diagram']);
   });
 });
 
@@ -71,7 +71,7 @@ describe('getLayerOf', () => {
   it('experienced samples', () => {
     expect(getLayerOf('experienced', 'pitfalls', 's1')).toBe('core');
     expect(getLayerOf('experienced', 'examples', 's1')).toBe('apply');
-    expect(getLayerOf('experienced', 'primer', 's1')).toBe('deep');
+    expect(getLayerOf('experienced', 'jargon', 's1')).toBe('deep');
   });
   it('overrides are chapter-scoped', () => {
     expect(getLayerOf('beginner', 'faq', 's11')).toBe('core');
@@ -82,7 +82,7 @@ describe('getLayerOf', () => {
 
 describe('getChapterLayout', () => {
   it('beginner s1 core', () => {
-    expect(core('beginner', 's1')).toEqual(['primer', 'jargon', 'otherSide', 'coreConcepts']);
+    expect(core('beginner', 's1')).toEqual(['jargon', 'otherSide', 'coreConcepts']);
   });
   it('experienced s1 core', () => {
     expect(core('experienced', 's1')).toEqual(['otherSide', 'coreConcepts', 'pitfalls']);
@@ -93,7 +93,7 @@ describe('getChapterLayout', () => {
     }
   });
   it('s15 leads core with the glossary, then its own jargon list (term-definitions P2.3)', () => {
-    expect(core('beginner', 's15')).toEqual(['glossary', 'primer', 'jargon', 'otherSide', 'coreConcepts', 'diagram']);
+    expect(core('beginner', 's15')).toEqual(['glossary', 'jargon', 'otherSide', 'coreConcepts', 'diagram']);
     expect(core('experienced', 's15')).toEqual(['glossary', 'otherSide', 'coreConcepts', 'pitfalls', 'diagram']);
     expect(getChapterLayout('experienced', ch('s15')).find(g => g.layer === 'deep')!.sections).toContain('jargon');
   });
@@ -105,18 +105,18 @@ describe('getChapterLayout', () => {
       expect(rest('s11')).not.toContain('faq');
       expect(rest('s15')).not.toContain('glossary');
     }
-    expect(core('beginner', 's11')).toEqual(['faq', 'primer', 'jargon', 'otherSide', 'coreConcepts', 'diagram']);
+    expect(core('beginner', 's11')).toEqual(['faq', 'jargon', 'otherSide', 'coreConcepts', 'diagram']);
   });
   it('layer minutes = sum of sectionMinutes', () => {
     for (const level of LEVELS) for (const g of getChapterLayout(level, ch('s1'))) {
       expect(g.minutes).toBe(g.sections.reduce((s, k) => s + sectionMinutes(level, k), 0));
     }
-    expect(getChapterLayout('beginner', ch('s1'))[0].minutes).toBe(7); // primer + jargon + otherSide + coreConcepts (1); s1 has no Diagram section after Q4
+    expect(getChapterLayout('beginner', ch('s1'))[0].minutes).toBe(5); // jargon + otherSide + coreConcepts (1); s1 has no Diagram section after Q4
   });
   it('sectionMinutes: compact core concepts count 1 minute for beginners only', () => {
     expect(sectionMinutes('beginner', 'coreConcepts')).toBe(1);
     expect(sectionMinutes('experienced', 'coreConcepts')).toBe(3);
-    expect(sectionMinutes('beginner', 'primer')).toBe(SECTION_META.primer.minutes);
+    expect(sectionMinutes('beginner', 'jargon')).toBe(SECTION_META.jargon.minutes);
   });
   it('every chapter has coreConcepts in the beginner Core layer', () => {
     for (const c of CHAPTERS) expect(core('beginner', c.id)).toContain('coreConcepts');
@@ -146,7 +146,7 @@ describe('sectionHasTool', () => {
   it('diagram in all chapters but s1, s14 and s16-s19; friction only in s1, s2, s6', () => {
     expect(CHAPTERS.filter(c => !sectionHasTool(c, 'diagram')).map(c => c.id)).toEqual(['s1', 's14', 's16', 's17', 's18', 's19']);
     expect(CHAPTERS.filter(c => sectionHasTool(c, 'friction')).map(c => c.id)).toEqual(['s1', 's2', 's6']);
-    expect(sectionHasTool(ch('s1'), 'primer')).toBe(false);
+    expect(sectionHasTool(ch('s1'), 'jargon')).toBe(false);
   });
 });
 
@@ -163,7 +163,6 @@ describe('open state', () => {
     const s = deriveOpenState(s3, 's3');
     expect(s.layers.core).toBe(true);
     expect(s.sections.jargon).toBe(true);
-    expect(s.sections.primer).toBe(true);
     expect(s.sections.diagram).toBe(true);
     expect(s).toEqual(deriveOpenState(s3));
     expect(deriveOpenState(layout, 's1')).toEqual(deriveOpenState(layout));
@@ -194,7 +193,7 @@ describe('open state', () => {
   });
   it('toggleSection and toggleLayer flip one flag', () => {
     const base = deriveOpenState(layout);
-    expect(toggleSection(base, 'primer').sections.primer).toBe(false);
+    expect(toggleSection(base, 'jargon').sections.jargon).toBe(false);
     expect(toggleLayer(base, 'apply').layers.apply).toBe(true);
   });
 });

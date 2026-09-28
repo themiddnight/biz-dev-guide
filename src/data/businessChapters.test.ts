@@ -56,9 +56,9 @@ describe('business chapters s16-s19', () => {
     expect(JSON.stringify(chapter(id))).not.toContain('$');
   });
 
-  it('s16 carries the #A1024 refund P&L table inline after the primer', () => {
+  it('s16 carries the #A1024 refund P&L table inline after the core concepts (spec A6)', () => {
     const inline = (chapter('s16').contentSections ?? []).filter(
-      (s) => s.placement === 'inline' && s.after === 'primer',
+      (s) => s.placement === 'inline' && s.after === 'coreConcepts' && s.conceptIndex === undefined,
     );
     const tables = inline.flatMap((s) => s.blocks).filter((b) => b.kind === 'table');
     expect(tables).toHaveLength(1);

@@ -7,7 +7,6 @@ import { RoleMindsetCard } from '../../RoleMindsetCard';
 import { FrictionPlaybookCard } from '../../FrictionPlaybookCard';
 import type { SectionKey } from '../../../data/sectionLayers';
 import type { Role } from '../../../data/rolePerspective';
-import { PrimerSection } from './PrimerSection';
 import { JargonSection } from './JargonSection';
 import { DialogueSection } from './DialogueSection';
 import { DiagramSection } from './DiagramSection';
@@ -59,7 +58,6 @@ export const SECTION_COMPONENTS: Record<SectionKey, React.FC<SectionProps>> = {
   mindset: MindsetSection,
   otherSide: OtherSideSection,
   friction: FrictionSection,
-  primer: PrimerSection,
   jargon: JargonSection,
   dialogue: DialogueSection,
   diagram: DiagramSection,

@@ -45,7 +45,7 @@ import { ChapterHero } from '../ChapterHero';
 import { CoreConceptsSection } from './CoreConceptsSection';
 import { JargonSection } from './JargonSection';
 import { OtherSideSection } from './OtherSideSection';
-import { PrimerSection } from './PrimerSection';
+import { ChapterIntro } from '../ChapterIntro';
 import type { GuideSectionContext, OtherSideView } from './registry';
 
 const noop = () => {};
@@ -103,7 +103,7 @@ describe('term markers survive a StrictMode double render', () => {
       const cases = {
         hero: [renderToStaticMarkup(<ChapterHero chapter={chapter} experienceLevel="beginner" isRead={false} />),
           [hero.chapterOpening, ...(chapter.heroFigure ? [hero.plainAnalogy, hero.keyTakeaway] : [hero.keyTakeaway, hero.plainAnalogy])]],
-        primer: [renderToStaticMarkup(<PrimerSection chapter={chapter} isOpen onToggle={noop} ctx={ctx} />),
+        primer: [renderToStaticMarkup(<ChapterIntro chapter={chapter} />),
           primer ? [primer.whatIsIt, primer.whyItMatters, primer.realWorldScenario] : []],
         jargon: [renderToStaticMarkup(<JargonSection chapter={chapter} isOpen onToggle={noop} ctx={ctx} />),
           jargonTerms(chapter).flatMap(card => [card.humanTranslation, card.meetingExample])],

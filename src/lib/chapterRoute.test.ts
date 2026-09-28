@@ -144,3 +144,10 @@ describe('planRequest', () => {
     expect(planRequest(ch('s1'), 'top')).toEqual({ kind: 'top' });
   });
 });
+
+describe('retired section keys (spec A7)', () => {
+  it('primer goes to the chapter top and canonicalises to the bare chapter', () => {
+    expect(parse('#/ch/3/primer')).toEqual({ chapterId: 's3', focus: 'top' });
+    expect(formatChapterHash(3, parse('#/ch/3/primer')!.section)).toBe('#/ch/3');
+  });
+});

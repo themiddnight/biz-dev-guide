@@ -3,6 +3,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { CHAPTERS } from '../../../data/chaptersData';
 import { getChapterLayout } from '../../../data/sectionLayers';
 import { ChapterHero } from '../ChapterHero';
+import { ChapterIntro } from '../ChapterIntro';
 import { SECTION_COMPONENTS, type GuideSectionContext } from './registry';
 
 /**
@@ -29,9 +30,11 @@ const markersOf = (html: string) =>
 function beginnerCoreMarkers(chapterId: string): string[] {
   const chapter = CHAPTERS.find(c => c.id === chapterId)!;
   const hero = renderToStaticMarkup(<ChapterHero chapter={chapter} experienceLevel="beginner" isRead={false} />);
+  const intro = renderToStaticMarkup(<ChapterIntro chapter={chapter} />);
   const core = getChapterLayout('beginner', chapter).find(g => g.layer === 'core')!.sections;
   return [
     ...markersOf(hero).map(m => `hero: ${m}`),
+    ...markersOf(intro).map(m => `intro: ${m}`),
     ...core.flatMap(key => {
       const Section = SECTION_COMPONENTS[key];
       const html = renderToStaticMarkup(<Section chapter={chapter} isOpen onToggle={noop} ctx={ctx} />);
@@ -43,9 +46,9 @@ function beginnerCoreMarkers(chapterId: string): string[] {
 describe('automatic term markers on real chapters (beginner Core)', () => {
   it('s1, plain register: PM and SA in the PM → Designer → SA → Dev arrow chain are marked (D20, acceptance 1)', () => {
     expect(beginnerCoreMarkers('s1')).toEqual([
-      'primer: pm-vs-pjm (PM)',
-      'primer: sa (SA)',
-      'primer: api (API)',
+      'intro: pm-vs-pjm (PM)',
+      'intro: sa (SA)',
+      'intro: api (API)',
       'jargon: sprint (Sprint)',
       'jargon: wireframe (Wireframe)',
     ]);
@@ -56,9 +59,9 @@ describe('automatic term markers on real chapters (beginner Core)', () => {
     expect(beginnerCoreMarkers('s10')).toEqual([
       'hero: logging-monitoring-alerting (Monitoring)',
       'hero: incident (Incident)',
-      'primer: slo (SLO)',
-      'primer: incident (Incident)',
-      'primer: logging-monitoring-alerting (Monitoring)',
+      'intro: slo (SLO)',
+      'intro: incident (Incident)',
+      'intro: logging-monitoring-alerting (Monitoring)',
       'jargon: rollback (Rollback)',
       'jargon: sprint (Sprint)',
       'otherSide: sla (SLA)',
@@ -69,14 +72,14 @@ describe('automatic term markers on real chapters (beginner Core)', () => {
 
   it('s15, academic register: the six-abbreviation primer sentence', () => {
     expect(beginnerCoreMarkers('s15')).toEqual([
-      'primer: api (API)',
-      'primer: ci-cd (CI/CD)',
-      'primer: sla (SLA)',
-      'primer: mvp (MVP)',
-      'primer: non-functional-requirement (NFR)',
-      'primer: sdk (SDK)',
-      'primer: refactoring (Refactor)',
-      'primer: technical-debt (Tech Debt)',
+      'intro: api (API)',
+      'intro: ci-cd (CI/CD)',
+      'intro: sla (SLA)',
+      'intro: mvp (MVP)',
+      'intro: non-functional-requirement (NFR)',
+      'intro: sdk (SDK)',
+      'intro: refactoring (Refactor)',
+      'intro: technical-debt (Tech Debt)',
       'otherSide: mvp (MVP)',
       'otherSide: sla (SLA)',
       'otherSide: refactoring (Refactor)',

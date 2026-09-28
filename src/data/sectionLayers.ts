@@ -5,24 +5,24 @@ export type Layer = 'core' | 'apply' | 'deep';
 export const LAYERS: readonly Layer[] = ['core', 'apply', 'deep'];
 
 export type SectionKey =
-  | 'mindset' | 'otherSide' | 'friction' | 'primer' | 'jargon' | 'dialogue' | 'diagram' | 'faq'
+  | 'mindset' | 'otherSide' | 'friction' | 'jargon' | 'dialogue' | 'diagram' | 'faq'
   | 'examples' | 'coreConcepts' | 'reference' | 'glossary' | 'workflow' | 'pitfalls' | 'checklist';
 
 export const SECTION_KEYS: readonly SectionKey[] = [
-  'mindset', 'otherSide', 'friction', 'primer', 'jargon', 'dialogue', 'diagram', 'faq',
+  'mindset', 'otherSide', 'friction', 'jargon', 'dialogue', 'diagram', 'faq',
   'examples', 'coreConcepts', 'reference', 'glossary', 'workflow', 'pitfalls', 'checklist',
 ];
 
 export const LAYER_CONFIG: Record<ExperienceLevel, Record<Layer, readonly SectionKey[]>> = {
   beginner: {
-    core: ['primer', 'jargon', 'otherSide', 'coreConcepts', 'diagram'],
+    core: ['jargon', 'otherSide', 'coreConcepts', 'diagram'],
     apply: ['dialogue', 'examples', 'workflow', 'checklist', 'pitfalls', 'faq', 'friction'],
     deep: ['reference', 'glossary', 'mindset'],
   },
   experienced: {
     core: ['otherSide', 'coreConcepts', 'pitfalls', 'diagram'],
     apply: ['friction', 'dialogue', 'workflow', 'checklist', 'faq', 'examples'],
-    deep: ['primer', 'jargon', 'reference', 'glossary', 'mindset'],
+    deep: ['jargon', 'reference', 'glossary', 'mindset'],
   },
 };
 
@@ -33,7 +33,6 @@ const CHAPTER_CORE_OVERRIDES: Readonly<Record<string, readonly SectionKey[]>> = 
 };
 
 export const SECTION_META: Record<SectionKey, { chip: string; minutes: number }> = {
-  primer: { chip: 'จุดเริ่มต้น', minutes: 2 },
   jargon: { chip: 'ศัพท์จำเป็น', minutes: 2 },
   diagram: { chip: 'แผนภาพ', minutes: 3 },
   dialogue: { chip: 'บทสนทนา', minutes: 2 },
@@ -117,7 +116,6 @@ export function isSectionPresent(chapter: Chapter, key: SectionKey): boolean {
     case 'mindset': case 'friction': return true;
     case 'otherSide': return !!chapter.perspectives;
     case 'diagram': return hasDiagramContent(chapter);
-    case 'primer': return !!chapter.beginnerPrimer;
     case 'jargon': return (chapter.jargonList?.length ?? 0) > 0;
     case 'dialogue': return !!chapter.dialogueExample;
     case 'faq': return chapter.id === 's11';
@@ -163,7 +161,7 @@ const sectionsWhere = (layout: LayerGroup[], pick: (g: LayerGroup) => boolean) =
 
 /**
  * Core sections that start closed for a chapter (visual-first pilot). Layer stays expanded.
- * Empty since the jargon block moved to second in beginner Core (term-definitions spec D4):
+ * Empty since the jargon block leads beginner Core (term-definitions spec D4, section consolidation A.3):
  * s3's title uses `UX/UI`, so the block that resolves it must be open. The mechanism stays.
  */
 export const CHAPTER_CORE_COLLAPSED: Readonly<Record<string, readonly SectionKey[]>> = {};
