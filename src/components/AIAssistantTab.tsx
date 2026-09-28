@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Markdown, { type Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { ChatMessage } from '../types';
@@ -107,6 +107,33 @@ export function fallbackNotice(reason?: ChatMessage['fallbackReason']): string {
     : 'โหมดคลังความรู้ผู้เชี่ยวชาญ: ให้คำแนะนำจากคลังความรู้เฉพาะทางของคู่มือ';
 }
 
+/** The suggested-question row. Disabled while an answer loads, so a second tap is not silently dropped (F-04). */
+export function QuickPromptChips({ loading, activePrompt, onPick }: {
+  loading: boolean;
+  /** The chip whose question is being answered; it shows the spinner. */
+  activePrompt: string | null;
+  onPick: (prompt: string) => void;
+}) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {QUICK_PROMPTS.map((prompt) => (
+        <button
+          key={prompt}
+          type="button"
+          disabled={loading}
+          onClick={() => onPick(prompt)}
+          className={`${TAP_GAP[8]} text-xs px-3 py-1.5 rounded-xl bg-base-100 hover:bg-base-300 text-base-content-body border border-base-border hover:border-base-border-strong transition-all text-left cursor-pointer shadow-2xs disabled:opacity-60 disabled:cursor-not-allowed`}
+        >
+          {loading && prompt === activePrompt && (
+            <Loader2 className="inline w-3.5 h-3.5 mr-1.5 -mt-0.5 animate-spin" />
+          )}
+          {prompt}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
   initialPrompt = '',
   chapterContext,
@@ -132,6 +159,20 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
   const [rolePerspective, setRolePerspective] = useState<'both' | 'business' | 'engineer'>('both');
   const [isLoading, setIsLoading] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [activePrompt, setActivePrompt] = useState<string | null>(null);
+  // Set by handleSend; the effect scrolls the new question to the top once it has rendered (F-04).
+  const [pendingScrollId, setPendingScrollId] = useState<string | null>(null);
+
+  // To the question, not the end of the answer: the answer then reads from its top. scrollIntoView
+  // scrolls every ancestor, so this works in the desktop box and on the mobile page (F-05).
+  useEffect(() => {
+    if (!pendingScrollId) return;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    document
+      .querySelector(`[data-msg-id="${pendingScrollId}"]`)
+      ?.scrollIntoView({ block: 'start', behavior: reduceMotion ? 'auto' : 'smooth' });
+    setPendingScrollId(null);
+  }, [messages, pendingScrollId]);
 
   const handleSend = async (questionText?: string) => {
     const q = questionText || inputQuestion;
@@ -146,6 +187,8 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
     };
 
     setMessages((prev) => [...prev, userMsg]);
+    setPendingScrollId(userMsg.id);
+    setActivePrompt(questionText ?? null);
     setInputQuestion('');
     setIsLoading(true);
 
@@ -188,6 +231,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
       setMessages((prev) => [...prev, errorMsg]);
     } finally {
       setIsLoading(false);
+      setActivePrompt(null);
     }
   };
 
@@ -254,17 +298,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
           <Lightbulb className="w-3.5 h-3.5 text-warning" />
           <span>คำถามยอดฮิตที่เลือกถามได้ทันที:</span>
         </div>
-        <div className="flex flex-wrap gap-2">
-          {QUICK_PROMPTS.map((prompt, idx) => (
-            <button
-              key={idx}
-              onClick={() => handleSend(prompt)}
-              className={`${TAP_GAP[8]} text-xs px-3 py-1.5 rounded-xl bg-base-100 hover:bg-base-300 text-base-content-body border border-base-border hover:border-base-border-strong transition-all text-left cursor-pointer shadow-2xs`}
-            >
-              {prompt}
-            </button>
-          ))}
-        </div>
+        <QuickPromptChips loading={isLoading} activePrompt={activePrompt} onPick={handleSend} />
       </div>
 
       {/* Chat Conversation Thread */}
@@ -274,7 +308,8 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
           return (
             <div
               key={msg.id}
-              className={`flex items-start gap-3 ${isAi ? '' : 'flex-row-reverse'}`}
+              data-msg-id={msg.id}
+              className={`flex items-start gap-3 scroll-mt-[calc(var(--header-h)+8px)] ${isAi ? '' : 'flex-row-reverse'}`}
             >
               <IconBadge size="md">{isAi ? <Bot className="w-4 h-4" /> : <User className="w-4 h-4" />}</IconBadge>
 
