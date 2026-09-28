@@ -14,6 +14,7 @@ import {
   Trophy
 } from 'lucide-react';
 import { TAP } from './ui/tapTarget';
+import { FrictionPrinciples } from './FrictionPrinciples';
 
 interface RoleMindsetCardProps {
   isOpen: boolean;
@@ -167,6 +168,8 @@ export const RoleMindsetCard: React.FC<RoleMindsetCardProps> = ({
               {guide.bridgeAdvice}
             </p>
           </div>
+
+          <FrictionPrinciples />
         </div>
       )}
     </div>

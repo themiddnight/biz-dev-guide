@@ -111,7 +111,8 @@ function hasDiagramContent(chapter: Chapter): boolean {
 /** A section renders iff this returns true. */
 export function isSectionPresent(chapter: Chapter, key: SectionKey): boolean {
   switch (key) {
-    case 'mindset': case 'friction': return true;
+    case 'mindset': return true;
+    case 'friction': return !!chapter.frictionPlaybook;
     case 'otherSide': return !!chapter.perspectives;
     case 'diagram': return hasDiagramContent(chapter);
     case 'jargon': return (chapter.jargonList?.length ?? 0) > 0;

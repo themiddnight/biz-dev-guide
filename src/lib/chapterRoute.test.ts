@@ -134,6 +134,10 @@ describe('popstateCanonicalHash', () => {
 });
 
 describe('planRequest', () => {
+  it('friction in a chapter without a playbook falls back to the chapter top (spec A.5)', () => {
+    expect(planRequest(ch('s3'), 'friction')).toEqual({ kind: 'top' });
+    expect(planRequest(ch('s1'), 'friction')).toEqual({ kind: 'section', key: 'friction' });
+  });
   it('a present section opens', () => {
     expect(planRequest(ch('s1'), 'reference')).toEqual({ kind: 'section', key: 'reference' });
   });

@@ -17,7 +17,6 @@ import {
   toggleSection,
   toggleLayer,
   getInlineSectionsAt,
-  SECTION_META,
   type OpenState,
   type SectionKey,
 } from '../data/sectionLayers';
@@ -27,6 +26,7 @@ import { InlineSections } from './guide/InlineSections';
 import { ChapterHero } from './guide/ChapterHero';
 import { ChapterIntro } from './guide/ChapterIntro';
 import { SectionOutline } from './guide/SectionOutline';
+import { lensHint } from './guide/lensHint';
 import { TrackPanel } from './guide/TrackPanel';
 import { chapterLevelResetLabel, chapterLevelScopeLabel } from './guide/rolePerspectiveUi';
 import { TrackNextCard, TrackEndCard } from './guide/TrackFooter';
@@ -225,9 +225,6 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   const [flippedFor, setFlippedFor] = useState<string | null>(null);
   const seatFlipped = flippedFor === seatKey;
   const seat = role ? (seatFlipped ? otherRole(role) : role) : 'biz';
-
-  // Lens hint names the Core sections this chapter actually opens with (from the layer config).
-  const coreHint = (layout.find(g => g.layer === 'core')?.sections ?? []).map(k => SECTION_META[k].chip).join(' · ');
 
   // Per-chapter level button: no redundant override; picking the fallback level clears it.
   const handleChapterLevelPick = (lvl: ExperienceLevel) => {
@@ -708,9 +705,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
               )}
 
               <p className="text-[11px] sm:text-xs text-base-content-muted leading-relaxed">
-                {chapterLevel === 'beginner'
-                  ? `💡 โหมดมือใหม่: เปิด ${coreHint} ไว้ก่อน ส่วนอื่นพับไว้ในชั้น "นำไปใช้" และ "เจาะลึก"`
-                  : `⚡ โหมดทำงานข้ามทีม: เปิด ${coreHint} ไว้ก่อน วิธีรับมือ Friction อยู่ในชั้น "นำไปใช้"`}
+                {lensHint(chapterLevel, layout)}
               </p>
             </div>
 

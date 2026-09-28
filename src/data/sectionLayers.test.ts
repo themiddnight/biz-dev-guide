@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { CHAPTERS } from './chaptersData';
+import { FRICTION_PLAYBOOKS } from './frictionPlaybooks';
 import {
   LAYERS, SECTION_KEYS, LAYER_CONFIG, SECTION_META, sectionMinutes,
   getLayerOf, getChapterLayout, deriveOpenState, expandAll, collapseAll,
@@ -132,8 +133,12 @@ describe('isSectionPresent', () => {
   it('reference exactly in s1, s2, s5, s6, s8, s12, s13, s14', () => {
     expect(idsWith('reference')).toEqual(['s1', 's2', 's5', 's6', 's8', 's12', 's13', 's14']);
   });
-  it('mindset, friction, otherSide in every chapter', () => {
-    for (const key of ['mindset', 'friction', 'otherSide'] as SectionKey[]) expect(idsWith(key)).toHaveLength(CHAPTERS.length);
+  it('mindset and otherSide in every chapter', () => {
+    for (const key of ['mindset', 'otherSide'] as SectionKey[]) expect(idsWith(key)).toHaveLength(CHAPTERS.length);
+  });
+  it('friction exactly where a playbook exists: s1, s2, s4, s6, s7, s8, s11, s12 (spec A4)', () => {
+    expect(idsWith('friction')).toEqual(['s1', 's2', 's4', 's6', 's7', 's8', 's11', 's12']);
+    expect(idsWith('friction')).toEqual(Object.keys(FRICTION_PLAYBOOKS));
   });
   it('diagram in every chapter except s1 (widget moved to s8, Q4), s14 (Q6) and s16-s19 (P4.1)', () => {
     expect(idsWith('diagram')).toHaveLength(13);

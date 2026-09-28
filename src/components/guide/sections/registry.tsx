@@ -43,14 +43,11 @@ const MindsetSection: React.FC<SectionProps> = ({ isOpen, onToggle }) => (
   <RoleMindsetCard isOpen={isOpen} onToggle={onToggle} />
 );
 
-const FrictionSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggle, ctx }) => (
-  <FrictionPlaybookCard
-    playbook={chapter.frictionPlaybook}
-    chapterTitle={chapter.title}
-    isOpen={isOpen}
-    onToggle={onToggle}
-  />
-);
+const FrictionSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggle }) => {
+  // Present only with a playbook (spec A4); the guard narrows the type without a non-null assertion.
+  if (!chapter.frictionPlaybook) return null;
+  return <FrictionPlaybookCard playbook={chapter.frictionPlaybook} isOpen={isOpen} onToggle={onToggle} />;
+};
 
 export const SECTION_COMPONENTS: Record<SectionKey, React.FC<SectionProps>> = {
   mindset: MindsetSection,
