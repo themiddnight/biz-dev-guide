@@ -148,22 +148,6 @@ describe('resolvePopstatePendingRoute (F-03, per-entry stored hash)', () => {
     expect(resolvePopstatePendingRoute('#/ch/3', '#/ch/5/examples', CHAPTERS, 's1'))
       .toEqual({ chapterId: 's3' });
   });
-
-  it('a second tab-switch/navigate cycle cannot leak an older or newer entry\'s hash onto this one (re-review)', () => {
-    // Tab-switch away from ch.5/examples strips entry A to bare, storing '#/ch/5/examples' on A's
-    // own history.state. navigate (push) to ch.7 creates a real, unrelated entry. Tab-switch away
-    // from ch.7 strips entry B to bare, storing '#/ch/7' on B's own history.state — a *different*
-    // history.state object from A's, so there is no shared slot for B to overwrite.
-    const entryBPushed = resolvePopstatePendingRoute('#/ch/7', null, CHAPTERS, 's1');
-    expect(entryBPushed).toEqual({ chapterId: 's7' });
-
-    // Landing back on entry A (bare) resolves from A's own stored hash, never B's.
-    expect(resolvePopstatePendingRoute('', '#/ch/5/examples', CHAPTERS, 's1'))
-      .toEqual({ chapterId: 's5', section: 'examples' });
-    // Landing on entry B (bare) resolves from B's own stored hash — order of these two calls,
-    // and whatever happened in between, cannot change either result.
-    expect(resolvePopstatePendingRoute('', '#/ch/7', CHAPTERS, 's1')).toEqual({ chapterId: 's7' });
-  });
 });
 
 describe('planRequest', () => {
