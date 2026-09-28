@@ -4,7 +4,7 @@
 // real <br> element.
 
 /** U+2028 LINE SEPARATOR: not a Markdown line ending, so a table row that carries it stays one row. */
-export const LINE_SEPARATOR = ' ';
+export const LINE_SEPARATOR = '\u2028';
 
 const BR_TAG = /<br\s*\/?>/gi;
 const FENCE = /^\s*(```|~~~)/;
