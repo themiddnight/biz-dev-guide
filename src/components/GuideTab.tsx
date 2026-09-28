@@ -34,6 +34,7 @@ import { getTrackNext, resolveTrack, type TrackKey, type TrackNext } from '../da
 import { planChapterLevelChoice } from '../lib/rolePrefs';
 import { ROLE_META, otherRole, resolveChapterLevel, getActiveTrackKey, type LevelInputs, type LevelMode, type Role } from '../data/rolePerspective';
 import { FirstVisitCard, type FirstVisitMode } from './guide/FirstVisitCard';
+import { RoleMindsetCard } from './RoleMindsetCard';
 import { 
   Search, 
   Bookmark, 
@@ -142,6 +143,8 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   const [glossaryCategory, setGlossaryCategory] = useState<GlossaryFilter>('all');
   const [glossaryQuery, setGlossaryQuery] = useState('');
   const [pendingScrollId, setPendingScrollId] = useState<string | null>(null);
+  // Landing role-mindset card: collapsed by default, not persisted; #/ch/N/mindset opens it (spec A5, A7).
+  const [mindsetOpen, setMindsetOpen] = useState(false);
   // Button that opened the index drawer, so focus can return to it on close (I-25).
   const indexOpenerRef = useRef<HTMLElement | null>(null);
 
@@ -246,6 +249,12 @@ export const GuideTab: React.FC<GuideTabProps> = ({
     // Consume the request so a remount (Quiz -> Guide) never re-opens and re-scrolls to it.
     onRequestedSectionApplied();
     const action = planRequest(activeChapter, requestedSection.key);
+    if (action.kind === 'mindset') {
+      setMindsetOpen(true);
+      setPendingScrollId('role-mindset-card');
+      onReplaceSection(null);
+      return;
+    }
     if (action.kind === 'top') {
       // A retired key that maps to the chapter top, or a section this chapter lacks (spec A.5).
       onReplaceSection(null);
@@ -412,6 +421,9 @@ export const GuideTab: React.FC<GuideTabProps> = ({
         </div>
       </div>
       )}
+
+      {/* Role mindset: once per page, below the landing banner in both branches (spec A5). */}
+      <RoleMindsetCard isOpen={mindsetOpen} onToggle={() => setMindsetOpen(o => !o)} />
 
       {/* Main Layout: Desktop Sidebar Index + Chapter Reader Card */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-start">

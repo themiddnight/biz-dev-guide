@@ -166,4 +166,29 @@ describe('retired section keys (spec A7)', () => {
     expect(parse('#/ch/3/dialogue')).toEqual({ chapterId: 's3', section: 'examples' });
     expect(formatChapterHash(3, parse('#/ch/3/dialogue')!.section)).toBe('#/ch/3/examples');
   });
+
+  it('mindset focuses the landing card and canonicalises to the bare chapter', () => {
+    expect(parse('#/ch/3/mindset')).toEqual({ chapterId: 's3', focus: 'mindset' });
+    expect(planRequest(ch('s3'), 'mindset')).toEqual({ kind: 'mindset' });
+  });
+
+  it('every spec A.5 hash parses and canonicalises as specified', () => {
+    const cases: [hash: string, route: object, canonical: string][] = [
+      ['#/ch/3/dialogue', { chapterId: 's3', section: 'examples' }, '#/ch/3/examples'],
+      ['#/ch/3/workflow', { chapterId: 's3', section: 'practice' }, '#/ch/3/practice'],
+      ['#/ch/3/checklist', { chapterId: 's3', section: 'practice' }, '#/ch/3/practice'],
+      ['#/ch/3/primer', { chapterId: 's3', focus: 'top' }, '#/ch/3'],
+      ['#/ch/3/mindset', { chapterId: 's3', focus: 'mindset' }, '#/ch/3'],
+      // Canonical on load; the request effect then clears it to #/ch/3 (planRequest -> top).
+      ['#/ch/3/friction', { chapterId: 's3', section: 'friction' }, '#/ch/3/friction'],
+      ['#/ch/1/friction', { chapterId: 's1', section: 'friction' }, '#/ch/1/friction'],
+      ['#/ch/3/bogus', { chapterId: 's3' }, '#/ch/3'],
+    ];
+    for (const [hash, route, canonical] of cases) {
+      const parsed = parse(hash);
+      expect(parsed, hash).toEqual(route);
+      expect(formatChapterHash(ch(parsed!.chapterId).num, parsed!.section), hash).toBe(canonical);
+    }
+    expect(planRequest(ch('s3'), 'friction')).toEqual({ kind: 'top' });
+  });
 });

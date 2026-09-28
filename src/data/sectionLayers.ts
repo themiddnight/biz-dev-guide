@@ -5,11 +5,11 @@ export type Layer = 'core' | 'apply' | 'deep';
 export const LAYERS: readonly Layer[] = ['core', 'apply', 'deep'];
 
 export type SectionKey =
-  | 'mindset' | 'otherSide' | 'friction' | 'jargon' | 'diagram' | 'faq'
+  | 'otherSide' | 'friction' | 'jargon' | 'diagram' | 'faq'
   | 'examples' | 'coreConcepts' | 'reference' | 'glossary' | 'practice' | 'pitfalls';
 
 export const SECTION_KEYS: readonly SectionKey[] = [
-  'mindset', 'otherSide', 'friction', 'jargon', 'diagram', 'faq',
+  'otherSide', 'friction', 'jargon', 'diagram', 'faq',
   'examples', 'coreConcepts', 'reference', 'glossary', 'practice', 'pitfalls',
 ];
 
@@ -17,12 +17,12 @@ export const LAYER_CONFIG: Record<ExperienceLevel, Record<Layer, readonly Sectio
   beginner: {
     core: ['jargon', 'otherSide', 'coreConcepts', 'diagram'],
     apply: ['examples', 'practice', 'pitfalls', 'faq', 'friction'],
-    deep: ['reference', 'glossary', 'mindset'],
+    deep: ['reference', 'glossary'],
   },
   experienced: {
     core: ['otherSide', 'coreConcepts', 'pitfalls', 'diagram'],
     apply: ['friction', 'examples', 'practice', 'faq'],
-    deep: ['jargon', 'reference', 'glossary', 'mindset'],
+    deep: ['jargon', 'reference', 'glossary'],
   },
 };
 
@@ -43,7 +43,6 @@ export const SECTION_META: Record<SectionKey, { chip: string; minutes: number }>
   pitfalls: { chip: 'กับดัก', minutes: 2 },
   reference: { chip: 'อ้างอิง', minutes: 3 },
   glossary: { chip: 'รวมคำศัพท์', minutes: 5 },
-  mindset: { chip: 'วิธีคิดแต่ละบทบาท', minutes: 2 },
   otherSide: { chip: 'อีกฝั่งมองยังไง', minutes: 2 },
 };
 
@@ -111,7 +110,6 @@ function hasDiagramContent(chapter: Chapter): boolean {
 /** A section renders iff this returns true. */
 export function isSectionPresent(chapter: Chapter, key: SectionKey): boolean {
   switch (key) {
-    case 'mindset': return true;
     case 'friction': return !!chapter.frictionPlaybook;
     case 'otherSide': return !!chapter.perspectives;
     case 'diagram': return hasDiagramContent(chapter);

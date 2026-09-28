@@ -30,11 +30,19 @@ describe('LAYER_CONFIG', () => {
     expect(isSectionKey('diagram')).toBe(true);
     expect(isSectionKey('xyz')).toBe(false);
   });
-  it('core leads with jargon for beginners and otherSide for experienced (A.3, term-definitions P1)', () => {
-    expect(LAYER_CONFIG.beginner.core).toEqual(['jargon', 'otherSide', 'coreConcepts', 'diagram']);
-    expect(LAYER_CONFIG.beginner.apply).toContain('pitfalls');
-    expect(LAYER_CONFIG.beginner.deep).toEqual(['reference', 'glossary', 'mindset']);
-    expect(LAYER_CONFIG.experienced.core).toEqual(['otherSide', 'coreConcepts', 'pitfalls', 'diagram']);
+  it('matches spec A.3: jargon leads beginner Core, otherSide leads experienced Core', () => {
+    expect(LAYER_CONFIG).toEqual({
+      beginner: {
+        core: ['jargon', 'otherSide', 'coreConcepts', 'diagram'],
+        apply: ['examples', 'practice', 'pitfalls', 'faq', 'friction'],
+        deep: ['reference', 'glossary'],
+      },
+      experienced: {
+        core: ['otherSide', 'coreConcepts', 'pitfalls', 'diagram'],
+        apply: ['friction', 'examples', 'practice', 'faq'],
+        deep: ['jargon', 'reference', 'glossary'],
+      },
+    });
     expect(SECTION_META.otherSide).toEqual({ chip: 'อีกฝั่งมองยังไง', minutes: 2 });
   });
   it('beginner jargon precedes every section that uses terms bare (term-definitions D3)', () => {
@@ -65,7 +73,7 @@ describe('getLayerOf', () => {
   it('beginner samples', () => {
     expect(getLayerOf('beginner', 'jargon', 's1')).toBe('core');
     expect(getLayerOf('beginner', 'friction', 's1')).toBe('apply');
-    expect(getLayerOf('beginner', 'mindset', 's1')).toBe('deep');
+    expect(getLayerOf('beginner', 'reference', 's1')).toBe('deep');
     expect(getLayerOf('beginner', 'coreConcepts', 's1')).toBe('core');
     expect(getLayerOf('beginner', 'pitfalls', 's1')).toBe('apply');
   });
@@ -133,8 +141,8 @@ describe('isSectionPresent', () => {
   it('reference exactly in s1, s2, s5, s6, s8, s12, s13, s14', () => {
     expect(idsWith('reference')).toEqual(['s1', 's2', 's5', 's6', 's8', 's12', 's13', 's14']);
   });
-  it('mindset and otherSide in every chapter', () => {
-    for (const key of ['mindset', 'otherSide'] as SectionKey[]) expect(idsWith(key)).toHaveLength(CHAPTERS.length);
+  it('otherSide in every chapter', () => {
+    expect(idsWith('otherSide')).toHaveLength(CHAPTERS.length);
   });
   it('friction exactly where a playbook exists: s1, s2, s4, s6, s7, s8, s11, s12 (spec A4)', () => {
     expect(idsWith('friction')).toEqual(['s1', 's2', 's4', 's6', 's7', 's8', 's11', 's12']);
@@ -196,10 +204,10 @@ describe('open state', () => {
   });
   it('openSection on a deep key expands deep and opens only that key', () => {
     const base = deriveOpenState(layout);
-    const s = openSection(base, layout, 'mindset');
+    const s = openSection(base, layout, 'reference');
     expect(s.layers.deep).toBe(true);
-    expect(s.sections.mindset).toBe(true);
-    const deepOthers = layout[2].sections.filter(k => k !== 'mindset');
+    expect(s.sections.reference).toBe(true);
+    const deepOthers = layout[2].sections.filter(k => k !== 'reference');
     for (const k of deepOthers) expect(!!s.sections[k]).toBe(false);
   });
   it('openSection for an absent key returns the same state', () => {
@@ -210,5 +218,42 @@ describe('open state', () => {
     const base = deriveOpenState(layout);
     expect(toggleSection(base, 'jargon').sections.jargon).toBe(false);
     expect(toggleLayer(base, 'apply').layers.apply).toBe(true);
+  });
+});
+
+describe('consolidated sections (spec A.3, A.6 new 1 and 3, A.7 #1)', () => {
+  const RETIRED = ['mindset', 'primer', 'dialogue', 'workflow', 'checklist'];
+  const COUNTS: Record<number, string[]> = {
+    6: ['s16', 's17', 's18', 's19'],
+    7: ['s3', 's9', 's10', 's14'],
+    8: ['s1', 's4', 's5', 's7', 's13', 's15'],
+    9: ['s2', 's6', 's8', 's11', 's12'],
+  };
+
+  it('SECTION_KEYS is the 11 keys, in spec order', () => {
+    expect(SECTION_KEYS).toEqual([
+      'otherSide', 'friction', 'jargon', 'diagram', 'faq', 'examples',
+      'coreConcepts', 'reference', 'glossary', 'practice', 'pitfalls',
+    ]);
+  });
+
+  it('no retired key is a key or appears in any layout, at either level', () => {
+    for (const key of RETIRED) {
+      expect(isSectionKey(key), key).toBe(false);
+      for (const level of LEVELS) for (const c of CHAPTERS) {
+        expect(getChapterLayout(level, c).flatMap(g => g.sections), `${level} ${c.id}`).not.toContain(key);
+      }
+    }
+  });
+
+  it('no chip reads a retired label', () => {
+    const chips = Object.values(SECTION_META).map(m => m.chip);
+    for (const label of ['จุดเริ่มต้น', 'บทสนทนา', 'ขั้นตอนงาน', 'เช็กลิสต์', 'วิธีคิดแต่ละบทบาท']) expect(chips).not.toContain(label);
+  });
+
+  it.each(LEVELS)('%s: every chapter shows 6-9 sections, exactly as spec A.3 pins them', level => {
+    const got = Object.fromEntries(CHAPTERS.map(c => [c.id, getChapterLayout(level, c).flatMap(g => g.sections).length]));
+    const want = Object.fromEntries(Object.entries(COUNTS).flatMap(([n, ids]) => ids.map(id => [id, Number(n)])));
+    expect(got).toEqual(want);
   });
 });

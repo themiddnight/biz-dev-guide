@@ -3,7 +3,6 @@ import type { Chapter, ExperienceLevel } from '../../../types';
 import type { DiagramJumpTarget } from '../../../data/diagramFamilies';
 import type { GlossaryCategory } from '../../../data/glossary';
 import type { GlossaryFilter } from '../../glossary/GlossaryPanel';
-import { RoleMindsetCard } from '../../RoleMindsetCard';
 import { FrictionPlaybookCard } from '../../FrictionPlaybookCard';
 import type { SectionKey } from '../../../data/sectionLayers';
 import type { Role } from '../../../data/rolePerspective';
@@ -39,10 +38,6 @@ export interface GuideSectionContext {
 
 export interface SectionProps { chapter: Chapter; isOpen: boolean; onToggle: () => void; ctx: GuideSectionContext }
 
-const MindsetSection: React.FC<SectionProps> = ({ isOpen, onToggle }) => (
-  <RoleMindsetCard isOpen={isOpen} onToggle={onToggle} />
-);
-
 const FrictionSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggle }) => {
   // Present only with a playbook (spec A4); the guard narrows the type without a non-null assertion.
   if (!chapter.frictionPlaybook) return null;
@@ -50,7 +45,6 @@ const FrictionSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggle }) 
 };
 
 export const SECTION_COMPONENTS: Record<SectionKey, React.FC<SectionProps>> = {
-  mindset: MindsetSection,
   otherSide: OtherSideSection,
   friction: FrictionSection,
   jargon: JargonSection,

@@ -1,8 +1,8 @@
 import type { Chapter } from '../types';
 import { isSectionKey, isSectionPresent, type SectionKey } from '../data/sectionLayers.js';
 
-/** A route target that is not a section: `top` is the chapter start (spec A7). */
-export type RouteFocus = 'top';
+/** A route target that is not a section: `top` is the chapter start, `mindset` the landing card (spec A7). */
+export type RouteFocus = 'top' | 'mindset';
 export type RequestTarget = SectionKey | RouteFocus;
 
 export interface ChapterRoute { chapterId: string; section?: SectionKey; focus?: RouteFocus }
@@ -22,6 +22,7 @@ const SECTION_ALIASES: Readonly<Record<string, RequestTarget>> = {
   workflow: 'practice',
   checklist: 'practice',
   dialogue: 'examples',
+  mindset: 'mindset',
 };
 
 /** A hash section word: a current key, a retired key's new target, or nothing. */
@@ -70,9 +71,11 @@ export function popstateCanonicalHash(hash: string, route: ChapterRoute, num: nu
 }
 
 /** What a section request does once its chapter is shown (spec A.4 GuideTab, A.5). */
-export type RequestAction = { kind: 'section'; key: SectionKey } | { kind: 'top' };
+export type RequestAction = { kind: 'section'; key: SectionKey } | { kind: 'top' } | { kind: 'mindset' };
 
 export function planRequest(chapter: Chapter, key: RequestTarget): RequestAction {
+  if (key === 'mindset') return { kind: 'mindset' };
+  // key narrows back to SectionKey | 'top' here, same as before 'mindset' was added to RequestTarget.
   if (key === 'top' || !isSectionPresent(chapter, key)) return { kind: 'top' };
   return { kind: 'section', key };
 }
