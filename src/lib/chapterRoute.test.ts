@@ -1,8 +1,16 @@
 import { describe, it, expect } from 'vitest';
 import { CHAPTERS } from '../data/chaptersData';
-import { formatChapterHash, initRouteSession, parseChapterHash, reduceRouteSession, resolveInitialChapter } from './chapterRoute';
+import {
+  formatChapterHash, initRouteSession, parseChapterHash, planRequest, popstateCanonicalHash,
+  reduceRouteSession, resolveInitialChapter, resolveSectionParam,
+} from './chapterRoute';
 
 const parse = (hash: string) => parseChapterHash(hash, CHAPTERS);
+const ch = (id: string) => {
+  const c = CHAPTERS.find(x => x.id === id);
+  if (!c) throw new Error(`missing ${id}`);
+  return c;
+};
 
 describe('formatChapterHash', () => {
   it('formats and round-trips', () => {
@@ -85,5 +93,54 @@ describe('resolveInitialChapter', () => {
 
   it('an unparseable hash falls back to the stored chapter', () => {
     expect(resolve('#/ch/99', 's12')).toEqual({ chapterId: 's12', source: 'stored' });
+  });
+});
+
+describe('resolveSectionParam', () => {
+  it('a current key resolves to itself', () => {
+    expect(resolveSectionParam('examples')).toEqual({ section: 'examples' });
+    expect(resolveSectionParam('diagram')).toEqual({ section: 'diagram' });
+  });
+  it('an unknown word resolves to nothing', () => {
+    expect(resolveSectionParam('bogus')).toEqual({});
+  });
+  it('Object.prototype member names are unknown words, not aliases', () => {
+    for (const raw of ['constructor', 'toString', 'hasOwnProperty', 'valueOf']) {
+      expect(resolveSectionParam(raw), raw).toEqual({});
+    }
+    expect(parse('#/ch/3/constructor')).toEqual({ chapterId: 's3' });
+  });
+});
+
+describe('popstateCanonicalHash', () => {
+  const pop = (hash: string) => {
+    const route = parse(hash);
+    if (!route) throw new Error(`unparseable ${hash}`);
+    return popstateCanonicalHash(hash, route, ch(route.chapterId).num);
+  };
+  it('rewrites a non-canonical hash', () => {
+    expect(pop('#/ch/3/bogus')).toBe('#/ch/3');
+    expect(pop('#/ch/3/')).toBe('#/ch/3');
+    expect(pop('#s3')).toBe('#/ch/3');
+  });
+  it('leaves a canonical hash alone', () => {
+    expect(pop('#/ch/1/friction')).toBeNull();
+    expect(pop('#/ch/3')).toBeNull();
+  });
+  it('never writes a hash onto the bare initial entry', () => {
+    expect(popstateCanonicalHash('', { chapterId: 's1' }, 1)).toBeNull();
+    expect(popstateCanonicalHash('#', { chapterId: 's1' }, 1)).toBeNull();
+  });
+});
+
+describe('planRequest', () => {
+  it('a present section opens', () => {
+    expect(planRequest(ch('s1'), 'reference')).toEqual({ kind: 'section', key: 'reference' });
+  });
+  it('an absent section falls back to the chapter top (spec A7, A.8)', () => {
+    expect(planRequest(ch('s3'), 'reference')).toEqual({ kind: 'top' });
+  });
+  it('the top focus goes to the chapter top', () => {
+    expect(planRequest(ch('s1'), 'top')).toEqual({ kind: 'top' });
   });
 });

@@ -16,13 +16,12 @@ import {
   openSection,
   toggleSection,
   toggleLayer,
-  isSectionPresent,
   getInlineSectionsAt,
   SECTION_META,
   type OpenState,
   type SectionKey,
 } from '../data/sectionLayers';
-import type { RequestedSection } from '../lib/chapterRoute';
+import { planRequest, type RequestedSection } from '../lib/chapterRoute';
 import { LayerGroupView } from './guide/LayerGroup';
 import { InlineSections } from './guide/InlineSections';
 import { ChapterHero } from './guide/ChapterHero';
@@ -248,12 +247,15 @@ export const GuideTab: React.FC<GuideTabProps> = ({
     if (!requestedSection) return;
     // Consume the request so a remount (Quiz -> Guide) never re-opens and re-scrolls to it.
     onRequestedSectionApplied();
-    if (!isSectionPresent(activeChapter, requestedSection.key)) {
+    const action = planRequest(activeChapter, requestedSection.key);
+    if (action.kind === 'top') {
+      // A retired key that maps to the chapter top, or a section this chapter lacks (spec A.5).
       onReplaceSection(null);
+      scrollToChapterStart('smooth');
       return;
     }
-    setOpenState(openSection(deriveOpenState(layout, activeChapter.id), layout, requestedSection.key));
-    setPendingScrollId(`sec-${requestedSection.key}`);
+    setOpenState(openSection(deriveOpenState(layout, activeChapter.id), layout, action.key));
+    setPendingScrollId(`sec-${action.key}`);
   }, [requestedSection?.nonce]);
 
   // Chip click: open (never close) the section, scroll to it, and record it in the URL (spec §2.1).

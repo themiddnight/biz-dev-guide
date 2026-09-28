@@ -6,6 +6,7 @@ import {
   initRouteSession,
   isBareHash,
   parseChapterHash,
+  popstateCanonicalHash,
   reduceRouteSession,
   resolveInitialChapter,
   type ChapterRoute,
@@ -40,9 +41,10 @@ export function useChapterRoute(chapters: Chapter[], opts: { onChapterRoute: () 
     return { route, chapterId: resolved.chapterId, source: resolved.source };
   });
   const [activeChapterId, setActiveChapterId] = useState(init.chapterId);
-  const [requestedSection, setRequestedSection] = useState<RequestedSection | null>(
-    init.route?.section ? { key: init.route.section, nonce: 1 } : null,
-  );
+  const [requestedSection, setRequestedSection] = useState<RequestedSection | null>(() => {
+    const key = init.route?.section ?? init.route?.focus;
+    return key ? { key, nonce: 1 } : null;
+  });
   const [session, dispatch] = useReducer(reduceRouteSession, window.location.hash, initRouteSession);
   const [hasNavigated, setHasNavigated] = useState(false);
   const navigatedRef = useRef(false);
@@ -86,13 +88,18 @@ export function useChapterRoute(chapters: Chapter[], opts: { onChapterRoute: () 
       navigatedRef.current = true;
       setHasNavigated(true);
       dispatch({ type: 'pop', hash });
+      // Legacy or malformed hashes (#/ch/3/bogus, later #/ch/3/dialogue) are rewritten in place, as on load (spec A.5).
+      const num = numOf(route.chapterId);
+      const canonical = num === undefined ? null : popstateCanonicalHash(hash, route, num);
+      if (canonical) window.history.replaceState(null, '', canonical);
+      const target = route.section ?? route.focus;
       // A chapter change with no section target starts at the chapter title, like handleSelectChapter.
       // Deferred a frame: the browser restores the entry's saved scroll after popstate fires.
-      if (!route.section && route.chapterId !== activeRef.current) {
+      if (!target && route.chapterId !== activeRef.current) {
         window.requestAnimationFrame(() => scrollToChapterStart());
       }
       setActiveChapterId(route.chapterId);
-      setRequestedSection(route.section ? { key: route.section, nonce: ++nonceRef.current } : null);
+      setRequestedSection(target ? { key: target, nonce: ++nonceRef.current } : null);
       onRouteRef.current();
     };
     window.addEventListener('popstate', onPopState);
