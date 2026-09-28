@@ -29,12 +29,6 @@ export interface ChapterRouteApi {
   replaceSection: (section: SectionKey | null) => void;
   /** Called once a requested section has been applied, so a GuideTab remount never replays it. */
   clearRequestedSection: () => void;
-  /**
-   * Called just before a tab switch clears the URL's chapter hash (spec §5.2), so that the next
-   * back-navigation to the resulting bare entry restores this chapter and section instead of
-   * falling back to the chapter resolved when the app first mounted (spec F-03). Consumed once.
-   */
-  rememberHashBeforeTabClear: (hash: string) => void;
 }
 
 const DEFAULT_CHAPTER = 's1';
@@ -57,9 +51,6 @@ export function useChapterRoute(chapters: Chapter[], opts: { onChapterRoute: () 
   const nonceRef = useRef(1);
   const activeRef = useRef(activeChapterId);
   activeRef.current = activeChapterId;
-  // Set by rememberHashBeforeTabClear just before a tab switch strips the hash, consumed by the
-  // next bare-hash popstate (spec F-03: back from a non-guide tab restores the chapter + section).
-  const pendingBareFallbackRef = useRef<string | null>(null);
   const onRouteRef = useRef(opts.onChapterRoute);
   onRouteRef.current = opts.onChapterRoute;
 
@@ -88,14 +79,12 @@ export function useChapterRoute(chapters: Chapter[], opts: { onChapterRoute: () 
     const onPopState = () => {
       const { hash } = window.location;
       // A bare entry is either the untouched initial page (shows the chapter resolved on load),
-      // or one a tab switch just stripped the hash from (shows the chapter + section that was on
-      // screen before the switch, per rememberHashBeforeTabClear). The latter is consumed only by
-      // the bare popstate that actually uses it — an intervening real chapter-hash popstate (e.g.
-      // an earlier Back) must leave it untouched (spec F-03 consume-once).
-      const { route, clearPending } = resolvePopstatePendingRoute(
-        hash, pendingBareFallbackRef.current, chapters, init.chapterId,
-      );
-      if (clearPending) pendingBareFallbackRef.current = null;
+      // or one a tab switch just stripped the hash from — that entry's own `history.state` then
+      // carries the chapter + section that was on screen before the switch (spec §5.2 in App.tsx),
+      // so each bare entry restores only its own hash and a later tab-switch/navigate cycle can
+      // never leak a different entry's hash onto it (spec F-03).
+      const storedChapterHash = (window.history.state as { chapterHash?: string } | null)?.chapterHash ?? null;
+      const route = resolvePopstatePendingRoute(hash, storedChapterHash, chapters, init.chapterId);
       if (!route) {
         const num = numOf(activeRef.current);
         if (num !== undefined) window.history.replaceState(null, '', formatChapterHash(num));
@@ -142,10 +131,6 @@ export function useChapterRoute(chapters: Chapter[], opts: { onChapterRoute: () 
 
   const clearRequestedSection = useCallback(() => setRequestedSection(null), []);
 
-  const rememberHashBeforeTabClear = useCallback((hash: string) => {
-    pendingBareFallbackRef.current = hash;
-  }, []);
-
   return {
     activeChapterId,
     requestedSection,
@@ -156,6 +141,5 @@ export function useChapterRoute(chapters: Chapter[], opts: { onChapterRoute: () 
     navigate,
     replaceSection,
     clearRequestedSection,
-    rememberHashBeforeTabClear,
   };
 }

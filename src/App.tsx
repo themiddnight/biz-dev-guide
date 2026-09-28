@@ -30,8 +30,11 @@ export default function App() {
     prevTabRef.current = activeTab;
     if (activeTab !== 'guide') {
       if (window.location.hash) {
-        route.rememberHashBeforeTabClear(window.location.hash);
-        window.history.replaceState(null, '', window.location.pathname + window.location.search);
+        // Stored on this entry's own history.state (not a shared ref) so a later tab-switch or
+        // navigate can never leak its hash onto a different bare entry (spec F-03).
+        const chapterHash = window.location.hash;
+        const state = { ...window.history.state, chapterHash };
+        window.history.replaceState(state, '', window.location.pathname + window.location.search);
       }
       return;
     }

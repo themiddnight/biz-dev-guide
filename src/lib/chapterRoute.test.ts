@@ -133,40 +133,36 @@ describe('popstateCanonicalHash', () => {
   });
 });
 
-describe('resolvePopstatePendingRoute (F-03 consume-once)', () => {
-  it('a bare popstate with nothing pending falls back to the init chapter', () => {
-    expect(resolvePopstatePendingRoute('', null, CHAPTERS, 's1'))
-      .toEqual({ route: { chapterId: 's1' }, clearPending: true });
-    expect(resolvePopstatePendingRoute('#', null, CHAPTERS, 's1'))
-      .toEqual({ route: { chapterId: 's1' }, clearPending: true });
+describe('resolvePopstatePendingRoute (F-03, per-entry stored hash)', () => {
+  it('a bare popstate with no stored hash falls back to the init chapter', () => {
+    expect(resolvePopstatePendingRoute('', null, CHAPTERS, 's1')).toEqual({ chapterId: 's1' });
+    expect(resolvePopstatePendingRoute('#', null, CHAPTERS, 's1')).toEqual({ chapterId: 's1' });
   });
 
-  it('a bare popstate with a pending hash restores its chapter and section', () => {
+  it('a bare popstate restores its own stored chapter and section', () => {
     expect(resolvePopstatePendingRoute('', '#/ch/5/examples', CHAPTERS, 's1'))
-      .toEqual({ route: { chapterId: 's5', section: 'examples' }, clearPending: true });
+      .toEqual({ chapterId: 's5', section: 'examples' });
   });
 
-  it('a real chapter-hash popstate leaves a pending hash unconsumed', () => {
-    const result = resolvePopstatePendingRoute('#/ch/3', '#/ch/5/examples', CHAPTERS, 's1');
-    expect(result.route).toEqual({ chapterId: 's3' });
-    expect(result.clearPending).toBe(false);
+  it('a real chapter-hash popstate ignores any stored hash', () => {
+    expect(resolvePopstatePendingRoute('#/ch/3', '#/ch/5/examples', CHAPTERS, 's1'))
+      .toEqual({ chapterId: 's3' });
   });
 
-  it('a chapter hop, then a non-bare popstate, then a bare popstate still restores the pending hash', () => {
-    // chapter 3 -> chapter 5 navigate, tab switch remembers '#/ch/5/examples' and clears the
-    // entry to bare, then Back lands on the earlier #/ch/3 entry (non-bare) before Forward lands
-    // back on the bare, tab-switch-created entry.
-    let pending: string | null = '#/ch/5/examples';
+  it('a second tab-switch/navigate cycle cannot leak an older or newer entry\'s hash onto this one (re-review)', () => {
+    // Tab-switch away from ch.5/examples strips entry A to bare, storing '#/ch/5/examples' on A's
+    // own history.state. navigate (push) to ch.7 creates a real, unrelated entry. Tab-switch away
+    // from ch.7 strips entry B to bare, storing '#/ch/7' on B's own history.state — a *different*
+    // history.state object from A's, so there is no shared slot for B to overwrite.
+    const entryBPushed = resolvePopstatePendingRoute('#/ch/7', null, CHAPTERS, 's1');
+    expect(entryBPushed).toEqual({ chapterId: 's7' });
 
-    const back = resolvePopstatePendingRoute('#/ch/3', pending, CHAPTERS, 's1');
-    expect(back.route).toEqual({ chapterId: 's3' });
-    if (back.clearPending) pending = null;
-    expect(pending).toBe('#/ch/5/examples');
-
-    const forward = resolvePopstatePendingRoute('', pending, CHAPTERS, 's1');
-    expect(forward.route).toEqual({ chapterId: 's5', section: 'examples' });
-    if (forward.clearPending) pending = null;
-    expect(pending).toBeNull();
+    // Landing back on entry A (bare) resolves from A's own stored hash, never B's.
+    expect(resolvePopstatePendingRoute('', '#/ch/5/examples', CHAPTERS, 's1'))
+      .toEqual({ chapterId: 's5', section: 'examples' });
+    // Landing on entry B (bare) resolves from B's own stored hash — order of these two calls,
+    // and whatever happened in between, cannot change either result.
+    expect(resolvePopstatePendingRoute('', '#/ch/7', CHAPTERS, 's1')).toEqual({ chapterId: 's7' });
   });
 });
 

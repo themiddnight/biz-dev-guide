@@ -71,22 +71,21 @@ export function popstateCanonicalHash(hash: string, route: ChapterRoute, num: nu
 }
 
 /**
- * What a popstate should resolve to, given any hash `rememberHashBeforeTabClear` remembered just
- * before a tab switch stripped it to bare (spec F-03: back from a non-guide tab restores the
- * chapter + section). The remembered hash is only ever consumed by a *bare* popstate — a real
- * chapter-hash popstate (e.g. an intervening `Back` that lands on an earlier chapter entry) must
- * leave it untouched, or one extra back/forward hop discards it before it's used and reintroduces
- * the bug this exists to fix. `clearPending` tells the caller whether to reset its ref.
+ * What a popstate should resolve to. A bare entry is either the untouched initial page, or one a
+ * tab switch stripped the hash from, storing the collapsed chapter+section hash in *that entry's
+ * own* `history.state` (spec F-03: back from a non-guide tab restores the chapter + section).
+ * Reading the stored hash from the popped entry itself, rather than a value shared across entries,
+ * means a second tab-switch/navigate cycle can never apply a different entry's hash to this one —
+ * the earlier ref-based design could, since one shared slot was overwritten before it was consumed.
  */
 export function resolvePopstatePendingRoute(
   hash: string,
-  pending: string | null,
+  storedChapterHash: string | null,
   chapters: ChapterRef[],
   initChapterId: string,
-): { route: ChapterRoute | null; clearPending: boolean } {
-  if (!isBareHash(hash)) return { route: parseChapterHash(hash, chapters), clearPending: false };
-  const route = (pending ? parseChapterHash(pending, chapters) : null) ?? { chapterId: initChapterId };
-  return { route, clearPending: true };
+): ChapterRoute | null {
+  if (!isBareHash(hash)) return parseChapterHash(hash, chapters);
+  return (storedChapterHash ? parseChapterHash(storedChapterHash, chapters) : null) ?? { chapterId: initChapterId };
 }
 
 /** What a section request does once its chapter is shown (spec A.4 GuideTab, A.5). */
