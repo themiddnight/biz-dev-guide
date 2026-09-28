@@ -8,3 +8,6 @@ coverage/
 !.env.example
 work/
 .vercel
+
+# UX assessment runs (local reports and screenshots)
+.ux-assessment*/
