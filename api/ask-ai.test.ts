@@ -211,6 +211,7 @@ describe('POST /api/ask-ai with Groq', () => {
     const system = sentMessages(fetchMock)[0].content;
     expect(system).toContain(`GUIDE คู่มือ ${CHAPTERS.length} บท`);
     expect(system).toContain(`ถ้าผู้ใช้ถามว่าเว็บนี้คืออะไรหรือทำอะไรได้ ให้ตอบจากข้อมูลนี้ สั้นๆ เป็นรายการ:\n${SITE_OVERVIEW}`);
+    expect(system).toContain('"เว็บนี้" ในคำถามนี้หมายถึงเว็บคู่มือด้านบนเท่านั้น ไม่ใช่ตัวคุณ (AI), ChatGPT หรือ chatbot ทั่วไป ห้ามตอบเรื่องความสามารถของ AI ทั่วไปแทน');
     expect(system).toContain('ห้ามใช้ HTML ทุกชนิด รวมถึง <br>');
     expect(system).toContain('หัวข้อทุกระดับเป็นภาษาไทย');
     expect(system).not.toMatch(/\((Insights|Actionable|Friction|Real-world)/i);
