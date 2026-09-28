@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { ExperienceLevel, TabType, UserStats } from './types';
 import { readStorage, writeStorage, removeStorage } from './lib/storage';
 import { USER_STATS_KEY, parseUserStats } from './lib/userStats';
@@ -7,6 +7,8 @@ import type { LevelInputs, LevelMode, Role } from './data/rolePerspective';
 import { CHAPTERS } from './data/chaptersData';
 import { formatChapterHash } from './lib/chapterRoute';
 import { useChapterRoute } from './hooks/useChapterRoute';
+import { scrollToChapterStart } from './lib/chapterScroll';
+import { tabEntryScroll } from './lib/tabScroll';
 import { QUIZ_QUESTIONS } from './data/quizQuestions';
 import type { ChapterContext } from './lib/chapterContext';
 import { Header } from './components/Header';
@@ -35,6 +37,21 @@ export default function App() {
       if (num !== undefined) window.history.replaceState(null, '', formatChapterHash(num));
     }
   }, [activeTab, route.activeChapterId, route.hashInUrl]);
+
+  // Each tab opens at its top, and the guide at the chapter start (spec F-03). A layout effect, so it
+  // runs before GuideTab's passive section effect and that effect's two-frame deferred scroll; a
+  // section link (#/ch/N/key from back/forward) therefore still lands on its section. Own ref, and
+  // skips the first mount so load-time hash scrolls are untouched.
+  const scrollTabRef = useRef<TabType | null>(null);
+  useLayoutEffect(() => {
+    const prev = scrollTabRef.current;
+    scrollTabRef.current = activeTab;
+    if (prev === null) return;
+    // Read at the switch only: the request is consumed a moment later by GuideTab.
+    const action = tabEntryScroll(prev, activeTab, route.requestedSection !== null);
+    if (action === 'top') window.scrollTo(0, 0);
+    else if (action === 'chapter-start') scrollToChapterStart();
+  }, [activeTab]);
   const [experienceLevel, setExperienceLevel] = useState<ExperienceLevel>(() => {
     const saved = readStorage('be_guide_exp_level') as ExperienceLevel | null;
     return saved || 'beginner';
