@@ -145,6 +145,11 @@ describe('isSectionPresent', () => {
     expect(idsWith('practice')).toHaveLength(CHAPTERS.length);
     expect(SECTION_META.practice).toEqual({ chip: 'ลงมือทำ', minutes: 3 });
   });
+
+  it('examples in every chapter; meta is ตัวอย่างจริง, 5 minutes (spec A.3)', () => {
+    expect(idsWith('examples')).toHaveLength(CHAPTERS.length);
+    expect(SECTION_META.examples).toEqual({ chip: 'ตัวอย่างจริง', minutes: 5 });
+  });
 });
 
 describe('sectionHasTool', () => {

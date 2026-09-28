@@ -157,4 +157,9 @@ describe('retired section keys (spec A7)', () => {
     expect(formatChapterHash(3, parse('#/ch/3/workflow')!.section)).toBe('#/ch/3/practice');
     expect(popstateCanonicalHash('#/ch/3/checklist', parse('#/ch/3/checklist')!, 3)).toBe('#/ch/3/practice');
   });
+
+  it('dialogue lands on examples', () => {
+    expect(parse('#/ch/3/dialogue')).toEqual({ chapterId: 's3', section: 'examples' });
+    expect(formatChapterHash(3, parse('#/ch/3/dialogue')!.section)).toBe('#/ch/3/examples');
+  });
 });

@@ -21,6 +21,7 @@ const SECTION_ALIASES: Readonly<Record<string, RequestTarget>> = {
   primer: 'top',
   workflow: 'practice',
   checklist: 'practice',
+  dialogue: 'examples',
 };
 
 /** A hash section word: a current key, a retired key's new target, or nothing. */

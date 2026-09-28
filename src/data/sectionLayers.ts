@@ -5,23 +5,23 @@ export type Layer = 'core' | 'apply' | 'deep';
 export const LAYERS: readonly Layer[] = ['core', 'apply', 'deep'];
 
 export type SectionKey =
-  | 'mindset' | 'otherSide' | 'friction' | 'jargon' | 'dialogue' | 'diagram' | 'faq'
+  | 'mindset' | 'otherSide' | 'friction' | 'jargon' | 'diagram' | 'faq'
   | 'examples' | 'coreConcepts' | 'reference' | 'glossary' | 'practice' | 'pitfalls';
 
 export const SECTION_KEYS: readonly SectionKey[] = [
-  'mindset', 'otherSide', 'friction', 'jargon', 'dialogue', 'diagram', 'faq',
+  'mindset', 'otherSide', 'friction', 'jargon', 'diagram', 'faq',
   'examples', 'coreConcepts', 'reference', 'glossary', 'practice', 'pitfalls',
 ];
 
 export const LAYER_CONFIG: Record<ExperienceLevel, Record<Layer, readonly SectionKey[]>> = {
   beginner: {
     core: ['jargon', 'otherSide', 'coreConcepts', 'diagram'],
-    apply: ['dialogue', 'examples', 'practice', 'pitfalls', 'faq', 'friction'],
+    apply: ['examples', 'practice', 'pitfalls', 'faq', 'friction'],
     deep: ['reference', 'glossary', 'mindset'],
   },
   experienced: {
     core: ['otherSide', 'coreConcepts', 'pitfalls', 'diagram'],
-    apply: ['friction', 'dialogue', 'practice', 'faq', 'examples'],
+    apply: ['friction', 'examples', 'practice', 'faq'],
     deep: ['jargon', 'reference', 'glossary', 'mindset'],
   },
 };
@@ -35,8 +35,7 @@ const CHAPTER_CORE_OVERRIDES: Readonly<Record<string, readonly SectionKey[]>> = 
 export const SECTION_META: Record<SectionKey, { chip: string; minutes: number }> = {
   jargon: { chip: 'ศัพท์จำเป็น', minutes: 2 },
   diagram: { chip: 'แผนภาพ', minutes: 3 },
-  dialogue: { chip: 'บทสนทนา', minutes: 2 },
-  examples: { chip: 'ตัวอย่างจริง', minutes: 3 },
+  examples: { chip: 'ตัวอย่างจริง', minutes: 5 },
   practice: { chip: 'ลงมือทำ', minutes: 3 },
   faq: { chip: 'คำถามที่เจอบ่อย', minutes: 6 },
   friction: { chip: 'รับมือ Friction', minutes: 4 },
@@ -116,9 +115,8 @@ export function isSectionPresent(chapter: Chapter, key: SectionKey): boolean {
     case 'otherSide': return !!chapter.perspectives;
     case 'diagram': return hasDiagramContent(chapter);
     case 'jargon': return (chapter.jargonList?.length ?? 0) > 0;
-    case 'dialogue': return !!chapter.dialogueExample;
     case 'faq': return chapter.id === 's11';
-    case 'examples': return (chapter.realWorldExamples?.length ?? 0) > 0;
+    case 'examples': return (chapter.realWorldExamples?.length ?? 0) > 0 || !!chapter.dialogueExample;
     case 'coreConcepts': return (chapter.coreConcepts?.length ?? 0) > 0;
     case 'reference': return getReferenceSections(chapter).length > 0;
     case 'glossary': return chapter.id === 's15';

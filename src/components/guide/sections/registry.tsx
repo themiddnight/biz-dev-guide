@@ -8,7 +8,6 @@ import { FrictionPlaybookCard } from '../../FrictionPlaybookCard';
 import type { SectionKey } from '../../../data/sectionLayers';
 import type { Role } from '../../../data/rolePerspective';
 import { JargonSection } from './JargonSection';
-import { DialogueSection } from './DialogueSection';
 import { DiagramSection } from './DiagramSection';
 import { FaqSection } from './FaqSection';
 import { ExamplesSection } from './ExamplesSection';
@@ -58,7 +57,6 @@ export const SECTION_COMPONENTS: Record<SectionKey, React.FC<SectionProps>> = {
   otherSide: OtherSideSection,
   friction: FrictionSection,
   jargon: JargonSection,
-  dialogue: DialogueSection,
   diagram: DiagramSection,
   faq: FaqSection,
   examples: ExamplesSection,
