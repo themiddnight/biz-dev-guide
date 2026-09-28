@@ -292,7 +292,11 @@ export default function App() {
         {activeTab === 'quiz' && (
           <QuizTab
             questions={QUIZ_QUESTIONS}
+            chapters={CHAPTERS}
             role={role}
+            readChapters={userStats.readChapters}
+            // An untouched default chapter is not reading (spec F-07): count it only after a navigation or a hash/stored load.
+            currentChapterId={route.hasNavigated || route.initialSource !== 'default' ? route.activeChapterId : null}
             onAskAIWithPrompt={handleAskAIWithPrompt}
             onOpenChapter={handleOpenChapterFromQuiz}
           />

@@ -1,7 +1,11 @@
 import React, { useMemo, useState } from 'react';
 import { QuizQuestion } from '../types';
 import type { Role } from '../data/rolePerspective';
-import { QUIZ_ROUNDS, QUIZ_ROUND_META, QuizRound, defaultQuizRound, getQuizRound, initialQuizRound } from '../data/quizRounds';
+import {
+  QUIZ_ROUNDS, QUIZ_ROUND_META, QuizRound, defaultQuizRound, getQuizRound, initialQuizRound,
+  orderQuizRound, quizAnchors, quizTrackKey, basicsHintChapter,
+} from '../data/quizRounds';
+import { resolveTrack, type ChapterRef } from '../data/readingTracks';
 import { readStorage, removeStorage, writeStorage } from '../lib/storage';
 import { missedItems, type QuizAnswer } from '../lib/quizResult';
 import { QuizResultScreen } from './quiz/QuizResultScreen';
@@ -19,7 +23,13 @@ import { TAP } from './ui/tapTarget';
 
 interface QuizTabProps {
   questions: QuizQuestion[]; // the full bank; the tab picks the round
+  /** For reading-track order and chapter numbers. */
+  chapters: ChapterRef[];
   role: Role | null;
+  /** Read chapters in the order they were marked read (UserStats.readChapters). */
+  readChapters: readonly string[];
+  /** The chapter open in the guide, or null when the reader has not chosen one (the default s1). */
+  currentChapterId: string | null;
   onAskAIWithPrompt: (prompt: string) => void;
   onOpenChapter: (chapterId: string) => void;
 }
@@ -49,7 +59,10 @@ const ROUND_KEY = 'be_guide_quiz_round';
 // restarts index, score and shuffled options with no confirmation (D12).
 export const QuizTab: React.FC<QuizTabProps> = ({
   questions,
+  chapters,
   role,
+  readChapters,
+  currentChapterId,
   onAskAIWithPrompt,
   onOpenChapter,
 }) => {
@@ -72,7 +85,21 @@ export const QuizTab: React.FC<QuizTabProps> = ({
     setRound(r);
     setRunStarted(false);
   };
-  const roundQuestions = useMemo(() => getQuizRound(questions, round), [questions, round]);
+  // Read once per visit to the tab: what the reader has just read cannot change while they are here.
+  const [anchors] = useState(() => quizAnchors(currentChapterId, readChapters));
+  const orderRound = (r: QuizRound) =>
+    orderQuizRound(getQuizRound(questions, r), { trackIds: resolveTrack(quizTrackKey(r, role), chapters), anchors });
+  // Ordered once per round (spec F-07). A role change mid-run keeps the round, and must keep its order
+  // too: QuizRun shuffles each question's options once, by index, so a reorder would mismatch them.
+  const [ordered, setOrdered] = useState(() => ({ round, questions: orderRound(round) }));
+  let current = ordered;
+  if (ordered.round !== round) {
+    current = { round, questions: orderRound(round) };
+    setOrdered(current);
+  }
+  const roundQuestions = current.questions;
+  const hintChapterId = useMemo(() => basicsHintChapter(round, questions, anchors), [round, questions, anchors]);
+  const hintNum = chapters.find((c) => c.id === hintChapterId)?.num;
 
   return (
     <div className="space-y-section">
@@ -98,6 +125,20 @@ export const QuizTab: React.FC<QuizTabProps> = ({
           );
         })}
       </div>
+
+      {hintNum !== undefined && (
+        <p data-quiz-hint className="max-w-3xl mx-auto flex flex-wrap items-center gap-x-3 gap-y-1 text-xs sm:text-sm text-base-content-body">
+          <span>{`ชุดพื้นฐานมีคำถามจากบทที่ ${hintNum} ที่คุณเพิ่งอ่าน`}</span>
+          <button
+            type="button"
+            data-quiz-basics-hint
+            onClick={() => chooseRound('basics')}
+            className={`${TAP} font-semibold text-base-content underline underline-offset-2 cursor-pointer`}
+          >
+            ไปชุดพื้นฐาน
+          </button>
+        </p>
+      )}
 
       <QuizRun
         key={round}
