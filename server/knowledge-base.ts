@@ -17,8 +17,21 @@ const CHAPTERS = [...chapters1_5, ...chapters6_10, ...chapters11_15, ...chapters
 
 const TAKEAWAY_MAX = 220;
 
+// What the site offers, for "what is this site?" questions: the AI prompt (server/ask-ai.ts) and
+// the fallback below answer from the same text. The chapter count is derived, never typed in.
+const SITE_INTRO = 'เว็บนี้คือคู่มือ "จุดที่ business กับ engineering มาเจอกัน" มี 3 แท็บ:';
+const SITE_TABS = [
+  `GUIDE คู่มือ ${CHAPTERS.length} บท เลือกสาย (Business / Engineering) และระดับ (Beginner / Experienced) ได้ มีเส้นทางการอ่านตามสาย สารบัญค้นหาและกรองตามสายงาน และบทศัพท์เทคนิค`,
+  'AI BRIDGE ถามต่อจากบทที่อ่านอยู่ได้',
+  'QUIZ แบบทดสอบ 4 ชุด (พื้นฐาน / สาย Business / สาย Engineering / ทั้งหมด)',
+];
+export const SITE_OVERVIEW = `${SITE_INTRO} ${SITE_TABS.join(', ')}`;
+const SITE_OVERVIEW_LIST = `${SITE_INTRO}\n\n${SITE_TABS.map((tab) => `- ${tab}`).join('\n')}`;
+const SITE_QUESTION = /(เว็บ|เว็บไซต์|แอป|ที่นี่)(นี้)?.{0,12}(ทำอะไร|ใช้ยังไง|ใช้อย่างไร|มีอะไร)/;
+
 function cannedAnswer(question: string): string | null {
   const q = question.toLowerCase();
+  if (SITE_QUESTION.test(q) || q.includes("คุณคือใคร")) return SITE_OVERVIEW_LIST;
   if (q.includes("ปุ่มเดียว") || q.includes("แค่เพิ่ม") || q.includes("button")) {
     return `**ทำไม "แค่เพิ่มปุ่มเดียว" ถึงใช้เวลาเป็นสัปดาห์?**
 

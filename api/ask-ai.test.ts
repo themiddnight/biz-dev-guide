@@ -1,5 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { POST } from './ask-ai';
+import { SITE_OVERVIEW } from '../server/knowledge-base';
+import { CHAPTERS } from '../src/data/chaptersData';
 
 const post = (body: string) =>
   POST(new Request('http://localhost/api/ask-ai', { method: 'POST', body }));
@@ -190,6 +192,30 @@ describe('POST /api/ask-ai with Groq', () => {
     await post(JSON.stringify({ question: 'q', context: { text: 'x' } }));
     expect(sentMessages(fetchMock).at(-1).content).not.toContain('[บริบทเพิ่มเติม]');
   });
+
+  it('ends the user turn at the question, with no fixed answer structure (F-01)', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(groqReply('คำตอบ'));
+    vi.stubGlobal('fetch', fetchMock);
+
+    await post(JSON.stringify({ question: 'เว็บนี้ทำอะไรได้บ้าง' }));
+    const user = sentMessages(fetchMock).at(-1).content;
+    expect(user.endsWith('[คำถาม]: เว็บนี้ทำอะไรได้บ้าง')).toBe(true);
+    expect(user).not.toContain('แบ่งเป็นข้อคิด');
+  });
+
+  it('gives the model Thai-only rules and the site overview (F-01)', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(groqReply('คำตอบ'));
+    vi.stubGlobal('fetch', fetchMock);
+
+    await post(JSON.stringify({ question: 'q' }));
+    const system = sentMessages(fetchMock)[0].content;
+    expect(system).toContain(`GUIDE คู่มือ ${CHAPTERS.length} บท`);
+    expect(system).toContain(`ถ้าผู้ใช้ถามว่าเว็บนี้คืออะไรหรือทำอะไรได้ ให้ตอบจากข้อมูลนี้ สั้นๆ เป็นรายการ:\n${SITE_OVERVIEW}`);
+    expect(system).toContain('ห้ามใช้ HTML ทุกชนิด รวมถึง <br>');
+    expect(system).toContain('หัวข้อทุกระดับเป็นภาษาไทย');
+    expect(system).not.toMatch(/\((Insights|Actionable|Friction|Real-world)/i);
+    expect(system).not.toContain('สองด้านเสมอ');
+  });
 });
 
 describe('POST /api/ask-ai with Gemini after Groq', () => {
@@ -207,6 +233,7 @@ describe('POST /api/ask-ai with Gemini after Groq', () => {
   afterEach(() => {
     vi.unstubAllEnvs();
     vi.unstubAllGlobals();
+    vi.restoreAllMocks();
   });
 
   it('asks Gemini once every Groq model has failed', async () => {
@@ -223,6 +250,22 @@ describe('POST /api/ask-ai with Gemini after Groq', () => {
     expect(gemini).toMatchObject({ url: GEMINI_URL, auth: 'Bearer gem_test', model: 'gemini-3.8-flash' });
     // Gemini 3 always thinks, and thinking spends the same token cap and time the answer needs
     expect(gemini.reasoning_effort).toBe('low');
+  });
+
+  it('sends Gemini exactly the messages Groq got (F-01)', async () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {}); // the three Groq failures are expected here
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(new Response('down', { status: 503 }))
+      .mockResolvedValueOnce(new Response('down', { status: 503 }))
+      .mockResolvedValueOnce(new Response('down', { status: 503 }))
+      .mockResolvedValueOnce(reply('คำตอบจาก Gemini'));
+    vi.stubGlobal('fetch', fetchMock);
+
+    const history = [{ role: 'user', content: 'q1' }, { role: 'assistant', content: 'a1' }];
+    await post(JSON.stringify({ question: 'เว็บนี้ทำอะไรได้บ้าง', history, context: 'บทที่ 2 · x' }));
+    const sent = calls(fetchMock);
+    expect(sent[3].url).toBe(GEMINI_URL);
+    expect(sent[3].messages).toEqual(sent[0].messages);
   });
 
   it('does not ask Gemini when Groq answers', async () => {
@@ -317,6 +360,25 @@ describe('POST /api/ask-ai fallback knowledge base', () => {
     const data = await ask({ question: 'test pyramid คืออะไร' });
     expect(data.answer).toContain('บทในคู่มือเหล่านี้');
     expect(data.answer).toMatch(/- \[บทที่ 7 · [^\]]+\]\(#\/ch\/7\): /);
+  });
+
+  it('answers "what does this site do" with the site overview as a list (F-01)', async () => {
+    const data = await ask({ question: 'เว็บนี้ทำอะไรได้บ้าง' });
+    expect(data.answer).toContain(`- GUIDE คู่มือ ${CHAPTERS.length} บท`);
+    expect(data.answer).toContain('- AI BRIDGE');
+    expect(data.answer).toContain('- QUIZ');
+    expect(data.answer).not.toContain('คำแนะนำเพื่อการทำงานร่วมกัน');
+  });
+
+  it('answers "คุณคือใคร" with the overview too', async () => {
+    const data = await ask({ question: 'คุณคือใคร' });
+    expect(data.answer).toContain('- AI BRIDGE');
+  });
+
+  it('keeps the overview ahead of the chapter being read', async () => {
+    const data = await ask({ question: 'แอปนี้ใช้ยังไง', context: 'บทที่ 9 · Tech Debt และ Refactor: x\nใจความสำคัญ: y' });
+    expect(data.answer).toContain('- AI BRIDGE');
+    expect(data.answer).not.toContain('บทที่คุณกำลังอ่าน');
   });
 
   it('falls back to the general advice when nothing matches', async () => {

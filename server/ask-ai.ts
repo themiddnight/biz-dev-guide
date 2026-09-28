@@ -2,7 +2,7 @@
 // function in api/ask-ai.ts, which is what serves the route on Vercel. Answers come from Groq, then
 // Gemini, each only when its key is set; when neither answers, a built-in knowledge base does.
 import { compactHistory, type ChatHistoryItem } from "../src/lib/chatHistory.js";
-import { fallbackAnswer } from "./knowledge-base.js";
+import { fallbackAnswer, SITE_OVERVIEW } from "./knowledge-base.js";
 
 interface AskAiInput {
   question?: unknown;
@@ -16,16 +16,20 @@ interface AskAiResult {
   body: Record<string, unknown>;
 }
 
-// Knowledge base summary for contextual grounding
+// Knowledge base summary for contextual grounding. Thai rules only: the English glosses the old
+// prompt carried, e.g. (Actionable advice), came back as answer headings (spec F-01).
 const SYSTEM_INSTRUCTION = `คุณคือ "AI Bridge Specialist" ผู้เชี่ยวชาญด้านการเชื่อมช่องว่างระหว่างทีม Business (Product Managers, Business Analysts, UX/UI, Marketing, Executives) และทีม Engineering (Software Engineers, Solution Architects, QA, DevOps, SRE).
 อ้างอิงจากคู่มือ "จุดที่ business กับ engineering มาเจอกัน":
-- ยึดหลักการลดความเข้าใจผิด (Friction reduction)
-- อธิบายด้วยเหตุผลสองด้านเสมอ (ทำไม Business คิดแบบนี้ vs ทำไม Engineer กังวลเรื่องนี้)
-- ใช้คำอุปมาแบบบ้านๆ (Real-world analogies) เพื่อให้คนที่ไม่ใช่เทคนิคเข้าใจง่าย
-- ให้คำแนะนำที่เอาไปใช้ได้เลย (Actionable advice) เช่น รูปประโยคที่ควรพูดในที่ประชุม หรือขั้นตอนตกลงร่วมกัน
+- ตอบให้ตรงคำถามก่อน ความยาวและรูปแบบให้ตามคำถาม: คำถามสั้นหรือถามข้อเท็จจริง ตอบสั้นๆ ไม่กี่บรรทัด ใช้หัวข้อหรือตารางเฉพาะเมื่อคำถามต้องการเปรียบเทียบหรือมีหลายขั้นตอน
+- อธิบายมุมมองทั้งสองฝั่งเมื่อคำถามเป็นเรื่องที่สองฝั่งเห็นต่างกัน ไม่ต้องทำทุกครั้ง
+- หัวข้อทุกระดับเป็นภาษาไทย ห้ามใช้หัวข้อหรือวงเล็บภาษาอังกฤษ ศัพท์เทคนิคที่คนในวงการใช้ทับศัพท์ (เช่น API, Acceptance Criteria) ใช้ในเนื้อความได้
+- ห้ามใช้ HTML ทุกชนิด รวมถึง <br> ถ้าในช่องตารางมีหลายประเด็น ให้ใช้รายการนอกตารางแทน
 - ใช้ภาษาไทยที่เป็นมิตร ชัดเจน ตรงประเด็น และกระชับ
 - ใช้ภาษาพูดง่ายๆ แบบคนอธิบายให้ฟัง ไม่ใช่ภาษาตำรา
-- ถ้ามี [บริบทเพิ่มเติม] จากบทในคู่มือ ให้ตอบโดยยึดเนื้อหานั้นเป็นหลัก แล้วค่อยเสริมด้วยความรู้ทั่วไป`;
+- ถ้ามี [บริบทเพิ่มเติม] จากบทในคู่มือ ให้ตอบโดยยึดเนื้อหานั้นเป็นหลัก แล้วค่อยเสริมด้วยความรู้ทั่วไป
+
+ถ้าผู้ใช้ถามว่าเว็บนี้คืออะไรหรือทำอะไรได้ ให้ตอบจากข้อมูลนี้ สั้นๆ เป็นรายการ:
+${SITE_OVERVIEW}`;
 
 const EARLIER_QUESTIONS_NOTE = `หัวข้อที่ผู้ใช้เคยถามไปก่อนหน้านี้ในแชทนี้ (ใช้เป็นพื้นหลังเท่านั้น ถ้าคำถามใหม่อ้างถึง "ข้อนั้น" "ที่ว่ามา" หรือ "ข้อแรก" ให้หมายถึงคำตอบล่าสุดของคุณ):`;
 
@@ -108,7 +112,8 @@ function buildMessages(question: string, role: string, context: string, history:
   const system = earlier.length ? `${SYSTEM_INSTRUCTION}\n\n${EARLIER_QUESTIONS_NOTE}\n${earlier.join("\n")}` : SYSTEM_INSTRUCTION;
 
   const userRoleText = role === 'business' ? 'ฝั่ง Business' : role === 'engineer' ? 'ฝั่ง Engineer' : 'ทั้งสองฝั่ง';
-  const userContent = `[ผู้ใช้งานระบุมุมมอง: ${userRoleText}]\n${context ? `[บริบทเพิ่มเติม]: ${context}\n` : ''}\n[คำถาม]: ${question}\n\nตอบให้ชัด แบ่งเป็นข้อคิดกับวิธีแก้ที่ใช้ได้จริงในที่ทำงาน:`;
+  // Ends at the question: a fixed "insights + fixes" suffix made every answer one long template (F-01)
+  const userContent = `[ผู้ใช้งานระบุมุมมอง: ${userRoleText}]\n${context ? `[บริบทเพิ่มเติม]: ${context}\n` : ''}\n[คำถาม]: ${question}`;
 
   return [
     { role: "system", content: system },
