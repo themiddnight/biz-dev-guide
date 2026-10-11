@@ -7,7 +7,7 @@ import type { LevelMode, Role } from '../../data/rolePerspective';
  */
 
 // ROLE_META carries `origin`, `side` and `person`, none of which is the bare track name
-// this chip needs (`ฝั่ง Business` / `Dev` read wrong after `เฉพาะสาย`).
+// this label needs (`ฝั่ง Business` / `Dev` read wrong after `ของสาย`).
 const TRACK_NAME: Record<Role, string> = { biz: 'Business', eng: 'Engineering' };
 
 /** `กลับไปใช้ค่าตามสายงาน` is only true while the header level mode is auto. */
@@ -17,5 +17,5 @@ export function chapterLevelResetLabel(levelMode: LevelMode): string {
 
 /** Names the two things the override is scoped to: this chapter, and this role. */
 export function chapterLevelScopeLabel(role: Role): string {
-  return `เฉพาะบทนี้ · เฉพาะสาย ${TRACK_NAME[role]}`;
+  return `เฉพาะบทนี้ ของสาย ${TRACK_NAME[role]}`;
 }

@@ -21,13 +21,12 @@ import {
 import { planRequest, type RequestedSection } from '../lib/chapterRoute';
 import { ChapterHero } from './guide/ChapterHero';
 import { ChapterIntro } from './guide/ChapterIntro';
-import { SectionOutline } from './guide/SectionOutline';
+import { ChapterControlRow } from './guide/ChapterControlRow';
 import { TrackPanel } from './guide/TrackPanel';
-import { chapterLevelResetLabel, chapterLevelScopeLabel } from './guide/rolePerspectiveUi';
 import { TrackNextCard, TrackEndCard } from './guide/TrackFooter';
 import { getTrackNext, resolveTrack, type TrackKey, type TrackNext } from '../data/readingTracks';
 import { planChapterLevelChoice } from '../lib/rolePrefs';
-import { ROLE_META, otherRole, resolveChapterLevel, getActiveTrackKey, type LevelInputs, type LevelMode, type Role } from '../data/rolePerspective';
+import { otherRole, resolveChapterLevel, getActiveTrackKey, type LevelInputs, type LevelMode, type Role } from '../data/rolePerspective';
 import { FirstVisitCard, type FirstVisitMode } from './guide/FirstVisitCard';
 import { RoleMindsetCard } from './RoleMindsetCard';
 import { 
@@ -44,8 +43,7 @@ import {
   ArrowLeft,
   ArrowRight,
   GraduationCap,
-  Check,
-  SlidersHorizontal
+  Check
 } from 'lucide-react';
 import { TAP, TAP_GAP } from './ui/tapTarget';
 import { Button } from './ui/Button';
@@ -260,8 +258,8 @@ export const GuideTab: React.FC<GuideTabProps> = ({
     setPendingScrollId(`sec-${action.key}`);
   }, [requestedSection?.nonce]);
 
-  // Chip click: open (never close) the section, scroll to it, and record it in the URL (spec §2.1).
-  const handleOutlineSelect = (key: SectionKey) => {
+  // A control-row link opens (never folds) its section, scrolls to it and records it in the URL.
+  const handleSectionLink = (key: SectionKey) => {
     setOpenState(prev => openSection(prev, layout, key));
     setPendingScrollId(`sec-${key}`);
     onReplaceSection(key);
@@ -638,87 +636,17 @@ export const GuideTab: React.FC<GuideTabProps> = ({
 
             <ChapterIntro chapter={activeChapter} onNavigateChapter={handleSelectChapter} onSearchGlossary={handleSearchGlossary} />
 
-            {/* ADAPTIVE LENS CONTROLLER BANNER */}
-            <div className="p-box-dense rounded-box bg-base-300 border border-base-border space-y-2 sm:space-y-2.5">
-              {role === null ? (
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="text-xs font-bold text-base-content flex items-center gap-1.5">
-                      <SlidersHorizontal className="w-3.5 h-3.5 text-base-content-secondary" />
-                      <span>Active Mode:</span>
-                    </span>
-                    <span className="text-[11px] sm:text-xs font-semibold px-2 py-0.5 rounded-md bg-success/10 text-success">
-                      {chapterLevel === 'beginner' ? '🌱 Beginner' : '⚡ Experienced'}
-                    </span>
-                  </div>
-
-                  {/* Quick Switch Buttons */}
-                  <Tabs<ExperienceLevel>
-                    variant="segmented"
-                    aria-label="สลับเลนส์เนื้อหา"
-                    className="self-start sm:self-auto"
-                    items={[
-                      { value: 'beginner', label: '🌱 ใหม่กับเรื่องนี้' },
-                      { value: 'experienced', label: '⚡ ทำงานข้ามทีมมาแล้ว' },
-                    ]}
-                    value={chapterLevel}
-                    onChange={lvl => onExperienceLevelChange?.(lvl)}
-                  />
-                </div>
-              ) : (
-                <div data-role-lens={role} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <p className="text-xs font-bold text-base-content flex items-start gap-1.5" data-role-lens-status>
-                    <SlidersHorizontal className="w-3.5 h-3.5 mt-0.5 shrink-0 text-base-content-secondary" />
-                    <span>
-                      {activeChapter.home === 'shared'
-                        ? 'บทนี้เป็นงานที่สองฝั่งทำร่วมกัน'
-                        : `บทนี้เป็นงาน${ROLE_META[activeChapter.home === role ? role : otherRole(role)].side}`}
-                      {' · '}
-                      {levelSource === 'global'
-                        ? 'ใช้ระดับเดียวกันทุกบท'
-                        : chapterLevel === 'experienced' ? 'เปิดแบบคุ้นงาน' : 'เปิดแบบมือใหม่'}
-                    </span>
-                  </p>
-
-                  {/* Per-chapter level switch (this chapter only) */}
-                  <div className="flex flex-wrap items-center gap-1.5 self-start sm:self-auto">
-                    <Tabs<ExperienceLevel>
-                      variant="segmented"
-                      aria-label="ระดับของบทนี้"
-                      items={[
-                        { value: 'beginner', label: '🌱 มือใหม่' },
-                        { value: 'experienced', label: '⚡ คุ้นงานแล้ว' },
-                      ]}
-                      value={chapterLevel}
-                      onChange={handleChapterLevelPick}
-                    />
-                    {levelSource === 'chapter' && (
-                      <>
-                        <span data-chapter-level-scope className="text-xs text-base-content-muted">
-                          {chapterLevelScopeLabel(role)}
-                        </span>
-                        <button
-                          type="button"
-                          data-chapter-level-reset
-                          onClick={() => onChapterLevelChange?.(activeChapter.id, null)}
-                          className={`${TAP} text-xs font-semibold text-base-content-muted hover:underline cursor-pointer`}
-                        >
-                          {chapterLevelResetLabel(levelMode)}
-                        </button>
-                      </>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <SectionOutline
-              chapter={activeChapter}
+            <ChapterControlRow
+              chapterNum={activeChapter.num}
               layout={layout}
               openState={openState}
-              onSelectSection={handleOutlineSelect}
-              onExpandAll={() => setOpenState(expandAll(layout))}
-              onCollapseAll={() => setOpenState(collapseAll(layout))}
+              level={chapterLevel}
+              onLevelChange={lvl => (role === null ? onExperienceLevelChange?.(lvl) : handleChapterLevelPick(lvl))}
+              levelOverride={role !== null && levelSource === 'chapter'
+                ? { role, levelMode, onReset: () => onChapterLevelChange?.(activeChapter.id, null) }
+                : null}
+              onSelectSection={handleSectionLink}
+              onSetAllOpen={open => setOpenState(open ? expandAll(layout) : collapseAll(layout))}
             />
 
             <div>

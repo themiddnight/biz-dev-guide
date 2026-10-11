@@ -4,7 +4,7 @@ import { FRICTION_PLAYBOOKS } from './frictionPlaybooks';
 import {
   LAYERS, SECTION_KEYS, LAYER_CONFIG, SECTION_LABEL,
   getLayerOf, getChapterLayout, deriveOpenState, expandAll, collapseAll,
-  openSection, toggleSection, isSectionPresent, isSectionKey, sectionHasTool,
+  openSection, toggleSection, isSectionPresent, isSectionKey,
   type SectionKey,
 } from './sectionLayers';
 import type { ExperienceLevel } from '../types';
@@ -143,14 +143,6 @@ describe('isSectionPresent', () => {
 
   it('examples in every chapter (spec A.3)', () => {
     expect(idsWith('examples')).toHaveLength(CHAPTERS.length);
-  });
-});
-
-describe('sectionHasTool', () => {
-  it('diagram in all chapters but s1, s14 and s16-s19; friction only in s1, s2, s6', () => {
-    expect(CHAPTERS.filter(c => !sectionHasTool(c, 'diagram')).map(c => c.id)).toEqual(['s1', 's14', 's16', 's17', 's18', 's19']);
-    expect(CHAPTERS.filter(c => sectionHasTool(c, 'friction')).map(c => c.id)).toEqual(['s1', 's2', 's6']);
-    expect(sectionHasTool(ch('s1'), 'practice')).toBe(false);
   });
 });
 

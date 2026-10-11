@@ -157,7 +157,7 @@ code, samp, pre, kbd {
 
 /*
  * Anchor offset (I-18): GuideTab measures the sticky app header with a ResizeObserver and
- * writes its height to --header-h on <html>. SectionOutline does the same for its own bar,
+ * writes its height to --header-h on <html>. ChapterControlRow does the same for its own row,
  * writing --outline-h. Every id'd element (anchor / scrollIntoView target) keeps clear of
  * both. Unlayered on purpose so it beats Tailwind scroll-mt-*.
  */

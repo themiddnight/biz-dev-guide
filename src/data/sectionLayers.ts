@@ -116,12 +116,6 @@ export function isSectionPresent(chapter: Chapter, key: SectionKey): boolean {
   }
 }
 
-export function sectionHasTool(chapter: Chapter, key: SectionKey): boolean {
-  if (key === 'diagram') return hasDiagramContent(chapter);
-  if (key === 'friction') return !!chapter.frictionPlaybook?.dilemma;
-  return false;
-}
-
 function layerKeys(level: ExperienceLevel, layer: Layer, chapterId: string): SectionKey[] {
   const overrides = CHAPTER_CORE_OVERRIDES[chapterId] ?? [];
   const base = LAYER_CONFIG[level][layer].filter(k => !overrides.includes(k));

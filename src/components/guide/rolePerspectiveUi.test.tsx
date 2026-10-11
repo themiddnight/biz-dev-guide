@@ -50,8 +50,7 @@ describe('TrackPanel', () => {
   });
 });
 
-// The lens row itself lives inline in GuideTab, which needs hooks and a DOM; its copy is
-// asserted here and the row renders these literals (round3 spec P4.1, P4.2).
+// The control row renders these literals while a chapter carries its own level (round3 spec P4.1, P4.2).
 describe('chapterLevelResetLabel', () => {
   it('auto mode falls back to the role default', () => {
     expect(chapterLevelResetLabel('auto')).toBe('กลับไปใช้ค่าตามสายงาน');
@@ -64,10 +63,8 @@ describe('chapterLevelResetLabel', () => {
 
 describe('chapterLevelScopeLabel', () => {
   it('names this chapter and the track it belongs to', () => {
-    expect(chapterLevelScopeLabel('eng')).toContain('เฉพาะบทนี้');
-    expect(chapterLevelScopeLabel('eng')).toContain('Engineering');
-    expect(chapterLevelScopeLabel('biz')).toContain('เฉพาะบทนี้');
-    expect(chapterLevelScopeLabel('biz')).toContain('Business');
+    expect(chapterLevelScopeLabel('eng')).toBe('เฉพาะบทนี้ ของสาย Engineering');
+    expect(chapterLevelScopeLabel('biz')).toBe('เฉพาะบทนี้ ของสาย Business');
   });
   it('the two roles get different chips', () => {
     expect(chapterLevelScopeLabel('eng')).not.toBe(chapterLevelScopeLabel('biz'));
