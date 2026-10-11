@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { ProtocolSimulator } from './ProtocolSimulator';
-import { ArrowDown, ArrowRight, Layers, Shield, Database, Smartphone, Globe, Server, CheckCircle2, AlertTriangle, GitBranch, TrendingUp, Flame, Sliders, FileText, Bot, Lock, Gauge, HelpCircle, Eye, Activity, Play, RotateCcw, Send, Check, Compass, FileCode2, Users, AlertCircle } from 'lucide-react';
+import { ArrowDown, ArrowRight, Check, RotateCcw } from 'lucide-react';
 import { TAP, TAP_Y } from './ui/tapTarget';
-import { DISCLOSURE_SUMMARY, DisclosureChevron } from './ui/Disclosure';
+import { DisclosureChevron } from './ui/Disclosure';
 import { TABS_LAYOUT } from './ui/Tabs';
 import { chipClass } from './ui/ToggleChip';
 
@@ -861,102 +861,59 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
   // CHAPTER 12: Dual-Track Agile (Discovery & Delivery, one team)
   // =========================================================================
   if (chapterId === 's12') {
+    const discoveryOn = dualTrackPhase === 'discovery' || dualTrackPhase === 'synchronized';
+    const deliveryOn = dualTrackPhase === 'delivery' || dualTrackPhase === 'synchronized';
     return (
-      <div className="space-y-4">
-        <div className="p-box-dense rounded-box bg-base-100 border border-base-border space-y-4">
-          <div className="flex items-center justify-between flex-wrap gap-2">
-            <div className="flex items-center gap-2">
-              <span className="text-base">🔀</span>
-              <div>
-                <h4 className="text-xs sm:text-sm font-bold text-base-content">
-                  Dual-Track Agile: ทีมเดียว สองเส้นงาน
-                </h4>
-                <p className="text-[11px] text-base-content-muted">
-                  ทีมเดียวกันทำสองงานคู่กัน: Discovery พิสูจน์ไอเดียล่วงหน้า 1-2 Sprint ส่งงานที่ผ่านแล้วให้ Delivery สร้าง
-                </p>
-              </div>
-            </div>
+      <div className={FRAME}>
+        <WidgetHead
+          title="Dual-Track Agile ทีมเดียว สองเส้นงาน"
+          hint="ทีมเดียวกันทำสองงานคู่กัน Discovery พิสูจน์ไอเดียล่วงหน้า 1 ถึง 2 Sprint แล้วส่งงานที่ผ่านให้ Delivery สร้าง"
+        >
+          <Segmented label="เส้นงานที่ดู">
+            {([['discovery', 'Discovery'], ['delivery', 'Delivery'], ['synchronized', 'ทำคู่ขนาน']] as const).map(([value, label]) => (
+              <button
+                key={value}
+                type="button"
+                aria-pressed={dualTrackPhase === value}
+                onClick={() => setDualTrackPhase(value)}
+                className={chipClass(segment(dualTrackPhase === value))}
+              >
+                {label}
+              </button>
+            ))}
+          </Segmented>
+        </WidgetHead>
 
-            <div className="flex rounded-xl bg-base-300 p-1">
-              <button
-                onClick={() => setDualTrackPhase('discovery')}
-                className={`${TAP} px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                  dualTrackPhase === 'discovery' ? 'bg-data-3 text-data-content shadow-xs' : 'text-base-content-secondary'
-                }`}
-              >
-                1. Discovery
-              </button>
-              <button
-                onClick={() => setDualTrackPhase('delivery')}
-                className={`${TAP} px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                  dualTrackPhase === 'delivery' ? 'bg-data-1 text-data-content shadow-xs' : 'text-base-content-secondary'
-                }`}
-              >
-                2. Delivery
-              </button>
-              <button
-                onClick={() => setDualTrackPhase('synchronized')}
-                className={`${TAP} px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                  dualTrackPhase === 'synchronized' ? 'bg-engineer text-engineer-content shadow-xs' : 'text-base-content-secondary'
-                }`}
-              >
-                3. ทำคู่ขนาน
-              </button>
+        {/* Two tracks, same team */}
+        <div className="grid grid-cols-1 gap-y-5 sm:grid-cols-2 sm:gap-y-0 sm:divide-x sm:divide-base-border">
+          <div className={`space-y-2 transition-colors sm:pr-6 ${discoveryOn ? '' : 'text-base-content-muted'}`}>
+            <div className="flex flex-wrap items-baseline justify-between gap-x-3">
+              <h4 className={discoveryOn ? TITLE : 'font-semibold'}>Track 1 Discovery</h4>
+              <span className={LABEL}>{discoveryOn ? 'เน้นหาคำตอบ' : 'พักไว้'}</span>
             </div>
+            <p className={LABEL}>ล่วงหน้า Sprint N+1</p>
+            <p>
+              PM กับ Designer นำ มี Dev ร่วมประเมินความเป็นไปได้ งานหลักคือสัมภาษณ์ลูกค้าและทำ Prototype เพื่อทดสอบว่า &ldquo;มีคนต้องการฟีเจอร์นี้จริงไหม&rdquo;
+            </p>
+            <p><span className={LABEL}>ผลที่ได้</span> <b className={discoveryOn ? 'text-base-content' : ''}>Validated Backlog และ Acceptance Criteria ที่ชัดเจน</b></p>
           </div>
 
-          {/* Two tracks, same team */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-            <div className={`p-4 rounded-xl border transition-all ${
-              dualTrackPhase === 'discovery' || dualTrackPhase === 'synchronized'
-                ? 'bg-data-3/10 border-data-3/25'
-                : 'bg-base-300 border-base-border opacity-60'
-            }`}>
-              <div className="flex items-center justify-between mb-2">
-                <b className="text-data-3 font-bold flex items-center gap-1.5">
-                  <Compass className="w-4 h-4" />
-                  <span>Track 1: Discovery (ล่วงหน้า Sprint N+1)</span>
-                </b>
-                <span className="text-[10px] px-2 py-0.5 rounded bg-data-3/10 text-data-3">
-                  เน้นหาคำตอบ
-                </span>
-              </div>
-              <p className="text-[11px] text-base-content-secondary mb-2">
-                PM + Designer นำ โดยมี Dev ร่วมประเมินความเป็นไปได้: สัมภาษณ์ลูกค้า ทำ Prototype ทดสอบว่า "มีคนต้องการฟีเจอร์นี้จริงไหม"
-              </p>
-              <div className="p-2 rounded-lg bg-base-100/90 text-[10px] text-data-3">
-                ผลที่ได้: Validated Backlog + ชัดเจนเรื่อง Acceptance Criteria
-              </div>
+          <div className={`space-y-2 border-t border-base-border pt-5 transition-colors sm:border-t-0 sm:pl-6 sm:pt-0 ${deliveryOn ? '' : 'text-base-content-muted'}`}>
+            <div className="flex flex-wrap items-baseline justify-between gap-x-3">
+              <h4 className={deliveryOn ? TITLE : 'font-semibold'}>Track 2 Delivery</h4>
+              <span className={LABEL}>{deliveryOn ? 'เน้นสร้างของจริง' : 'พักไว้'}</span>
             </div>
-
-            <div className={`p-4 rounded-xl border transition-all ${
-              dualTrackPhase === 'delivery' || dualTrackPhase === 'synchronized'
-                ? 'bg-data-1/10 border-data-1/25'
-                : 'bg-base-300 border-base-border opacity-60'
-            }`}>
-              <div className="flex items-center justify-between mb-2">
-                <b className="text-data-1 font-bold flex items-center gap-1.5">
-                  <FileCode2 className="w-4 h-4" />
-                  <span>Track 2: Delivery (Sprint ปัจจุบัน N)</span>
-                </b>
-                <span className="text-[10px] px-2 py-0.5 rounded bg-data-1/10 text-data-1">
-                  เน้นสร้างของจริง
-                </span>
-              </div>
-              <p className="text-[11px] text-base-content-secondary mb-2">
-                ทีมเดียวกัน (Dev + QA เป็นแกน) หยิบงานที่ผ่าน Discovery แล้วมาสร้างโค้ดระดับ Production เขียน Automated Test และ Deploy
-              </p>
-              <div className="p-2 rounded-lg bg-base-100/90 text-[10px] text-data-1">
-                ผลที่ได้: ซอฟต์แวร์ที่ใช้งานได้และผ่านการทดสอบ
-              </div>
-            </div>
-          </div>
-
-          <div className="p-3 bg-base-300 rounded-xl text-xs text-base-content-secondary flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-success shrink-0" />
-            <span><b>หลักง่ายๆ:</b> อย่าเริ่มสร้างงานระดับ production ก่อน validate ไอเดียนั้น ถ้ายังไม่แน่ใจ ให้ทดสอบด้วย Prototype ที่ทิ้งได้ถูกๆ ก่อน</span>
+            <p className={LABEL}>Sprint ปัจจุบัน N</p>
+            <p>
+              ทีมเดียวกัน มี Dev กับ QA เป็นแกน หยิบงานที่ผ่าน Discovery แล้วมาสร้างโค้ดระดับ Production เขียน Automated Test และ Deploy
+            </p>
+            <p><span className={LABEL}>ผลที่ได้</span> <b className={deliveryOn ? 'text-base-content' : ''}>ซอฟต์แวร์ที่ใช้งานได้และเทสต์ผ่านแล้ว</b></p>
           </div>
         </div>
+
+        <p className={RULE}>
+          <b className="text-base-content">หลักง่ายๆ</b> อย่าเริ่มสร้างงานระดับ production ก่อน validate ไอเดียนั้น ถ้ายังไม่แน่ใจ ให้ทดสอบด้วย Prototype ที่ทิ้งได้ถูกๆ ก่อน
+        </p>
       </div>
     );
   }
@@ -965,27 +922,24 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
   // CHAPTER 13: AI in SDLC Transformation
   // =========================================================================
   if (chapterId === 's13') {
+    const columns = [
+      { head: 'สิ่งที่ AI ทำแทนได้เร็ว', text: 'เขียน Boilerplate Code, เขียน Unit Test ตามสเปก, แปลง Figma เป็น HTML' },
+      { head: 'คอขวดใหม่ที่อยู่ที่คน', text: 'เขียน Prompt/Spec ให้ไม่มีช่องโหว่, ตรวจ Security และ Architecture' },
+      { head: 'ทักษะที่แพงที่สุด', text: 'Domain Judgment คือเข้าใจโจทย์ธุรกิจ และเลือก Trade-off เทคโนโลยีที่คุ้มค่า' },
+    ];
     return (
-      <div className="space-y-3">
-        <div className="p-4 rounded-box border border-base-border bg-base-100 space-y-3">
-          <span className="text-xs font-bold text-data-2 uppercase tracking-wider flex items-center gap-1.5">
-            <Bot className="w-4 h-4" />
-            <span>SDLC ที่เปลี่ยนไปในยุค AI (2026+)</span>
-          </span>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
-            <div className="p-3 rounded-xl bg-base-300">
-              <b className="text-base-content-body block mb-1">สิ่งที่ AI ทำแทนได้รวดเร็ว:</b>
-              <span className="text-[11px] text-base-content-muted">เขียน Boilerplate Code, เขียน Unit Test ตามสเปก, แปลง Figma เป็น HTML</span>
+      <div className={FRAME}>
+        <h3 className={TITLE}>SDLC ที่เปลี่ยนไปในยุค AI (2026+)</h3>
+        <div className="grid grid-cols-1 gap-y-5 sm:grid-cols-3 sm:gap-y-0 sm:divide-x sm:divide-base-border">
+          {columns.map((c, idx) => (
+            <div
+              key={c.head}
+              className={`space-y-1 ${idx > 0 ? 'border-t border-base-border pt-5 sm:border-t-0 sm:pl-5 sm:pt-0' : ''} ${idx < columns.length - 1 ? 'sm:pr-5' : ''}`}
+            >
+              <h4 className={TITLE}>{c.head}</h4>
+              <p className="text-sm text-base-content-secondary">{c.text}</p>
             </div>
-            <div className="p-3 rounded-xl bg-data-2/10 border border-data-2/25">
-              <b className="text-data-2 block mb-1">คอขวดใหม่ที่อยู่ที่คน:</b>
-              <span className="text-[11px] text-base-content-secondary">เขียน Prompt/Spec ให้ไม่มีช่องโหว่, ตรวจ Security และ Architecture</span>
-            </div>
-            <div className="p-3 rounded-xl bg-engineer/10 border border-engineer/25">
-              <b className="text-engineer block mb-1">ทักษะที่แพงที่สุด:</b>
-              <span className="text-[11px] text-base-content-secondary">Domain Judgment: เข้าใจโจทย์ธุรกิจ และเลือก Trade-off เทคโนโลยีที่คุ้มค่า</span>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     );
