@@ -737,157 +737,120 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
     // effective team output flattens after scale 3.
     const TEAM_OUTPUT = [1, 1.8, 2.4, 2.6, 2.7];
     const pressure = (scopeVal * 1.5) / (timeVal * TEAM_OUTPUT[costVal - 1]);
-    // One set of thresholds drives the badge, the meter, the advice and the triangle.
+    // One set of thresholds drives the label, the meter, the advice and the triangle.
     const PRESSURE_LEVELS = [
-      { max: 6, label: 'ต่ำ', text: '✨ คุณภาพสูงสุด (Pristine Quality)', color: 'text-success', bg: 'bg-success/10 border-success/25', stroke: 'var(--color-success)', core: 'var(--color-success)' },
-      { max: 18, label: 'ปานกลาง', text: '⚖️ สมดุลใช้งานได้จริง (Production Balanced)', color: 'text-engineer', bg: 'bg-engineer/10 border-engineer/25', stroke: 'var(--color-engineer)', core: 'var(--color-success)' },
-      { max: 35, label: 'สูง', text: '⚠️ หนี้ทางเทคนิคสะสมสูง (High Tech Debt)', color: 'text-warning', bg: 'bg-warning/10 border-warning/25', stroke: 'var(--color-warning)', core: 'var(--color-warning)' },
-      { max: Infinity, label: 'สูงมาก', text: '💥 วิกฤติบั๊กล้นระบบ (System Meltdown Risk)', color: 'text-error', bg: 'bg-error/10 border-error/25', stroke: 'var(--color-error)', core: 'var(--color-error)' },
+      { max: 6, label: 'ต่ำ', text: 'คุณภาพสูงสุด', color: 'text-success', stroke: 'var(--color-success)', core: 'var(--color-success)' },
+      { max: 18, label: 'ปานกลาง', text: 'สมดุลใช้งานได้จริง', color: 'text-engineer', stroke: 'var(--color-engineer)', core: 'var(--color-success)' },
+      { max: 35, label: 'สูง', text: 'หนี้ทางเทคนิคสะสมสูง', color: 'text-warning', stroke: 'var(--color-warning)', core: 'var(--color-warning)' },
+      { max: Infinity, label: 'สูงมาก', text: 'วิกฤติบั๊กล้นระบบ', color: 'text-error', stroke: 'var(--color-error)', core: 'var(--color-error)' },
     ];
     const levelIdx = PRESSURE_LEVELS.findIndex((l) => pressure <= l.max);
     const level = PRESSURE_LEVELS[levelIdx];
     const isDanger = levelIdx >= 2;
 
+    const sliders = [
+      {
+        name: 'Scope', gloss: 'ปริมาณฟีเจอร์', value: `${scopeVal}%`, min: 30, max: 100, step: 5, current: scopeVal, set: setScopeVal,
+        caption: scopeVal > 80 ? 'ฟีเจอร์แน่นเอี๊ยดทุกหน้า' : scopeVal > 50 ? 'ขนาดกำลังดี' : 'เน้นเฉพาะ MVP แกนหลัก',
+      },
+      {
+        name: 'Time', gloss: 'ระยะเวลาส่งมอบ', value: `${timeVal} เดือน`, min: 1, max: 6, step: 1, current: timeVal, set: setTimeVal,
+        caption: timeVal <= 1 ? 'ไฟลนก้น เร่งด่วนสุดขีด' : timeVal <= 3 ? 'ระยะเวลามาตรฐาน' : 'มีเวลาเก็บงานและทดสอบ',
+      },
+      {
+        name: 'Cost', gloss: 'คนและงบประมาณ', value: `${costVal} สเกล`, min: 1, max: 5, step: 1, current: costVal, set: setCostVal,
+        caption: costVal <= 1 ? 'Dev ทำงานคนเดียว' : costVal <= 3 ? 'ทีมเล็ก' : 'ทีมใหญ่ขึ้น แต่ได้งานเพิ่มไม่มาก',
+      },
+    ];
+
     return (
-      <div className="space-y-4">
-        <div className="p-box-dense rounded-box bg-base-100 border border-base-border space-y-4">
-          <div className="flex items-center justify-between flex-wrap gap-2">
-            <div className="flex items-center gap-2">
-              <span className="text-base">🔺</span>
-              <div>
-                <h4 className="text-xs sm:text-sm font-bold text-base-content">
-                  The Interactive Iron Triangle Simulator
-                </h4>
-                <p className="text-[11px] text-base-content-muted">
-                  ลองเลื่อน 3 ด้าน แล้วดูว่าแรงกดดันต่อคุณภาพขึ้นหรือลง (ภาพเชิงเปรียบเทียบ ไม่ใช่ตัวเลขจริง)
-                </p>
-              </div>
-            </div>
+      <div className={FRAME}>
+        <WidgetHead
+          title="ตัวจำลอง Iron Triangle"
+          hint="ลองเลื่อน 3 ด้าน แล้วดูว่าแรงกดดันต่อคุณภาพขึ้นหรือลง (ภาพเชิงเปรียบเทียบ ไม่ใช่ตัวเลขจริง)"
+        />
 
-            <span className={`text-xs px-2.5 py-1 rounded-xl font-bold border ${level.bg} ${level.color}`}>
-              {level.text}
-            </span>
-          </div>
-
-          {/* 3 Sliders */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-            {/* Scope */}
-            <div className="p-3 rounded-xl bg-base-300 border border-base-border space-y-1.5">
-              <div className="flex justify-between items-center">
-                <span className="font-bold text-warning">1. Scope (ปริมาณฟีเจอร์)</span>
-                <span className="font-bold text-base-content-body">{scopeVal}%</span>
+        {/* 3 Sliders */}
+        <div className="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-3">
+          {sliders.map(s => (
+            <div key={s.name}>
+              <div className="flex items-baseline justify-between gap-2">
+                <label htmlFor={`iron-${s.name}`} className="font-semibold text-base-content">
+                  {s.name} <span className="font-normal text-base-content-muted">{s.gloss}</span>
+                </label>
+                <span className="text-sm font-semibold text-base-content">{s.value}</span>
               </div>
               <input
+                id={`iron-${s.name}`}
                 type="range"
-                min="30"
-                max="100"
-                step="5"
-                value={scopeVal}
-                onChange={(e) => setScopeVal(Number(e.target.value))}
-                className="w-full accent-warning cursor-pointer"
+                min={s.min}
+                max={s.max}
+                step={s.step}
+                value={s.current}
+                onChange={(e) => s.set(Number(e.target.value))}
+                className={RANGE}
               />
-              <span className="text-[10px] text-base-content-muted block">
-                {scopeVal > 80 ? 'ฟีเจอร์แน่นเอี๊ยดทุกหน้า' : scopeVal > 50 ? 'ขนาดกำลังดี' : 'เน้นเฉพาะ MVP แกนหลัก'}
+              <span className={`${HINT} block`}>{s.caption}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Real-time triangle and result */}
+        <div className={`${RULE} flex flex-col items-center justify-between gap-6 sm:flex-row`}>
+          <div className="space-y-2 text-center sm:text-left" aria-live="polite">
+            <p className={LABEL}>แรงกดดันต่อคุณภาพ</p>
+            <div className={`flex items-center justify-center gap-3 text-3xl font-bold sm:justify-start ${level.color}`}>
+              <span>{level.label}</span>
+              <span className="flex gap-1" aria-hidden="true">
+                {PRESSURE_LEVELS.map((l, i) => (
+                  <span
+                    key={l.label}
+                    className="h-2 w-4 rounded-sm"
+                    style={{ backgroundColor: i <= levelIdx ? level.stroke : 'var(--color-base-border-strong)' }}
+                  />
+                ))}
               </span>
             </div>
-
-            {/* Time */}
-            <div className="p-3 rounded-xl bg-base-300 border border-base-border space-y-1.5">
-              <div className="flex justify-between items-center">
-                <span className="font-bold text-data-1">2. Time (ระยะเวลาส่งมอบ)</span>
-                <span className="font-bold text-base-content-body">{timeVal} เดือน</span>
-              </div>
-              <input
-                type="range"
-                min="1"
-                max="6"
-                step="1"
-                value={timeVal}
-                onChange={(e) => setTimeVal(Number(e.target.value))}
-                className="w-full accent-data-1 cursor-pointer"
-              />
-              <span className="text-[10px] text-base-content-muted block">
-                {timeVal <= 1 ? 'ไฟลนก้น เร่งด่วนสุดขีด' : timeVal <= 3 ? 'ระยะเวลามาตรฐาน' : 'มีเวลาเก็บงานและทดสอบ'}
-              </span>
-            </div>
-
-            {/* Cost / Headcount */}
-            <div className="p-3 rounded-xl bg-base-300 border border-base-border space-y-1.5">
-              <div className="flex justify-between items-center">
-                <span className="font-bold text-data-2">3. Cost (คนและงบประมาณ)</span>
-                <span className="font-bold text-base-content-body">{costVal} สเกล</span>
-              </div>
-              <input
-                type="range"
-                min="1"
-                max="5"
-                step="1"
-                value={costVal}
-                onChange={(e) => setCostVal(Number(e.target.value))}
-                className="w-full accent-data-2 cursor-pointer"
-              />
-              <span className="text-[10px] text-base-content-muted block">
-                {costVal <= 1 ? 'Dev ทำงานคนเดียว' : costVal <= 3 ? 'ทีมเล็ก' : 'ทีมใหญ่ขึ้น แต่ได้งานเพิ่มไม่มาก'}
-              </span>
-            </div>
-          </div>
-
-          {/* Real-time Triangle Visual & Metrics */}
-          <div className="p-4 rounded-box bg-neutral text-neutral-content flex flex-col sm:flex-row items-center justify-between gap-4 border border-neutral">
-            <div className="space-y-1.5 text-xs text-center sm:text-left">
-              <div className="text-base-content-muted">แรงกดดันต่อคุณภาพ:</div>
-              <div className={`text-2xl sm:text-3xl font-bold flex items-center justify-center sm:justify-start gap-2 ${level.color}`}>
-                <span>{level.label}</span>
-                <span className="flex gap-1" aria-hidden="true">
-                  {PRESSURE_LEVELS.map((l, i) => (
-                    <span
-                      key={l.label}
-                      className="w-4 h-2 rounded-sm"
-                      style={{ backgroundColor: i <= levelIdx ? level.stroke : 'var(--color-base-border-strong)' }}
-                    />
-                  ))}
-                </span>
-              </div>
-              <p className="text-[11px] text-base-content-muted max-w-md">
-                {isDanger 
-                  ? '⚠️ แรงกดดันสูงเกินไป ทางที่ได้ผลคือตัด Scope ที่ไม่จำเป็นหรือขยายเวลา การเติมคนกลางทางมักทำให้ช้าลง (Brooks\'s law) เพราะคนใหม่ต้องเรียนรู้และคนเดิมต้องเสียเวลาสอน' 
-                  : '✅ ทีมยังคุมคุณภาพโค้ดและเทสต์ได้ครบ'}
+            <p className="font-semibold text-base-content">{level.text}</p>
+            <p className="max-w-md">
+              {isDanger
+                ? 'แรงกดดันสูงเกินไป ทางที่ได้ผลคือตัด Scope ที่ไม่จำเป็นหรือขยายเวลา การเติมคนกลางทางมักทำให้ช้าลง (Brooks\'s law) เพราะคนใหม่ต้องเรียนรู้และคนเดิมต้องเสียเวลาสอน'
+                : 'ทีมยังคุมคุณภาพโค้ดและเทสต์ได้ครบ'}
+            </p>
+            {costVal >= 4 && (
+              <p className="max-w-md">
+                เพิ่มคนเกินจุดหนึ่งแทบไม่ได้งานเพิ่ม เพราะต้องประสานงานกันมากขึ้น
               </p>
-              {costVal >= 4 && (
-                <p className="text-[11px] text-warning max-w-md">
-                  💡 เพิ่มคนเกินจุดหนึ่งแทบไม่ได้งานเพิ่ม เพราะต้องประสานงานกันมากขึ้น
-                </p>
-              )}
-            </div>
+            )}
+          </div>
 
-            {/* SVG Triangle Graphic */}
-            <div className="w-36 h-32 flex items-center justify-center relative shrink-0">
-              <svg viewBox="0 0 100 90" className="w-full h-full overflow-visible">
-                {/* Triangle background */}
-                <polygon
-                  points="50,10 90,80 10,80"
-                  fill={`color-mix(in oklab, ${level.stroke} 15%, transparent)`}
-                  stroke={level.stroke}
-                  strokeWidth="2"
-                  strokeLinejoin="round"
-                />
-                {/* Core Quality Circle: shrinks one step per pressure level */}
-                <circle
-                  cx="50"
-                  cy="55"
-                  r={18 - levelIdx * 4}
-                  fill={level.core}
-                  className="transition-all duration-300"
-                />
-                <text x="50" y="58" textAnchor="middle" className="fill-primary-content" fontSize="6" fontWeight="bold">
-                  Quality
-                </text>
-                {/* Vertex Labels */}
-                <text x="50" y="5" textAnchor="middle" className="fill-warning" fontSize="6" fontWeight="bold">Scope</text>
-                <text x="5" y="88" textAnchor="start" className="fill-data-1" fontSize="6" fontWeight="bold">Time</text>
-                <text x="95" y="88" textAnchor="end" className="fill-data-2" fontSize="6" fontWeight="bold">Cost</text>
-              </svg>
-            </div>
+          {/* SVG Triangle Graphic. Sized so the labels render at 13px or more. */}
+          <div className="relative flex h-44 w-48 shrink-0 items-center justify-center">
+            <svg viewBox="0 0 100 90" className="h-full w-full overflow-visible" role="img" aria-label={`แรงกดดันต่อคุณภาพ ${level.label}`}>
+              {/* Triangle background */}
+              <polygon
+                points="50,10 90,80 10,80"
+                fill={`color-mix(in oklab, ${level.stroke} 15%, transparent)`}
+                stroke={level.stroke}
+                strokeWidth="2"
+                strokeLinejoin="round"
+              />
+              {/* Core Quality Circle: shrinks one step per pressure level */}
+              <circle
+                cx="50"
+                cy="55"
+                r={18 - levelIdx * 4}
+                fill={level.core}
+                className="transition-all duration-300"
+              />
+              <text x="50" y="58" textAnchor="middle" className="fill-primary-content" fontSize="6.5" fontWeight="bold">
+                Quality
+              </text>
+              {/* Vertex Labels */}
+              <text x="50" y="5" textAnchor="middle" className="fill-base-content-secondary" fontSize="6.5" fontWeight="bold">Scope</text>
+              <text x="5" y="88" textAnchor="start" className="fill-base-content-secondary" fontSize="6.5" fontWeight="bold">Time</text>
+              <text x="95" y="88" textAnchor="end" className="fill-base-content-secondary" fontSize="6.5" fontWeight="bold">Cost</text>
+            </svg>
           </div>
         </div>
       </div>

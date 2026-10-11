@@ -12,7 +12,7 @@ describe('ChapterDiagram iron triangle (s11)', () => {
   });
 
   it('labels use token fill classes and no hex remains in the figure', () => {
-    for (const cls of ['fill-primary-content', 'fill-warning', 'fill-data-1', 'fill-data-2']) expect(svg).toContain(`class="${cls}"`);
+    for (const cls of ['fill-primary-content', 'fill-base-content-secondary']) expect(svg).toContain(`class="${cls}"`);
     expect(svg).not.toMatch(/#[0-9a-fA-F]{3,8}/);
   });
 });
