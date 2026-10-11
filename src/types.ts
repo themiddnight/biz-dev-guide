@@ -50,7 +50,8 @@ export type FigureKey =
   | 'refund-handoff-drift'
   | 'refund-deploy-log'
   | 'refund-dual-track-board'
-  | 'refund-unit-economics';
+  | 'refund-unit-economics'
+  | 'refund-fixed-deadline';
 
 /** One figure shown right under a chapter's subtitle (visual-first pilot). */
 export interface ChapterHeroFigure {

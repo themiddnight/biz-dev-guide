@@ -32,6 +32,7 @@ import { RefundStoryGates } from './RefundStoryGates';
 import { RefundSwimlane } from './RefundSwimlane';
 import { RefundTestReport } from './RefundTestReport';
 import { RefundUnitEconomics } from './RefundUnitEconomics';
+import { RefundFixedDeadline } from './RefundFixedDeadline';
 import { TechDebtQuadrant } from './TechDebtQuadrant';
 import { ThreeLenses } from './ThreeLenses';
 import { TranslationLayers } from './TranslationLayers';
@@ -98,6 +99,7 @@ export const FIGURES: Record<FigureKey, React.FC<FigureProps>> = {
   'refund-dual-track-board': RefundDualTrackBoard,
   // s16 hero (chapter content gaps spec 2026-10-11, section C)
   'refund-unit-economics': RefundUnitEconomics,
+  'refund-fixed-deadline': RefundFixedDeadline,
   // Appendix figures (spec §6)
   'translation-layers': TranslationLayers,
   'gate-timeline': GateTimeline,
