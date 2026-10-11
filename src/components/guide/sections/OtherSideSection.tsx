@@ -14,72 +14,63 @@ const SWITCH_OPTIONS: { value: OtherSideView; label: string }[] = [
   { value: 'both', label: 'ทั้งสองฝั่ง' },
 ];
 
-const Label: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div className="font-bold text-base-content text-xs">{children}</div>
-);
+const LABEL = 'font-semibold text-base-content';
 
 /**
  * One side's view, read by the other side. Labels name both roles so `both` mode reads correctly.
- * `view` arrives already marked (`otherSideTerms`, computed once by the section): the card only
- * renders strings, so rendering it twice — as StrictMode does — cannot change its markers. Every
- * field is prose, the `saysVsHears` dialogue lines included (D21).
+ * `view` arrives already marked (`otherSideTerms`, computed once by the section): this component
+ * only renders strings, so rendering it twice — as StrictMode does — cannot change its markers.
+ * Every field is prose, the `saysVsHears` dialogue lines included (D21).
  */
-const SideViewCard: React.FC<{
+const SideViewBody: React.FC<{
   view: SideViewTerms;
+  /** Two views side by side: name the side, and stack each label over its line. */
+  paired: boolean;
   ctx: Pick<GuideSectionContext, 'onNavigateChapter' | 'onSearchGlossary'>;
-}> = ({ view, ctx }) => {
+}> = ({ view, paired, ctx }) => {
   const { side } = view;
   const reader = otherRole(side);
   const prose = (text: string) => (
     <RichText text={text} onNavigateChapter={ctx.onNavigateChapter} onSearchGlossary={ctx.onSearchGlossary} />
   );
   return (
-    <div
-      data-other-side-view={side}
-      className="min-w-0 p-box-dense rounded-xl bg-base-300 border border-base-border space-y-3.5 text-xs sm:text-sm"
-    >
-      <div className="text-xs font-bold text-base-content-muted">
-        {ROLE_META[side].icon} {ROLE_META[side].side}
-      </div>
+    <div data-other-side-view={side} className="min-w-0 space-y-5">
+      {paired && <h3 className="text-sm text-base-content-muted">{ROLE_META[side].side}</h3>}
 
-      <div className="space-y-1">
-        <Label>{person(side)} ถูกวัดผลด้วย</Label>
-        <p className="text-base-content-body leading-relaxed">{prose(view.measuredBy)}</p>
-      </div>
+      <p><span className={LABEL} data-measured-by>ผลงานของ {person(side)} วัดจาก</span> {prose(view.measuredBy)}</p>
 
-      <div className="space-y-1">
-        <Label>{person(side)} กลัวอะไร</Label>
-        <ul className="list-disc pl-5 space-y-1 text-base-content-body leading-relaxed">
+      <div>
+        <div className={LABEL}>{person(side)} กลัวอะไร</div>
+        <ul className="mt-1 list-disc space-y-1 pl-5">
           {view.fears.map(f => <li key={f}>{prose(f)}</li>)}
         </ul>
       </div>
 
-      <div className="space-y-2">
-        <Label>พูดยังไงให้ไม่พลาด</Label>
-        {view.saysVsHears.map(row => (
-          <div key={row.youSay} className="p-3 rounded-lg bg-base-100 border border-base-border space-y-1.5 leading-relaxed">
-            <p className="text-base-content-body">
-              <span className="font-semibold text-base-content">{person(reader)} พูด:</span> {prose(row.youSay)}
-            </p>
-            <p className="text-base-content-secondary">
-              <span className="font-semibold text-warning">{person(side)} ได้ยินว่า:</span> {prose(row.theyHear)}
-            </p>
-            <p className="text-base-content-body">
-              <span className="font-semibold text-success">พูดแบบนี้แทน:</span> {prose(row.sayInstead)}
-            </p>
-          </div>
-        ))}
+      <div>
+        <div className={LABEL}>พูดยังไงให้ไม่พลาด</div>
+        <div className="mt-2 divide-y divide-base-border border-y border-base-border">
+          {view.saysVsHears.map(row => (
+            <dl key={row.youSay} className={`grid gap-x-4 gap-y-1 py-3 ${paired ? '' : 'sm:grid-cols-[9rem_1fr]'}`}>
+              <dt className="text-sm text-base-content-muted">{person(reader)} พูด</dt>
+              <dd>{prose(row.youSay)}</dd>
+              <dt className="text-sm text-base-content-muted">{person(side)} ได้ยินว่า</dt>
+              <dd>{prose(row.theyHear)}</dd>
+              <dt className="text-sm text-base-content-muted">พูดแบบนี้แทน</dt>
+              <dd className="font-medium text-base-content">{prose(row.sayInstead)}</dd>
+            </dl>
+          ))}
+        </div>
       </div>
 
-      <div className="space-y-1">
-        <Label>ถาม {person(side)} แบบนี้</Label>
-        <ul className="list-disc pl-5 space-y-1 text-base-content-body leading-relaxed">
+      <div>
+        <div className={LABEL}>ถาม {person(side)} แบบนี้</div>
+        <ul className="mt-1 list-disc space-y-1 pl-5">
           {view.askThem.map(q => <li key={q}>{prose(q)}</li>)}
         </ul>
       </div>
 
-      <p className="pt-3 border-t border-base-border text-base-content-body leading-relaxed" data-other-side-note={reader}>
-        <span className="font-semibold text-base-content">{person(reader)} ควรทำ:</span> {prose(view.note)}
+      <p data-other-side-note={reader}>
+        <span className={LABEL}>{person(reader)} ควรทำ</span> {prose(view.note)}
       </p>
     </div>
   );
@@ -88,32 +79,31 @@ const SideViewCard: React.FC<{
 export const OtherSideSection: React.FC<SectionProps> = props => {
   const { chapter, ctx } = props;
   const { role, otherSideView, setOtherSideView } = ctx;
-  // The shown cards share one first-occurrence walk (spec P3.5), a pure function of the chapter and
-  // the switch. Never a `seen` set handed to the cards: they would mutate it during render.
-  const cards = useMemo(
+  // The shown views share one first-occurrence walk (spec P3.5), a pure function of the chapter and
+  // the switch. Never a `seen` set handed to the views: they would mutate it during render.
+  const views = useMemo(
     () => otherSideTerms(chapter, otherSideView === 'both' ? ROLES : [otherSideView]),
     [chapter, otherSideView],
   );
   if (!chapter.perspectives) return null;
   const heading = role ? `${ROLE_META[otherRole(role)].side} มองเรื่องนี้ยังไง` : 'สองฝั่งมองเรื่องนี้ยังไง';
+  const paired = views.length > 1;
 
   return (
     <SectionShell {...props} sectionKey="otherSide" title={heading}>
-        <div className="space-y-3.5">
-          <div data-other-side-switch>
-            <Tabs<OtherSideView>
-              variant="pills"
-              aria-label="เลือกฝั่งที่จะดู"
-              className="flex-wrap"
-              items={SWITCH_OPTIONS}
-              value={otherSideView}
-              onChange={setOtherSideView}
-            />
-          </div>
-          <div className={cards.length > 1 ? 'grid grid-cols-1 md:grid-cols-2 gap-3' : ''}>
-            {cards.map(view => <SideViewCard key={view.side} view={view} ctx={ctx} />)}
-          </div>
-        </div>
+      <div data-other-side-switch className="mb-5">
+        <Tabs<OtherSideView>
+          variant="underline"
+          size="md"
+          aria-label="เลือกฝั่งที่จะดู"
+          items={SWITCH_OPTIONS}
+          value={otherSideView}
+          onChange={setOtherSideView}
+        />
+      </div>
+      <div className={paired ? 'grid grid-cols-1 gap-x-10 gap-y-8 md:grid-cols-2' : ''}>
+        {views.map(view => <SideViewBody key={view.side} view={view} paired={paired} ctx={ctx} />)}
+      </div>
     </SectionShell>
   );
 };

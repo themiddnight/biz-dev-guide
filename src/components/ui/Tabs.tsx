@@ -14,7 +14,7 @@ export interface TabsProps<T extends string> {
   value: T;
   onChange: (value: T) => void;
   variant: 'segmented' | 'pills' | 'underline';
-  size?: 'xs' | 'sm';
+  size?: 'xs' | 'sm' | 'md';
   'aria-label': string;
   scroll?: boolean;
   /** With `scroll`: the fade colour, matching the surface behind the row (default base-100). */

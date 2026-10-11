@@ -26,7 +26,7 @@ describe('CoreConceptsSection', () => {
     const html = render('s9', 'beginner');
     expect(html).toContain('15–20%');
     expect(s9cc1.bulletPoints).toHaveLength(4);
-    expect(html).toContain('ดูรายละเอียด (4 ข้อ)');
+    expect(html).toContain('ดูรายละเอียด 4 ข้อ');
     expect(html).toContain('data-concept-more="0"');
     expect(html).toContain('aria-expanded="false"');
     expect(html).not.toContain(firstBullet);
@@ -40,7 +40,7 @@ describe('CoreConceptsSection', () => {
 
   it('beginner s5: inline figure hidden behind the concept toggle', () => {
     const html = render('s5', 'beginner');
-    expect(html).toContain('ดูรายละเอียด (4 ข้อ)');
+    expect(html).toContain('ดูรายละเอียด 4 ข้อ');
     expect(html).not.toContain('data-inline-figure');
     expect(render('s5', 'experienced')).toContain('data-inline-figure');
   });

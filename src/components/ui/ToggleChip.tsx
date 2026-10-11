@@ -11,7 +11,7 @@ import type { Tap } from './types';
 export interface ToggleChipProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'color'> {
   selected: boolean;
   shape?: 'chip' | 'pill' | 'segment' | 'tab' | 'card';
-  size?: 'xs' | 'sm';
+  size?: 'xs' | 'sm' | 'md';
   selectedStyle?: 'soft' | 'solid';
   tap?: Tap;
 }
@@ -29,6 +29,7 @@ const SHAPE: Record<NonNullable<ToggleChipProps['shape']>, string> = {
 const SIZE: Record<NonNullable<ToggleChipProps['size']>, string> = {
   xs: 'px-2 py-1 text-xs',
   sm: 'px-3 py-1.5 text-xs',
+  md: 'px-3 py-2 text-sm',
 };
 
 function tone(selected: boolean, shape: NonNullable<ToggleChipProps['shape']>, selectedStyle: NonNullable<ToggleChipProps['selectedStyle']>): string {

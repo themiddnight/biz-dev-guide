@@ -16,18 +16,19 @@ describe('PitfallsSection warning sign (spec A1)', () => {
   it('shows pitfall, then the labelled warning sign, then the solution', () => {
     const html = render(s1);
     const pitfall = html.indexOf(first.pitfall);
-    const label = html.indexOf('อาการเตือน:');
+    const label = html.indexOf('>อาการเตือน</span>');
     const symptom = html.indexOf(first.symptom!, label);
     const solution = html.indexOf(first.solution);
     expect(pitfall).toBeGreaterThan(0);
     expect(label).toBeGreaterThan(pitfall);
     expect(symptom).toBeGreaterThan(label);
     expect(solution).toBeGreaterThan(symptom);
+    expect(html.slice(symptom, solution)).toContain('>ทางแก้</span>');
   });
 
   it('renders one warning sign per pitfall that has a symptom', () => {
     const withSymptoms = s1.commonPitfalls!.filter(p => p.symptom).length;
-    expect(render(s1).match(/อาการเตือน:/g)).toHaveLength(withSymptoms);
+    expect(render(s1).match(/>อาการเตือน<\/span>/g)).toHaveLength(withSymptoms);
   });
 
   it('omits the label and the line when a pitfall has no symptom', () => {
@@ -44,7 +45,7 @@ describe('PitfallsSection warning sign (spec A1)', () => {
       commonPitfalls: [first, { pitfall: second.pitfall, solution: second.solution }],
     };
     const html = render(mixed);
-    expect(html.match(/อาการเตือน:/g)).toHaveLength(1);
+    expect(html.match(/>อาการเตือน<\/span>/g)).toHaveLength(1);
     expect(html).toContain(first.symptom!);
   });
 

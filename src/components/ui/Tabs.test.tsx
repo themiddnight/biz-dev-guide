@@ -40,7 +40,7 @@ describe('ToggleChip', () => {
   });
 
   it('every shape, size and tap carries a tap ring', () => {
-    for (const shape of SHAPES) for (const size of ['xs', 'sm'] as const) for (const tap of TAPS)
+    for (const shape of SHAPES) for (const size of ['xs', 'sm', 'md'] as const) for (const tap of TAPS)
       expect(hasRing(chipClass({ selected: false, shape, size, tap })), `${shape} ${size} ${tap}`).toBe(true);
   });
 

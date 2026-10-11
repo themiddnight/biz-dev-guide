@@ -22,53 +22,39 @@ export const CoreConceptsSection: React.FC<SectionProps> = props => {
   );
   return (
     <SectionShell {...props} sectionKey="coreConcepts" note={`${chapter.coreConcepts.length} หัวข้อ`}>
-        <div className="space-y-3.5">
-          {chapter.coreConcepts.map((concept, cIdx) => {
-            const inline = getInlineSectionsAt(chapter, 'coreConcepts', cIdx);
-            const bulletCount = concept.bulletPoints?.length ?? 0;
-            const hasMore = bulletCount > 0 || inline.length > 0;
-            const showMore = !compact || !!moreOpen[cIdx];
-            return (
-            <React.Fragment key={cIdx}>
-              <div
-                className="p-box-dense rounded-xl bg-base-300 border border-base-border space-y-2"
-              >
-                <div className="text-xs sm:text-sm font-bold text-base-content flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-base-content inline-block"></span>
-                  <span>{concept.heading}</span>
-                </div>
-                <p data-concept-detail={cIdx} className="text-xs sm:text-sm text-base-content-secondary leading-relaxed pl-3 font-normal">
-                  {prose(marked[cIdx].detail)}
-                </p>
-                {compact && hasMore && (
-                  <button
-                    type="button"
-                    data-concept-more={cIdx}
-                    aria-expanded={!!moreOpen[cIdx]}
-                    onClick={() => setMore({ chapterId: chapter.id, open: { ...moreOpen, [cIdx]: !moreOpen[cIdx] } })}
-                    className="ml-3 -my-3.5 py-3.5 sm:my-0 sm:py-0 inline-flex items-center gap-1 text-[11px] sm:text-xs font-semibold text-base-content-body underline underline-offset-2 hover:text-base-content cursor-pointer"
-                  >
-                    {moreOpen[cIdx] ? 'ซ่อนรายละเอียด' : bulletCount > 0 ? `ดูรายละเอียด (${bulletCount} ข้อ)` : 'ดูรายละเอียด'}
-                  </button>
-                )}
-                {showMore && concept.bulletPoints && concept.bulletPoints.length > 0 && (
-                  <ul className="pt-1 pl-7 space-y-1.5 list-disc text-xs sm:text-sm text-base-content-secondary font-normal">
-                    {concept.bulletPoints.map((_, bpIdx) => (
-                      <li key={bpIdx} className="leading-relaxed">{prose(marked[cIdx].bulletPoints[bpIdx])}</li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-              {showMore && (
-                <InlineSections
-                  sections={inline}
-                  onNavigateChapter={ctx.onNavigateChapter}
-                />
+      <div className="space-y-6">
+        {chapter.coreConcepts.map((concept, cIdx) => {
+          const inline = getInlineSectionsAt(chapter, 'coreConcepts', cIdx);
+          const bulletCount = concept.bulletPoints?.length ?? 0;
+          const hasMore = bulletCount > 0 || inline.length > 0;
+          const showMore = !compact || !!moreOpen[cIdx];
+          return (
+            <div key={cIdx}>
+              <h3 className="font-semibold text-base-content">{concept.heading}</h3>
+              <p data-concept-detail={cIdx} className="mt-1">{prose(marked[cIdx].detail)}</p>
+              {compact && hasMore && (
+                <button
+                  type="button"
+                  data-concept-more={cIdx}
+                  aria-expanded={!!moreOpen[cIdx]}
+                  onClick={() => setMore({ chapterId: chapter.id, open: { ...moreOpen, [cIdx]: !moreOpen[cIdx] } })}
+                  className="-my-3.5 py-3.5 sm:my-0 sm:py-0 mt-1 cursor-pointer text-sm text-base-content-muted underline decoration-base-border underline-offset-4 hover:text-base-content"
+                >
+                  {moreOpen[cIdx] ? 'พับเก็บ' : bulletCount > 0 ? `ดูรายละเอียด ${bulletCount} ข้อ` : 'ดูรายละเอียด'}
+                </button>
               )}
-            </React.Fragment>
-            );
-          })}
-        </div>
+              {showMore && bulletCount > 0 && (
+                <ul className="mt-2 list-disc space-y-1 pl-5">
+                  {marked[cIdx].bulletPoints.map((point, bpIdx) => <li key={bpIdx}>{prose(point)}</li>)}
+                </ul>
+              )}
+              {showMore && (
+                <InlineSections className="mt-4" sections={inline} onNavigateChapter={ctx.onNavigateChapter} />
+              )}
+            </div>
+          );
+        })}
+      </div>
     </SectionShell>
   );
 };

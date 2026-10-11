@@ -37,11 +37,12 @@ describe('OtherSideSection', () => {
     expect(html).toContain('ฝั่ง Business มองเรื่องนี้ยังไง');
     expect(textOf(html)).toContain(esc(p.biz.measuredBy));
     expect(textOf(html)).not.toContain(esc(p.eng.measuredBy));
-    expect(html).toContain('Business ถูกวัดผลด้วย');
-    expect(html).toContain('Dev พูด:');
-    expect(html).toContain('Business ได้ยินว่า:');
+    expect(html).toContain('>ผลงานของ Business วัดจาก</span>');
+    expect(html).toContain('>Dev พูด</dt>');
+    expect(html).toContain('>Business ได้ยินว่า</dt>');
+    expect(html).toContain('>พูดแบบนี้แทน</dt>');
     expect(html).toContain('ถาม Business แบบนี้');
-    expect(html).toContain('Dev ควรทำ:');
+    expect(html).toContain('>Dev ควรทำ</span>');
     expect(html).toContain(esc(s9.engineerNote));
     expect(html).not.toContain(esc(s9.businessNote));
   });
@@ -51,7 +52,7 @@ describe('OtherSideSection', () => {
     expect(html).toContain('ฝั่ง Engineering มองเรื่องนี้ยังไง');
     expect(textOf(html)).toContain(esc(p.eng.measuredBy));
     expect(textOf(html)).not.toContain(esc(p.biz.measuredBy));
-    expect(html).toContain('Business ควรทำ:');
+    expect(html).toContain('>Business ควรทำ</span>');
     expect(html).toContain(esc(s9.businessNote));
   });
 
@@ -70,6 +71,11 @@ describe('OtherSideSection', () => {
     expect(html).toContain('ทั้งสองฝั่ง');
     expect(html.match(/aria-pressed="true"/g)).toHaveLength(1);
     expect(html.match(/aria-pressed="false"/g)).toHaveLength(2);
+  });
+
+  it('names each side above its view only when both are shown', () => {
+    expect(render(null, 'both').match(/<h3[^>]*>(ฝั่ง Business|ฝั่ง Engineering)<\/h3>/g)).toHaveLength(2);
+    expect(render('eng', 'biz')).not.toContain('<h3');
   });
 
   it('keeps the heading visible when collapsed', () => {

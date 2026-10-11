@@ -62,12 +62,12 @@ describe('term markers survive a StrictMode double render', () => {
     expect(renderToStaticMarkup(<Probe />)).toBe('<b>2</b>');
   });
 
-  it('s18, eng reader: the "Business ถูกวัดผลด้วย" card marks KR and KPI (acceptance 2)', () => {
+  it('s18, eng reader: the line on how Business is measured marks KR and KPI (acceptance 2)', () => {
     const chapter = CHAPTERS.find(c => c.id === 's18')!;
     const html = renderToStaticMarkup(
       <OtherSideSection chapter={chapter} fold={CORE} ctx={ctxFor({ role: 'eng', otherSideView: 'biz' })} />,
     );
-    const measuredBy = /ถูกวัดผลด้วย<\/div><p[^>]*>(.*?)<\/p>/.exec(html)?.[1] ?? '';
+    const measuredBy = /<p><span[^>]*data-measured-by[^>]*>.*?<\/span>(.*?)<\/p>/.exec(html)?.[1] ?? '';
     expect(rendered(measuredBy)).toEqual(['kr', 'okr-kpi']);
   });
 
