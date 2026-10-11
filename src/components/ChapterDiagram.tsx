@@ -3,8 +3,8 @@ import { ProtocolSimulator } from './ProtocolSimulator';
 import { ArrowDown, ArrowRight, Layers, Shield, Database, Smartphone, Globe, Server, CheckCircle2, AlertTriangle, GitBranch, TrendingUp, Flame, Sliders, FileText, Bot, Lock, Gauge, HelpCircle, Eye, Activity, Play, RotateCcw, Send, Check, Compass, FileCode2, Users, AlertCircle } from 'lucide-react';
 import { TAP, TAP_Y } from './ui/tapTarget';
 import { DISCLOSURE_SUMMARY, DisclosureChevron } from './ui/Disclosure';
-import { Tabs } from './ui/Tabs';
-import { ToggleChip } from './ui/ToggleChip';
+import { TABS_LAYOUT } from './ui/Tabs';
+import { chipClass } from './ui/ToggleChip';
 
 interface ChapterDiagramProps {
   chapterId: string;
@@ -32,11 +32,17 @@ const WidgetHead: React.FC<{ title: string; hint?: string; children?: React.Reac
 
 /** A toggle whose state is written out, so colour never carries it alone. */
 const SwitchChip: React.FC<{ label: string; on: boolean; onToggle: () => void }> = ({ label, on, onToggle }) => (
-  <ToggleChip selected={on} size="md" onClick={onToggle}>
+  <button type="button" aria-pressed={on} onClick={onToggle} className={chipClass({ selected: on, size: 'md' })}>
     {label}
     <span className="text-base-content-muted">{on ? 'เปิด' : 'ปิด'}</span>
-  </ToggleChip>
+  </button>
 );
+
+/** A group of switch buttons joined into one segmented control. */
+const Segmented: React.FC<{ label: string; children: React.ReactNode }> = ({ label, children }) => (
+  <div role="group" aria-label={label} className={TABS_LAYOUT.segmented.group}>{children}</div>
+);
+const segment = (selected: boolean) => ({ selected, shape: 'segment', size: 'md', tap: 'y' }) as const;
 
 type Tone = 'success' | 'warning' | 'error';
 const DOT: Record<Tone, string> = { success: 'bg-success', warning: 'bg-warning', error: 'bg-error' };
@@ -376,191 +382,149 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
   // CHAPTER 5: Monolith vs Microservices & API Gateway (failure blast radius)
   // =========================================================================
   if (chapterId === 's5') {
-    const svcOk = 'bg-base-100 border-success/25';
+    const services = [
+      { name: 'User Service', ok: 'ล็อกอินได้' },
+      { name: 'Catalog Service', ok: 'ค้นหาสินค้าได้' },
+      { name: 'Order Service', ok: 'สั่งซื้อได้' },
+      { name: 'Payment Service', ok: 'ตัดบัตรได้' },
+      { name: 'Inventory Service', ok: 'เช็คสต็อกได้' },
+    ];
+    const monolithCells = ['1. จัดการสมาชิก', '2. สั่งสินค้า', '3. Payment ตัดบัตร', '4. ตัดสต็อก'];
     return (
-      <div className="space-y-4">
-        <div className="p-box-dense rounded-box bg-base-100 border border-base-border space-y-4">
-          <div className="flex items-center justify-between flex-wrap gap-2">
-            <div className="flex items-center gap-2">
-              <span className="text-base">🧩</span>
-              <div>
-                <h4 className="text-xs sm:text-sm font-bold text-base-content">
-                  Monolith vs Microservices: เมื่อ Payment ล่ม
-                </h4>
-                <p className="text-[11px] text-base-content-muted">
-                  ลองทำให้ส่วนตัดเงินพัง แล้วดูว่าแต่ละแบบเสียหายกว้างแค่ไหน
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <div className="flex rounded-xl bg-base-300 p-1">
+      <div className="space-y-6">
+        <div className={FRAME}>
+          <WidgetHead
+            title="Monolith กับ Microservices เมื่อ Payment ล่ม"
+            hint="ลองทำให้ส่วนตัดเงินพัง แล้วดูว่าแต่ละแบบเสียหายกว้างแค่ไหน"
+          >
+            <div className="flex flex-wrap items-center gap-3">
+              <Segmented label="รูปแบบสถาปัตยกรรม">
                 <button
+                  type="button"
+                  aria-pressed={archMode === 'monolith'}
                   onClick={() => { setArchMode('monolith'); setPaymentFailed(false); }}
-                  className={`${TAP} px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                    archMode === 'monolith' ? 'bg-engineer text-engineer-content shadow-xs' : 'text-base-content-secondary'
-                  }`}
+                  className={chipClass(segment(archMode === 'monolith'))}
                 >
-                  1. Monolith
+                  Monolith
                 </button>
                 <button
+                  type="button"
+                  aria-pressed={archMode === 'microservices'}
                   onClick={() => { setArchMode('microservices'); setPaymentFailed(false); }}
-                  className={`${TAP} px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                    archMode === 'microservices' ? 'bg-engineer text-engineer-content shadow-xs' : 'text-base-content-secondary'
-                  }`}
+                  className={chipClass(segment(archMode === 'microservices'))}
                 >
-                  2. Microservices
+                  Microservices
                 </button>
-              </div>
-
+              </Segmented>
               <button
+                type="button"
+                aria-pressed={paymentFailed}
                 onClick={() => setPaymentFailed(!paymentFailed)}
-                className={`${TAP} px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                  paymentFailed 
-                    ? 'bg-error text-error-content shadow-xs' 
-                    : 'bg-base-300 text-base-content-body hover:bg-base-border'
-                }`}
+                className={chipClass({ selected: paymentFailed, size: 'md' })}
               >
-                {paymentFailed ? '↺ กู้ Payment กลับมา' : '⚡ จำลอง Payment ล่ม'}
+                {paymentFailed ? 'กู้ Payment กลับมา' : 'จำลอง Payment ล่ม'}
               </button>
             </div>
-          </div>
+          </WidgetHead>
 
-          {/* Architecture Display */}
+          {/* Architecture display */}
           {archMode === 'monolith' ? (
-            <div className={`p-4 rounded-box border transition-all ${
-              paymentFailed 
-                ? 'bg-error/10 border-error text-error' 
-                : 'bg-base-300 border-base-border'
-            }`}>
-              <div className="flex justify-between items-center mb-3 gap-2 flex-wrap">
-                <span className="font-bold text-xs uppercase tracking-wider text-base-content-muted">
-                  Monolith: แอปก้อนเดียว Deploy ก้อนเดียว
-                </span>
+            <div className="space-y-3" aria-live="polite">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span className="font-semibold text-base-content">Monolith คือแอปก้อนเดียว Deploy ก้อนเดียว</span>
                 {paymentFailed ? (
-                  <span className="px-2 py-0.5 rounded bg-error text-error-content text-[10px] font-bold">
-                    💥 Deploy ก้อนเดียว พังพร้อมกันทั้งระบบ
-                  </span>
+                  <StatusWord tone="error">Deploy ก้อนเดียว พังพร้อมกันทั้งระบบ</StatusWord>
                 ) : (
-                  <span className="px-2 py-0.5 rounded bg-success/10 text-success text-[10px] font-bold">
-                    ● ระบบทำงานปกติ
-                  </span>
+                  <StatusWord tone="success">ระบบทำงานปกติ</StatusWord>
                 )}
               </div>
 
-              <div className="p-4 rounded-xl border border-dashed border-base-border-strong bg-base-100/90 text-center space-y-2">
-                <div className="text-xs font-bold text-base-content">
-                  📦 Monolith Application (User + Order + Payment + Inventory อยู่ในโปรแกรมเดียวกัน)
-                </div>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] pt-1">
-                  <div className={`p-2 rounded-lg ${paymentFailed ? 'bg-error/10 text-error' : 'bg-base-300'}`}>
-                    1. จัดการสมาชิก
-                  </div>
-                  <div className={`p-2 rounded-lg ${paymentFailed ? 'bg-error/10 text-error' : 'bg-base-300'}`}>
-                    2. สั่งสินค้า
-                  </div>
-                  <div className={`p-2 rounded-lg font-bold ${paymentFailed ? 'bg-error text-error-content animate-pulse' : 'bg-warning/10 text-warning'}`}>
-                    3. ตัดบัตร (Payment) {paymentFailed && '🔥 ล่ม'}
-                  </div>
-                  <div className={`p-2 rounded-lg ${paymentFailed ? 'bg-error/10 text-error' : 'bg-base-300'}`}>
-                    4. ตัดสต็อก
-                  </div>
+              <div className="space-y-3 rounded-field border border-dashed border-base-border-strong p-3 text-center">
+                <p className="text-sm font-semibold text-base-content">
+                  Monolith Application (User, Order, Payment และ Inventory อยู่ในโปรแกรมเดียวกัน)
+                </p>
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                  {monolithCells.map((cell, i) => {
+                    const isPayment = i === 2;
+                    return (
+                      <div
+                        key={cell}
+                        className={`rounded-field border p-2 text-sm ${paymentFailed ? 'border-error' : 'border-base-border'} ${isPayment ? 'font-semibold text-base-content' : ''}`}
+                      >
+                        {cell}
+                        {paymentFailed && (
+                          <span className="block text-[13px] font-semibold text-error">{isPayment ? 'ล่ม' : 'ดับตาม'}</span>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
-              <p className="text-[11px] text-base-content-muted mt-2">
-                {paymentFailed 
-                  ? '⚠️ ผลกระทบ: โค้ดตัดบัตรมี Memory Leak จนโปรแกรมทั้งก้อนดับ ลูกค้าล็อกอินหรือดูสินค้าไม่ได้เลย' 
-                  : '💡 จุดเด่น: สร้างง่าย ส่งของได้เร็วช่วงแรก แต่ส่วนหนึ่งพังอาจลากทั้งระบบลงไปด้วย'}
+              <p>
+                {paymentFailed
+                  ? <><span className="font-semibold text-error">ผลกระทบ</span> โค้ดตัดบัตรมี Memory Leak จนโปรแกรมทั้งก้อนดับ ลูกค้าล็อกอินหรือดูสินค้าไม่ได้เลย</>
+                  : <><span className="font-semibold text-base-content">จุดเด่น</span> สร้างง่าย ส่งของได้เร็วช่วงแรก แต่ส่วนหนึ่งพังอาจลากทั้งระบบลงไปด้วย</>}
               </p>
             </div>
           ) : (
-            <div className="p-4 rounded-box bg-base-300 border border-base-border space-y-3">
-              <div className="flex justify-between items-center gap-2 flex-wrap">
-                <span className="font-bold text-xs uppercase tracking-wider text-engineer">
-                  Microservices &amp; API Gateway
-                </span>
+            <div className="space-y-3" aria-live="polite">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span className="font-semibold text-base-content">Microservices และ API Gateway</span>
                 {paymentFailed ? (
-                  <span className="px-2 py-0.5 rounded bg-warning text-warning-content text-[10px] font-bold">
-                    ⚠️ เสียบางส่วน: ดูสินค้าได้ แต่จ่ายเงินไม่ได้
-                  </span>
+                  <span className="text-sm"><StatusWord tone="warning">เสียบางส่วน</StatusWord> ดูสินค้าได้ แต่จ่ายเงินไม่ได้</span>
                 ) : (
-                  <span className="px-2 py-0.5 rounded bg-success/10 text-success text-[10px] font-bold">
-                    ● ทุก Service ทำงานปกติ
-                  </span>
+                  <StatusWord tone="success">ทุก Service ทำงานปกติ</StatusWord>
                 )}
               </div>
 
               {/* API Gateway */}
-              <div className="p-2.5 rounded-xl bg-data-2 text-data-content text-center text-xs font-bold shadow-xs">
-                🚪 API Gateway (ประตูเดียวรับคำขอจาก Mobile/Web ส่งต่อให้แต่ละ Service และตรวจ Rate Limit)
+              <div className="rounded-field border border-base-border-strong p-3 text-center">
+                <p className="font-semibold text-base-content">API Gateway</p>
+                <p className="text-sm text-base-content-secondary">ประตูเดียวรับคำขอจาก Mobile/Web ส่งต่อให้แต่ละ Service และตรวจ Rate Limit</p>
               </div>
 
               {/* Independent services */}
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
-                <div className={`p-3 rounded-xl border text-center space-y-1 ${svcOk}`}>
-                  <span className="text-base">👤</span>
-                  <div className="font-bold text-success">User Service</div>
-                  <span className="text-[10px] text-success">● ล็อกอินได้</span>
-                </div>
-
-                <div className={`p-3 rounded-xl border text-center space-y-1 ${svcOk}`}>
-                  <span className="text-base">📋</span>
-                  <div className="font-bold text-success">Catalog Service</div>
-                  <span className="text-[10px] text-success">● ค้นหาสินค้าได้</span>
-                </div>
-
-                <div className={`p-3 rounded-xl border text-center space-y-1 transition-all ${
-                  paymentFailed
-                    ? 'bg-warning/10 border-warning text-warning'
-                    : svcOk
-                }`}>
-                  <span className="text-base">🛒</span>
-                  <div className={`font-bold ${paymentFailed ? '' : 'text-success'}`}>Order Service</div>
-                  {paymentFailed ? (
-                    <span className="text-[10px] text-warning font-bold">◐ ทำงานบางส่วน (จ่ายเงินไม่ได้ชั่วคราว)</span>
-                  ) : (
-                    <span className="text-[10px] text-success">● สั่งซื้อได้</span>
-                  )}
-                </div>
-
-                <div className={`p-3 rounded-xl border text-center space-y-1 transition-all ${
-                  paymentFailed 
-                    ? 'bg-error/10 border-error text-error' 
-                    : svcOk
-                }`}>
-                  <span className="text-base">💳</span>
-                  <div className={`font-bold ${paymentFailed ? '' : 'text-success'}`}>Payment Service</div>
-                  {paymentFailed ? (
-                    <span className="text-[10px] text-error font-bold">🔥 ล่ม</span>
-                  ) : (
-                    <span className="text-[10px] text-success">● ตัดบัตรได้</span>
-                  )}
-                </div>
-
-                <div className={`p-3 rounded-xl border text-center space-y-1 col-span-2 sm:col-span-1 ${svcOk}`}>
-                  <span className="text-base">📦</span>
-                  <div className="font-bold text-success">Inventory Service</div>
-                  <span className="text-[10px] text-success">● เช็คสต็อกได้</span>
-                </div>
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
+                {services.map((svc, i) => {
+                  const isPayment = i === 3;
+                  const isOrder = i === 2;
+                  const border = paymentFailed && isPayment ? 'border-error' : paymentFailed && isOrder ? 'border-warning' : 'border-base-border';
+                  return (
+                    <div
+                      key={svc.name}
+                      className={`rounded-field border p-3 text-center ${border} ${i === 4 ? 'col-span-2 sm:col-span-1' : ''}`}
+                    >
+                      <div className="text-sm font-semibold text-base-content">{svc.name}</div>
+                      <div className="mt-0.5 text-[13px] leading-5">
+                        {paymentFailed && isPayment ? (
+                          <StatusWord tone="error">ล่ม</StatusWord>
+                        ) : paymentFailed && isOrder ? (
+                          <StatusWord tone="warning">ทำงานบางส่วน (จ่ายเงินไม่ได้ชั่วคราว)</StatusWord>
+                        ) : (
+                          <StatusWord tone="success">{svc.ok}</StatusWord>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
 
-              <p className="text-[11px] text-base-content-muted">
-                {paymentFailed 
-                  ? '✅ บทเรียน: Payment ล่ม แต่ลูกค้ายังล็อกอิน ค้นหา และหยิบใส่ตะกร้าได้ ขั้นจ่ายเงินเท่านั้นที่ต้องรอ ทีมต้องออกแบบไว้ล่วงหน้าว่าช่วงนั้นจะบอกลูกค้าอย่างไร' 
-                  : '💡 สิ่งที่ต้องแลก: Microservices ซับซ้อนกว่าและต้นทุนดูแลสูงกว่า จึงคุ้มเมื่อระบบและทีมเริ่มใหญ่'}
+              <p>
+                {paymentFailed
+                  ? <><span className="font-semibold text-success">บทเรียน</span> Payment ล่ม แต่ลูกค้ายังล็อกอิน ค้นหา และหยิบใส่ตะกร้าได้ ขั้นจ่ายเงินเท่านั้นที่ต้องรอ ทีมต้องออกแบบไว้ล่วงหน้าว่าช่วงนั้นจะบอกลูกค้าอย่างไร</>
+                  : <><span className="font-semibold text-base-content">สิ่งที่ต้องแลก</span> Microservices ซับซ้อนกว่าและต้นทุนดูแลสูงกว่า จึงคุ้มเมื่อระบบและทีมเริ่มใหญ่</>}
               </p>
             </div>
           )}
         </div>
+
         {/* Sync vs Async simulator (moved from former chapter 15 diagram), closed by default */}
-        <details className="group rounded-box bg-base-100 border border-base-border overflow-hidden">
-          <summary className={DISCLOSURE_SUMMARY}>
-            <span className="text-xs sm:text-sm font-bold text-base-content">
-              Sync vs Async: Polling / Webhook / WebSocket
-            </span>
+        <details className="group border-y border-base-border">
+          <summary className={FOLD_SUMMARY}>
+            <span className={TITLE}>ลองเทียบ Polling, Webhook และ WebSocket</span>
             <DisclosureChevron />
           </summary>
-          <div className="p-box-dense border-t border-base-border">
+          <div className="pb-4">
             <ProtocolSimulator />
           </div>
         </details>
@@ -680,14 +644,19 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-            <Tabs<string>
-              variant="segmented"
-              size="md"
-              aria-label="สัดส่วน Traffic ไปเวอร์ชันใหม่"
-              items={[5, 10, 25, 50, 100].map(pct => ({ value: String(pct), label: `${pct}%` }))}
-              value={String(canaryPercent)}
-              onChange={v => setCanaryPercent(Number(v))}
-            />
+            <Segmented label="สัดส่วน Traffic ไปเวอร์ชันใหม่">
+              {[5, 10, 25, 50, 100].map(pct => (
+                <button
+                  key={pct}
+                  type="button"
+                  aria-pressed={canaryPercent === pct}
+                  onClick={() => setCanaryPercent(pct)}
+                  className={chipClass(segment(canaryPercent === pct))}
+                >
+                  {pct}%
+                </button>
+              ))}
+            </Segmented>
             <span className={`${HINT} max-w-md`}>
               {canaryPercent < 100 ? 'ถ้าตัวชี้วัดเกินเกณฑ์ ระบบ Rollback อัตโนมัติ (เร็วแค่ไหนขึ้นกับว่าเช็กตัวชี้วัดถี่แค่ไหน)' : 'ปล่อยครบแล้ว ปลอดภัยเพราะทุกขั้นก่อนหน้าผ่านเกณฑ์'}
             </span>
