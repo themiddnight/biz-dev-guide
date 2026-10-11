@@ -22,7 +22,7 @@ const HEADER_H = 24;
 const LABEL_X = 10;
 const VALUE_X = W - 8; // right-aligned money
 const ZERO_X = 162;
-const SCALE = 0.058; // user units per baht: 1,290 → 75 right of zero, 900 → 52 left of it
+const SCALE = 0.058; // user units per baht: 1,290 → 75 right of zero
 const ROWS_Y = 32;
 const ROW_H = 26;
 const BAR_H = 14;
@@ -64,7 +64,7 @@ const Page: React.FC<{ children: React.ReactNode }> = ({ children }) => (
     <text x={LABEL_X} y={16} fontSize="10" fontWeight="700" fill="var(--fig-text)">
       #A1024 หูฟังไร้สาย ฿1,290
     </text>
-    <text x={W - LABEL_X} y={16} textAnchor="end" fontSize="10" fill="var(--fig-text-muted)">
+    <text x={W - LABEL_X} y={16} textAnchor="end" fontSize="10" fill="var(--fig-text-2)">
       ตัวเลขสมมติ
     </text>
     <path
@@ -99,7 +99,7 @@ const Line: React.FC<{ row: Row; index: number; ghost?: boolean }> = ({ row, ind
             stroke="var(--fig-text-muted)"
             strokeDasharray="4 3"
           />
-          <text x={ZERO_X + 5} y={mid + 3.5} fontSize="10" fill="var(--fig-text-muted)">
+          <text x={ZERO_X + 5} y={mid + 3.5} fontSize="10" fill="var(--fig-text-2)">
             คืนลูกค้าแล้ว
           </text>
         </>
@@ -140,7 +140,7 @@ const Result: React.FC<{ tone: 'ok' | 'warn'; text: string }> = ({ tone, text })
   const width = W - 16;
   const glyph = 12;
   const gap = 5;
-  const group = glyph + gap + estimateTextWidth(text) * 1.08; // bold runs wider than the regular estimate
+  const group = glyph + gap + estimateTextWidth(text);
   const gx = x + (width - group) / 2;
   const cy = RESULT_Y + RESULT_H / 2;
   return (

@@ -9,7 +9,7 @@ import { Chip, WarnBang } from './shared/glyphs';
  * Each panel is viewBox 0 0 300 200 (2-up at container ≥ 640px ≈ 314px wide, stacked at a 375px
  * viewport ≈ 317px, so fontSize 10 never renders under 10px). The Sprint frame has the same size and
  * slots in both panels: the request swaps places with the automatic refund system, which leaves the
- * Sprint for the lane under it. Layout (user units): frame 1–112 · arrow 112–132 · lane 138–198.
+ * Sprint for the lane under it. Layout (user units): frame 1–112 · arrow 116–156 · lane card 160–192.
  * Status is glyph + text, never colour alone. Panel labels and notes are HTML.
  */
 

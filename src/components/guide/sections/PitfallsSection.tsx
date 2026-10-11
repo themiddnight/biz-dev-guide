@@ -40,7 +40,7 @@ export const PitfallsSection: React.FC<SectionProps> = ({ chapter, isOpen, onTog
               </div>
               {cp.symptom && (
                 <div className="pl-5 text-base-content-body leading-relaxed text-xs">
-                  <span className="font-bold text-warning">👀 อาการเตือน: </span>
+                  <span className="font-bold text-base-content">👀 อาการเตือน: </span>
                   <span>{cp.symptom}</span>
                 </div>
               )}

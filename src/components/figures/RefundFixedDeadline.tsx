@@ -45,7 +45,7 @@ const FLAG_TEXT = '11.11 เลื่อนไม่ได้';
 
 /** Frame, header, the week strip, and the locked date flag with its line down to the work bar. */
 const Calendar: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const flagW = Math.ceil(estimateTextWidth(FLAG_TEXT)) + 38;
+  const flagW = Math.ceil(estimateTextWidth(FLAG_TEXT) * 0.75) + 34 // digits and a bold short string run narrower than the estimate;
   return (
     <>
       <rect x={1} y={1} width={W - 2} height={H - 2} rx={6} fill="var(--fig-bg)" stroke="var(--fig-border)" />
@@ -53,7 +53,7 @@ const Calendar: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       <text x={X0} y={16} fontSize="10" fontWeight="700" fill="var(--fig-text)">
         ปฏิทินแคมเปญ · นับจากวันนี้
       </text>
-      <text x={W - X0} y={16} textAnchor="end" fontSize="10" fill="var(--fig-text-muted)">
+      <text x={W - X0} y={16} textAnchor="end" fontSize="10" fill="var(--fig-text-2)">
         สัปดาห์
       </text>
 
@@ -99,7 +99,7 @@ const Result: React.FC<{ tone: 'ok' | 'warn'; text: string }> = ({ tone, text })
   const width = W - 16;
   const glyph = 12;
   const gap = 5;
-  const group = glyph + gap + estimateTextWidth(text) * 1.08; // bold runs wider than the regular estimate
+  const group = glyph + gap + estimateTextWidth(text);
   const gx = x + (width - group) / 2;
   const cy = RESULT_Y + RESULT_H / 2;
   return (
@@ -190,7 +190,7 @@ const CutScope: React.FC = () => (
       stroke="var(--fig-text-muted)"
       strokeDasharray="4 3"
     />
-    <text x={DATE_X + 8} y={BAR_Y + 16} fontSize="10" fill="var(--fig-text-muted)">
+    <text x={DATE_X + 8} y={BAR_Y + 16} fontSize="10" fill="var(--fig-text-2)">
       ตามมาทีหลัง
     </text>
     <text x={DATE_X + 4} y={BAR_Y + BAR_H + 18} fontSize="10" fill="var(--fig-text-2)">
@@ -205,7 +205,7 @@ const PANELS: FigurePanel[] = [
     label: 'ก่อน: ทำครบชุด',
     note: 'ทั้งชุดใช้ราว 5 สัปดาห์ แต่เหลือ 3 และวันเปิดขายขยับไม่ได้',
     title: 'ปฏิทินแคมเปญ 11.11 ที่ทำระบบคืนเงินอัตโนมัติครบชุด',
-    desc: 'ปฏิทินแคมเปญนับเป็นสัปดาห์ 6 ช่อง เส้นล็อกวัน 11.11 เลื่อนไม่ได้อยู่หลังสัปดาห์ที่ 3 แถบงานระบบอัตโนมัติครบชุดยาวถึงสัปดาห์ที่ 5 ส่วนที่เกินเส้นวันเป็นสีเหลืองพร้อมเครื่องหมายตกใจและคำว่าเกินวัน ต้องการอีก 2 สัปดาห์ สรุปว่าไม่ทันวันเปิดขาย',
+    desc: 'ปฏิทินแคมเปญนับเป็นสัปดาห์ 6 ช่อง เส้นล็อกวัน 11.11 เลื่อนไม่ได้อยู่หลังสัปดาห์ที่ 3 แถบงานระบบอัตโนมัติครบชุดยาวถึงสัปดาห์ที่ 5 ส่วนที่เกินเส้นวันมีเครื่องหมายตกใจและคำว่าเกินวัน ต้องการอีก 2 สัปดาห์ สรุปว่าไม่ทันวันเปิดขาย',
     viewBox: `0 0 ${W} ${H}`,
     Screen: FullScope,
   },

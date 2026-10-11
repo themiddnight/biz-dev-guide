@@ -24,8 +24,8 @@ import { termPattern } from '../data/termInventory';
  *   lines, and `diagramDescription` — it renders inside the diagram section's toggle `<button>`, and
  *   a term button cannot nest inside another button.
  *
- * A glossary key that means something else in one string (`Pipeline` in "Leaky Pipeline", `L1`–`L3`
- * as C4 zoom levels) is opted out in that string with `[[!g:id]]` (guardrail 7), not excluded here.
+ * A glossary key that means something else in one string (`Pipeline` in "Leaky Pipeline") is opted
+ * out in that string with `[[!g:id]]` (guardrail 7), not excluded here.
  *
  * Deliberately not read: `role` and `chapterLevel` (D17). Every reader gets the same markers.
  */
