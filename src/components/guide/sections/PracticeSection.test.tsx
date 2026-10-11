@@ -31,7 +31,7 @@ describe('PracticeSection (spec A2)', () => {
   });
 
   it('a tick made before the change still shows: key s1_cl_0 is unchanged', () => {
-    expect(render(s1, { checkedChecklist: { s1_cl_0: true } }).match(/line-through/g)).toHaveLength(1);
+    expect(render(s1, { checkedChecklist: { s1_cl_0: true } }).match(/<input type="checkbox"[^>]* checked=""/g)).toHaveLength(1);
   });
 
   it('ticking the first item reports key s1_cl_0', () => {

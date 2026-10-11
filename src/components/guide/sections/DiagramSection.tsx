@@ -51,9 +51,14 @@ export const DiagramSection: React.FC<SectionProps> = props => {
     <ContentBlocks sections={chapter.contentSections} placement="diagram" onNavigateChapter={ctx.onNavigateChapter} />
   );
   return (
-    <SectionShell {...props} sectionKey="diagram" title={chapter.diagramTitle}>
+    <SectionShell {...props} sectionKey="diagram">
       <div className="space-y-6">
-        {chapter.diagramDescription && <p className="text-base-content-secondary">{chapter.diagramDescription}</p>}
+        {(chapter.diagramTitle || chapter.diagramDescription) && (
+          <div>
+            {chapter.diagramTitle && <h3 data-diagram-title className="font-semibold text-base-content">{chapter.diagramTitle}</h3>}
+            {chapter.diagramDescription && <p className="mt-1 text-base-content-secondary">{chapter.diagramDescription}</p>}
+          </div>
+        )}
 
         {/* s5: diagram families and their table sit above the Monolith vs Microservices simulator (spec §3.4 order) */}
         {chapter.id === 's5' && (

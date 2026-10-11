@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { CheckCircle, XCircle } from 'lucide-react';
 import type { FrictionPlaybook } from '../types';
 import { TAP } from './ui/tapTarget';
@@ -8,6 +8,8 @@ import { frictionTerms } from '../lib/sectionTerms';
 interface FrictionPlaybookCardProps {
   playbook: FrictionPlaybook;
   ctx: ProseCtx;
+  selectedOptionId: string | null;
+  onSelectOption: (optionId: string) => void;
 }
 
 const LABEL = 'block font-semibold text-base-content';
@@ -18,8 +20,7 @@ const OPTION_LETTERS = ['ก', 'ข', 'ค', 'ง', 'จ'];
  * The friction playbook: one of the few framed blocks in the reader, because it is a worked tool
  * and not chapter prose. Inside the frame everything is rows on hairlines.
  */
-export const FrictionPlaybookCard: React.FC<FrictionPlaybookCardProps> = ({ playbook, ctx }) => {
-  const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
+export const FrictionPlaybookCard: React.FC<FrictionPlaybookCardProps> = ({ playbook, ctx, selectedOptionId, onSelectOption }) => {
   // One first-occurrence walk for the playbook, computed purely from it.
   const marked = useMemo(() => frictionTerms(playbook), [playbook]);
   const { dilemma } = playbook;
@@ -72,7 +73,7 @@ export const FrictionPlaybookCard: React.FC<FrictionPlaybookCardProps> = ({ play
                 <li key={option.id} className="py-3">
                   <button
                     type="button"
-                    onClick={() => setSelectedOptionId(option.id)}
+                    onClick={() => onSelectOption(option.id)}
                     aria-pressed={isSelected}
                     className={`${TAP} flex w-full cursor-pointer items-start gap-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary`}
                   >

@@ -33,15 +33,15 @@ export const CoreConceptsSection: React.FC<SectionProps> = props => {
               <h3 className="font-semibold text-base-content">{concept.heading}</h3>
               <p data-concept-detail={cIdx} className="mt-1">{prose(marked[cIdx].detail)}</p>
               {compact && hasMore && (
-                <button
+                <div className="mt-1"><button
                   type="button"
                   data-concept-more={cIdx}
                   aria-expanded={!!moreOpen[cIdx]}
                   onClick={() => setMore({ chapterId: chapter.id, open: { ...moreOpen, [cIdx]: !moreOpen[cIdx] } })}
-                  className="-my-3.5 py-3.5 sm:my-0 sm:py-0 mt-1 cursor-pointer text-sm text-base-content-muted underline decoration-base-border underline-offset-4 hover:text-base-content"
+                  className="-my-3.5 py-3.5 sm:my-0 sm:py-0 cursor-pointer text-sm text-base-content-muted underline decoration-base-border underline-offset-4 hover:text-base-content"
                 >
                   {moreOpen[cIdx] ? 'พับเก็บ' : bulletCount > 0 ? `ดูรายละเอียด ${bulletCount} ข้อ` : 'ดูรายละเอียด'}
-                </button>
+                </button></div>
               )}
               {showMore && bulletCount > 0 && (
                 <ul className="mt-2 list-disc space-y-1 pl-5">

@@ -53,8 +53,10 @@ interface ChapterControlRowProps {
 
 /**
  * The one sticky row under the app header: a link to each section grouped by layer, the level
- * switch, and from `sm` up one control that opens or folds every section. Below `sm` the links
- * scroll sideways on one line; from `sm` they wrap, because nine links do not fit the 44rem column.
+ * switch, and from `sm` up one control that opens or folds every section. The links never fit
+ * the 44rem column (760 to 960px measured), so they stay on one line and scroll sideways under
+ * an edge fade. Below `sm` the switch shares that line; from `sm` the controls take a second line,
+ * which keeps the row at two lines on every chapter.
  */
 export const ChapterControlRow: React.FC<ChapterControlRowProps> = ({
   chapterNum, layout, openState, level, onLevelChange, levelOverride, onSelectSection, onSetAllOpen,
@@ -85,50 +87,52 @@ export const ChapterControlRow: React.FC<ChapterControlRowProps> = ({
       ref={rowRef}
       data-control-row
       aria-label="หัวข้อในบทและระดับการอ่าน"
-      className="sticky z-30 space-y-1 border-y border-base-border bg-base-100 py-3 text-sm leading-5 max-sm:-mx-box-spacious max-sm:px-box-spacious"
+      className="sticky z-30 flex flex-wrap items-center gap-x-4 gap-y-1 border-y border-base-border bg-base-100 py-3 text-sm leading-5 max-sm:-mx-box-spacious max-sm:gap-y-5 max-sm:px-box-spacious"
       style={{ top: 'var(--header-h)' }}
     >
-      <div className="flex items-start gap-x-4">
-        <ScrollFade
-          wrapperClassName="min-w-0 flex-1"
-          className={`flex items-center gap-x-5 gap-y-1 overflow-x-auto whitespace-nowrap [scrollbar-width:none] sm:flex-wrap sm:overflow-visible ${SCROLL_ROOM}`}
-        >
-          {groups.map(group => (
-            <span key={group.layer} data-control-layer={group.layer} className="flex items-center gap-x-4 sm:contents">
-              <span className="text-base-content-muted">{LAYER_LABEL[group.layer]}</span>
-              {group.sections.map(key => (
-                <a
-                  key={key}
-                  href={formatChapterHash(chapterNum, key)}
-                  data-section-link={key}
-                  onClick={event => {
-                    // A modified click keeps the browser's own behaviour (open the route in a new tab).
-                    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-                    event.preventDefault();
-                    onSelectSection(key);
-                  }}
-                  className={`${TAP_Y} ${LINK} py-0.5 font-medium text-base-content decoration-base-border hover:decoration-base-content`}
-                >
-                  {SECTION_LABEL[key]}
-                </a>
-              ))}
-            </span>
-          ))}
-        </ScrollFade>
+      <ScrollFade
+        fadeAt="all"
+        wrapperClassName="min-w-0 flex-1 sm:basis-full"
+        className={`flex items-center gap-x-5 overflow-x-auto whitespace-nowrap [scrollbar-width:none] ${SCROLL_ROOM}`}
+      >
+        {groups.map(group => (
+          <span key={group.layer} data-control-layer={group.layer} className="flex items-center gap-x-4">
+            <span className="text-base-content-muted">{LAYER_LABEL[group.layer]}</span>
+            {group.sections.map(key => (
+              <a
+                key={key}
+                href={formatChapterHash(chapterNum, key)}
+                data-section-link={key}
+                onClick={event => {
+                  // A modified click keeps the browser's own behaviour (open the route in a new tab).
+                  if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+                  event.preventDefault();
+                  onSelectSection(key);
+                }}
+                className={`${TAP_Y} ${LINK} py-0.5 font-medium text-base-content decoration-base-border hover:decoration-base-content`}
+              >
+                {SECTION_LABEL[key]}
+              </a>
+            ))}
+          </span>
+        ))}
+      </ScrollFade>
+      <div className="shrink-0 sm:order-2 sm:ml-auto">
         <LevelSwitch level={level} onChange={onLevelChange} />
-        {foldable.length > 0 && (
-          <button
-            type="button"
-            data-toggle-all
-            onClick={() => onSetAllOpen(!allOpen)}
-            className={`${TAP_Y} ${LINK} hidden shrink-0 py-0.5 text-base-content-muted decoration-base-border hover:text-base-content sm:inline`}
-          >
-            {allOpen ? 'พับทั้งหมด' : 'เปิดทั้งหมด'}
-          </button>
-        )}
       </div>
+      {foldable.length > 0 && (
+        <button
+          type="button"
+          data-toggle-all
+          onClick={() => onSetAllOpen(!allOpen)}
+          className={`${TAP_Y} ${LINK} hidden shrink-0 py-0.5 text-base-content-muted decoration-base-border hover:text-base-content sm:order-3 sm:inline`}
+        >
+          {allOpen ? 'พับทั้งหมด' : 'เปิดทั้งหมด'}
+        </button>
+      )}
+      {/* Below sm this takes its own line, a tap ring's height under the switch. */}
       {levelOverride && (
-        <p className="flex flex-wrap items-center justify-end gap-x-3 text-base-content-muted">
+        <p className="flex flex-wrap items-center justify-end gap-x-3 text-base-content-muted max-sm:basis-full sm:order-1">
           <span data-chapter-level-scope>{chapterLevelScopeLabel(levelOverride.role)}</span>
           <button
             type="button"

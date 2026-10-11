@@ -26,7 +26,15 @@ export const ChecklistItems: React.FC<{ chapter: Chapter; items: readonly string
                 checked={isChecked}
                 onChange={() => ctx.onToggleChecklistItem(itemKey)}
               />
-              <span className={isChecked ? 'text-base-content-muted line-through' : ''}><Prose text={item} ctx={ctx} /></span>
+              {/* A click inside an open definition must not reach the label and tick the box. */}
+              <span
+                className={isChecked ? 'text-base-content-muted' : ''}
+                onClick={event => {
+                  if ((event.target as Element).closest('[data-inline-term-panel]')) event.preventDefault();
+                }}
+              >
+                <Prose text={item} ctx={ctx} />
+              </span>
             </label>
           </li>
         );

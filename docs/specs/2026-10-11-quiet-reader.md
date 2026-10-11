@@ -59,7 +59,7 @@ Tables, notes and reference cards (`ContentBlocks`) stay unmarked.
 - Routes and aliases: `#/ch/N`, `#/ch/N/<section>`, and the retired section names.
 - The read mark, bookmark, previous and next chapter, the track footer, and the Ask AI button.
 - The seat flip under the hero figure.
-- Checklist ticks, saved as today.
+- Checklist ticks. Before this work they lived in memory only and were lost on reload. They are now saved in `localStorage` under `be_guide_checklist`.
 - The other-side switch with its three views.
 - The beginner view of core concepts: heading and detail first, bullets behind a control.
 - Every diagram widget, the C4 explorer, the glossary panel and its category map, the FAQ with its quick-jump chips, and the friction dilemma.
@@ -71,3 +71,13 @@ Tables, notes and reference cards (`ContentBlocks`) stay unmarked.
 - The landing card, the chapter index, the role mindset card, the AI tab and the quiz tab.
 - The content of any chapter.
 - New glossary entries.
+
+## Decisions after review (2026-10-12)
+
+- The section links need 760 to 960px and the column is at most 704px, so they stay on one line and scroll sideways under an edge fade at every width. From `sm` the level switch and the open-all control take a second line. The row is two lines on every chapter (78px measured), or three while a chapter carries its own level on a narrow column.
+- The diagram section is headed "แผนภาพ", the same words as its link. The chapter's `diagramTitle` shows as a line under the heading.
+- The dilemma answer is held by the friction section, keyed by chapter, so it survives a fold and a level change.
+- A jump moves focus to the section it lands on.
+- Changing the level from the sticky row, below the first section, scrolls back to the top of the sections.
+- A ticked checklist line is muted and no longer struck through, so an open definition inside the line stays readable.
+- Not changed: hero figure panel labels and glossary filter chips are 12px on a phone. Both come from shared components outside this work.

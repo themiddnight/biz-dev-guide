@@ -9,11 +9,12 @@ const render = (id: string, c4Level = 1) =>
   renderToStaticMarkup(<DiagramSection chapter={ch(id)} fold={CORE} ctx={ctxFor({ c4Level })} />);
 
 describe('DiagramSection', () => {
-  it('heads the section with the chapter\'s diagram title and shows its description as text', () => {
+  it('is headed "แผนภาพ" like its control-row link, with the diagram title and description below', () => {
     const s5 = ch('s5');
-    const html = render('s5');
-    expect(html).toContain(`<span class="text-xl font-bold leading-7 text-base-content">${s5.diagramTitle}</span>`);
-    expect(html.replace(/&amp;/g, '&')).toContain(`<p class="text-base-content-secondary">${s5.diagramDescription}</p>`);
+    const html = render('s5').replace(/&amp;/g, '&');
+    expect(/<h2>.*?<\/h2>/.exec(html)![0]).toContain('>แผนภาพ<');
+    expect(html).toContain(`<h3 data-diagram-title="true" class="font-semibold text-base-content">${s5.diagramTitle}</h3>`);
+    expect(html).toContain(`<p class="mt-1 text-base-content-secondary">${s5.diagramDescription}</p>`);
   });
 
   it('s5: the C4 explorer shows the note of the selected level only', () => {

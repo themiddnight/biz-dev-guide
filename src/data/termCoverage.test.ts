@@ -324,9 +324,8 @@ function trackGaps(track: TrackKey): { term: string; line: string }[] {
  * - `missingFromGlossary`: no glossary entry resolves the term, so nothing could ever mark it. A
  *   cheap content fix: add the entry. D20/D21 emptied it — every earlier "never defined" line
  *   (SA, SMS, OTP, QR, Refactor, ...) resolves, and is marked in a dialogue line or arrow chain.
- *   `FR` came in when the walk learned the seat lines under the hero figure (quiet-reader spec):
- *   s4's Engineering seat line says `FR` above the jargon row that defines it, and no glossary
- *   entry answers to `FR`, so the seat line cannot be marked.
+ *   `FR` (s4's Engineering seat line, above the jargon row that defines it) closed the same way:
+ *   the Functional requirement entry answers to it as an alias.
  */
 const KNOWN_GAPS_V2: Record<TrackKey, { guardrailLimited: readonly string[]; missingFromGlossary: readonly string[] }> = {
   beginner: {
@@ -334,9 +333,7 @@ const KNOWN_GAPS_V2: Record<TrackKey, { guardrailLimited: readonly string[]; mis
       'track beginner: "FURPS+" first seen at s4/coreConcepts.heading, never defined',
       'track beginner: "Gate" first seen at s6/diagramDescription, never defined',
     ],
-    missingFromGlossary: [
-      'track beginner: "FR" first seen at s4/heroFigure.seats, defined only later at s4/jargonList.term',
-    ],
+    missingFromGlossary: [],
   },
   experienced: {
     guardrailLimited: [
@@ -350,18 +347,14 @@ const KNOWN_GAPS_V2: Record<TrackKey, { guardrailLimited: readonly string[]; mis
       'track biz: "Gate" first seen at s6/diagramDescription, never defined',
       'track biz: "DORA" first seen at s8/coreConcepts.heading, defined only later at s8/coreConcepts.detail',
     ],
-    missingFromGlossary: [
-      'track biz: "FR" first seen at s4/heroFigure.seats, defined only later at s4/jargonList.term',
-    ],
+    missingFromGlossary: [],
   },
   eng: {
     guardrailLimited: [
       'track eng: "FURPS+" first seen at s4/coreConcepts.heading, never defined',
       'track eng: "SLO" first seen at s19/coreConcepts.heading, defined only later at s19/coreConcepts.detail',
     ],
-    missingFromGlossary: [
-      'track eng: "FR" first seen at s4/heroFigure.seats, defined only later at s4/jargonList.term',
-    ],
+    missingFromGlossary: [],
   },
 };
 

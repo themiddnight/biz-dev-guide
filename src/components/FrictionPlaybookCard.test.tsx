@@ -6,15 +6,20 @@ import { SECTION_COMPONENTS } from './guide/sections/registry';
 import { CORE, ctxFor } from './guide/sections/testCtx';
 import { FrictionPlaybookCard } from './FrictionPlaybookCard';
 
+const card = (id: 's1' | 's4', selectedOptionId: string | null = null) =>
+  renderToStaticMarkup(
+    <FrictionPlaybookCard playbook={FRICTION_PLAYBOOKS[id]} ctx={ctxFor()} selectedOptionId={selectedOptionId} onSelectOption={() => {}} />,
+  );
+
 describe('FrictionPlaybookCard (spec A4)', () => {
   it('renders the playbook, never the removed generic fallback', () => {
-    const html = renderToStaticMarkup(<FrictionPlaybookCard playbook={FRICTION_PLAYBOOKS.s1} ctx={ctxFor()} />);
+    const html = card('s1');
     expect(html).toContain(FRICTION_PLAYBOOKS.s1.battlegroundTitle);
     expect(html).not.toContain('3 ข้อที่ควรจำเมื่อคุยเรื่อง');
   });
 
   it('labels every block in plain Thai, with no English chrome name', () => {
-    const html = renderToStaticMarkup(<FrictionPlaybookCard playbook={FRICTION_PLAYBOOKS.s1} ctx={ctxFor()} />);
+    const html = card('s1');
     for (const label of ['ฝั่ง Business หงุดหงิดเรื่อง', 'ฝั่ง Engineering หงุดหงิดเรื่อง', 'สาเหตุจริง', 'ถ้าต้องการ', 'ต้องยอมเสีย', 'วิธีคุย', 'ลองตอบดู']) {
       expect(html, label).toContain(`>${label}</`);
     }
@@ -24,14 +29,25 @@ describe('FrictionPlaybookCard (spec A4)', () => {
   });
 
   it('shows one row per trade-off and per script, and the dilemma only where the playbook has one', () => {
-    const s1 = renderToStaticMarkup(<FrictionPlaybookCard playbook={FRICTION_PLAYBOOKS.s1} ctx={ctxFor()} />);
+    const s1 = card('s1');
     expect(s1.match(/>ถ้าต้องการ</g)).toHaveLength(FRICTION_PLAYBOOKS.s1.tradeOffMatrix.length);
     expect(s1.match(/>สถานการณ์<\/dt>/g)).toHaveLength(FRICTION_PLAYBOOKS.s1.goldenScripts.length);
     expect(s1.match(/aria-pressed="false"/g)).toHaveLength(FRICTION_PLAYBOOKS.s1.dilemma!.options.length);
-    const s4 = renderToStaticMarkup(<FrictionPlaybookCard playbook={FRICTION_PLAYBOOKS.s4} ctx={ctxFor()} />);
+    const s4 = card('s4');
     expect(FRICTION_PLAYBOOKS.s4.dilemma).toBeUndefined();
     expect(s4).not.toContain('data-playbook-dilemma');
     expect(s4).not.toContain('aria-pressed');
+  });
+
+  it('shows the result of the answer it is given, so the answer outlives a folded section', () => {
+    const options = FRICTION_PLAYBOOKS.s1.dilemma!.options;
+    const best = options.find(o => o.isOptimal)!;
+    const other = options.find(o => !o.isOptimal)!;
+    expect(card('s1')).not.toContain('data-dilemma-result');
+    expect(card('s1', best.id)).toContain('data-dilemma-result="optimal"');
+    const wrong = card('s1', other.id);
+    expect(wrong).toContain('data-dilemma-result="other"');
+    expect(wrong.match(/aria-pressed="true"/g)).toHaveLength(1);
   });
 
   it('the registry friction component renders the playbook under the sec-friction anchor', () => {

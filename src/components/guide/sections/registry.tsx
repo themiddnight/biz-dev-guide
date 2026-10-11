@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { Chapter, ExperienceLevel } from '../../../types';
 import type { DiagramJumpTarget } from '../../../data/diagramFamilies';
 import type { GlossaryCategory } from '../../../data/glossary';
@@ -50,10 +50,19 @@ export interface SectionProps { chapter: Chapter; fold: SectionFold; ctx: GuideS
 const FrictionSection: React.FC<SectionProps> = props => {
   // Present only with a playbook (spec A4); the guard narrows the type without a non-null assertion.
   const playbook = props.chapter.frictionPlaybook;
+  // The answer lives here, not in the card: the card unmounts when the section folds. It carries
+  // its chapter so one chapter's answer never shows on the next.
+  const [answer, setAnswer] = useState<{ chapterId: string; optionId: string } | null>(null);
   if (!playbook) return null;
+  const chapterId = props.chapter.id;
   return (
     <SectionShell {...props} sectionKey="friction" note="เมื่อสองฝั่งเถียงกันเรื่องนี้">
-      <FrictionPlaybookCard playbook={playbook} ctx={props.ctx} />
+      <FrictionPlaybookCard
+        playbook={playbook}
+        ctx={props.ctx}
+        selectedOptionId={answer?.chapterId === chapterId ? answer.optionId : null}
+        onSelectOption={optionId => setAnswer({ chapterId, optionId })}
+      />
     </SectionShell>
   );
 };

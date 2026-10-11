@@ -22,7 +22,7 @@ export interface FaqGroup {
   subtitle: string;
 }
 
-export const FAQ_QUICK_JUMP_TITLE = 'คำถามในบทนี้ (12 ข้อ) — คลิกเพื่อข้ามไป';
+export const FAQ_QUICK_JUMP_TITLE = 'คำถามในบทนี้ 12 ข้อ กดเพื่อข้ามไป';
 
 /** Static `.aud-callout` text for each audience lens; both are shown together. */
 export const FAQ_AUDIENCE_CALLOUTS: Record<'business' | 'engineer', { who: string; body: string }> = {

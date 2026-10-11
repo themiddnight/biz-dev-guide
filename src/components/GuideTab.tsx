@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Chapter, ExperienceLevel } from '../types';
 import { CHAPTER_START_ID, scrollToChapterStart } from '../lib/chapterScroll';
+import { loadChecklist, saveChecklist } from '../lib/checklistStore';
 import { S5_JUMP_TARGET_IDS, DiagramJumpTarget } from '../data/diagramFamilies';
 import { GlossaryFilter } from './glossary/GlossaryPanel';
 import { GLOSSARY, GlossaryCategory } from '../data/glossary';
@@ -12,7 +13,6 @@ import {
   getChapterLayout,
   deriveOpenState,
   expandAll,
-  collapseAll,
   openSection,
   toggleSection,
   type OpenState,
@@ -52,6 +52,8 @@ import { Tabs } from './ui/Tabs';
 
 /** Glossary terms the index search matches for s15, computed once. */
 const GLOSSARY_TERMS = GLOSSARY.map(g => g.term);
+/** Wraps the chapter's sections; a level change scrolls back to it. */
+const CHAPTER_SECTIONS_ID = 'chapter-sections';
 
 const ROLE_FILTERS = [
   { value: 'all', label: 'ทั้งหมด' },
@@ -131,7 +133,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRole, setSelectedRole] = useState<string>('all');
   const [isIndexOpen, setIsIndexOpen] = useState(false);
-  const [checkedChecklist, setCheckedChecklist] = useState<Record<string, boolean>>({});
+  const [checkedChecklist, setCheckedChecklist] = useState<Record<string, boolean>>(loadChecklist);
   const [c4Level, setC4Level] = useState<number>(1);
   const [glossaryCategory, setGlossaryCategory] = useState<GlossaryFilter>('all');
   const [glossaryQuery, setGlossaryQuery] = useState('');
@@ -187,7 +189,10 @@ export const GuideTab: React.FC<GuideTabProps> = ({
     let raf2 = 0;
     const raf1 = window.requestAnimationFrame(() => {
       raf2 = window.requestAnimationFrame(() => {
-        document.getElementById(pendingScrollId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const target = document.getElementById(pendingScrollId);
+        target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // A section takes focus with the jump, so the next Tab continues inside it.
+        if (target?.hasAttribute('tabindex')) target.focus({ preventScroll: true });
         setPendingScrollId(null);
       });
     });
@@ -254,7 +259,9 @@ export const GuideTab: React.FC<GuideTabProps> = ({
       scrollToChapterStart('smooth');
       return;
     }
-    setOpenState(openSection(deriveOpenState(layout), layout, action.key));
+    // On a new chapter the re-derive above has already queued; on the same chapter the sections
+    // the reader opened stay open.
+    setOpenState(prev => openSection(prev, layout, action.key));
     setPendingScrollId(`sec-${action.key}`);
   }, [requestedSection?.nonce]);
 
@@ -332,10 +339,9 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   };
 
   const toggleChecklistItem = (key: string) => {
-    setCheckedChecklist(prev => ({
-      ...prev,
-      [key]: !prev[key]
-    }));
+    const next = { ...checkedChecklist, [key]: !checkedChecklist[key] };
+    setCheckedChecklist(next);
+    saveChecklist(next);
   };
 
   const sectionCtx: GuideSectionContext = {
@@ -640,16 +646,26 @@ export const GuideTab: React.FC<GuideTabProps> = ({
               layout={layout}
               openState={openState}
               level={chapterLevel}
-              onLevelChange={lvl => (role === null ? onExperienceLevelChange?.(lvl) : handleChapterLevelPick(lvl))}
+              onLevelChange={lvl => {
+                // The switch is sticky: past the first section, a new level reorders what is on
+                // screen, so start the reader at the top of the sections again.
+                const sections = document.getElementById(CHAPTER_SECTIONS_ID);
+                const row = document.querySelector('[data-control-row]');
+                if (sections && row && sections.getBoundingClientRect().top < row.getBoundingClientRect().bottom - 1) {
+                  setPendingScrollId(CHAPTER_SECTIONS_ID);
+                }
+                if (role === null) onExperienceLevelChange?.(lvl);
+                else handleChapterLevelPick(lvl);
+              }}
               levelOverride={role !== null && levelSource === 'chapter'
                 ? { role, levelMode, onReset: () => onChapterLevelChange?.(activeChapter.id, null) }
                 : null}
               onSelectSection={handleSectionLink}
-              onSetAllOpen={open => setOpenState(open ? expandAll(layout) : collapseAll(layout))}
+              onSetAllOpen={open => setOpenState(open ? expandAll(layout) : deriveOpenState(layout))}
             />
 
             {/* The control row's bottom rule already separates it from the first section. */}
-            <div className="[&>section:first-child]:border-t-0">
+            <div id={CHAPTER_SECTIONS_ID} className="anchor-target [&>section:first-child]:border-t-0">
               {layout.flatMap(group => group.sections.map(key => {
                 const Section = SECTION_COMPONENTS[key];
                 const fold: SectionFold = group.layer === 'core'
@@ -665,7 +681,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <button
                   onClick={() => onAskAIWithPrompt(`ช่วยอธิบายบทที่ ${activeChapter.num} "${activeChapter.title}" ให้ฟังอย่างละเอียด พร้อมยกตัวอย่างเคสจริงในบริษัทเทคให้เห็นภาพ`, buildChapterContext(activeChapter))}
-                  className={`${TAP} inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-base-300 text-base-content hover:bg-base-border text-xs sm:text-sm font-semibold border border-base-border transition-colors cursor-pointer`}
+                  className={`${TAP} inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-base-300 text-base-content hover:bg-base-border text-sm font-semibold border border-base-border transition-colors cursor-pointer`}
                 >
                   <Bot className="w-4 h-4 text-base-content-secondary" />
                   <span>ถาม AI เพิ่มเรื่องบทนี้</span>
@@ -701,11 +717,11 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                     onClick={() => handleSelectChapter(prevChapter.id)}
                     className={`${TAP} p-box-dense rounded-box border border-base-border hover:border-base-border-strong text-left transition-all cursor-pointer bg-base-300 group`}
                   >
-                    <div className="flex items-center gap-1 text-[11px] text-base-content-muted group-hover:text-base-content transition-colors">
+                    <div className="flex items-center gap-1 text-sm text-base-content-muted group-hover:text-base-content transition-colors">
                       <ArrowLeft className="w-3.5 h-3.5" />
                       <span>บทก่อนหน้า</span>
                     </div>
-                    <div className="font-bold text-xs sm:text-sm text-base-content mt-1 truncate">
+                    <div className="font-bold text-sm text-base-content mt-1 truncate">
                       บทที่ {prevChapter.num}: {prevChapter.title}
                     </div>
                   </button>
@@ -721,11 +737,11 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                       onClick={() => handleSelectChapter(nextChapter.id)}
                       className={`${TAP} p-box-dense rounded-box border border-base-border hover:border-base-border-strong text-right transition-all cursor-pointer bg-base-300 group`}
                     >
-                      <div className="flex items-center justify-end gap-1 text-[11px] text-base-content font-semibold">
+                      <div className="flex items-center justify-end gap-1 text-sm text-base-content font-semibold">
                         <span>บทถัดไป</span>
                         <ArrowRight className="w-3.5 h-3.5" />
                       </div>
-                      <div className="font-bold text-xs sm:text-sm text-base-content mt-1 truncate">
+                      <div className="font-bold text-sm text-base-content mt-1 truncate">
                         บทที่ {nextChapter.num}: {nextChapter.title}
                       </div>
                     </button>
@@ -832,7 +848,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                           <BookmarkCheck className="w-3.5 h-3.5 text-warning shrink-0" />
                         )}
                       </div>
-                      <p className="text-[11px] text-base-content-muted line-clamp-1 font-normal">
+                      <p className="text-sm text-base-content-muted line-clamp-1 font-normal">
                         {chapter.subtitle}
                       </p>
                       <div className="flex items-center gap-2 pt-1 text-[10px] text-base-content-muted font-normal">

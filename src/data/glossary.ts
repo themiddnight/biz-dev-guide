@@ -128,6 +128,7 @@ export const GLOSSARY: GlossaryTerm[] = [
     definition: 'สิ่งที่ระบบต้อง "ทำได้"',
     category: 'requirements',
     relatedChapterIds: ['s4'],
+    aliases: ['FR'],
     origin: 'static',
   },
   {

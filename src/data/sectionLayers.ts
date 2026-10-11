@@ -148,11 +148,6 @@ export function expandAll(layout: LayerGroup[]): OpenState {
   return { sections: sectionsWhere(layout, () => true) };
 }
 
-/** Core has no fold control, so folding everything is the starting state. */
-export function collapseAll(layout: LayerGroup[]): OpenState {
-  return deriveOpenState(layout);
-}
-
 export function openSection(state: OpenState, layout: LayerGroup[], key: SectionKey): OpenState {
   if (!layout.some(g => g.sections.includes(key))) return state;
   return { sections: { ...state.sections, [key]: true } };

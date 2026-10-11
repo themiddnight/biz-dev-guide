@@ -3,7 +3,7 @@ import { CHAPTERS } from './chaptersData';
 import { FRICTION_PLAYBOOKS } from './frictionPlaybooks';
 import {
   LAYERS, SECTION_KEYS, LAYER_CONFIG, SECTION_LABEL,
-  getLayerOf, getChapterLayout, deriveOpenState, expandAll, collapseAll,
+  getLayerOf, getChapterLayout, deriveOpenState, expandAll,
   openSection, toggleSection, isSectionPresent, isSectionKey,
   type SectionKey,
 } from './sectionLayers';
@@ -159,11 +159,6 @@ describe('open state', () => {
     const s = deriveOpenState(getChapterLayout('beginner', ch('s3')));
     expect(s.sections.jargon).toBe(true);
     expect(s.sections.diagram).toBe(true);
-  });
-  it('collapseAll folds every section outside Core and keeps Core open', () => {
-    const s = collapseAll(layout);
-    expect(openKeys(s)).toEqual(['jargon', 'otherSide', 'coreConcepts']);
-    expect(s.sections.examples).toBe(false);
   });
   it('expandAll opens everything present', () => {
     expect(openKeys(expandAll(layout))).toEqual(present);

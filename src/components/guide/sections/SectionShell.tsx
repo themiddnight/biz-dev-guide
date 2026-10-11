@@ -30,7 +30,7 @@ export const SectionShell: React.FC<SectionShellProps> = ({
     </>
   );
   return (
-    <section id={id} data-section={sectionKey} className="anchor-target border-t border-base-border">
+    <section id={id} data-section={sectionKey} tabIndex={-1} className="anchor-target border-t border-base-border focus:outline-none">
       <h2>
         {fold.foldable ? (
           <button
@@ -41,7 +41,7 @@ export const SectionShell: React.FC<SectionShellProps> = ({
             className={`${TAP} flex w-full cursor-pointer flex-wrap items-baseline gap-x-3 gap-y-1 py-5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary`}
           >
             {heading}
-            <span className="ml-auto text-sm font-normal text-base-content-muted">{fold.isOpen ? 'พับเก็บ' : 'เปิดอ่าน'}</span>
+            <span aria-hidden="true" className="ml-auto text-sm font-normal text-base-content-muted">{fold.isOpen ? 'พับเก็บ' : 'เปิดอ่าน'}</span>
           </button>
         ) : (
           <span className="flex flex-wrap items-baseline gap-x-3 gap-y-1 pt-7">{heading}</span>

@@ -16,7 +16,7 @@ describe('heroTerms seat lines', () => {
     expect(markers(heroTerms(ch('s16'), ['biz', 'eng']).seats)).toEqual(['revenue(ยอดขาย)', 'pm-vs-pjm(PM)']);
   });
 
-  it('walks the seat line after the opening and before the analogy and takeaway', () => {
+  it('marks a seat line from what the opening defined, without moving the markers below it', () => {
     const chapter: Chapter = {
       ...ch('s16'),
       chapterOpening: 'เปิดบทด้วย KPI',
@@ -27,8 +27,12 @@ describe('heroTerms seat lines', () => {
     const hero = heroTerms(chapter, ['biz']);
     expect(hero.chapterOpening).toBe('เปิดบทด้วย [[g:okr-kpi|KPI]]');
     expect(hero.seats.biz).toBe('ที่นั่งนี้พูดถึง KPI และ [[g:sprint|Sprint]]');
-    expect(hero.plainAnalogy).toBe('เปรียบกับ Sprint และ [[g:mvp|MVP]]');
+    expect(hero.plainAnalogy).toBe('เปรียบกับ [[g:sprint|Sprint]] และ [[g:mvp|MVP]]');
     expect(hero.keyTakeaway).toBe('สรุปด้วย MVP');
+    // The other seat shows the same analogy and takeaway.
+    const flipped = heroTerms(chapter, ['eng']);
+    expect(flipped.plainAnalogy).toBe(hero.plainAnalogy);
+    expect(flipped.keyTakeaway).toBe(hero.keyTakeaway);
   });
 
   it('a chapter without a hero figure has no seat line', () => {

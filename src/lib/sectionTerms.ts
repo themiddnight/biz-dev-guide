@@ -34,11 +34,14 @@ export interface HeroTerms {
  * the takeaway. Like the other-side switch, flipping the seat is an input, never render state.
  */
 export function heroTerms(chapter: Chapter, seats: readonly Role[]): HeroTerms {
-  const mark = sectionMarker();
+  const seen = new Set<string>();
+  const mark = (text: string) => markTerms(text, 'prose', seen);
   const chapterOpening = mark(chapter.chapterOpening);
+  // Each seat line starts from what the opening defined and adds nothing to the shared set, so
+  // flipping the seat never moves a marker in the analogy or the takeaway.
   const seatLines: Partial<Record<Role, string>> = {};
   const figure = chapter.heroFigure;
-  if (figure) for (const side of seats) seatLines[side] = mark(figure.seats[side]);
+  if (figure) for (const side of seats) seatLines[side] = sectionMarker(seen)(figure.seats[side]);
   const plainAnalogy = mark(chapter.plainAnalogy);
   return { chapterOpening, seats: seatLines, plainAnalogy, keyTakeaway: mark(chapter.keyTakeaway) };
 }
