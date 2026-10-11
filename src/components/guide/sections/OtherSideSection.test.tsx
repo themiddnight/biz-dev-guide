@@ -4,6 +4,7 @@ import { CHAPTERS } from '../../../data/chaptersData';
 import type { Role } from '../../../data/rolePerspective';
 import { OtherSideSection } from './OtherSideSection';
 import type { GuideSectionContext, OtherSideView } from './registry';
+import { CORE, foldable } from './testCtx';
 
 const noop = () => {};
 /** renderToStaticMarkup escapes quotes; compare against the escaped form. */
@@ -26,7 +27,7 @@ function ctx(role: Role | null, otherSideView: OtherSideView): GuideSectionConte
 }
 
 const render = (role: Role | null, view: OtherSideView) =>
-  renderToStaticMarkup(<OtherSideSection chapter={s9} isOpen onToggle={noop} ctx={ctx(role, view)} />);
+  renderToStaticMarkup(<OtherSideSection chapter={s9} fold={CORE} ctx={ctx(role, view)} />);
 
 describe('OtherSideSection', () => {
   const p = s9.perspectives!;
@@ -72,7 +73,7 @@ describe('OtherSideSection', () => {
   });
 
   it('keeps the heading visible when collapsed', () => {
-    const html = renderToStaticMarkup(<OtherSideSection chapter={s9} isOpen={false} onToggle={noop} ctx={ctx('eng', 'biz')} />);
+    const html = renderToStaticMarkup(<OtherSideSection chapter={s9} fold={foldable(false)} ctx={ctx('eng', 'biz')} />);
     expect(html).toContain('ฝั่ง Business มองเรื่องนี้ยังไง');
     expect(textOf(html)).not.toContain(esc(p.biz.measuredBy));
   });

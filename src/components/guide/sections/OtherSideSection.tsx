@@ -1,11 +1,9 @@
 import React, { useMemo } from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
 import { ROLES, ROLE_META, otherRole, type Role } from '../../../data/rolePerspective';
 import type { GuideSectionContext, OtherSideView, SectionProps } from './registry';
+import { SectionShell } from './SectionShell';
 import { RichText } from '../../content/RichText';
 import { otherSideTerms, type SideViewTerms } from '../../../lib/sectionTerms';
-import { TAP } from '../../ui/tapTarget';
-import { IconBadge } from '../../ui/IconBadge';
 import { Tabs } from '../../ui/Tabs';
 
 const person = (r: Role) => ROLE_META[r].person;
@@ -87,7 +85,8 @@ const SideViewCard: React.FC<{
   );
 };
 
-export const OtherSideSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggle, ctx }) => {
+export const OtherSideSection: React.FC<SectionProps> = props => {
+  const { chapter, ctx } = props;
   const { role, otherSideView, setOtherSideView } = ctx;
   // The shown cards share one first-occurrence walk (spec P3.5), a pure function of the chapter and
   // the switch. Never a `seen` set handed to the cards: they would mutate it during render.
@@ -99,27 +98,8 @@ export const OtherSideSection: React.FC<SectionProps> = ({ chapter, isOpen, onTo
   const heading = role ? `${ROLE_META[otherRole(role)].side} มองเรื่องนี้ยังไง` : 'สองฝั่งมองเรื่องนี้ยังไง';
 
   return (
-    <div className="border border-base-border rounded-box overflow-hidden bg-base-100 shadow-2xs">
-      <button
-        type="button"
-        onClick={onToggle}
-        aria-expanded={!!isOpen}
-        className={`${TAP} w-full p-box flex items-center justify-between bg-base-300 hover:bg-base-border text-left cursor-pointer select-none transition-colors`}
-      >
-        <div className="flex items-center gap-3">
-          <IconBadge size="md">🔁</IconBadge>
-          <div>
-            <h3 className="text-xs sm:text-sm font-bold text-base-content">{heading}</h3>
-            <p className="text-[11px] sm:text-xs text-base-content-muted">
-              เขาถูกวัดผลด้วยอะไร กลัวอะไร และควรพูดกับเขายังไง
-            </p>
-          </div>
-        </div>
-        {isOpen ? <ChevronUp className="w-4 h-4 text-base-content-secondary" /> : <ChevronDown className="w-4 h-4 text-base-content-muted" />}
-      </button>
-
-      {isOpen && (
-        <div className="p-box space-y-3.5 border-t border-base-border">
+    <SectionShell {...props} sectionKey="otherSide" title={heading}>
+        <div className="space-y-3.5">
           <div data-other-side-switch>
             <Tabs<OtherSideView>
               variant="pills"
@@ -134,7 +114,6 @@ export const OtherSideSection: React.FC<SectionProps> = ({ chapter, isOpen, onTo
             {cards.map(view => <SideViewCard key={view.side} view={view} ctx={ctx} />)}
           </div>
         </div>
-      )}
-    </div>
+    </SectionShell>
   );
 };

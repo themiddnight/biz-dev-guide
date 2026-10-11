@@ -1,34 +1,15 @@
 import React from 'react';
-import { ChevronDown, ChevronUp, ShieldAlert } from 'lucide-react';
+import { ShieldAlert } from 'lucide-react';
 import type { SectionProps } from './registry';
-import { TAP } from '../../ui/tapTarget';
-import { IconBadge } from '../../ui/IconBadge';
+import { SectionShell } from './SectionShell';
 
-export const PitfallsSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggle }) => {
+export const PitfallsSection: React.FC<SectionProps> = props => {
+  const { chapter } = props;
   /* SECTION 7: กับดักที่เจอบ่อยและทางออก (Common Pitfalls & Solutions) */
   if (!chapter.commonPitfalls || chapter.commonPitfalls.length === 0) return null;
   return (
-    <div className="border border-base-border rounded-box overflow-hidden bg-base-100 shadow-2xs">
-      <button
-        onClick={onToggle}
-        className={`${TAP} w-full p-box flex items-center justify-between bg-base-300 hover:bg-base-border text-left cursor-pointer select-none transition-colors`}
-      >
-        <div className="flex items-center gap-3">
-          <IconBadge size="md">⚠️</IconBadge>
-          <div>
-            <h3 className="text-xs sm:text-sm font-bold text-base-content">
-              กับดักที่เจอบ่อยและทางแก้ (Pitfalls &amp; Solutions)
-            </h3>
-            <p className="text-[11px] sm:text-xs text-base-content-muted">
-              เรื่องที่มักทำให้โปรเจกต์ช้าหรือพัง พร้อมวิธีกัน
-            </p>
-          </div>
-        </div>
-        {isOpen ? <ChevronUp className="w-4 h-4 text-base-content-secondary" /> : <ChevronDown className="w-4 h-4 text-base-content-muted" />}
-      </button>
-
-      {isOpen && (
-        <div className="p-box space-y-3 border-t border-base-border bg-base-100">
+    <SectionShell {...props} sectionKey="pitfalls" title="กับดักที่เจอบ่อย" note={`${chapter.commonPitfalls.length} ข้อ`}>
+        <div className="space-y-3">
           {chapter.commonPitfalls.map((cp, cpIdx) => (
             <div
               key={cpIdx}
@@ -51,7 +32,6 @@ export const PitfallsSection: React.FC<SectionProps> = ({ chapter, isOpen, onTog
             </div>
           ))}
         </div>
-      )}
-    </div>
+    </SectionShell>
   );
 };

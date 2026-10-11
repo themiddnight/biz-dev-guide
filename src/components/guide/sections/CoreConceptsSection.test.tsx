@@ -4,6 +4,7 @@ import { CHAPTERS } from '../../../data/chaptersData';
 import type { ExperienceLevel } from '../../../types';
 import { CoreConceptsSection } from './CoreConceptsSection';
 import type { GuideSectionContext } from './registry';
+import { CORE } from './testCtx';
 
 const ch = (id: string) => {
   const c = CHAPTERS.find(x => x.id === id);
@@ -12,7 +13,7 @@ const ch = (id: string) => {
 };
 const render = (id: string, chapterLevel: ExperienceLevel) => {
   const ctx = { chapterLevel, onNavigateChapter: () => {} } as unknown as GuideSectionContext;
-  return renderToStaticMarkup(<CoreConceptsSection chapter={ch(id)} isOpen onToggle={() => {}} ctx={ctx} />);
+  return renderToStaticMarkup(<CoreConceptsSection chapter={ch(id)} fold={CORE} ctx={ctx} />);
 };
 
 const esc = (t: string) => t.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;').replace(/</g, '&lt;').replace(/>/g, '&gt;');

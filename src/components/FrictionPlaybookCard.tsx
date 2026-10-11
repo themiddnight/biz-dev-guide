@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { FrictionPlaybook } from '../types';
 import { 
   Flame, 
-  ChevronDown, 
-  ChevronUp, 
   Scale, 
   MessageSquareQuote, 
   CheckCircle, 
@@ -16,14 +14,10 @@ import { TAP } from './ui/tapTarget';
 
 interface FrictionPlaybookCardProps {
   playbook: FrictionPlaybook;
-  isOpen: boolean;
-  onToggle: () => void;
 }
 
 export const FrictionPlaybookCard: React.FC<FrictionPlaybookCardProps> = ({
   playbook,
-  isOpen,
-  onToggle,
 }) => {
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
 
@@ -32,40 +26,8 @@ export const FrictionPlaybookCard: React.FC<FrictionPlaybookCardProps> = ({
   };
 
   return (
-    <div 
-      id="friction-playbook-card"
-      className="border border-base-border rounded-box overflow-hidden bg-base-100 shadow-2xs transition-all"
-    >
-      {/* Playbook Header Accordion */}
-      <button
-        onClick={onToggle}
-        className={`${TAP} w-full p-box flex items-center justify-between bg-base-300 text-left cursor-pointer select-none transition-colors hover:bg-base-border`}
-      >
-        <div className="flex items-center gap-stack">
-          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-field bg-warning text-warning-content flex items-center justify-center font-bold text-xs sm:text-sm shadow-xs shrink-0">
-            ⚡
-          </div>
-          <div>
-            <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-              <h3 className="text-xs sm:text-base font-bold text-base-content leading-snug">
-                คู่มือรับมือ Friction & วิธีเจรจา (Friction Playbook)
-              </h3>
-              <span className="text-[10px] sm:text-[11px] font-semibold px-2 py-0.5 rounded-full bg-warning/10 text-warning border border-warning/25">
-                สำหรับ Experienced
-              </span>
-            </div>
-            <p className="text-[11px] sm:text-xs text-base-content-muted mt-0.5 line-clamp-1 sm:line-clamp-none">
-              จุดที่เถียงกัน: {playbook.battlegroundTitle}
-            </p>
-          </div>
-        </div>
-        <div className="text-warning shrink-0 ml-2">
-          {isOpen ? <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5" /> : <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5" />}
-        </div>
-      </button>
-
-      {isOpen && (
-        <div className="p-box space-y-3 sm:space-y-3.5 border-t border-base-border bg-base-100 text-xs sm:text-sm">
+        <div className="space-y-3 sm:space-y-3.5 text-xs sm:text-sm">
+          <h3 className="text-base font-bold text-base-content">{playbook.battlegroundTitle}</h3>
           {/* Section 1: The Iceberg - Frustrations and Root Cause */}
           <div className="space-y-2.5">
             <div className="flex items-center gap-1.5 text-xs font-bold text-base-content">
@@ -284,7 +246,5 @@ export const FrictionPlaybookCard: React.FC<FrictionPlaybookCardProps> = ({
             </div>
           )}
         </div>
-      )}
-    </div>
   );
 };

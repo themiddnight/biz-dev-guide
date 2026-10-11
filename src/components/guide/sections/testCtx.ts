@@ -1,5 +1,5 @@
 import { CHAPTERS } from '../../../data/chaptersData';
-import type { GuideSectionContext } from './registry';
+import type { GuideSectionContext, SectionFold } from './registry';
 
 const noop = () => {};
 
@@ -15,3 +15,8 @@ export const ctxFor = (over: Partial<GuideSectionContext> = {}): GuideSectionCon
   role: null, chapterLevel: 'beginner', otherSideView: 'both', setOtherSideView: noop,
   ...over,
 });
+
+/** A Core section: open, no control. */
+export const CORE: SectionFold = { foldable: false };
+/** A section outside Core, in the given fold state. */
+export const foldable = (isOpen: boolean, onToggle: () => void = noop): SectionFold => ({ foldable: true, isOpen, onToggle });

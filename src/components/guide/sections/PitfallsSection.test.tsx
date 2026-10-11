@@ -3,14 +3,14 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { CHAPTERS } from '../../../data/chaptersData';
 import type { Chapter } from '../../../types';
 import { PitfallsSection } from './PitfallsSection';
-import { ctxFor } from './testCtx';
+import { CORE, foldable, ctxFor } from './testCtx';
 
 const noop = () => {};
 const s1 = CHAPTERS.find(c => c.id === 's1')!;
 const first = s1.commonPitfalls![0];
 const second = s1.commonPitfalls![1];
 const render = (chapter: Chapter, isOpen = true) =>
-  renderToStaticMarkup(<PitfallsSection chapter={chapter} isOpen={isOpen} onToggle={noop} ctx={ctxFor()} />);
+  renderToStaticMarkup(<PitfallsSection chapter={chapter} fold={isOpen ? CORE : foldable(false)} ctx={ctxFor()} />);
 
 describe('PitfallsSection warning sign (spec A1)', () => {
   it('shows pitfall, then the labelled warning sign, then the solution', () => {

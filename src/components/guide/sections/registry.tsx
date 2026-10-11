@@ -16,6 +16,7 @@ import { GlossarySection } from './GlossarySection';
 import { PracticeSection } from './PracticeSection';
 import { PitfallsSection } from './PitfallsSection';
 import { OtherSideSection } from './OtherSideSection';
+import { SectionShell } from './SectionShell';
 
 /** Which side the other-side box shows (spec P2.2). Session state in GuideTab, not persisted. */
 export type OtherSideView = Role | 'both';
@@ -36,12 +37,25 @@ export interface GuideSectionContext {
   otherSideView: OtherSideView; setOtherSideView: (v: OtherSideView) => void;
 }
 
-export interface SectionProps { chapter: Chapter; isOpen: boolean; onToggle: () => void; ctx: GuideSectionContext }
+/**
+ * How a section sits in the reader's layout: a Core section is always open and has no control,
+ * any other section folds and its heading is the control.
+ */
+export type SectionFold =
+  | { foldable: false }
+  | { foldable: true; isOpen: boolean; onToggle: () => void };
 
-const FrictionSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggle }) => {
+export interface SectionProps { chapter: Chapter; fold: SectionFold; ctx: GuideSectionContext }
+
+const FrictionSection: React.FC<SectionProps> = props => {
   // Present only with a playbook (spec A4); the guard narrows the type without a non-null assertion.
-  if (!chapter.frictionPlaybook) return null;
-  return <FrictionPlaybookCard playbook={chapter.frictionPlaybook} isOpen={isOpen} onToggle={onToggle} />;
+  const playbook = props.chapter.frictionPlaybook;
+  if (!playbook) return null;
+  return (
+    <SectionShell {...props} sectionKey="friction" note="เมื่อสองฝั่งเถียงกันเรื่องนี้">
+      <FrictionPlaybookCard playbook={playbook} />
+    </SectionShell>
+  );
 };
 
 export const SECTION_COMPONENTS: Record<SectionKey, React.FC<SectionProps>> = {

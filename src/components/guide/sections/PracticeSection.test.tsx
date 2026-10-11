@@ -6,19 +6,18 @@ import type { Chapter } from '../../../types';
 import type { GuideSectionContext } from './registry';
 import { PracticeSection } from './PracticeSection';
 import { ChecklistItems } from './ChecklistItems';
-import { ctxFor } from './testCtx';
+import { CORE, foldable, ctxFor } from './testCtx';
 
 const noop = () => {};
 const s1 = CHAPTERS.find(c => c.id === 's1')!;
 const render = (chapter: Chapter, over: Partial<GuideSectionContext> = {}, isOpen = true) =>
-  renderToStaticMarkup(<PracticeSection chapter={chapter} isOpen={isOpen} onToggle={noop} ctx={ctxFor(over)} />);
+  renderToStaticMarkup(<PracticeSection chapter={chapter} fold={isOpen ? CORE : foldable(false)} ctx={ctxFor(over)} />);
 
 describe('PracticeSection (spec A2)', () => {
-  it('header: title and both counts; closed shows no body', () => {
+  it('heading: the section name and both counts; folded shows no body', () => {
     const html = render(s1, {}, false);
-    expect(html).toContain('🛠️');
-    expect(html).toContain('ลงมือทำ: ขั้นตอนงานและเช็กลิสต์');
-    expect(html).toContain('ส่งต่องานทีละขั้น แล้วเช็กให้ครบก่อนส่ง (4 ขั้น · 5 ข้อ)');
+    expect(html).toContain('>ลงมือทำ</span>');
+    expect(html).toContain('>4 ขั้น · 5 ข้อ</span>');
     expect(html).not.toContain('data-practice-steps');
   });
 
@@ -47,10 +46,10 @@ describe('PracticeSection (spec A2)', () => {
 
   it('drops an empty half and its count', () => {
     const noList = render({ ...s1, checklist: [] });
-    expect(noList).toContain('ส่งต่องานทีละขั้น แล้วเช็กให้ครบก่อนส่ง (4 ขั้น)');
+    expect(noList).toContain('>4 ขั้น</span>');
     expect(noList).not.toContain('data-practice-checklist');
     const noSteps = render({ ...s1, realWorldWorkflow: [] });
-    expect(noSteps).toContain('ส่งต่องานทีละขั้น แล้วเช็กให้ครบก่อนส่ง (5 ข้อ)');
+    expect(noSteps).toContain('>5 ข้อ</span>');
     expect(noSteps).not.toContain('data-practice-steps');
   });
 

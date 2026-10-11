@@ -7,7 +7,7 @@ import { GLOSSARY, GlossaryCategory } from '../data/glossary';
 import { filterIndexChapters } from '../lib/chapterSearch';
 import { buildChapterContext, type ChapterContext } from '../lib/chapterContext';
 import { IndexEmptyState } from './guide/IndexEmptyState';
-import { SECTION_COMPONENTS, type GuideSectionContext, type OtherSideView } from './guide/sections/registry';
+import { SECTION_COMPONENTS, type GuideSectionContext, type OtherSideView, type SectionFold } from './guide/sections/registry';
 import {
   getChapterLayout,
   deriveOpenState,
@@ -15,12 +15,10 @@ import {
   collapseAll,
   openSection,
   toggleSection,
-  getInlineSectionsAt,
   type OpenState,
   type SectionKey,
 } from '../data/sectionLayers';
 import { planRequest, type RequestedSection } from '../lib/chapterRoute';
-import { InlineSections } from './guide/InlineSections';
 import { ChapterHero } from './guide/ChapterHero';
 import { ChapterIntro } from './guide/ChapterIntro';
 import { SectionOutline } from './guide/SectionOutline';
@@ -334,7 +332,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
       return;
     }
     setOpenState(prev => openSection(prev, layout, 'friction'));
-    setPendingScrollId('friction-playbook-card');
+    setPendingScrollId('sec-friction');
   };
 
   const toggleChecklistItem = (key: string) => {
@@ -723,26 +721,15 @@ export const GuideTab: React.FC<GuideTabProps> = ({
               onCollapseAll={() => setOpenState(collapseAll(layout))}
             />
 
-            {layout.flatMap(group => group.sections).map(key => {
-              const Section = SECTION_COMPONENTS[key];
-              return (
-                <section key={key} id={`sec-${key}`} className="anchor-target">
-                  <Section
-                    chapter={activeChapter}
-                    isOpen={!!openState.sections[key]}
-                    onToggle={() => setOpenState(prev => toggleSection(prev, key))}
-                    ctx={sectionCtx}
-                  />
-                  {openState.sections[key] && (
-                    <InlineSections
-                      className="mt-3.5"
-                      sections={getInlineSectionsAt(activeChapter, key)}
-                      onNavigateChapter={sectionCtx.onNavigateChapter}
-                    />
-                  )}
-                </section>
-              );
-            })}
+            <div>
+              {layout.flatMap(group => group.sections.map(key => {
+                const Section = SECTION_COMPONENTS[key];
+                const fold: SectionFold = group.layer === 'core'
+                  ? { foldable: false }
+                  : { foldable: true, isOpen: !!openState.sections[key], onToggle: () => setOpenState(prev => toggleSection(prev, key)) };
+                return <Section key={key} chapter={activeChapter} fold={fold} ctx={sectionCtx} />;
+              }))}
+            </div>
 
             {/* Chapter Footer Actions */}
             <div className="pt-5 border-t border-base-border space-y-3.5">

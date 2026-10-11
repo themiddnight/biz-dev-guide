@@ -47,7 +47,7 @@ import { JargonSection } from './JargonSection';
 import { OtherSideSection } from './OtherSideSection';
 import { ChapterIntro } from '../ChapterIntro';
 import type { OtherSideView } from './registry';
-import { ctxFor } from './testCtx';
+import { CORE, ctxFor } from './testCtx';
 
 const noop = () => {};
 
@@ -65,7 +65,7 @@ describe('term markers survive a StrictMode double render', () => {
   it('s18, eng reader: the "Business ถูกวัดผลด้วย" card marks KR and KPI (acceptance 2)', () => {
     const chapter = CHAPTERS.find(c => c.id === 's18')!;
     const html = renderToStaticMarkup(
-      <OtherSideSection chapter={chapter} isOpen onToggle={noop} ctx={ctxFor({ role: 'eng', otherSideView: 'biz' })} />,
+      <OtherSideSection chapter={chapter} fold={CORE} ctx={ctxFor({ role: 'eng', otherSideView: 'biz' })} />,
     );
     const measuredBy = /ถูกวัดผลด้วย<\/div><p[^>]*>(.*?)<\/p>/.exec(html)?.[1] ?? '';
     expect(rendered(measuredBy)).toEqual(['kr', 'okr-kpi']);
@@ -74,7 +74,7 @@ describe('term markers survive a StrictMode double render', () => {
   it.each(['biz', 'eng', 'both'] as OtherSideView[])('other side (%s): every chapter renders exactly the markers its walk computes', view => {
     let total = 0;
     for (const chapter of CHAPTERS) {
-      const html = renderToStaticMarkup(<OtherSideSection chapter={chapter} isOpen onToggle={noop} ctx={ctxFor({ otherSideView: view })} />);
+      const html = renderToStaticMarkup(<OtherSideSection chapter={chapter} fold={CORE} ctx={ctxFor({ otherSideView: view })} />);
       const cards = otherSideTerms(chapter, view === 'both' ? ROLES : [view]);
       const want = expected(cards.flatMap(c => [c.measuredBy, ...c.fears, ...c.saysVsHears.flatMap(r => [r.youSay, r.theyHear, r.sayInstead]), ...c.askThem, c.note]));
       expect(rendered(html), chapter.id).toEqual(want);
@@ -95,9 +95,9 @@ describe('term markers survive a StrictMode double render', () => {
           [hero.chapterOpening, ...(chapter.heroFigure ? [hero.plainAnalogy, hero.keyTakeaway] : [hero.keyTakeaway, hero.plainAnalogy])]],
         primer: [renderToStaticMarkup(<ChapterIntro chapter={chapter} />),
           primer ? [primer.whatIsIt, primer.whyItMatters, primer.realWorldScenario] : []],
-        jargon: [renderToStaticMarkup(<JargonSection chapter={chapter} isOpen onToggle={noop} ctx={ctx} />),
+        jargon: [renderToStaticMarkup(<JargonSection chapter={chapter} fold={CORE} ctx={ctx} />),
           jargonTerms(chapter).flatMap(card => [card.humanTranslation, card.meetingExample])],
-        coreConcepts: [renderToStaticMarkup(<CoreConceptsSection chapter={chapter} isOpen onToggle={noop} ctx={ctx} />),
+        coreConcepts: [renderToStaticMarkup(<CoreConceptsSection chapter={chapter} fold={CORE} ctx={ctx} />),
           concepts.flatMap(c => [c.detail, ...c.bulletPoints])],
       } as const;
       for (const [section, [html, texts]] of Object.entries(cases)) {
@@ -117,7 +117,7 @@ describe('unfolding a concept never moves a marker (review S1)', () => {
     let markers = 0;
     for (const chapter of CHAPTERS) {
       const render = (chapterLevel: 'beginner' | 'experienced') =>
-        renderToStaticMarkup(<CoreConceptsSection chapter={chapter} isOpen onToggle={noop} ctx={ctxFor({ chapterLevel })} />);
+        renderToStaticMarkup(<CoreConceptsSection chapter={chapter} fold={CORE} ctx={ctxFor({ chapterLevel })} />);
       const folded = render('beginner');
       const unfolded = render('experienced');
       expect(folded).not.toContain('<ul'); // the beginner view really is folded

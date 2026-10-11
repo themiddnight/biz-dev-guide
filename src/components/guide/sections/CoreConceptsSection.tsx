@@ -1,14 +1,13 @@
 import React, { useMemo, useState } from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
 import { getInlineSectionsAt } from '../../../data/sectionLayers';
 import { InlineSections } from '../InlineSections';
 import type { SectionProps } from './registry';
+import { SectionShell } from './SectionShell';
 import { RichText } from '../../content/RichText';
 import { coreConceptTerms } from '../../../lib/sectionTerms';
-import { TAP } from '../../ui/tapTarget';
-import { IconBadge } from '../../ui/IconBadge';
 
-export const CoreConceptsSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggle, ctx }) => {
+export const CoreConceptsSection: React.FC<SectionProps> = props => {
+  const { chapter, ctx } = props;
   // Beginners see each concept compact (heading + detail); bullets and inline sections sit behind a toggle.
   // Toggles are keyed by concept index, so they belong to one chapter and reset when it changes.
   const [more, setMore] = useState<{ chapterId: string; open: Record<number, boolean> }>({ chapterId: chapter.id, open: {} });
@@ -22,27 +21,8 @@ export const CoreConceptsSection: React.FC<SectionProps> = ({ chapter, isOpen, o
     <RichText text={text} onNavigateChapter={ctx.onNavigateChapter} onSearchGlossary={ctx.onSearchGlossary} />
   );
   return (
-    <div className="border border-base-border rounded-box overflow-hidden bg-base-100 shadow-2xs">
-      <button
-        onClick={onToggle}
-        className={`${TAP} w-full p-box flex items-center justify-between bg-base-300 hover:bg-base-border text-left cursor-pointer select-none transition-colors`}
-      >
-        <div className="flex items-center gap-3">
-          <IconBadge size="md">💡</IconBadge>
-          <div>
-            <h3 className="text-xs sm:text-sm font-bold text-base-content">
-              แนวคิดหลัก (Core Concepts)
-            </h3>
-            <p className="text-[11px] sm:text-xs text-base-content-muted">
-              แนวคิดที่ใช้จริงในงาน ({chapter.coreConcepts.length} หัวข้อ)
-            </p>
-          </div>
-        </div>
-        {isOpen ? <ChevronUp className="w-4 h-4 text-base-content-secondary" /> : <ChevronDown className="w-4 h-4 text-base-content-muted" />}
-      </button>
-
-      {isOpen && (
-        <div className="p-box space-y-3.5 border-t border-base-border bg-base-100">
+    <SectionShell {...props} sectionKey="coreConcepts" note={`${chapter.coreConcepts.length} หัวข้อ`}>
+        <div className="space-y-3.5">
           {chapter.coreConcepts.map((concept, cIdx) => {
             const inline = getInlineSectionsAt(chapter, 'coreConcepts', cIdx);
             const bulletCount = concept.bulletPoints?.length ?? 0;
@@ -89,7 +69,6 @@ export const CoreConceptsSection: React.FC<SectionProps> = ({ chapter, isOpen, o
             );
           })}
         </div>
-      )}
-    </div>
+    </SectionShell>
   );
 };

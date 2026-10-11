@@ -5,7 +5,7 @@ import { getChapterLayout } from '../../../data/sectionLayers';
 import { ChapterHero } from '../ChapterHero';
 import { ChapterIntro } from '../ChapterIntro';
 import { SECTION_COMPONENTS } from './registry';
-import { ctxFor } from './testCtx';
+import { CORE, ctxFor } from './testCtx';
 
 /**
  * The honesty check on real data (term-definitions spec D16): where the automatic markers land in
@@ -29,7 +29,7 @@ function beginnerCoreMarkers(chapterId: string): string[] {
     ...markersOf(intro).map(m => `intro: ${m}`),
     ...core.flatMap(key => {
       const Section = SECTION_COMPONENTS[key];
-      const html = renderToStaticMarkup(<Section chapter={chapter} isOpen onToggle={noop} ctx={ctx} />);
+      const html = renderToStaticMarkup(<Section chapter={chapter} fold={CORE} ctx={ctx} />);
       return markersOf(html).map(m => `${key}: ${m}`);
     }),
   ];

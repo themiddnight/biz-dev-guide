@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layers, ChevronDown, ChevronUp } from 'lucide-react';
+import { Layers } from 'lucide-react';
 import { ChapterDiagram } from '../../ChapterDiagram';
 import { ContentBlocks } from '../../content/ContentBlocks';
 import { DiagramFamilyGrid } from '../../diagrams/DiagramFamilyGrid';
@@ -9,33 +9,15 @@ import { FIGURES } from '../../figures';
 import { GlossaryCategoryMap } from '../../glossary/GlossaryCategoryMap';
 import { GLOSSARY } from '../../../data/glossary';
 import type { SectionProps } from './registry';
-import { TAP } from '../../ui/tapTarget';
-import { IconBadge } from '../../ui/IconBadge';
+import { SectionShell } from './SectionShell';
 import { Tabs } from '../../ui/Tabs';
 
-export const DiagramSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggle, ctx }) => {
+export const DiagramSection: React.FC<SectionProps> = props => {
+  const { chapter, ctx } = props;
   return (
-    <div className="border border-base-border rounded-box overflow-hidden bg-base-100 shadow-2xs">
-      <button
-        onClick={onToggle}
-        className={`${TAP} w-full p-box flex items-center justify-between bg-base-300 hover:bg-base-border text-left cursor-pointer select-none transition-colors`}
-      >
-        <div className="flex items-center gap-3">
-          <IconBadge size="md">🗺️</IconBadge>
-          <div>
-            <h3 className="text-xs sm:text-sm font-bold text-base-content">
-              {chapter.diagramTitle || `แผนภาพโครงสร้างและกระบวนการบทที่ ${chapter.num}`}
-            </h3>
-            <p className="text-[11px] sm:text-xs text-base-content-muted">
-              {chapter.diagramDescription || 'ภาพรวมระบบและขั้นตอนการทำงาน'}
-            </p>
-          </div>
-        </div>
-        {isOpen ? <ChevronUp className="w-4 h-4 text-base-content-secondary" /> : <ChevronDown className="w-4 h-4 text-base-content-muted" />}
-      </button>
-
-      {isOpen && (
-        <div className="p-box border-t border-base-border bg-base-100 space-y-4">
+    <SectionShell {...props} sectionKey="diagram" title={chapter.diagramTitle}>
+        <div className="space-y-4">
+          {chapter.diagramDescription && <p className="text-base-content-secondary">{chapter.diagramDescription}</p>}
           {/* s5: diagram families + T1 render above the Monolith vs Microservices simulator (spec §3.4 order) */}
           {chapter.id === 's5' && (
             <div className="space-y-3">
@@ -152,7 +134,6 @@ export const DiagramSection: React.FC<SectionProps> = ({ chapter, isOpen, onTogg
             </>
           )}
         </div>
-      )}
-    </div>
+    </SectionShell>
   );
 };

@@ -1,36 +1,19 @@
 import React from 'react';
-import { ChevronDown, ChevronUp, Lightbulb } from 'lucide-react';
+import { Lightbulb } from 'lucide-react';
 import type { SectionProps } from './registry';
-import { TAP } from '../../ui/tapTarget';
-import { IconBadge } from '../../ui/IconBadge';
+import { SectionShell } from './SectionShell';
 import { DialogueCompare } from './DialogueCompare';
 
 /** Real examples: the workplace dialogue first, then the company cases (spec A3). */
-export const ExamplesSection: React.FC<SectionProps> = ({ chapter, isOpen, onToggle }) => {
+export const ExamplesSection: React.FC<SectionProps> = props => {
+  const { chapter } = props;
   const cases = chapter.realWorldExamples ?? [];
   if (cases.length === 0 && !chapter.dialogueExample) return null;
-  // The case count is dropped when there are no cases, like the practice counts.
-  const subtitle = `พูดแบบไหนพัง แบบไหนได้ผล และบทเรียนจากบริษัทจริง${cases.length > 0 ? ` (${cases.length} เคส)` : ''}`;
+  // A part is dropped when the chapter lacks it, like the practice counts.
+  const note = [chapter.dialogueExample ? 'บทสนทนา' : null, cases.length > 0 ? `${cases.length} เคส` : null].filter(Boolean).join(' · ');
   return (
-    <div className="border border-base-border rounded-box overflow-hidden bg-base-100 shadow-2xs">
-      <button
-        onClick={onToggle}
-        className={`${TAP} w-full p-box flex items-center justify-between bg-base-300 hover:bg-base-border text-left cursor-pointer select-none transition-colors`}
-      >
-        <div className="flex items-center gap-3">
-          <IconBadge size="md">🏢</IconBadge>
-          <div>
-            <h3 className="text-xs sm:text-sm font-bold text-base-content">
-              ตัวอย่างจริง: บทสนทนาและเคสจากบริษัท
-            </h3>
-            <p className="text-[11px] sm:text-xs text-base-content-muted">{subtitle}</p>
-          </div>
-        </div>
-        {isOpen ? <ChevronUp className="w-4 h-4 text-base-content-secondary" /> : <ChevronDown className="w-4 h-4 text-base-content-muted" />}
-      </button>
-
-      {isOpen && (
-        <div className="p-box space-y-5 border-t border-base-border bg-base-100">
+    <SectionShell {...props} sectionKey="examples" note={note}>
+        <div className="space-y-5">
           {chapter.dialogueExample && (
             <div className="space-y-2.5" data-examples-dialogue>
               <h4 className="text-xs sm:text-sm font-bold text-base-content">บทสนทนาในที่ทำงาน</h4>
@@ -94,7 +77,6 @@ export const ExamplesSection: React.FC<SectionProps> = ({ chapter, isOpen, onTog
             </div>
           )}
         </div>
-      )}
-    </div>
+    </SectionShell>
   );
 };
