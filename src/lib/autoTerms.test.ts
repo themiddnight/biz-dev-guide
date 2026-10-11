@@ -62,11 +62,26 @@ describe('markTerms guardrails', () => {
     expect(marked.startsWith('QA (Quality Assurance) คือ')).toBe(true);
     expect(ids(marked).some(id => id.startsWith('qa|'))).toBe(false);
     expect(ids(mark('KR (ผลลัพธ์หลัก) ของไตรมาส'))).toEqual([]);
-    expect(ids(mark('ดู Key Results (KR) ทุกเดือน'))).toEqual([]);
+    // An expansion that only repeats the term in Thai or in full is not a second marker.
+    expect(ids(mark('PM (Product Manager) คือคนตัดสินใจ'))).toEqual([]);
     // An expanded first use still counts as the section's one use of that term.
     const seen = new Set<string>();
     mark('QA (Quality Assurance) คือ', seen);
     expect(ids(mark('แล้ว QA ก็ตรวจ', seen))).toEqual([]);
+  });
+
+  it('6b. a term alone in parentheses is marked: a gloss in passing is not a definition', () => {
+    expect(mark('เงินที่ได้จากลูกค้าหนึ่งคน (LTV) มากกว่าเงินที่จ่ายเพื่อหาเขามา (CAC)')).toBe(
+      'เงินที่ได้จากลูกค้าหนึ่งคน ([[g:ltv|LTV]]) มากกว่าเงินที่จ่ายเพื่อหาเขามา ([[g:cac|CAC]])',
+    );
+    expect(ids(mark('รายได้ (Revenue): เงินที่ลูกค้าจ่าย'))).toEqual(['revenue|Revenue']);
+    // The short form in parentheses carries the marker when the full name comes first.
+    expect(mark('ดู Key Results (KR) ทุกเดือน')).toBe('ดู Key Results ([[g:kr|KR]]) ทุกเดือน');
+    expect(ids(mark('Product Manager (PM) คือคนตัดสินใจ'))).toEqual(['pm-vs-pjm|PM']);
+    // Still once per section.
+    const seen = new Set<string>();
+    mark('เงินที่ได้จากลูกค้าหนึ่งคน (LTV)', seen);
+    expect(ids(mark('ลด LTV โดยตรง', seen))).toEqual([]);
   });
 
   it('7. `[[!g:id]]` suppresses one term and `[[!g:*]]` suppresses all; both are stripped', () => {

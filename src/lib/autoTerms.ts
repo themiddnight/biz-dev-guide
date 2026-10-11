@@ -91,10 +91,17 @@ type Span = [start: number, end: number];
 
 const overlaps = (spans: readonly Span[], [s, e]: Span) => spans.some(([a, b]) => s < b && a < e);
 
-/** Guardrail 6: the text expands the term itself — `QA (Quality Assurance)`, `KR (ผลลัพธ์หลัก)`, `Key Results (KR)`. */
-const isExpandedAt = (text: string, [start, end]: Span, candidate: Candidate): boolean => {
+/** The term is the whole content of a pair of parentheses: `รายได้ (Revenue)`, `Key Results (KR)`. */
+const isAloneInParens = (text: string, [start, end]: Span): boolean =>
+  /\(\s*$/.test(text.slice(0, start)) && /^\s*\)/.test(text.slice(end));
+
+/**
+ * Guardrail 6: the text expands the term right after it — `QA (Quality Assurance)`, `KR (ผลลัพธ์หลัก)`.
+ * A term alone in parentheses is not expanded text: `เงินที่ได้จากลูกค้าหนึ่งคน (LTV)` glosses the
+ * term in passing, and the reader still needs its definition, so it is marked.
+ */
+const isExpandedAt = (text: string, [, end]: Span, candidate: Candidate): boolean => {
   if (/^\s*\(/.test(text.slice(end))) return true;
-  if (/\(\s*$/.test(text.slice(0, start)) && /^\s*\)/.test(text.slice(end))) return true;
   const window = text.slice(end, end + 40).toLowerCase();
   const open = window.indexOf('(');
   if (open === -1) return false;
@@ -144,11 +151,18 @@ function scan(text: string, seen: Set<string>, named?: string[]): string {
 
   let out = '';
   let cursor = 0;
-  for (const { span, candidate, label } of hits.sort((a, b) => a.span[0] - b.span[0])) {
+  hits.sort((a, b) => a.span[0] - b.span[0]);
+  for (const [index, { span, candidate, label }] of hits.entries()) {
     named?.push(candidate.id);
     if (optedOut.has(candidate.id) || seen.has(candidate.id)) continue;
+    const expanded = isExpandedAt(source, span, candidate);
+    // `Key Results (KR)`: a shorter form of the same term follows in parentheses and carries the
+    // marker. `QA (Quality Assurance)` stays unmarked: there the parentheses spell the term out.
+    const next = hits[index + 1];
+    const shortFormFollows = next?.candidate.id === candidate.id && next.label.length < label.length && isAloneInParens(source, next.span);
+    if (expanded && shortFormFollows) continue;
     seen.add(candidate.id); // an expanded first use also counts: the text defined it right there
-    if (isExpandedAt(source, span, candidate)) continue;
+    if (expanded) continue;
     out += source.slice(cursor, span[0]) + `[[g:${candidate.id}|${label}]]`;
     cursor = span[1];
   }

@@ -51,6 +51,20 @@ With a hero figure, `plainAnalogy` renders as one line under the figure and must
 | D1 | The Business track becomes 2, 1, 14, 4, 5, 6, 8, 9, 10, 11. Its length grows from 94 to 120 minutes. The owner accepted the longer track. s15 stays outside every track because it is a reference chapter. |
 | D2 | Add one quiz question each for s1, s3, s12, s14 and s15. The bank grows from 20 to 25 questions and every chapter has at least one. |
 
+## E. Terms in parentheses get a definition dropdown
+
+Added on 2026-10-11 after a check of first-use terms. It refines guardrail 6 of the term-definitions spec (P3.5).
+
+Before, automatic marking skipped a term that stood alone in parentheses, such as `เงินที่ได้จากลูกค้าหนึ่งคน (LTV)`, and counted it as defined for the rest of the section. CAC and LTV in s16 had no dropdown anywhere.
+
+| Text | Result |
+|------|--------|
+| `รายได้ (Revenue)`, `... (LTV)` | The term in parentheses is marked. |
+| `Product Manager (PM)`, `Key Results (KR)` | The short form in parentheses is marked. |
+| `QA (Quality Assurance)`, `KR (ผลลัพธ์หลัก)` | No change. The parentheses spell the term out, so nothing is marked. |
+
+A term is still marked once in each section. The change adds 21 markers across the 19 chapters and removes none.
+
 ## Out of scope
 
 - Interactive diagram widgets for s16-s19.

@@ -38,6 +38,9 @@ function beginnerCoreMarkers(chapterId: string): string[] {
 describe('automatic term markers on real chapters (beginner Core)', () => {
   it('s1, plain register: PM and SA in the PM → Designer → SA → Dev arrow chain are marked (D20, acceptance 1)', () => {
     expect(beginnerCoreMarkers('s1')).toEqual([
+      'hero: ba (BA)',
+      'hero: ux-ui (UX)',
+      'hero: qa (QA)',
       'intro: pm-vs-pjm (PM)',
       'intro: sa (SA)',
       'intro: api (API)',
@@ -65,6 +68,7 @@ describe('automatic term markers on real chapters (beginner Core)', () => {
 
   it('s15, academic register: the six-abbreviation primer sentence', () => {
     expect(beginnerCoreMarkers('s15')).toEqual([
+      'hero: ubiquitous-language (Ubiquitous Language)',
       'intro: api (API)',
       'intro: ci-cd (CI/CD)',
       'intro: sla (SLA)',
