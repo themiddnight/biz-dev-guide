@@ -4,7 +4,7 @@ import { resolveTrack, parseReadMinutes, getTrackMinutes, getTrackNext, getTrack
 
 const BEGINNER = ['s1', 's2', 's3', 's4', 's6', 's7', 's11', 's14'];
 const EXPERIENCED = ['s11', 's1', 's6', 's9', 's12', 's13', 's14'];
-const BIZ = ['s2', 's1', 's14', 's4', 's6', 's9', 's10', 's11'];
+const BIZ = ['s2', 's1', 's14', 's4', 's5', 's6', 's8', 's9', 's10', 's11'];
 const ENG = ['s16', 's1', 's2', 's17', 's18', 's4', 's11', 's19', 's9'];
 const homeOf = (id: string) => CHAPTERS.find(c => c.id === id)?.home;
 
@@ -36,9 +36,11 @@ describe('resolveTrack', () => {
     expect(homeOf(BIZ[0])).toBe('biz');
     expect(homeOf(ENG[0])).toBe('biz');
   });
-  it('biz track includes the spec chapter s14 and drops the architecture chapter s5', () => {
-    expect(BIZ).toContain('s14');
-    expect(BIZ).not.toContain('s5');
+  it('biz track includes the spec chapter s14 and the architecture and release chapters s5 and s8 (spec D1)', () => {
+    for (const id of ['s14', 's5', 's8']) expect(BIZ).toContain(id);
+  });
+  it('s15 is a reference chapter and sits on no track (spec D1)', () => {
+    for (const track of [BEGINNER, EXPERIENCED, BIZ, ENG]) expect(track).not.toContain('s15');
   });
   it('neither role track starts with s1', () => {
     expect(BIZ[0]).not.toBe('s1');
@@ -59,8 +61,8 @@ describe('minutes', () => {
     expect(getTrackMinutes(BEGINNER, CHAPTERS)).toBe(92);
     expect(getTrackMinutes(EXPERIENCED, CHAPTERS)).toBe(83);
   });
-  it('role track minutes 94 / 100', () => {
-    expect(getTrackMinutes(BIZ, CHAPTERS)).toBe(94);
+  it('role track minutes 120 / 100', () => {
+    expect(getTrackMinutes(BIZ, CHAPTERS)).toBe(120);
     expect(getTrackMinutes(ENG, CHAPTERS)).toBe(100);
   });
 });

@@ -350,8 +350,7 @@ const KNOWN_GAPS_V2: Record<TrackKey, { guardrailLimited: readonly string[]; mis
     guardrailLimited: [
       'track biz: "FURPS+" first seen at s4/coreConcepts.heading, never defined',
       'track biz: "Gate" first seen at s6/diagramDescription, never defined',
-      'track biz: "L1" first seen at s10/diagramTitle, defined only in s5 (not in this track)',
-      'track biz: "L2" first seen at s10/diagramTitle, defined only in s5 (not in this track)',
+      'track biz: "DORA" first seen at s8/coreConcepts.heading, defined only later at s8/coreConcepts.detail',
       'track biz: "L3" first seen at s10/diagramTitle, never defined',
     ],
     missingFromGlossary: [],
@@ -398,7 +397,7 @@ describe('term coverage v2: a definition at or before first use, per reading tra
   it('terms a track never defines anywhere, per track', () => {
     const never = (track: TrackKey) => trackGaps(track).filter(g => !g.line.includes('defined only later')).length;
     expect({ beginner: never('beginner'), experienced: never('experienced'), biz: never('biz'), eng: never('eng') })
-      .toEqual({ beginner: 2, experienced: 1, biz: 5, eng: 1 });
+      .toEqual({ beginner: 2, experienced: 1, biz: 3, eng: 1 });
   });
 });
 

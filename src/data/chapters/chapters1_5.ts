@@ -587,7 +587,7 @@ export const chapters1_5: Chapter[] = [
     businessNote: 'ขอดูแผนผัง Level 1 (System Context) ให้เข้าใจว่าระบบเราคุยกับใคร และเงินกับข้อมูลวิ่งไปทางไหน',
     engineerNote: 'ใช้ C4 Model และเขียนกำกับทุกกล่องทุกเส้น ให้ตั้งแต่เด็กฝึกงานถึงผู้บริหารดูภาพเดียวกันรู้เรื่อง',
     keyTakeaway: 'แผนผังที่ดีคือแผนผังที่คนนอกทีมดูแล้วชี้ได้ว่า ถ้าเซิร์ฟเวอร์ตัวนี้พัง ลูกค้ากลุ่มไหนโดนผลกระทบ',
-    plainAnalogy: '[[!g:support-ticket-support-tier]]เหมือนซูม Google Maps: L1 ทั้งประเทศ, L2 ถนนหลัก, L3 ตึก, L4 สายไฟในบ้าน',
+    plainAnalogy: 'เหมือนซูม Google Maps: ระดับ 1 ทั้งประเทศ, 2 ถนนหลัก, 3 ตึก, 4 สายไฟในบ้าน',
     readTime: '13 นาที',
     diagramTitle: 'Interactive C4 Architecture Model (การซูม 4 ระดับ)',
     diagramDescription: 'ลองซูมแผนผังระบบ 4 ระดับ: Level 1 (Context), Level 2 (Containers), Level 3 (Components), และ Level 4 (Code/Classes)',
@@ -600,7 +600,7 @@ export const chapters1_5: Chapter[] = [
       {
         term: 'C4 Model',
         formalDefinition: 'กรอบการวาดผังสถาปัตยกรรมซอฟต์แวร์ของ Simon Brown แบ่งเป็น Context, Containers, Components และ Code',
-        humanTranslation: '[[!g:support-ticket-support-tier]]ผังเดียวกันแต่เลือกระดับให้ตรงคนอ่าน: ผู้บริหารดู L1, Dev ดู L3–L4',
+        humanTranslation: 'ผังเดียวกันแต่เลือกระดับให้ตรงคนอ่าน: ผู้บริหารดู Level 1, Dev ดู Level 3–4',
         meetingExample: '"ประชุมกับผู้บริหาร ใช้ C4 Level 1 พอครับ อย่าเพิ่งเปิด Level 3 เดี๋ยวหลุดโฟกัส"'
       },
       {
@@ -678,8 +678,8 @@ export const chapters1_5: Chapter[] = [
         ]
       },
       {
-        heading: '3. ง่ายไว้ก่อน (KISS Principle)',
-        detail: 'สถาปัตยกรรมที่ดีที่สุดไม่ใช่แบบที่ทันสมัยที่สุด แต่คือแบบที่ง่ายที่สุดที่ยังตอบโจทย์ธุรกิจ อย่าเริ่มทำ Microservices ข้ามคลาวด์ตอนมีผู้ใช้วันละ 100 คน'
+        heading: '3. ง่ายไว้ก่อน (KISS)',
+        detail: 'หลัก KISS (Keep It Simple) บอกว่าสถาปัตยกรรมที่ดีที่สุดไม่ใช่แบบที่ทันสมัยที่สุด แต่คือแบบที่ง่ายที่สุดที่ยังตอบโจทย์ธุรกิจ อย่าเริ่มทำ Microservices ข้ามคลาวด์ตอนมีผู้ใช้วันละ 100 คน'
       }
     ],
     realWorldWorkflow: [
