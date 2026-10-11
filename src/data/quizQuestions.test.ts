@@ -9,10 +9,10 @@ const chaptersFor = (role: 'eng' | 'biz') =>
   new Set(QUIZ_QUESTIONS.filter((q) => q.forRole === role).map((q) => q.chapterId));
 
 describe('quiz questions', () => {
-  it('has unique ids 1-20', () => {
+  it('has unique ids 1-25', () => {
     const ids = QUIZ_QUESTIONS.map((q) => q.id);
     expect(new Set(ids).size).toBe(ids.length);
-    expect([...ids].sort((a, b) => a - b)).toEqual(Array.from({ length: 20 }, (_, i) => i + 1));
+    expect([...ids].sort((a, b) => a - b)).toEqual(Array.from({ length: 25 }, (_, i) => i + 1));
   });
 
   it('every question has 4 options and exactly one correct', () => {
@@ -44,7 +44,7 @@ describe('quiz questions', () => {
   });
 
   it('scenario questions 9-20: 6 eng as Dev, 6 biz, each mapped to a chapter, 25 XP', () => {
-    const scenario = QUIZ_QUESTIONS.filter((q) => q.id >= 9);
+    const scenario = QUIZ_QUESTIONS.filter((q) => q.id >= 9 && q.id <= 20);
     expect(scenario).toHaveLength(12);
     const eng = scenario.filter((q) => q.forRole === 'eng');
     const biz = scenario.filter((q) => q.forRole === 'biz');
@@ -53,6 +53,20 @@ describe('quiz questions', () => {
     expect(eng.every((q) => q.role === 'Dev')).toBe(true);
     expect(biz.every((q) => ['PM', 'BA', 'Bridge'].includes(q.role))).toBe(true);
     expect(scenario.every((q) => q.chapterId)).toBe(true);
+  });
+
+  it('questions 21-25 fill the chapters with none: s1 for both, s3 and s12 for eng, s14 and s15 for biz (spec D2)', () => {
+    const added = QUIZ_QUESTIONS.filter((q) => q.id >= 21);
+    expect(added.map((q) => [q.chapterId, q.forRole])).toEqual([
+      ['s1', 'both'], ['s3', 'eng'], ['s12', 'eng'], ['s14', 'biz'], ['s15', 'biz'],
+    ]);
+    expect(added.filter((q) => q.forRole === 'eng').every((q) => q.role === 'Dev')).toBe(true);
+    expect(added.filter((q) => q.forRole === 'biz').every((q) => ['PM', 'BA', 'Bridge'].includes(q.role))).toBe(true);
+  });
+
+  it('every chapter has at least one question (spec D2)', () => {
+    const covered = new Set(QUIZ_QUESTIONS.map((q) => q.chapterId));
+    expect(CHAPTERS.filter((c) => !covered.has(c.id)).map((c) => c.id)).toEqual([]);
   });
 
   it('eng set covers s16, s17, s18, s19, s2 and s11', () => {

@@ -19,6 +19,9 @@ const render = (role: 'eng' | 'biz' | null, read: string[] = [], current: string
       onOpenChapter={noop}
     />,
   );
+// With nothing read, a round opens on the question of the first chapter of the track it follows (F-07).
+const firstBasics = (track: 'beginner' | 'eng') =>
+  orderQuizRound(getQuizRound(QUIZ_QUESTIONS, 'basics'), { trackIds: resolveTrack(track, CHAPTERS), anchors: [] })[0];
 const scenario = (id: number) => QUIZ_QUESTIONS.find((x) => x.id === id)!.scenario.replace(/"/g, '&quot;');
 
 // The tab reads the stored round through the same guarded helper the app uses.
@@ -44,9 +47,9 @@ describe('QuizTab rounds', () => {
   it('role eng opens on its own round, marked as the reader\'s, with the first eng scenario', () => {
     const html = render('eng');
     expect(html).toContain('aria-label="เลือกชุดคำถาม"');
-    expect(html).toContain('สาย Engineering (สายคุณ) · 6 ข้อ');
-    expect(html).toContain('พื้นฐาน (ทุกสาย) · 8 ข้อ');
-    expect(html).toContain('ทั้งหมด · 20 ข้อ');
+    expect(html).toContain('สาย Engineering (สายคุณ) · 8 ข้อ');
+    expect(html).toContain('พื้นฐาน (ทุกสาย) · 9 ข้อ');
+    expect(html).toContain('ทั้งหมด · 25 ข้อ');
     // With nothing read, the eng round follows the eng reading track (F-07).
     const first = orderQuizRound(getQuizRound(QUIZ_QUESTIONS, 'eng'), { trackIds: resolveTrack('eng', CHAPTERS), anchors: [] })[0];
     expect(html).toContain(first.scenario);
@@ -56,7 +59,7 @@ describe('QuizTab rounds', () => {
   it('no role opens on basics with no own-role suffix', () => {
     const html = render(null);
     expect(html).not.toContain('(สายคุณ)');
-    expect(html).toContain(QUIZ_QUESTIONS[0].scenario.replace(/"/g, '&quot;'));
+    expect(html).toContain(firstBasics('beginner').scenario.replace(/"/g, '&quot;'));
   });
 });
 
@@ -65,7 +68,7 @@ describe('QuizTab remembers the chosen round (P5.1)', () => {
     setStoredRound('basics');
     const html = render('eng');
     expect(html).toMatch(/aria-pressed="true"[^>]*>พื้นฐาน \(ทุกสาย\)/);
-    expect(html).toContain(getQuizRound(QUIZ_QUESTIONS, 'basics')[0].scenario.replace(/"/g, '&quot;'));
+    expect(html).toContain(firstBasics('eng').scenario.replace(/"/g, '&quot;'));
   });
 
   it('a garbage stored value leaves the role default in place', () => {

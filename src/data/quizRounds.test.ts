@@ -9,22 +9,22 @@ import {
 } from './quizRounds';
 
 describe('quiz rounds', () => {
-  it('basics is the original 8 questions in order', () => {
-    expect(getQuizRound(QUIZ_QUESTIONS, 'basics').map((q) => q.id)).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
+  it('basics is the original 8 questions in order, then the s1 question (spec D2)', () => {
+    expect(getQuizRound(QUIZ_QUESTIONS, 'basics').map((q) => q.id)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 21]);
   });
 
-  it.each(['eng', 'biz'] as const)('%s round has 6 questions, all for that role', (round) => {
+  it.each(['eng', 'biz'] as const)('%s round has 8 questions, all for that role', (round) => {
     const qs = getQuizRound(QUIZ_QUESTIONS, round);
-    expect(qs).toHaveLength(6);
+    expect(qs).toHaveLength(8);
     expect(qs.every((q) => q.forRole === round)).toBe(true);
   });
 
-  it('all round has 20 questions with no duplicates, role-specific first', () => {
+  it('all round has 25 questions with no duplicates, role-specific first', () => {
     const qs = getQuizRound(QUIZ_QUESTIONS, 'all');
-    expect(qs).toHaveLength(20);
-    expect(new Set(qs.map((q) => q.id)).size).toBe(20);
+    expect(qs).toHaveLength(25);
+    expect(new Set(qs.map((q) => q.id)).size).toBe(25);
     const firstBasics = qs.findIndex((q) => q.forRole === 'both');
-    expect(firstBasics).toBe(12);
+    expect(firstBasics).toBe(16);
     expect(qs.slice(firstBasics).every((q) => q.forRole === 'both')).toBe(true);
   });
 
@@ -69,10 +69,10 @@ describe('initialQuizRound', () => {
   });
 });
 
-describe('round sizes are unchanged', () => {
-  it('8 / 6 / 6 / 20', () => {
+describe('round sizes', () => {
+  it('9 / 8 / 8 / 25 (spec D2)', () => {
     const sizes = (['basics', 'eng', 'biz', 'all'] as const).map((r) => getQuizRound(QUIZ_QUESTIONS, r).length);
-    expect(sizes).toEqual([8, 6, 6, 20]);
+    expect(sizes).toEqual([9, 8, 8, 25]);
   });
 });
 
@@ -143,10 +143,10 @@ describe('basicsHintChapter', () => {
   it('no hint with no anchors, on basics itself, or when basics has nothing either', () => {
     expect(basicsHintChapter('biz', QUIZ_QUESTIONS, [])).toBeNull();
     expect(basicsHintChapter('basics', QUIZ_QUESTIONS, ['s2'])).toBeNull();
-    expect(basicsHintChapter('biz', QUIZ_QUESTIONS, ['s1'])).toBeNull();
+    expect(basicsHintChapter('biz', QUIZ_QUESTIONS, ['s3'])).toBeNull();
   });
   it('names the first anchor basics covers', () => {
-    expect(basicsHintChapter('eng', QUIZ_QUESTIONS, ['s1', 's5'])).toBe('s5');
+    expect(basicsHintChapter('eng', QUIZ_QUESTIONS, ['s13', 's5'])).toBe('s5');
   });
   it('the all round contains basics, so it never needs the hint', () => {
     expect(basicsHintChapter('all', QUIZ_QUESTIONS, ['s2'])).toBeNull();
