@@ -578,8 +578,8 @@ export const chapters6_10: Chapter[] = [
     keyTakeaway: 'ตั้ง SLO ให้เข้มกว่า SLA เสมอ จะได้รู้ตัวก่อนผิดสัญญากับลูกค้า',
     plainAnalogy: 'เหมือนโรงพยาบาล: Monitoring คือเครื่องวัดชีพจร Incident Response คือทีมฉุกเฉิน',
     readTime: '12 นาที',
-    diagramTitle: 'Closed-Loop Support & Escalation (L1 ➔ L2 ➔ L3 ➔ Product Backlog)',
-    diagramDescription: 'วงจรรับเรื่องปัญหา: ลูกค้าแจ้งเรื่อง ➔ L1 คัดเรื่องก่อน ➔ L2 วิเคราะห์ระบบ ➔ L3 แก้โค้ดฉุกเฉิน ➔ หาต้นเหตุจริง (Root Cause) แล้ววนกลับเป็นงานปรับปรุงใน Backlog',
+    diagramTitle: 'Closed-Loop Support & Escalation (Tier 1 ➔ Tier 2 ➔ Tier 3 ➔ Product Backlog)',
+    diagramDescription: 'วงจรรับเรื่องปัญหา: ลูกค้าแจ้งเรื่อง ➔ Tier 1 คัดเรื่องก่อน ➔ Tier 2 วิเคราะห์ระบบ ➔ Tier 3 แก้โค้ดฉุกเฉิน ➔ หาต้นเหตุจริง (Root Cause) แล้ววนกลับเป็นงานปรับปรุงใน Backlog',
     beginnerPrimer: {
       whatIsIt: 'SRE (Site Reliability Engineering) คือการใช้หลักวิศวกรรมดูแลระบบ ตั้งเป้าด้วย SLO และเปลี่ยนงานซ้ำๆ ให้อัตโนมัติ ส่วน Incident Management คือการดับไฟตอนระบบพัง',
       whyItMatters: 'ระบบล่มนานเท่าไร ก็เสียทั้งรายได้และความเชื่อใจที่เรียกกลับมายาก ถ้ามีขั้นตอนรับมือชัด ทีมจะกู้ระบบได้เร็วขึ้นมาก',
@@ -656,7 +656,7 @@ export const chapters6_10: Chapter[] = [
       },
       {
         heading: '2. ลำดับขั้นการรับเรื่อง (Support Tiers)',
-        detail: 'แบ่งชั้นการรับเรื่อง เพื่อไม่ให้ Dev โดนขัดจังหวะตลอดเวลา',
+        detail: 'แบ่งชั้นการรับเรื่อง เพื่อไม่ให้ Dev โดนขัดจังหวะตลอดเวลา บางทีมเรียก Tier 1-3 สั้นๆ ว่า L1, L2, L3',
         bulletPoints: [
           'Tier 1 (Helpdesk): ตอบคำถามทั่วไป แนะนำการใช้งาน รีเซ็ตรหัสผ่าน',
           'Tier 2 (Application Support): ตรวจข้อมูลในระบบ แก้การตั้งค่า ดึงรายงาน',

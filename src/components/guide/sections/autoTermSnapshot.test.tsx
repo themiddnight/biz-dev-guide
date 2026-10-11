@@ -59,6 +59,7 @@ describe('automatic term markers on real chapters (beginner Core)', () => {
       'otherSide: sla (SLA)',
       'otherSide: logging-monitoring-alerting (Monitoring)',
       'otherSide: slo (SLO)',
+      'coreConcepts: support-ticket-support-tier (L1)',
     ]);
   });
 

@@ -789,12 +789,12 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
     return (
       <div className="p-4 rounded-box border border-base-border bg-base-100 space-y-3">
         <span className="text-xs font-bold text-engineer uppercase tracking-wider">
-          Closed-Loop Support &amp; Incident Escalation (L1 ➔ L2 ➔ L3)
+          Closed-Loop Support &amp; Incident Escalation (Tier 1 ➔ Tier 2 ➔ Tier 3)
         </span>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
           <div className="p-3 rounded-xl bg-base-300 border border-base-border">
             <b className="text-base-content block mb-1">Tier 1: Customer Support</b>
-            <p className="text-[11px] text-base-content-muted">ตอบคำถามทั่วไป แก้ปัญหาเบื้องต้นตามคู่มือ ถ้าแก้ไม่ได้ส่งต่อ L2</p>
+            <p className="text-[11px] text-base-content-muted">ตอบคำถามทั่วไป แก้ปัญหาเบื้องต้นตามคู่มือ ถ้าแก้ไม่ได้ส่งต่อ Tier 2</p>
           </div>
           <div className="p-3 rounded-xl bg-base-300 border border-base-border">
             <b className="text-base-content block mb-1">Tier 2: Tech Support / Ops</b>
@@ -809,8 +809,8 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
         <div className="p-3 rounded-xl bg-success/10 border border-success/25 text-xs flex items-start gap-2">
           <RotateCcw className="w-4 h-4 shrink-0 mt-0.5 text-success" />
           <div>
-            <b className="text-success block mb-0.5">ปิดวงจร: แก้เสร็จ → L1 แจ้งลูกค้า → อัปเดต FAQ/Runbook</b>
-            <p className="text-[11px] text-base-content-secondary">ครั้งหน้าที่เจอเรื่องเดิม L1 ตอบได้เองโดยไม่ต้องส่งต่อ</p>
+            <b className="text-success block mb-0.5">ปิดวงจร: แก้เสร็จ → Tier 1 แจ้งลูกค้า → อัปเดต FAQ/Runbook</b>
+            <p className="text-[11px] text-base-content-secondary">ครั้งหน้าที่เจอเรื่องเดิม Tier 1 ตอบได้เองโดยไม่ต้องส่งต่อ</p>
           </div>
         </div>
       </div>
