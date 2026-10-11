@@ -19,9 +19,9 @@ export const GlossaryCategoryMap: React.FC<GlossaryCategoryMapProps> = ({ terms,
   }, [terms]);
 
   return (
-    <div className="p-box rounded-box bg-base-100 border border-base-border space-y-3">
-      <p className="text-[11px] sm:text-xs text-base-content-muted">
-        {GLOSSARY_CATEGORIES.length} หมวด รวม {terms.length} คำ — กดหมวดเพื่อกรองคำศัพท์
+    <div className="space-y-3">
+      <p className="text-sm text-base-content-muted">
+        มี {GLOSSARY_CATEGORIES.length} หมวด รวม {terms.length} คำ กดที่หมวดเพื่อกรองคำศัพท์
       </p>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
         {GLOSSARY_CATEGORIES.map(cat => {
@@ -35,11 +35,11 @@ export const GlossaryCategoryMap: React.FC<GlossaryCategoryMapProps> = ({ terms,
               className="p-3 min-w-0"
             >
               <div className="flex items-start justify-between gap-2">
-                <span className="text-xs font-bold leading-snug text-base-content">
+                <span className="text-sm font-semibold leading-snug text-base-content">
                   {cat.label}
                 </span>
                 <span
-                  className={`shrink-0 text-[11px] font-bold ${
+                  className={`shrink-0 text-sm ${
                     active ? 'opacity-80' : 'text-base-content-muted'
                   }`}
                 >
@@ -47,7 +47,7 @@ export const GlossaryCategoryMap: React.FC<GlossaryCategoryMapProps> = ({ terms,
                 </span>
               </div>
               <div
-                className={`mt-1 text-[10px] sm:text-[11px] leading-snug break-words ${
+                className={`mt-1 text-sm font-normal leading-snug break-words ${
                   active ? 'opacity-80' : 'text-base-content-muted'
                 }`}
               >

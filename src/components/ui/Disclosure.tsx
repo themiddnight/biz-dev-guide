@@ -11,8 +11,8 @@ import { TAP_Y } from './tapTarget';
 const SUMMARY_ROW =
   'flex items-center justify-between gap-2 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden';
 
-/** The boxed summary bar used by collapsible content blocks, tables and diagrams. */
-export const DISCLOSURE_SUMMARY = `${TAP_Y} ${SUMMARY_ROW} p-box-dense bg-base-300 hover:bg-base-border transition-colors`;
+/** The summary row of a framed disclosure: collapsible content blocks, tables and diagrams. */
+export const DISCLOSURE_SUMMARY = `${TAP_Y} ${SUMMARY_ROW} p-box-dense hover:bg-base-300 transition-colors`;
 
 export const DisclosureChevron: React.FC = () => (
   <ChevronDown className="w-4 h-4 shrink-0 text-base-content-muted transition-transform group-open:rotate-180" />

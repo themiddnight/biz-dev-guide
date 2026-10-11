@@ -15,16 +15,16 @@ interface ContentBlocksProps {
 
 type NoteTone = Extract<ContentBlock, { kind: 'note' }>['tone'];
 
-const NOTE_TONES: Record<NoteTone, string> = {
-  info: 'bg-base-300 border-base-border text-base-content-body',
-  warn: 'bg-warning/10 border-warning/25 text-warning',
-  ok: 'bg-success/10 border-success/25 text-success',
+/** The tone colours the note's title word only; the note itself is a ruled paragraph, not a box. */
+const NOTE_TITLE_TONE: Record<NoteTone, string> = {
+  info: 'text-base-content',
+  warn: 'text-warning',
+  ok: 'text-success',
 };
 
-const blockTitleClass = 'text-xs sm:text-sm font-bold text-base-content';
-const introClass = 'text-xs sm:text-sm text-base-content-secondary leading-relaxed';
-const detailsClass =
-  'group rounded-xl border border-base-border bg-base-100 overflow-hidden';
+const blockTitleClass = 'font-semibold text-base-content';
+const introClass = 'text-base-content-secondary';
+const detailsClass = 'group rounded-box border border-base-border overflow-hidden';
 
 // Guards against keys missing at runtime (e.g. stale data) even though FIGURES is typed as complete.
 const getFigure = (key: FigureKey): React.FC<FigureProps> | undefined => FIGURES[key];
@@ -51,8 +51,8 @@ const Block: React.FC<BlockProps> = ({ block, onNavigateChapter }) => {
 
     case 'note':
       return (
-        <div className={`p-box-dense rounded-xl border text-xs sm:text-sm leading-relaxed ${NOTE_TONES[block.tone]}`}>
-          {block.title && <div className="font-bold mb-1">{block.title}</div>}
+        <div className="border-l-2 border-base-border-strong pl-4">
+          {block.title && <div className={`font-semibold ${NOTE_TITLE_TONE[block.tone]}`}>{block.title}</div>}
           <div>{rich(block.body)}</div>
         </div>
       );
@@ -73,7 +73,7 @@ const Block: React.FC<BlockProps> = ({ block, onNavigateChapter }) => {
             <Figure className="w-full h-auto" />
           )}
           {block.caption && (
-            <figcaption className="text-[11px] sm:text-xs text-base-content-muted leading-relaxed">
+            <figcaption className="text-sm text-base-content-muted">
               {rich(block.caption)}
             </figcaption>
           )}
@@ -86,21 +86,14 @@ const Block: React.FC<BlockProps> = ({ block, onNavigateChapter }) => {
         <div className="space-y-3">
           {block.title && <h4 className={blockTitleClass}>{block.title}</h4>}
           {block.intro && <p className={introClass}>{rich(block.intro)}</p>}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <dl className="divide-y divide-base-border border-y border-base-border">
             {block.cards.map((card, idx) => (
-              <div
-                key={idx}
-                className="p-3.5 rounded-xl bg-base-300 border border-base-border space-y-1.5"
-              >
-                <div className="text-xs sm:text-sm font-bold text-base-content leading-snug">
-                  {card.term}
-                </div>
-                <p className="text-xs sm:text-sm text-base-content-secondary leading-relaxed">
-                  {rich(card.def)}
-                </p>
+              <div key={idx} className="grid gap-x-6 gap-y-1 py-3 sm:grid-cols-[11rem_1fr]">
+                <dt className="font-semibold text-base-content">{card.term}</dt>
+                <dd className="min-w-0">{rich(card.def)}</dd>
               </div>
             ))}
-          </div>
+          </dl>
         </div>
       );
 
@@ -127,9 +120,9 @@ const Block: React.FC<BlockProps> = ({ block, onNavigateChapter }) => {
             <DisclosureChevron />
           </summary>
           <div className="p-box-dense space-y-3 border-t border-base-border">
-            <ul className="pl-5 space-y-1 list-disc text-xs sm:text-sm text-base-content-body">
+            <ul className="list-disc space-y-1 pl-5">
               {block.items.map((item, idx) => (
-                <li key={idx} className="leading-relaxed">
+                <li key={idx}>
                   {item.url ? (
                     <a
                       href={item.url}
@@ -165,14 +158,11 @@ export const ContentBlocks: React.FC<ContentBlocksProps> = ({ sections, placemen
   if (visible.length === 0) return null;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-7">
       {visible.map((section, sIdx) => (
         <section key={sIdx} className="space-y-4">
           {section.heading && (
-            <h3 className="text-sm sm:text-base font-bold text-base-content flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-base-content inline-block"></span>
-              <span>{section.heading}</span>
-            </h3>
+            <h3 className="text-base font-bold text-base-content">{section.heading}</h3>
           )}
           {section.blocks.map(block => (
             <Block key={block.id} block={block} onNavigateChapter={onNavigateChapter} />

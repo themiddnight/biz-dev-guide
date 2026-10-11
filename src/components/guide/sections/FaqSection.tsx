@@ -9,13 +9,11 @@ export const FaqSection: React.FC<SectionProps> = props => {
   if (chapter.id !== 's11') return null;
   return (
     <SectionShell {...props} sectionKey="faq" title="คำถามที่แต่ละฝั่งบ่นกันจริงๆ" note={`${FRICTION_FAQS.length} ข้อ`}>
-        <div>
-          <FrictionFaqSection
-            onNavigateChapter={ctx.onNavigateChapter}
-            onScrollToPlaybook={ctx.onScrollToPlaybook}
-            onSearchGlossary={ctx.onSearchGlossary}
-          />
-        </div>
+      <FrictionFaqSection
+        onNavigateChapter={ctx.onNavigateChapter}
+        onScrollToPlaybook={ctx.onScrollToPlaybook}
+        onSearchGlossary={ctx.onSearchGlossary}
+      />
     </SectionShell>
   );
 };

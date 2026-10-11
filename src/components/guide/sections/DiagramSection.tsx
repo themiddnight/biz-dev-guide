@@ -1,5 +1,4 @@
 import React from 'react';
-import { Layers } from 'lucide-react';
 import { ChapterDiagram } from '../../ChapterDiagram';
 import { ContentBlocks } from '../../content/ContentBlocks';
 import { DiagramFamilyGrid } from '../../diagrams/DiagramFamilyGrid';
@@ -12,128 +11,102 @@ import type { SectionProps } from './registry';
 import { SectionShell } from './SectionShell';
 import { Tabs } from '../../ui/Tabs';
 
+type C4Level = 1 | 2 | 3 | 4;
+const C4_LEVELS: readonly C4Level[] = [1, 2, 3, 4];
+
+const C4_NOTES: Record<C4Level, { name: string; lines: string[] }> = {
+  1: {
+    name: 'Level 1 System Context',
+    lines: [
+      'ซูมออกสุด เห็นระบบเป็นกล่องเดียวตรงกลาง ล้อมด้วย Actor (ลูกค้า ร้านค้า ไรเดอร์) และระบบภายนอก (Payment Gateway, Map API) ระดับนี้เหมาะกับฝั่ง Business และผู้บริหารที่สุด',
+      'ยังไม่มีรายละเอียดเทคโนโลยีเลย คนที่ไม่ได้ทำงานเทคนิคก็อ่านได้',
+    ],
+  },
+  2: {
+    name: 'Level 2 Container Diagram',
+    lines: [
+      'ซูมเข้ามาหนึ่งชั้น เห็นหน่วยที่ Deploy แยกกันได้ เช่น Single Page App, Mobile App, Backend API, Database ระดับนี้เหมาะกับ Tech Lead และ Software Architect',
+      'Container ในที่นี้คือหน่วยที่ Deploy และรันแยกกันได้ คนอ่านคือคนเทคนิคที่ต้องเข้าใจการเลือกเทคโนโลยีในภาพรวม',
+    ],
+  },
+  3: {
+    name: 'Level 3 Component Diagram',
+    lines: [
+      'ซูมเข้าไปใน Container หนึ่งตัว (เช่น Backend API) เห็นโมดูลย่อย เช่น OrderComponent, PaymentController, NotificationService ระดับนี้เหมาะกับทีม Dev ที่ลงมือเขียน',
+    ],
+  },
+  4: {
+    name: 'Level 4 Code Diagram',
+    lines: [
+      'ซูมถึงระดับ Class และ Function ในโค้ดจริง (UML Class) ปกติไม่ต้องวาดเองเพราะโค้ดเปลี่ยนเร็ว ให้ IDE สร้างให้',
+    ],
+  },
+};
+
 export const DiagramSection: React.FC<SectionProps> = props => {
   const { chapter, ctx } = props;
+  const c4Level = (C4_LEVELS as readonly number[]).includes(ctx.c4Level) ? (ctx.c4Level as C4Level) : 1;
+  const C4Figure = FIGURES[`c4-l${c4Level}`];
+  const diagramBlocks = chapter.contentSections && (
+    <ContentBlocks sections={chapter.contentSections} placement="diagram" onNavigateChapter={ctx.onNavigateChapter} />
+  );
   return (
     <SectionShell {...props} sectionKey="diagram" title={chapter.diagramTitle}>
-        <div className="space-y-4">
-          {chapter.diagramDescription && <p className="text-base-content-secondary">{chapter.diagramDescription}</p>}
-          {/* s5: diagram families + T1 render above the Monolith vs Microservices simulator (spec §3.4 order) */}
-          {chapter.id === 's5' && (
-            <div className="space-y-3">
-              <DiagramFamilyGrid onJump={ctx.onDiagramJump} />
-              {chapter.contentSections && (
-                <ContentBlocks
-                  sections={chapter.contentSections}
-                  placement="diagram"
-                  onNavigateChapter={ctx.onNavigateChapter}
-                />
-              )}
-            </div>
-          )}
+      <div className="space-y-6">
+        {chapter.diagramDescription && <p className="text-base-content-secondary">{chapter.diagramDescription}</p>}
 
-          {/* Interactive Chapter Diagram Simulator */}
-          {chapter.id === 's15' ? (
-            <GlossaryCategoryMap
-              terms={GLOSSARY}
-              activeCategory={ctx.glossaryCategory}
-              onSelectCategory={ctx.onSelectGlossaryCategory}
-            />
-          ) : (
-            <ChapterDiagram chapterId={chapter.id} />
-          )}
+        {/* s5: diagram families and their table sit above the Monolith vs Microservices simulator (spec §3.4 order) */}
+        {chapter.id === 's5' && (
+          <>
+            <DiagramFamilyGrid onJump={ctx.onDiagramJump} />
+            {diagramBlocks}
+          </>
+        )}
 
-          {/* Restored static-guide blocks placed inside the diagram section (s5 renders them above) */}
-          {chapter.id !== 's5' && chapter.contentSections && (
-            <ContentBlocks
-              sections={chapter.contentSections}
-              placement="diagram"
-              onNavigateChapter={ctx.onNavigateChapter}
-            />
-          )}
+        {chapter.id === 's15' ? (
+          <GlossaryCategoryMap
+            terms={GLOSSARY}
+            activeCategory={ctx.glossaryCategory}
+            onSelectCategory={ctx.onSelectGlossaryCategory}
+          />
+        ) : (
+          <ChapterDiagram chapterId={chapter.id} />
+        )}
 
-          {/* Interactive C4 Model Zoom for Chapter 5 */}
-          {chapter.id === 's5' && (
-            <>
+        {chapter.id !== 's5' && diagramBlocks}
+
+        {chapter.id === 's5' && (
+          <>
             <div
               id={S5_JUMP_TARGET_IDS.c4}
-              className="anchor-target mt-4 p-box-dense rounded-box bg-base-100 border border-base-border space-y-3"
+              data-c4-explorer
+              className="anchor-target space-y-3 rounded-box border border-base-border p-box"
             >
-              <div className="flex items-center justify-between flex-wrap gap-2">
-                <h4 className="text-xs sm:text-sm font-bold text-base-content flex items-center gap-2">
-                  <Layers className="w-4 h-4 text-base-content-secondary" />
-                  <span>Interactive C4 Model Explorer (คลิกซูมเข้าดูทีละระดับ)</span>
-                </h4>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <h3 className="font-semibold text-base-content">ซูมดู C4 ทีละระดับ</h3>
                 <Tabs<string>
                   variant="segmented"
                   aria-label="ระดับ C4"
-                  items={[1, 2, 3, 4].map(lvl => ({ value: String(lvl), label: `L${lvl}` }))}
-                  value={String(ctx.c4Level)}
+                  items={C4_LEVELS.map(lvl => ({ value: String(lvl), label: `L${lvl}` }))}
+                  value={String(c4Level)}
                   onChange={v => ctx.setC4Level(Number(v))}
                 />
               </div>
-
-              <p className="text-[11px] sm:text-xs text-base-content-muted leading-relaxed">
-                Metaphor แบบ Google Maps — ซูมเข้าไปทีละชั้น ยิ่งซูมเข้ายิ่งเห็นรายละเอียดมากขึ้น แต่ดูทีละระดับพอ
+              <p className="text-sm text-base-content-muted">
+                เหมือนซูม Google Maps ยิ่งซูมเข้ายิ่งเห็นรายละเอียด ดูทีละระดับก็พอ
               </p>
-
-              {/* Static C4 figure for the selected level (c4-l1…c4-l4) */}
-              {(() => {
-                const C4Figure = FIGURES[`c4-l${ctx.c4Level}` as 'c4-l1' | 'c4-l2' | 'c4-l3' | 'c4-l4'];
-                return (
-                  <div className="p-3 rounded-xl bg-base-100 border border-base-border">
-                    <C4Figure className="w-full" />
-                  </div>
-                );
-              })()}
-
-              <div className="p-3.5 bg-base-300 rounded-xl border border-base-border text-xs sm:text-sm space-y-1">
-                {ctx.c4Level === 1 && (
-                  <div>
-                    <span className="font-bold text-base-content">Level 1: System Context</span>
-                    <p className="text-base-content-secondary mt-1 leading-relaxed text-xs">
-                      ซูมออกสุด เห็นระบบเป็นกล่องเดียวตรงกลาง ล้อมรอบด้วย Actor (ลูกค้า, ร้านค้า, ไรเดอร์) และระบบภายนอก (Payment Gateway, Map API) — <b>เหมาะที่สุดสำหรับ Business Stakeholders และผู้บริหาร</b>
-                    </p>
-                    <p className="text-base-content-secondary mt-1 leading-relaxed text-xs">
-                      ไม่มีรายละเอียดเทคโนโลยีเลย ผู้อ่าน: ทุกคนรวมถึงคนไม่เทคนิค
-                    </p>
-                  </div>
-                )}
-                {ctx.c4Level === 2 && (
-                  <div>
-                    <span className="font-bold text-base-content">Level 2: Container Diagram</span>
-                    <p className="text-base-content-secondary mt-1 leading-relaxed text-xs">
-                      ซูมเข้ามา 1 ชั้น เห็นหน่วยที่ Deploy แยกกันได้ เช่น Single Page App, Mobile App, Backend API, Database — <b>เหมาะสำหรับ Tech Lead &amp; Software Architects</b>
-                    </p>
-                    <p className="text-base-content-secondary mt-1 leading-relaxed text-xs">
-                      "container" คือหน่วยที่ deploy/run แยกกันได้ ผู้อ่าน: คนเทคนิคที่ต้องเข้าใจ tech choice ระดับสูง
-                    </p>
-                  </div>
-                )}
-                {ctx.c4Level === 3 && (
-                  <div>
-                    <span className="font-bold text-base-content">Level 3: Component Diagram</span>
-                    <p className="text-base-content-secondary mt-1 leading-relaxed text-xs">
-                      ซูมเข้าไปในหนึ่ง Container (เช่น Backend API) แสดงโมดูลย่อย เช่น OrderComponent, PaymentController, NotificationService — <b>เหมาะสำหรับทีม Developer ที่ Implement</b>
-                    </p>
-                  </div>
-                )}
-                {ctx.c4Level === 4 && (
-                  <div>
-                    <span className="font-bold text-base-content">Level 4: Code Diagram (UML Class)</span>
-                    <p className="text-base-content-secondary mt-1 leading-relaxed text-xs">
-                      ซูมระดับ Class / Functions ในโค้ดจริง — <i>คำแนะนำ:</i> มักไม่ต้องวาดมือเพราะโค้ดเปลี่ยนเร็ว ให้ IDE สร้างอัตโนมัติ
-                    </p>
-                  </div>
-                )}
+              <C4Figure className="w-full" />
+              <div data-c4-note={c4Level}>
+                <p className="font-semibold text-base-content">{C4_NOTES[c4Level].name}</p>
+                {C4_NOTES[c4Level].lines.map(line => <p key={line} className="mt-1">{line}</p>)}
               </div>
             </div>
 
             {/* Swimlane vs sequence worked example (static s5 dg-behavior) */}
             <SwimlaneVsSequence />
-            </>
-          )}
-        </div>
+          </>
+        )}
+      </div>
     </SectionShell>
   );
 };

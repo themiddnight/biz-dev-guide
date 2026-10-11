@@ -9,18 +9,16 @@ export const GlossarySection: React.FC<SectionProps> = props => {
   if (chapter.id !== 's15') return null;
   return (
     <SectionShell {...props} sectionKey="glossary" note={`${GLOSSARY.length} คำ`}>
-        <div>
-          <GlossaryPanel
-            terms={GLOSSARY}
-            chapters={ctx.chapters}
-            onNavigateChapter={ctx.onNavigateChapter}
-            category={ctx.glossaryCategory}
-            onCategoryChange={ctx.setGlossaryCategory}
-            query={ctx.glossaryQuery}
-            onQueryChange={ctx.setGlossaryQuery}
-            role={ctx.role}
-          />
-        </div>
+      <GlossaryPanel
+        terms={GLOSSARY}
+        chapters={ctx.chapters}
+        onNavigateChapter={ctx.onNavigateChapter}
+        category={ctx.glossaryCategory}
+        onCategoryChange={ctx.setGlossaryCategory}
+        query={ctx.glossaryQuery}
+        onQueryChange={ctx.setGlossaryQuery}
+        role={ctx.role}
+      />
     </SectionShell>
   );
 };

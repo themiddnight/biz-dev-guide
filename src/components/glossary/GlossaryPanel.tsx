@@ -100,17 +100,16 @@ export const GlossaryPanel: React.FC<GlossaryPanelProps> = ({
   };
 
   return (
-    <div id="glossary-panel" className="space-y-4 scroll-mt-24">
-      {/* Search */}
+    <div className="space-y-4">
       <div className="relative">
         <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-base-content-muted pointer-events-none" />
         <input
           type="search"
           value={query}
           onChange={e => setQuery(e.target.value)}
-          placeholder="ค้นหาคำศัพท์ เช่น NFR, PjM, canary, ย้อนหลัง..."
+          placeholder="ค้นหาคำศัพท์ เช่น NFR, PjM, canary, ย้อนหลัง"
           aria-label="ค้นหาคำศัพท์"
-          className={cn(fieldClass(), 'pl-9 pr-9 py-2.5 text-xs sm:text-sm')}
+          className={cn(fieldClass(), 'pl-9 pr-9 py-2.5 text-sm')}
         />
         {query && (
           <button
@@ -159,63 +158,52 @@ export const GlossaryPanel: React.FC<GlossaryPanelProps> = ({
         ))}
       </ScrollFade>
 
-      <p className="text-[11px] sm:text-xs text-base-content-muted" aria-live="polite">
+      <p className="text-sm text-base-content-muted" aria-live="polite">
         แสดง {results.length} จาก {terms.length} คำ
       </p>
 
       {results.length === 0 ? (
-        <div className="p-6 rounded-xl border border-dashed border-base-border-strong text-center space-y-3">
-          <p className="text-xs sm:text-sm text-base-content-secondary">ไม่พบคำที่ค้นหา</p>
+        <div className="space-y-3 border-y border-base-border py-6 text-center">
+          <p className="text-base-content-secondary">ไม่พบคำที่ค้นหา</p>
           <Button color="neutral" variant="soft" size="sm" onClick={clearFilters}>
             ล้างตัวกรอง
           </Button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <dl className="divide-y divide-base-border border-y border-base-border">
           {results.map(term => (
-            <div
-              key={term.id}
-              className="p-box rounded-xl bg-base-100 border border-base-border space-y-2 min-w-0"
-            >
-              <div className="text-xs sm:text-sm font-bold text-base-content leading-snug break-words">
-                {term.term}
-              </div>
-              <p className="text-xs sm:text-sm text-base-content-secondary leading-relaxed break-words">
-                <RichText text={term.definition} onNavigateChapter={onNavigateChapter} />
-              </p>
+            <div key={term.id} data-glossary-term={term.id} className="grid gap-x-6 gap-y-1 py-4 sm:grid-cols-[11rem_1fr]">
+              <dt className="min-w-0 break-words font-semibold text-base-content">{term.term}</dt>
+              <dd className="min-w-0 space-y-2 break-words">
+                <p><RichText text={term.definition} onNavigateChapter={onNavigateChapter} /></p>
 
-              {term.plain && (
-                <div className="p-2.5 rounded-lg border bg-business/10 border-business/25">
-                  <div className="text-[10px] font-bold mb-0.5 text-business">พูดแบบบ้านๆ</div>
-                  <p className="text-xs text-base-content-body leading-relaxed">
+                {term.plain && (
+                  <p>
+                    <span className="font-semibold text-base-content">พูดแบบบ้านๆ</span>{' '}
                     <RichText text={term.plain} onNavigateChapter={onNavigateChapter} />
                   </p>
-                </div>
-              )}
+                )}
 
-              {term.example && (
-                <p className="text-[11px] sm:text-xs text-base-content-muted leading-relaxed italic border-l-2 border-base-border-strong pl-2.5">
-                  {term.example}
-                </p>
-              )}
+                {term.example && <p className="text-base-content-secondary">{term.example}</p>}
 
-              {term.relatedChapterIds.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 pt-0.5">
-                  {term.relatedChapterIds.map(chId => (
-                    <button
-                      key={chId}
-                      type="button"
-                      onClick={() => onNavigateChapter(chId)}
-                      className={`${TAP_GAP[6]} px-2 py-0.5 rounded-md bg-base-300 border border-base-border text-[10px] sm:text-[11px] font-semibold text-base-content-body hover:bg-base-border cursor-pointer transition-colors`}
-                    >
-                      บทที่ {chapterNum[chId] ?? chId.replace('s', '')}
-                    </button>
-                  ))}
-                </div>
-              )}
+                {term.relatedChapterIds.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {term.relatedChapterIds.map(chId => (
+                      <button
+                        key={chId}
+                        type="button"
+                        onClick={() => onNavigateChapter(chId)}
+                        className={`${TAP_GAP[8]} cursor-pointer text-sm text-base-content-muted underline decoration-base-border underline-offset-4 hover:text-base-content`}
+                      >
+                        บทที่ {chapterNum[chId] ?? chId.replace('s', '')}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </dd>
             </div>
           ))}
-        </div>
+        </dl>
       )}
     </div>
   );

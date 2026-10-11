@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowRight, ChevronDown, ChevronUp, ExternalLink, ListOrdered } from 'lucide-react';
+import { ChevronDown, ExternalLink } from 'lucide-react';
 import {
   FAQ_AUDIENCE_CALLOUTS,
   FAQ_CAVEAT,
@@ -35,8 +35,8 @@ const GLOSSARY_KEYS: Set<string> = new Set(
   GLOSSARY.flatMap(term => [term.term, ...(term.aliases ?? [])].flatMap(glossaryKeys))
 );
 
-const chipClass =
-  'px-2.5 py-1 rounded-lg text-[11px] sm:text-xs font-medium border transition-colors';
+const chipClass = 'rounded-field border border-base-border px-2.5 py-1 text-sm transition-colors';
+const LINK = 'cursor-pointer underline decoration-base-border underline-offset-4 hover:decoration-base-content';
 
 export const FrictionFaqSection: React.FC<FrictionFaqSectionProps> = ({
   onNavigateChapter,
@@ -69,88 +69,68 @@ export const FrictionFaqSection: React.FC<FrictionFaqSectionProps> = ({
     const Figure = faq.figure ? FIGURES[faq.figure.key] : null;
 
     return (
-      <div
-        key={faq.id}
-        id={faq.id}
-        className="anchor-target bg-base-100 rounded-xl border border-base-border overflow-hidden"
-      >
-        <button
-          type="button"
-          onClick={() => toggleItem(faq.id)}
-          aria-expanded={isOpen}
-          aria-controls={panelId}
-          className={`${TAP} w-full p-3.5 flex items-start justify-between gap-3 text-left cursor-pointer select-none hover:bg-base-300 transition-colors`}
-        >
-          <span className="flex items-start gap-2.5 font-bold text-xs sm:text-sm text-base-content leading-relaxed">
-            <span className="shrink-0 mt-0.5 px-1.5 py-0.5 rounded-md bg-base-300 border border-base-border text-[10px] text-base-content-secondary">
-              Q{num}
-            </span>
-            <span>{faq.question}</span>
-          </span>
-          <span className="shrink-0 text-base-content-muted text-base leading-none mt-0.5" aria-hidden="true">
-            {isOpen ? '−' : '+'}
-          </span>
-        </button>
+      <div key={faq.id} id={faq.id} className="anchor-target">
+        <h4>
+          <button
+            type="button"
+            onClick={() => toggleItem(faq.id)}
+            aria-expanded={isOpen}
+            aria-controls={isOpen ? panelId : undefined}
+            className={`${TAP} group flex w-full cursor-pointer items-baseline gap-3 py-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary`}
+          >
+            <span className="shrink-0 text-sm text-base-content-muted">Q{num}</span>
+            <span className="flex-1 font-semibold text-base-content">{faq.question}</span>
+            <ChevronDown aria-hidden="true" className={`h-4 w-4 shrink-0 self-center text-base-content-muted transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+          </button>
+        </h4>
 
         {isOpen && (
-          <div
-            id={panelId}
-            className="px-3.5 pb-3.5 pt-3 border-t border-base-border space-y-3 text-xs sm:text-sm"
-          >
-            <p className="text-base-content-body leading-relaxed">
-              <RichText text={faq.real} onNavigateChapter={onNavigateChapter} />
-            </p>
+          <div id={panelId} className="space-y-4 pb-5">
+            <p><RichText text={faq.real} onNavigateChapter={onNavigateChapter} /></p>
 
             {faq.figure && Figure && (
-              <figure className="p-3 rounded-xl bg-base-100 border border-base-border space-y-2">
-                <p className="text-[11px] sm:text-xs font-bold text-base-content">{faq.figure.title}</p>
+              <figure className="space-y-2 rounded-box border border-base-border p-box-dense">
+                <p className="font-semibold text-base-content">{faq.figure.title}</p>
                 <div className="overflow-x-auto">
                   <Figure className="min-w-[480px] max-w-[560px] mx-auto" />
                 </div>
                 {faq.figure.caption && (
-                  <figcaption className="text-[11px] sm:text-xs text-base-content-muted leading-relaxed">
+                  <figcaption className="text-sm text-base-content-muted">
                     <RichText text={faq.figure.caption} onNavigateChapter={onNavigateChapter} />
                   </figcaption>
                 )}
                 {faq.figure.note && (
-                  <p className="text-[11px] sm:text-xs text-base-content-muted leading-relaxed">
+                  <p className="text-sm text-base-content-muted">
                     <RichText text={faq.figure.note} onNavigateChapter={onNavigateChapter} />
                   </p>
                 )}
               </figure>
             )}
 
-            <div className="p-3 rounded-xl bg-success/10 border border-success/25 space-y-1.5">
-              <div className="font-bold text-success">ทางออกที่ใช้ได้</div>
-              <ul className="pl-4 space-y-1 list-disc text-success leading-relaxed marker:text-success">
+            <div>
+              <div className="font-semibold text-success">ทางออกที่ใช้ได้</div>
+              <ul className="mt-1 list-disc space-y-1 pl-5">
                 {faq.fixes.map((fix, idx) => (
-                  <li key={idx}>
-                    <RichText text={fix} onNavigateChapter={onNavigateChapter} />
-                  </li>
+                  <li key={idx}><RichText text={fix} onNavigateChapter={onNavigateChapter} /></li>
                 ))}
               </ul>
             </div>
 
-            <div className="flex flex-wrap items-center gap-1.5">
-              <span className="text-[11px] text-base-content-muted">แนวคิดที่เกี่ยวข้อง:</span>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-sm text-base-content-muted">แนวคิดที่เกี่ยวข้อง</span>
               {faq.concepts.map(concept =>
                 GLOSSARY_KEYS.has(concept.toLowerCase()) ? (
                   <button
                     key={concept}
                     type="button"
                     onClick={() => onSearchGlossary(concept)}
-                    title={`ค้นหา "${concept}" ในหน้ารวมคำศัพท์ (บทที่ 15)`}
-                    className={`${TAP_GAP[6]} ${chipClass} cursor-pointer bg-base-300 border-base-border text-base-content-body hover:bg-base-border underline decoration-dotted decoration-base-content-subtle underline-offset-2`}
+                    title={`ค้นหา "${concept}" ในรวมคำศัพท์ บทที่ 15`}
+                    className={`${TAP_GAP[8]} ${chipClass} cursor-pointer text-base-content hover:bg-base-300`}
                   >
                     {concept}
                   </button>
                 ) : (
-                  <span
-                    key={concept}
-                    className={`${chipClass} bg-base-300 border-base-border text-base-content-secondary`}
-                  >
-                    {concept}
-                  </span>
+                  <span key={concept} className={`${chipClass} text-base-content-muted`}>{concept}</span>
                 )
               )}
             </div>
@@ -159,12 +139,11 @@ export const FrictionFaqSection: React.FC<FrictionFaqSectionProps> = ({
               <button
                 type="button"
                 onClick={() => onScrollToPlaybook(faq.relatedPlaybookChapterId as string)}
-                className={`${TAP} inline-flex items-center gap-1.5 text-xs font-semibold text-base-content underline decoration-base-content-subtle underline-offset-2 hover:decoration-base-content cursor-pointer`}
+                className={`${TAP} ${LINK} text-sm text-base-content`}
               >
                 {faq.relatedPlaybookChapterId === 's11'
-                  ? 'ดู Iron Triangle ด้านบน'
-                  : `ดู playbook เต็ม: บทที่ ${faq.relatedPlaybookChapterId.slice(1)}`}
-                <ArrowRight className="w-3.5 h-3.5" />
+                  ? 'ดูวิธีรับมือ Friction ของบทนี้'
+                  : `ดูวิธีรับมือ Friction ในบทที่ ${faq.relatedPlaybookChapterId.slice(1)}`}
               </button>
             )}
           </div>
@@ -174,102 +153,78 @@ export const FrictionFaqSection: React.FC<FrictionFaqSectionProps> = ({
   };
 
   return (
-    <div className="space-y-5">
-      {/* Audience callouts (static .aud-callout) — both shown together */}
-      <div className="p-box-dense rounded-xl border bg-base-300 border-base-border text-xs sm:text-sm text-base-content-body leading-relaxed space-y-2.5">
-        <div>
-          <span className="block font-bold text-base-content mb-0.5">
-            {FAQ_AUDIENCE_CALLOUTS.business.who}
-          </span>
-          {FAQ_AUDIENCE_CALLOUTS.business.body}
-        </div>
-        <div>
-          <span className="block font-bold text-base-content mb-0.5">
-            {FAQ_AUDIENCE_CALLOUTS.engineer.who}
-          </span>
-          {FAQ_AUDIENCE_CALLOUTS.engineer.body}
-        </div>
+    <div className="space-y-7">
+      <div className="space-y-2">
+        <p><span className="font-semibold text-base-content">{FAQ_AUDIENCE_CALLOUTS.business.who}</span> {FAQ_AUDIENCE_CALLOUTS.business.body}</p>
+        <p><span className="font-semibold text-base-content">{FAQ_AUDIENCE_CALLOUTS.engineer.who}</span> {FAQ_AUDIENCE_CALLOUTS.engineer.body}</p>
       </div>
 
       {/* Quick jump chips (collapsible on mobile) */}
-      <nav aria-label="สารบัญคำถามในบทนี้" className="p-3 rounded-xl bg-base-100 border border-base-border space-y-2">
+      <nav aria-label="สารบัญคำถามในบทนี้" className="space-y-2">
         <button
           type="button"
           onClick={() => setIsJumpOpen(prev => !prev)}
           aria-expanded={isJumpOpen}
           aria-controls="s11-faq-jump"
-          className={`${TAP} w-full flex items-center justify-between gap-2 text-left sm:cursor-default cursor-pointer`}
+          className={`${TAP} flex w-full cursor-pointer items-center justify-between gap-2 text-left sm:cursor-default`}
         >
-          <span className="flex items-center gap-2 text-[11px] sm:text-xs font-bold text-base-content">
-            <ListOrdered className="w-4 h-4 text-base-content-muted" />
-            {FAQ_QUICK_JUMP_TITLE}
-          </span>
-          <span className="sm:hidden">
-            {isJumpOpen ? <ChevronUp className="w-4 h-4 text-base-content-muted" /> : <ChevronDown className="w-4 h-4 text-base-content-muted" />}
-          </span>
+          <span className="text-sm text-base-content-muted">{FAQ_QUICK_JUMP_TITLE}</span>
+          <ChevronDown aria-hidden="true" className={`h-4 w-4 text-base-content-muted transition-transform sm:hidden ${isJumpOpen ? 'rotate-180' : ''}`} />
         </button>
-        <div id="s11-faq-jump" className={`${isJumpOpen ? 'flex' : 'hidden'} sm:flex flex-wrap gap-1.5`}>
+        <div id="s11-faq-jump" className={`${isJumpOpen ? 'flex' : 'hidden'} flex-wrap gap-2 sm:flex`}>
           {FRICTION_FAQS.map((faq, idx) => (
             <button
               key={faq.id}
               type="button"
+              data-faq-jump={faq.id}
               onClick={() => jumpTo(faq.id)}
-              className={`${TAP_GAP[6]} ${chipClass} cursor-pointer text-left bg-base-300 border-base-border text-base-content-body hover:bg-base-border`}
+              className={`${TAP_GAP[8]} ${chipClass} cursor-pointer text-left text-base-content hover:bg-base-300`}
             >
-              <span className="text-base-content-muted mr-1">{idx + 1}.</span>
+              <span className="mr-1 text-base-content-muted">{idx + 1}.</span>
               {faq.question}
             </button>
           ))}
         </div>
       </nav>
 
-      {/* Groups, normal order */}
       {FAQ_GROUPS.map(group => (
-        <section key={group.key} className="space-y-2.5">
-          <div>
-            <h4 className="text-xs sm:text-sm font-bold text-base-content">{group.title}</h4>
-            <p className="text-[11px] sm:text-xs text-base-content-muted">{group.subtitle}</p>
+        <section key={group.key}>
+          <h3 className="font-semibold text-base-content">{group.title}</h3>
+          <p className="text-sm text-base-content-muted">{group.subtitle}</p>
+          <div className="mt-2 divide-y divide-base-border border-y border-base-border">
+            {FRICTION_FAQS.filter(faq => faq.group === group.key).map(renderItem)}
           </div>
-          {FRICTION_FAQS.filter(faq => faq.group === group.key).map(renderItem)}
         </section>
       ))}
 
-      {/* Closing principles, caveat and sources */}
-      <section className="space-y-3">
-        <h4 className="text-xs sm:text-sm font-bold text-base-content">{FAQ_PRINCIPLES_TITLE}</h4>
-        <ol className="space-y-2">
+      <section className="space-y-4">
+        <h3 className="font-semibold text-base-content">{FAQ_PRINCIPLES_TITLE}</h3>
+        <ol className="space-y-3">
           {FAQ_PRINCIPLES.map((principle, idx) => (
-            <li
-              key={idx}
-              className="p-3 rounded-xl bg-base-100 border border-base-border text-xs sm:text-sm space-y-1"
-            >
-              <div className="font-bold text-base-content">
-                {idx + 1}. {principle.title}
-              </div>
-              <p className="text-base-content-secondary leading-relaxed">
-                <RichText text={principle.body} onNavigateChapter={onNavigateChapter} />
-              </p>
+            <li key={idx}>
+              <div className="font-semibold text-base-content">{idx + 1}. {principle.title}</div>
+              <p><RichText text={principle.body} onNavigateChapter={onNavigateChapter} /></p>
             </li>
           ))}
         </ol>
 
-        <div className="p-box-dense rounded-xl border text-xs sm:text-sm leading-relaxed bg-warning/10 border-warning/25 text-warning">
+        <p className="border-l-2 border-base-border-strong pl-4">
           <RichText text={FAQ_CAVEAT} onNavigateChapter={onNavigateChapter} />
-        </div>
+        </p>
 
-        <div className="space-y-1.5">
-          <div className="text-[11px] sm:text-xs font-bold text-base-content-body">ที่มาของแนวคิดในบทที่ 11</div>
-          <ul className="pl-5 space-y-1 list-disc text-xs sm:text-sm text-base-content-body">
+        <div>
+          <div className="text-sm text-base-content-muted">ที่มาของแนวคิดในบทนี้</div>
+          <ul className="mt-1 list-disc space-y-1 pl-5">
             {FAQ_SOURCES.map(source => (
-              <li key={source.url} className="leading-relaxed">
+              <li key={source.url}>
                 <a
                   href={source.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`${TAP} inline-flex items-center gap-1 underline decoration-base-content-subtle underline-offset-2 hover:decoration-base-content`}
+                  className={`${TAP} ${LINK} inline-flex items-center gap-1`}
                 >
                   {source.label}
-                  <ExternalLink className="w-3 h-3" />
+                  <ExternalLink className="h-3 w-3" aria-hidden="true" />
                 </a>
               </li>
             ))}

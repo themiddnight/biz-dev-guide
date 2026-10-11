@@ -14,33 +14,33 @@ import { FIGURES } from '../figures';
 export const SwimlaneVsSequence: React.FC = () => (
   <details
     id={S5_JUMP_TARGET_IDS.behavior}
-    className="group scroll-mt-4 rounded-box bg-base-100 border border-base-border overflow-hidden"
+    className="group scroll-mt-4 rounded-box border border-base-border overflow-hidden"
   >
     <summary className={DISCLOSURE_SUMMARY}>
-      <span className="text-xs sm:text-sm font-bold text-base-content">
+      <span className="font-semibold text-base-content">
         {SWIMLANE_VS_SEQUENCE.summary}
       </span>
       <DisclosureChevron />
     </summary>
     <div className="p-box-dense space-y-4 border-t border-base-border">
-      <p className="text-xs sm:text-sm text-base-content-secondary leading-relaxed">
+      <p className="text-base-content-secondary">
         <RichText text={SWIMLANE_VS_SEQUENCE.intro} />
       </p>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {SWIMLANE_VS_SEQUENCE.columns.map(col => {
           const Figure = FIGURES[col.figureKey];
           return (
             <div
               key={col.figureKey}
-              className="p-3.5 rounded-xl bg-base-300 border border-base-border space-y-2"
+              className="space-y-2"
             >
               <div>
-                <h5 className="text-xs sm:text-sm font-bold text-base-content">{col.title}</h5>
-                <p className="text-[11px] sm:text-xs text-base-content-muted">{col.sub}</p>
+                <h5 className="font-semibold text-base-content">{col.title}</h5>
+                <p className="text-sm text-base-content-muted">{col.sub}</p>
               </div>
               <Figure className="w-full" />
-              <p className="text-[11px] text-base-content-muted leading-relaxed">
+              <p className="text-sm text-base-content-muted">
                 <RichText text={col.caption} />
               </p>
             </div>

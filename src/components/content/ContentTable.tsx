@@ -13,14 +13,13 @@ interface ContentTableProps {
 const widthClass = (hint?: 'narrow' | 'wide') =>
   hint === 'narrow' ? 'w-[18%]' : hint === 'wide' ? 'w-[40%]' : '';
 
-const titleClass = 'text-xs sm:text-sm font-bold text-base-content';
-const introClass = 'text-xs sm:text-sm text-base-content-secondary leading-relaxed';
-const footnoteClass =
-  'text-[11px] sm:text-xs text-base-content-muted leading-relaxed p-3 rounded-xl bg-base-300 border border-base-border';
+const titleClass = 'font-semibold text-base-content';
+const introClass = 'text-base-content-secondary';
+const footnoteClass = 'text-sm text-base-content-muted';
 const thClass =
-  'px-3 py-2 text-left align-bottom text-[10px] sm:text-[11px] tracking-wider uppercase font-semibold text-base-content-muted border-b border-base-border-strong';
+  'px-3 py-2 text-left align-bottom text-sm font-semibold text-base-content-muted border-b border-base-border-strong';
 const tdClass =
-  'px-3 py-2.5 align-top text-xs sm:text-sm text-base-content-body leading-relaxed border-b border-base-border';
+  'px-3 py-2.5 align-top text-sm leading-6 text-base-content-body border-b border-base-border';
 
 export const ContentTable: React.FC<ContentTableProps> = ({ block, onNavigateChapter }) => {
   const mode = block.mobile ?? 'stack';
@@ -88,33 +87,26 @@ export const ContentTable: React.FC<ContentTableProps> = ({ block, onNavigateCha
         <>
           {desktopTable}
 
-          {/* Mobile (<640px): one card per row; first column is the card title */}
-          <div className="sm:hidden space-y-2.5">
+          {/* Mobile (<640px): one block per row on a hairline; the first column is its title */}
+          <div className="sm:hidden">
             {block.title && !block.collapsed && <h4 className={titleClass}>{block.title}</h4>}
-            {block.rows.map((row, rIdx) => (
-              <div
-                key={rIdx}
-                className="p-3 rounded-xl bg-base-300 border border-base-border space-y-2"
-              >
-                {firstCol && (
-                  <div className="text-xs font-bold text-base-content leading-snug">
-                    {renderCell(row.cells[firstCol.key])}
-                  </div>
-                )}
-                <dl className="space-y-1.5">
-                  {restCols.map(col => (
-                    <div key={col.key}>
-                      <dt className="text-[10px] tracking-wider uppercase font-semibold text-base-content-muted">
-                        {col.label}
-                      </dt>
-                      <dd className="text-xs text-base-content-body leading-relaxed break-words">
-                        {renderCell(row.cells[col.key])}
-                      </dd>
-                    </div>
-                  ))}
-                </dl>
-              </div>
-            ))}
+            <div className="divide-y divide-base-border border-y border-base-border">
+              {block.rows.map((row, rIdx) => (
+                <div key={rIdx} className="space-y-2 py-3">
+                  {firstCol && (
+                    <div className="font-semibold text-base-content">{renderCell(row.cells[firstCol.key])}</div>
+                  )}
+                  <dl className="space-y-1.5">
+                    {restCols.map(col => (
+                      <div key={col.key}>
+                        <dt className="text-sm text-base-content-muted">{col.label}</dt>
+                        <dd className="break-words">{renderCell(row.cells[col.key])}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              ))}
+            </div>
           </div>
         </>
       )}
@@ -129,7 +121,7 @@ export const ContentTable: React.FC<ContentTableProps> = ({ block, onNavigateCha
 
   if (block.collapsed) {
     return (
-      <details className="group rounded-xl border border-base-border bg-base-100 overflow-hidden">
+      <details className="group rounded-box border border-base-border overflow-hidden">
         <summary className={DISCLOSURE_SUMMARY}>
           <span className={titleClass}>{block.title ?? 'ตาราง'}</span>
           <DisclosureChevron />

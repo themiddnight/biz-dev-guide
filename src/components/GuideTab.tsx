@@ -307,9 +307,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   const handleSelectGlossaryCategory = (category: GlossaryCategory) => {
     setGlossaryCategory(category);
     setOpenState(prev => openSection(prev, layout, 'glossary'));
-    window.setTimeout(() => {
-      document.getElementById('glossary-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 50);
+    setPendingScrollId('sec-glossary');
   };
 
   // s11 FAQ concept chip -> open the s15 glossary with the search prefilled
