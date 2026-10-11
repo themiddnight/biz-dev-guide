@@ -5,6 +5,7 @@ import { TAP, TAP_Y } from './ui/tapTarget';
 import { DisclosureChevron } from './ui/Disclosure';
 import { TABS_LAYOUT } from './ui/Tabs';
 import { chipClass } from './ui/ToggleChip';
+import { cn } from './ui/cn';
 
 interface ChapterDiagramProps {
   chapterId: string;
@@ -32,7 +33,7 @@ const WidgetHead: React.FC<{ title: string; hint?: string; children?: React.Reac
 
 /** A toggle whose state is written out, so colour never carries it alone. */
 const SwitchChip: React.FC<{ label: string; on: boolean; onToggle: () => void }> = ({ label, on, onToggle }) => (
-  <button type="button" aria-pressed={on} onClick={onToggle} className={chipClass({ selected: on, size: 'md' })}>
+  <button type="button" aria-pressed={on} onClick={onToggle} className={cn(chipClass({ selected: on, size: 'md' }), !on && 'border-base-border!')}>
     {label}
     <span className="text-base-content-muted">{on ? 'เปิด' : 'ปิด'}</span>
   </button>
@@ -404,7 +405,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
                 type="button"
                 aria-pressed={paymentFailed}
                 onClick={() => setPaymentFailed(!paymentFailed)}
-                className={chipClass({ selected: paymentFailed, size: 'md' })}
+                className={cn(chipClass({ selected: paymentFailed, size: 'md' }), !paymentFailed && 'border-base-border!')}
               >
                 {paymentFailed ? 'กู้ Payment กลับมา' : 'จำลอง Payment ล่ม'}
               </button>
@@ -775,11 +776,10 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
           {sliders.map(s => (
             <div key={s.name}>
               <div className="flex items-baseline justify-between gap-2">
-                <label htmlFor={`iron-${s.name}`} className="font-semibold text-base-content">
-                  {s.name} <span className="font-normal text-base-content-muted">{s.gloss}</span>
-                </label>
-                <span className="text-sm font-semibold text-base-content">{s.value}</span>
+                <label htmlFor={`iron-${s.name}`} className="font-semibold text-base-content">{s.name}</label>
+                <span className="whitespace-nowrap text-sm font-semibold text-base-content">{s.value}</span>
               </div>
+              <p className={HINT}>{s.gloss}</p>
               <input
                 id={`iron-${s.name}`}
                 type="range"
@@ -843,7 +843,7 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
                 fill={level.core}
                 className="transition-all duration-300"
               />
-              <text x="50" y="58" textAnchor="middle" className="fill-primary-content" fontSize="6.5" fontWeight="bold">
+              <text x="50" y="58" textAnchor="middle" className="fill-primary-content" fontSize="6.5" fontWeight="bold" stroke={level.core} strokeWidth="1.5" strokeLinejoin="round" paintOrder="stroke">
                 Quality
               </text>
               {/* Vertex Labels */}

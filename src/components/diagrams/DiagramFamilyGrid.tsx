@@ -9,7 +9,7 @@ interface DiagramFamilyGridProps {
 
 // Each family is a row on a hairline, not a card. The side inset keeps the hover fill off the text.
 const cardBase =
-  'h-full w-full -mx-2 px-2 py-4 rounded-field border-t border-base-border flex flex-col gap-1.5 text-left';
+  'h-full w-full -mx-2 px-2 py-4 border-t border-base-border flex flex-col gap-1.5 text-left';
 const jumpClass =
   'cursor-pointer transition-colors hover:bg-base-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary';
 
