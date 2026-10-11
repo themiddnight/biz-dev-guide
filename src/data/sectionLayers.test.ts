@@ -144,8 +144,8 @@ describe('isSectionPresent', () => {
   it('otherSide in every chapter', () => {
     expect(idsWith('otherSide')).toHaveLength(CHAPTERS.length);
   });
-  it('friction exactly where a playbook exists: s1, s2, s4, s6, s7, s8, s10, s11 (spec A4, B1)', () => {
-    expect(idsWith('friction')).toEqual(['s1', 's2', 's4', 's6', 's7', 's8', 's10', 's11']);
+  it('friction exactly where a playbook exists: s1, s2, s4, s6, s7, s8, s10, s11, s12, s16, s17, s18, s19 (spec A4, B1, B2)', () => {
+    expect(idsWith('friction')).toEqual(['s1', 's2', 's4', 's6', 's7', 's8', 's10', 's11', 's12', 's16', 's17', 's18', 's19']);
     expect(idsWith('friction')).toEqual(Object.keys(FRICTION_PLAYBOOKS));
   });
   it('diagram in every chapter except s1 (widget moved to s8, Q4), s14 (Q6) and s16-s19 (P4.1)', () => {
@@ -224,10 +224,9 @@ describe('open state', () => {
 describe('consolidated sections (spec A.3, A.6 new 1 and 3, A.7 #1)', () => {
   const RETIRED = ['mindset', 'primer', 'dialogue', 'workflow', 'checklist'];
   const COUNTS: Record<number, string[]> = {
-    6: ['s16', 's17', 's18', 's19'],
-    7: ['s3', 's9', 's14'],
-    8: ['s1', 's4', 's5', 's7', 's10', 's12', 's13', 's15'],
-    9: ['s2', 's6', 's8', 's11'],
+    7: ['s3', 's9', 's14', 's16', 's17', 's18', 's19'],
+    8: ['s1', 's4', 's5', 's7', 's10', 's13', 's15'],
+    9: ['s2', 's6', 's8', 's11', 's12'],
   };
 
   it('SECTION_KEYS is the 11 keys, in spec order', () => {
