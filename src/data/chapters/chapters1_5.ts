@@ -15,8 +15,6 @@ export const chapters1_5: Chapter[] = [
     keyTakeaway: 'อุดรอยรั่วด้วยการดึง Dev มาฟังปัญหาตั้งแต่ต้น ไม่ใช่เขียนเอกสารเพิ่ม',
     plainAnalogy: 'เหมือนเกมกระซิบ: สั่ง "ต้มยำไม่ใส่ผักชี" ต่อกัน 5 คน ครัวยกแกงจืดมาแทน',
     readTime: '10 นาที',
-    diagramTitle: 'The Leaky Translation Pipeline (8 จุดที่งานเปลี่ยนมือ)',
-    diagramDescription: 'บริบทหายไปทีละนิดทุกครั้งที่เปลี่ยนมือ ตั้งแต่ Business Concept ➔ PO ➔ UX ➔ BA ➔ SA ➔ Dev ➔ QA ➔ Deployment',
     beginnerPrimer: {
       whatIsIt: '[[!g:sales-pipeline]]Leaky Pipeline คืออาการที่โจทย์ธุรกิจเพี้ยนไปทีละนิดทุกครั้งที่งานเปลี่ยนมือ ตั้งแต่ผู้บริหาร → PM → Designer → SA → Dev เพราะแต่ละคนตีความตามมุมของตัวเอง',
       whyItMatters: 'ความผิดพลาดที่แพงที่สุดไม่ใช่บั๊ก แต่คือการทำของผิดชิ้นออกมาได้เนี้ยบ (Building the wrong thing right) ทีมทุ่มเทเป็นปี แต่เปิดตัวแล้วไม่มีใครใช้',

@@ -227,7 +227,6 @@ export interface Chapter {
   home: ChapterHome; // which side does this work (role perspective, spec P1.1)
   businessNote: string;
   engineerNote: string;
-  contentHtml?: string;
   keyTakeaway: string;
   plainAnalogy: string;
   readTime: string;
