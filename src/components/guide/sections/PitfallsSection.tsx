@@ -38,6 +38,12 @@ export const PitfallsSection: React.FC<SectionProps> = ({ chapter, isOpen, onTog
                 <ShieldAlert className="w-4 h-4 text-error shrink-0" />
                 <span>กับดัก: {cp.pitfall}</span>
               </div>
+              {cp.symptom && (
+                <div className="pl-5 text-base-content-body leading-relaxed text-xs">
+                  <span className="font-bold text-warning">👀 อาการเตือน: </span>
+                  <span>{cp.symptom}</span>
+                </div>
+              )}
               <div className="pl-5 text-base-content-body leading-relaxed text-xs">
                 <span className="font-bold text-success">💡 ทางแก้: </span>
                 <span>{cp.solution}</span>
