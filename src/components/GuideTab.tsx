@@ -623,18 +623,19 @@ export const GuideTab: React.FC<GuideTabProps> = ({
           {/* Chapter Main Content Reader Card */}
           <div id={CHAPTER_START_ID} className="bg-base-100 border border-base-border rounded-box p-box-spacious shadow-2xs space-y-section">
             
-            <ChapterHero
-              chapter={activeChapter}
-              experienceLevel={chapterLevel}
-              isRead={isCurrentRead}
-              role={role}
-              seat={seat}
-              onFlipSeat={() => setFlippedFor((f) => (f === seatKey ? null : seatKey))}
-              onNavigateChapter={handleSelectChapter}
-              onSearchGlossary={handleSearchGlossary}
-            />
-
-            <ChapterIntro chapter={activeChapter} onNavigateChapter={handleSelectChapter} onSearchGlossary={handleSearchGlossary} />
+            <article className="mx-auto max-w-[44rem] text-[15px] leading-7 text-base-content-body">
+              <div className="space-y-9 pb-9">
+                <ChapterHero
+                  chapter={activeChapter}
+                  isRead={isCurrentRead}
+                  role={role}
+                  seat={seat}
+                  onFlipSeat={() => setFlippedFor((f) => (f === seatKey ? null : seatKey))}
+                  onNavigateChapter={handleSelectChapter}
+                  onSearchGlossary={handleSearchGlossary}
+                />
+                <ChapterIntro chapter={activeChapter} onNavigateChapter={handleSelectChapter} onSearchGlossary={handleSearchGlossary} />
+              </div>
 
             <ChapterControlRow
               chapterNum={activeChapter.num}
@@ -658,6 +659,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                 return <Section key={key} chapter={activeChapter} fold={fold} ctx={sectionCtx} />;
               }))}
             </div>
+            </article>
 
             {/* Chapter Footer Actions */}
             <div className="pt-5 border-t border-base-border space-y-3.5">

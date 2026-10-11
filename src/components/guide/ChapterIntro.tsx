@@ -10,7 +10,7 @@ interface ChapterIntroProps {
 }
 
 /**
- * The chapter primer as plain intro prose under the hero: always visible, both levels,
+ * The chapter primer as one paragraph under the key takeaway: always visible, both levels,
  * no heading and no toggle (spec A1). Each glossary term is marked once (primerTerms).
  */
 export const ChapterIntro: React.FC<ChapterIntroProps> = ({ chapter, onNavigateChapter, onSearchGlossary }) => {
@@ -20,7 +20,7 @@ export const ChapterIntro: React.FC<ChapterIntroProps> = ({ chapter, onNavigateC
     <RichText text={text} onNavigateChapter={onNavigateChapter} onSearchGlossary={onSearchGlossary} />
   );
   return (
-    <p id="chapter-intro" data-chapter-intro className="text-sm text-base-content-secondary leading-relaxed">
+    <p id="chapter-intro" data-chapter-intro>
       {prose(marked.whatIsIt)}{' '}{prose(marked.whyItMatters)}{' '}{prose(marked.realWorldScenario)}
     </p>
   );

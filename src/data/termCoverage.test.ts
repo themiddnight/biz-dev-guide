@@ -182,8 +182,8 @@ function markedByField(chapter: Chapter): Map<string, string[]> {
   const concepts = coreConceptTerms(chapter);
   return new Map([
     ['chapterOpening', [hero.chapterOpening]],
-    ['keyTakeaway', [hero.keyTakeaway]],
     ['plainAnalogy', [hero.plainAnalogy]],
+    ['keyTakeaway', [hero.keyTakeaway]],
     ['beginnerPrimer.whatIsIt', primer ? [primer.whatIsIt] : []],
     ['beginnerPrimer.whyItMatters', primer ? [primer.whyItMatters] : []],
     ['beginnerPrimer.realWorldScenario', primer ? [primer.realWorldScenario] : []],
@@ -208,16 +208,6 @@ const MARKER_ID_RE = /\[\[g:([a-z0-9-]+)\|[^\]]+\]\]/g;
 const visibleText = (text: string) => text.replace(/\[\[!g:(?:[a-z0-9-]+|\*)\]\]/g, '').replace(/\[\[g:[a-z0-9-]+\|([^\]]+)\]\]/g, '$1');
 
 interface TrackEvent { term: string; at: string; defined: boolean }
-
-/** `ChapterHero` renders `plainAnalogy` above `keyTakeaway` when the chapter has a hero figure (`heroTerms` marks it first too). */
-function heroInRenderOrder<T extends { field: string }>(chapter: Chapter, occurrences: T[]): T[] {
-  if (!chapter.heroFigure) return occurrences;
-  const out = [...occurrences];
-  const takeaway = out.findIndex(o => o.field === 'keyTakeaway');
-  const analogy = out.findIndex(o => o.field === 'plainAnalogy');
-  [out[takeaway], out[analogy]] = [out[analogy], out[takeaway]];
-  return out;
-}
 
 /**
  * The chapter's headings. They are never marked (P3.5); the opening line directly under them is
@@ -266,7 +256,7 @@ const chapterEvents = (chapterId: string): TrackEvent[] => {
   const chapter = CHAPTERS.find(c => c.id === chapterId)!;
   const marked = markedByField(chapter);
   const nth = new Map<string, number>();
-  return heroInRenderOrder(chapter, beginnerVisibleTexts(chapter)).flatMap(({ field, text }) => {
+  return beginnerVisibleTexts(chapter).flatMap(({ field, text }) => {
     if (FOLDED_FOR_BEGINNERS.has(field)) return [];
     const markerIds = new Set<string>();
     const fieldTexts = marked.get(field);

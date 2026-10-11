@@ -8,7 +8,7 @@ import { TAP_Y } from './tapTarget';
  */
 
 /** A details summary laid out as a title row with the native marker hidden. */
-export const SUMMARY_ROW =
+const SUMMARY_ROW =
   'flex items-center justify-between gap-2 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden';
 
 /** The boxed summary bar used by collapsible content blocks, tables and diagrams. */

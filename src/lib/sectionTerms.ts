@@ -22,19 +22,12 @@ const sectionMarker = (seed: Iterable<string> = []) => {
 
 export interface HeroTerms { chapterOpening: string; plainAnalogy: string; keyTakeaway: string }
 
-/**
- * `ChapterHero`, in document order: the opening line (spec P4.3) sits under the subtitle, above
- * everything else; the analogy renders above the takeaway only when the chapter has a hero figure.
- */
+/** `ChapterHero`, in document order: the opening line (spec P4.3), the analogy, then the takeaway. */
 export function heroTerms(chapter: Chapter): HeroTerms {
   const mark = sectionMarker();
   const chapterOpening = mark(chapter.chapterOpening);
-  if (chapter.heroFigure) {
-    const plainAnalogy = mark(chapter.plainAnalogy);
-    return { chapterOpening, plainAnalogy, keyTakeaway: mark(chapter.keyTakeaway) };
-  }
-  const keyTakeaway = mark(chapter.keyTakeaway);
-  return { chapterOpening, keyTakeaway, plainAnalogy: mark(chapter.plainAnalogy) };
+  const plainAnalogy = mark(chapter.plainAnalogy);
+  return { chapterOpening, plainAnalogy, keyTakeaway: mark(chapter.keyTakeaway) };
 }
 
 export interface PrimerTerms { whatIsIt: string; whyItMatters: string; realWorldScenario: string }

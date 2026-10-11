@@ -16,7 +16,7 @@ describe('HeroFigure seats', () => {
       <HeroFigure figure={figure} role="eng" seat="eng" onFlipSeat={noop} />,
     );
     expect(html).toContain('data-seat="eng"');
-    expect(html).toContain('💻 เก้าอี้ฝั่ง Engineering');
+    expect(html).toContain('>เก้าอี้ฝั่ง Engineering</span>');
     expect(html).toContain('ENG_SEAT_LINE');
     expect(html).toContain('นั่งเก้าอี้อีกฝั่ง');
     expect(html).not.toContain('BIZ_SEAT_LINE');
@@ -27,7 +27,7 @@ describe('HeroFigure seats', () => {
     const html = renderToStaticMarkup(
       <HeroFigure figure={figure} role="eng" seat="biz" onFlipSeat={noop} />,
     );
-    expect(html).toContain('💼 เก้าอี้ฝั่ง Business');
+    expect(html).toContain('>เก้าอี้ฝั่ง Business</span>');
     expect(html).toContain('BIZ_SEAT_LINE');
     expect(html).toContain('กลับเก้าอี้ตัวเอง');
     expect(html).not.toContain('ENG_SEAT_LINE');
@@ -40,8 +40,8 @@ describe('HeroFigure seats', () => {
     );
     expect(html).toContain('BIZ_SEAT_LINE');
     expect(html).toContain('ENG_SEAT_LINE');
-    expect(html).toContain('💼 เก้าอี้ฝั่ง Business');
-    expect(html).toContain('💻 เก้าอี้ฝั่ง Engineering');
+    expect(html).toContain('>เก้าอี้ฝั่ง Business</span>');
+    expect(html).toContain('>เก้าอี้ฝั่ง Engineering</span>');
     expect(html).not.toContain('<button');
   });
 

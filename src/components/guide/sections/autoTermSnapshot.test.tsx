@@ -21,7 +21,7 @@ const markersOf = (html: string) =>
 
 function beginnerCoreMarkers(chapterId: string): string[] {
   const chapter = CHAPTERS.find(c => c.id === chapterId)!;
-  const hero = renderToStaticMarkup(<ChapterHero chapter={chapter} experienceLevel="beginner" isRead={false} />);
+  const hero = renderToStaticMarkup(<ChapterHero chapter={chapter} isRead={false} />);
   const intro = renderToStaticMarkup(<ChapterIntro chapter={chapter} />);
   const core = getChapterLayout('beginner', chapter).find(g => g.layer === 'core')!.sections;
   return [
