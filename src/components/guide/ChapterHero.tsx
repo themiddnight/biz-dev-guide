@@ -34,7 +34,7 @@ export const ChapterHero: React.FC<ChapterHeroProps> = ({
 
   return (
     <>
-      <header className="space-y-4">
+      <div className="space-y-4" data-chapter-head>
         <p className="flex flex-wrap gap-x-5 gap-y-1 text-sm text-base-content-muted" data-chapter-meta>
           <span>บทที่ {chapter.num}</span>
           <span>{HOME_LABEL[chapter.home]}</span>
@@ -49,7 +49,7 @@ export const ChapterHero: React.FC<ChapterHeroProps> = ({
         </div>
         <p className="text-lg leading-8 text-base-content">{chapter.subtitle}</p>
         <p data-chapter-opening>{prose(marked.chapterOpening)}</p>
-      </header>
+      </div>
 
       {chapter.heroFigure ? (
         <HeroFigure

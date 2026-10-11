@@ -8,7 +8,7 @@ interface DiagramFamilyGridProps {
 }
 
 const cardBase =
-  'h-full w-full p-3.5 rounded-xl bg-base-100 border border-base-border flex flex-col gap-1.5 text-left';
+  'h-full w-full p-3.5 rounded-field border border-base-border flex flex-col gap-1.5 text-left';
 const jumpClass =
   'cursor-pointer transition-colors hover:border-base-border-strong hover:bg-base-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary';
 
@@ -19,16 +19,16 @@ const FamilyCardBody: React.FC<{ family: DiagramFamily }> = ({ family }) => {
       <div className="mb-1 py-1" aria-hidden="true">
         <Figure className="w-full" />
       </div>
-      <span className="text-sm font-bold text-base-content">{family.name}</span>
-      <span className="text-xs sm:text-[13px] text-base-content-body leading-relaxed">{family.question}</span>
-      <span className="text-[11px] sm:text-xs text-base-content-muted leading-relaxed">
+      <span className="font-semibold text-base-content">{family.name}</span>
+      <span className="text-sm text-base-content-body">{family.question}</span>
+      <span className="text-sm text-base-content-muted">
         {family.examples}
       </span>
       {family.note && (
-        <span className="text-[11px] sm:text-xs text-base-content-secondary leading-relaxed">{family.note}</span>
+        <span className="text-sm text-base-content-secondary">{family.note}</span>
       )}
       {family.jumpLabel && (
-        <span className="mt-auto pt-1 text-[11px] sm:text-xs font-semibold text-base-content">
+        <span className="mt-auto pt-1 text-sm font-semibold text-base-content">
           {family.jumpLabel}
         </span>
       )}

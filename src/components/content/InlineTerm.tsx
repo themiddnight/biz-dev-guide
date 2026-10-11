@@ -53,7 +53,7 @@ export const InlineTermPanel: React.FC<InlineTermPanelProps> = ({ term, panelId,
     role="region"
     aria-label={term.term}
     data-inline-term-panel={term.id}
-    className="block my-2 p-3 rounded-lg border border-base-border bg-base-100 text-xs sm:text-sm leading-relaxed text-base-content-body not-italic font-normal"
+    className="block my-2 rounded-field border border-base-border bg-base-100 p-3 text-sm leading-6 font-normal not-italic text-base-content-body"
   >
     <span className="block font-semibold text-base-content">{term.term}</span>
     <span className="block mt-1">
@@ -69,7 +69,7 @@ export const InlineTermPanel: React.FC<InlineTermPanelProps> = ({ term, panelId,
         <button
           type="button"
           onClick={() => onSearchGlossary(term.term)}
-          className="inline-block -my-3.5 py-3.5 sm:my-0 sm:py-0 text-[11px] sm:text-xs font-semibold text-base-content-body underline underline-offset-2 hover:text-base-content cursor-pointer"
+          className="inline-block -my-3.5 py-3.5 sm:my-0 sm:py-0 cursor-pointer text-sm text-base-content-muted underline decoration-base-border underline-offset-4 hover:text-base-content"
         >
           ดูในหน้ารวมคำศัพท์
         </button>

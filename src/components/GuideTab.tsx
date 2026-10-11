@@ -532,7 +532,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
           <div className="bg-base-100 border border-base-border rounded-box p-box shadow-2xs">
             {showResumedLine && (
               <p data-resumed className="mb-2 text-xs text-base-content-muted truncate">
-                อ่านต่อจากครั้งก่อน · บทที่ {activeChapter.num}
+                อ่านต่อจากครั้งก่อน บทที่ {activeChapter.num}
               </p>
             )}
             <div className="flex items-center justify-between gap-3">
@@ -648,7 +648,8 @@ export const GuideTab: React.FC<GuideTabProps> = ({
               onSetAllOpen={open => setOpenState(open ? expandAll(layout) : collapseAll(layout))}
             />
 
-            <div>
+            {/* The control row's bottom rule already separates it from the first section. */}
+            <div className="[&>section:first-child]:border-t-0">
               {layout.flatMap(group => group.sections.map(key => {
                 const Section = SECTION_COMPONENTS[key];
                 const fold: SectionFold = group.layer === 'core'

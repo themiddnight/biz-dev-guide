@@ -34,25 +34,16 @@ export const GlossaryCategoryMap: React.FC<GlossaryCategoryMapProps> = ({ terms,
               onClick={() => onSelectCategory(cat.key)}
               className="p-3 min-w-0"
             >
-              <div className="flex items-start justify-between gap-2">
-                <span className="text-sm font-semibold leading-snug text-base-content">
-                  {cat.label}
+              {/* One block child: the chip is an inline-flex row, and the two lines must stack and wrap inside the tile. */}
+              <span className="block w-full min-w-0">
+                <span className="flex items-start justify-between gap-2">
+                  <span className="min-w-0 break-words text-sm font-semibold leading-snug text-base-content">{cat.label}</span>
+                  <span className={`shrink-0 text-sm ${active ? 'opacity-80' : 'text-base-content-muted'}`}>{counts[cat.key]}</span>
                 </span>
-                <span
-                  className={`shrink-0 text-sm ${
-                    active ? 'opacity-80' : 'text-base-content-muted'
-                  }`}
-                >
-                  {counts[cat.key]}
+                <span className={`mt-1 block break-words text-sm font-normal leading-snug ${active ? 'opacity-80' : 'text-base-content-muted'}`}>
+                  {cat.labelTh}
                 </span>
-              </div>
-              <div
-                className={`mt-1 text-sm font-normal leading-snug break-words ${
-                  active ? 'opacity-80' : 'text-base-content-muted'
-                }`}
-              >
-                {cat.labelTh}
-              </div>
+              </span>
             </ToggleChip>
           );
         })}

@@ -53,7 +53,8 @@ interface ChapterControlRowProps {
 
 /**
  * The one sticky row under the app header: a link to each section grouped by layer, the level
- * switch, and from `sm` up one control that opens or folds every section.
+ * switch, and from `sm` up one control that opens or folds every section. Below `sm` the links
+ * scroll sideways on one line; from `sm` they wrap, because nine links do not fit the 44rem column.
  */
 export const ChapterControlRow: React.FC<ChapterControlRowProps> = ({
   chapterNum, layout, openState, level, onLevelChange, levelOverride, onSelectSection, onSetAllOpen,
@@ -84,16 +85,16 @@ export const ChapterControlRow: React.FC<ChapterControlRowProps> = ({
       ref={rowRef}
       data-control-row
       aria-label="หัวข้อในบทและระดับการอ่าน"
-      className="sticky z-30 -mx-box-spacious space-y-1 border-y border-base-border bg-base-100 px-box-spacious py-3 text-sm leading-5"
+      className="sticky z-30 space-y-1 border-y border-base-border bg-base-100 py-3 text-sm leading-5 max-sm:-mx-box-spacious max-sm:px-box-spacious"
       style={{ top: 'var(--header-h)' }}
     >
-      <div className="flex items-center gap-x-4">
+      <div className="flex items-start gap-x-4">
         <ScrollFade
           wrapperClassName="min-w-0 flex-1"
-          className={`flex items-center gap-x-5 overflow-x-auto whitespace-nowrap [scrollbar-width:none] ${SCROLL_ROOM}`}
+          className={`flex items-center gap-x-5 gap-y-1 overflow-x-auto whitespace-nowrap [scrollbar-width:none] sm:flex-wrap sm:overflow-visible ${SCROLL_ROOM}`}
         >
           {groups.map(group => (
-            <span key={group.layer} data-control-layer={group.layer} className="flex items-center gap-x-4">
+            <span key={group.layer} data-control-layer={group.layer} className="flex items-center gap-x-4 sm:contents">
               <span className="text-base-content-muted">{LAYER_LABEL[group.layer]}</span>
               {group.sections.map(key => (
                 <a
