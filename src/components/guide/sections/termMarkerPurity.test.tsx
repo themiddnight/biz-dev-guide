@@ -40,10 +40,16 @@ vi.mock('react/jsx-runtime', async importOriginal => {
 import { renderToStaticMarkup } from 'react-dom/server';
 import { CHAPTERS } from '../../../data/chaptersData';
 import { ROLES } from '../../../data/rolePerspective';
-import { coreConceptTerms, heroTerms, jargonTerms, otherSideTerms, primerTerms } from '../../../lib/sectionTerms';
+import {
+  coreConceptTerms, examplesTerms, frictionTerms, heroTerms, jargonTerms, otherSideTerms, pitfallTerms, practiceTerms, primerTerms,
+} from '../../../lib/sectionTerms';
 import { ChapterHero } from '../ChapterHero';
 import { CoreConceptsSection } from './CoreConceptsSection';
 import { JargonSection } from './JargonSection';
+import { ExamplesSection } from './ExamplesSection';
+import { PracticeSection } from './PracticeSection';
+import { PitfallsSection } from './PitfallsSection';
+import { SECTION_COMPONENTS } from './registry';
 import { OtherSideSection } from './OtherSideSection';
 import { ChapterIntro } from '../ChapterIntro';
 import type { OtherSideView } from './registry';
@@ -87,16 +93,16 @@ describe('term markers survive a StrictMode double render', () => {
     const ctx = ctxFor({ chapterLevel: 'experienced' }); // bullets unfolded, so every concept string renders
     const totals = { hero: 0, primer: 0, jargon: 0, coreConcepts: 0 };
     for (const chapter of CHAPTERS) {
-      const hero = heroTerms(chapter);
+      const hero = heroTerms(chapter, ROLES);
       const primer = primerTerms(chapter);
       const concepts = coreConceptTerms(chapter);
       const cases = {
-        hero: [renderToStaticMarkup(<ChapterHero chapter={chapter} isRead={false} />),
-          [hero.chapterOpening, hero.plainAnalogy, hero.keyTakeaway]],
+        hero: [renderToStaticMarkup(<ChapterHero chapter={chapter} isRead={false} />), // no role: both seat lines
+          [hero.chapterOpening, hero.seats.biz, hero.seats.eng, hero.plainAnalogy, hero.keyTakeaway]],
         primer: [renderToStaticMarkup(<ChapterIntro chapter={chapter} />),
           primer ? [primer.whatIsIt, primer.whyItMatters, primer.realWorldScenario] : []],
         jargon: [renderToStaticMarkup(<JargonSection chapter={chapter} fold={CORE} ctx={ctx} />),
-          jargonTerms(chapter).flatMap(card => [card.humanTranslation, card.meetingExample])],
+          jargonTerms(chapter).flatMap(card => [card.humanTranslation, card.formalDefinition, card.meetingExample])],
         coreConcepts: [renderToStaticMarkup(<CoreConceptsSection chapter={chapter} fold={CORE} ctx={ctx} />),
           concepts.flatMap(c => [c.detail, ...c.bulletPoints])],
       } as const;
@@ -106,6 +112,51 @@ describe('term markers survive a StrictMode double render', () => {
       }
     }
     for (const [section, total] of Object.entries(totals)) expect(total, section).toBeGreaterThan(0);
+  });
+});
+
+describe('the sections wired by the quiet reader survive the double render too', () => {
+  it('examples, practice, pitfalls and friction: every chapter renders exactly the markers its walk computes', () => {
+    const ctx = ctxFor();
+    const Friction = SECTION_COMPONENTS.friction;
+    const totals = { examples: 0, practice: 0, pitfalls: 0, friction: 0 };
+    for (const chapter of CHAPTERS) {
+      const examples = examplesTerms(chapter);
+      const practice = practiceTerms(chapter);
+      const playbook = chapter.frictionPlaybook ? frictionTerms(chapter.frictionPlaybook) : null;
+      const sides = examples.dialogue ? [examples.dialogue.wrongWay, examples.dialogue.rightWay] : [];
+      const cases = {
+        examples: [renderToStaticMarkup(<ExamplesSection chapter={chapter} fold={CORE} ctx={ctx} />), [
+          examples.dialogue?.context, ...sides.flatMap(s => [s.speaker, s.text, s.outcome]),
+          ...examples.cases.flatMap(c => [c.situation, c.whatHappened, c.resolution, c.keyLesson]),
+        ]],
+        practice: [renderToStaticMarkup(<PracticeSection chapter={chapter} fold={CORE} ctx={ctx} />), [...practice.steps, ...practice.checklist]],
+        pitfalls: [renderToStaticMarkup(<PitfallsSection chapter={chapter} fold={CORE} ctx={ctx} />),
+          pitfallTerms(chapter).flatMap(p => [p.symptom, p.solution])],
+        // No option is picked in a static render, so the option results and tips are not on screen.
+        friction: [renderToStaticMarkup(<Friction chapter={chapter} fold={CORE} ctx={ctx} />), playbook ? [
+          playbook.businessFrustration, playbook.engineerFrustration, playbook.underlyingRootCause,
+          ...playbook.tradeOffs.flatMap(r => [r.ifYouNeed, r.youMustSacrifice, r.howToNegotiate]),
+          ...playbook.scripts.flatMap(s => [s.businessScript, s.engineerScript]),
+          playbook.dilemma?.scenario, playbook.dilemma?.counterpartQuote,
+        ] : []],
+      } as const;
+      for (const [section, [html, texts]] of Object.entries(cases)) {
+        expect(rendered(html), `${chapter.id} ${section}`).toEqual(expected(texts));
+        totals[section as keyof typeof totals] += expected(texts).length;
+      }
+    }
+    for (const [section, total] of Object.entries(totals)) expect(total, section).toBeGreaterThan(0);
+  });
+
+  it('the hero seat line: a reader with a role gets the marker of the seat shown, and flipping moves it', () => {
+    const s16 = CHAPTERS.find(c => c.id === 's16')!;
+    const seatMarkers = (seat: 'biz' | 'eng') => {
+      const html = renderToStaticMarkup(<ChapterHero chapter={s16} isRead={false} role="biz" seat={seat} />);
+      return rendered(/<span data-seat-line="\w+">(.*?)<\/span><\/p>/.exec(html)?.[1] ?? '');
+    };
+    expect(seatMarkers('biz')).toEqual(['revenue']);
+    expect(seatMarkers('eng')).toEqual(['pm-vs-pjm']);
   });
 });
 

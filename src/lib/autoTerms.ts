@@ -9,20 +9,23 @@ import { termPattern } from '../data/termInventory';
  * `src/lib/sectionTerms.ts`, a pure function of the chapter the section components memoise.
  *
  * Field scope (guardrail 1). The call sites pass the kind; nothing is marked unless it is `prose`.
- * - `prose` (marked): `beginnerPrimer.whatIsIt` / `whyItMatters` / `realWorldScenario`,
- *   `coreConcepts[].detail`, `coreConcepts[].bulletPoints[]`, `jargonList[].humanTranslation`,
- *   `jargonList[].meetingExample`, `keyTakeaway`, `plainAnalogy`, `businessNote`, `engineerNote`,
- *   `perspectives.*.measuredBy`, `perspectives.*.fears[]`, `perspectives.*.askThem[]`, and the
- *   `perspectives.*.saysVsHears[]` lines (`youSay` / `theyHear` / `sayInstead`). Dialogue and quoted
- *   speech are prose (D21): on the eng track every early `Sprint` is inside a spoken line.
+ * - `prose` (marked): `chapterOpening`, `heroFigure.seats.*`, `plainAnalogy`, `keyTakeaway`,
+ *   `beginnerPrimer.whatIsIt` / `whyItMatters` / `realWorldScenario`, `coreConcepts[].detail`,
+ *   `coreConcepts[].bulletPoints[]`, `jargonList[].humanTranslation` / `formalDefinition` /
+ *   `meetingExample`, `businessNote`, `engineerNote`, `perspectives.*.measuredBy`,
+ *   `perspectives.*.fears[]`, `perspectives.*.askThem[]`, the `perspectives.*.saysVsHears[]` lines,
+ *   every `dialogueExample` line, `realWorldExamples[]` (`situation`, `whatHappened`, `resolution`,
+ *   `keyLesson`), `realWorldWorkflow[].description`, `checklist[]`, `commonPitfalls[]` (`symptom`,
+ *   `solution`) and the `frictionPlaybook` lines. Dialogue and quoted speech are prose (D21): on the
+ *   eng track every early `Sprint` is inside a spoken line.
  * - `heading` (returned unchanged): `title`, `subtitle`, `enTerm`, `diagramTitle`,
- *   `coreConcepts[].heading`, `jargonList[].term`, `checklist[]`, `realWorldWorkflow[].step`,
- *   `commonPitfalls[].pitfall`, every section header string in the components, and every glossary
- *   `term` label.
- * - Not wired yet (spec Phase 3, deferrals): `ContentBlock` body and table-cell text
- *   (`ContentBlocks.tsx`), `jargonList[].formalDefinition`, `dialogueExample` and `frictionPlaybook`
- *   lines, and `diagramDescription` — it renders inside the diagram section's toggle `<button>`, and
- *   a term button cannot nest inside another button.
+ *   `heroFigure.caption`, `coreConcepts[].heading`, `jargonList[].term`,
+ *   `realWorldExamples[].title`, `realWorldWorkflow[].step`, `commonPitfalls[].pitfall`,
+ *   `frictionPlaybook.battlegroundTitle`, `goldenScripts[].situation`, every section header string
+ *   in the components, and every glossary `term` label.
+ * - Not wired: `ContentBlock` body and table-cell text (`ContentBlocks.tsx`), `diagramDescription`,
+ *   and a friction dilemma option's own text, which renders inside its `<button>` where a term
+ *   button cannot nest.
  *
  * A glossary key that means something else in one string (`Pipeline` in "Leaky Pipeline") is opted
  * out in that string with `[[!g:id]]` (guardrail 7), not excluded here.

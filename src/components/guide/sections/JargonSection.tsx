@@ -22,7 +22,7 @@ export const JargonSection: React.FC<SectionProps> = props => {
             <dd className="min-w-0 space-y-2">
               <p>{rich(marked[jIdx].humanTranslation)}</p>
               {item.formalDefinition && (
-                <p className="text-sm text-base-content-muted">{item.formalDefinition}</p>
+                <p className="text-sm text-base-content-muted">{rich(marked[jIdx].formalDefinition ?? item.formalDefinition)}</p>
               )}
               {item.meetingExample && (
                 <p className="text-base-content-secondary">{rich(marked[jIdx].meetingExample ?? item.meetingExample)}</p>

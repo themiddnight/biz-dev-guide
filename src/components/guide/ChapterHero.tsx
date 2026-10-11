@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import type { Chapter } from '../../types';
 import { HeroFigure } from './HeroFigure';
-import type { ChapterHome, Role } from '../../data/rolePerspective';
+import { ROLES, type ChapterHome, type Role } from '../../data/rolePerspective';
 import { RichText } from '../content/RichText';
 import { heroTerms } from '../../lib/sectionTerms';
 
@@ -25,8 +25,8 @@ export const ChapterHero: React.FC<ChapterHeroProps> = ({
   chapter, isRead, role = null, seat = 'biz', onFlipSeat = () => {}, onNavigateChapter, onSearchGlossary,
 }) => {
   // The hero is one section for automatic term marking (spec P3.5), computed purely from the
-  // chapter. `title`, `enTerm` and `subtitle` are headings and are never marked.
-  const marked = useMemo(() => heroTerms(chapter), [chapter]);
+  // chapter and the seats shown. `title`, `enTerm` and `subtitle` are headings and are never marked.
+  const marked = useMemo(() => heroTerms(chapter, role ? [seat] : ROLES), [chapter, role, seat]);
   const prose = (text: string) => (
     <RichText text={text} onNavigateChapter={onNavigateChapter} onSearchGlossary={onSearchGlossary} />
   );
@@ -52,7 +52,14 @@ export const ChapterHero: React.FC<ChapterHeroProps> = ({
       </header>
 
       {chapter.heroFigure ? (
-        <HeroFigure figure={chapter.heroFigure} analogy={analogy} role={role} seat={seat} onFlipSeat={onFlipSeat} />
+        <HeroFigure
+          figure={chapter.heroFigure}
+          seatLines={{ biz: marked.seats.biz && prose(marked.seats.biz), eng: marked.seats.eng && prose(marked.seats.eng) }}
+          analogy={analogy}
+          role={role}
+          seat={seat}
+          onFlipSeat={onFlipSeat}
+        />
       ) : (
         <p data-analogy className="text-base-content-secondary">{analogy}</p>
       )}

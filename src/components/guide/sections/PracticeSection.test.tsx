@@ -38,7 +38,8 @@ describe('PracticeSection (spec A2)', () => {
     const toggled: string[] = [];
     const tree = ChecklistItems({
       chapter: s1,
-      ctx: { checkedChecklist: {}, onToggleChecklistItem: key => { toggled.push(key); } },
+      items: s1.checklist!,
+      ctx: ctxFor({ onToggleChecklistItem: key => { toggled.push(key); } }),
     }) as ReactElement<{ children: ReactElement<{ children: ReactElement<{ children: ReactElement<{ onChange: () => void }>[] }> }>[] }>;
     tree.props.children[0].props.children.props.children[0].props.onChange();
     expect(toggled).toEqual(['s1_cl_0']);

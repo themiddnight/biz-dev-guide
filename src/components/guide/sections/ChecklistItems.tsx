@@ -1,15 +1,19 @@
 import React from 'react';
 import type { Chapter } from '../../../types';
 import type { GuideSectionContext } from './registry';
+import { Prose } from './Prose';
 
-type ChecklistCtx = Pick<GuideSectionContext, 'checkedChecklist' | 'onToggleChecklistItem'>;
+type ChecklistCtx = Pick<GuideSectionContext, 'checkedChecklist' | 'onToggleChecklistItem' | 'onNavigateChapter' | 'onSearchGlossary'>;
 
-/** Checklist items, body only; hosted by PracticeSection. Item keys stay `${chapter.id}_cl_${idx}` (spec A2). */
-export const ChecklistItems: React.FC<{ chapter: Chapter; ctx: ChecklistCtx }> = ({ chapter, ctx }) => {
-  if (!chapter.checklist || chapter.checklist.length === 0) return null;
+/**
+ * Checklist items, body only; hosted by PracticeSection. Item keys stay `${chapter.id}_cl_${idx}`
+ * (spec A2). `items` are the checklist lines as `practiceTerms` marked them, in order.
+ */
+export const ChecklistItems: React.FC<{ chapter: Chapter; items: readonly string[]; ctx: ChecklistCtx }> = ({ chapter, items, ctx }) => {
+  if (items.length === 0) return null;
   return (
     <ul>
-      {chapter.checklist.map((item, idx) => {
+      {items.map((item, idx) => {
         const itemKey = `${chapter.id}_cl_${idx}`;
         const isChecked = !!ctx.checkedChecklist[itemKey];
         return (
@@ -22,7 +26,7 @@ export const ChecklistItems: React.FC<{ chapter: Chapter; ctx: ChecklistCtx }> =
                 checked={isChecked}
                 onChange={() => ctx.onToggleChecklistItem(itemKey)}
               />
-              <span className={isChecked ? 'text-base-content-muted line-through' : ''}>{item}</span>
+              <span className={isChecked ? 'text-base-content-muted line-through' : ''}><Prose text={item} ctx={ctx} /></span>
             </label>
           </li>
         );

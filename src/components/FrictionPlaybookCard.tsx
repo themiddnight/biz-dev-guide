@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { CheckCircle, XCircle } from 'lucide-react';
 import type { FrictionPlaybook } from '../types';
 import { TAP } from './ui/tapTarget';
+import { Prose, type ProseCtx } from './guide/sections/Prose';
+import { frictionTerms } from '../lib/sectionTerms';
 
 interface FrictionPlaybookCardProps {
   playbook: FrictionPlaybook;
+  ctx: ProseCtx;
 }
 
 const LABEL = 'block font-semibold text-base-content';
@@ -15,27 +18,31 @@ const OPTION_LETTERS = ['ก', 'ข', 'ค', 'ง', 'จ'];
  * The friction playbook: one of the few framed blocks in the reader, because it is a worked tool
  * and not chapter prose. Inside the frame everything is rows on hairlines.
  */
-export const FrictionPlaybookCard: React.FC<FrictionPlaybookCardProps> = ({ playbook }) => {
+export const FrictionPlaybookCard: React.FC<FrictionPlaybookCardProps> = ({ playbook, ctx }) => {
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
+  // One first-occurrence walk for the playbook, computed purely from it.
+  const marked = useMemo(() => frictionTerms(playbook), [playbook]);
   const { dilemma } = playbook;
+  const markedDilemma = marked.dilemma;
+  const prose = (text: string) => <Prose text={text} ctx={ctx} />;
 
   return (
     <div data-friction-playbook className="rounded-box border border-base-border p-box-spacious">
       <h3 className="text-base font-bold text-base-content">{playbook.battlegroundTitle}</h3>
 
       <div className="mt-4 grid gap-5 sm:grid-cols-2">
-        <p><span className={LABEL}>ฝั่ง Business หงุดหงิดเรื่อง</span>{playbook.businessFrustration}</p>
-        <p><span className={LABEL}>ฝั่ง Engineering หงุดหงิดเรื่อง</span>{playbook.engineerFrustration}</p>
+        <p><span className={LABEL}>ฝั่ง Business หงุดหงิดเรื่อง</span>{prose(marked.businessFrustration)}</p>
+        <p><span className={LABEL}>ฝั่ง Engineering หงุดหงิดเรื่อง</span>{prose(marked.engineerFrustration)}</p>
       </div>
-      <p className="mt-5"><span className={LABEL}>สาเหตุจริง</span>{playbook.underlyingRootCause}</p>
+      <p className="mt-5"><span className={LABEL}>สาเหตุจริง</span>{prose(marked.underlyingRootCause)}</p>
 
       <div className="mt-6" data-playbook-tradeoffs>
         <h4 className="font-semibold text-base-content">อยากได้อย่างหนึ่ง ต้องยอมเสียอีกอย่าง</h4>
-        {playbook.tradeOffMatrix.map((item, idx) => (
+        {playbook.tradeOffMatrix.map((_, idx) => (
           <dl key={idx} className="mt-4 grid gap-x-4 gap-y-1 border-t border-base-border pt-4 sm:grid-cols-[9rem_1fr]">
-            <dt className={ROW_LABEL}>ถ้าต้องการ</dt><dd className="font-medium text-base-content">{item.ifYouNeed}</dd>
-            <dt className={ROW_LABEL}>ต้องยอมเสีย</dt><dd>{item.youMustSacrifice}</dd>
-            <dt className={ROW_LABEL}>วิธีคุย</dt><dd>{item.howToNegotiate}</dd>
+            <dt className={ROW_LABEL}>ถ้าต้องการ</dt><dd className="font-medium text-base-content">{prose(marked.tradeOffs[idx].ifYouNeed)}</dd>
+            <dt className={ROW_LABEL}>ต้องยอมเสีย</dt><dd>{prose(marked.tradeOffs[idx].youMustSacrifice)}</dd>
+            <dt className={ROW_LABEL}>วิธีคุย</dt><dd>{prose(marked.tradeOffs[idx].howToNegotiate)}</dd>
           </dl>
         ))}
       </div>
@@ -45,17 +52,17 @@ export const FrictionPlaybookCard: React.FC<FrictionPlaybookCardProps> = ({ play
         {playbook.goldenScripts.map((script, idx) => (
           <dl key={idx} className="mt-4 grid gap-x-4 gap-y-1 border-t border-base-border pt-4 sm:grid-cols-[9rem_1fr]">
             <dt className={ROW_LABEL}>สถานการณ์</dt><dd className="font-medium text-base-content">{script.situation}</dd>
-            {script.businessScript && (<><dt className={ROW_LABEL}>Business พูด</dt><dd>{script.businessScript}</dd></>)}
-            {script.engineerScript && (<><dt className={ROW_LABEL}>Dev พูด</dt><dd>{script.engineerScript}</dd></>)}
+            {marked.scripts[idx].businessScript !== undefined && (<><dt className={ROW_LABEL}>Business พูด</dt><dd>{prose(marked.scripts[idx].businessScript)}</dd></>)}
+            {marked.scripts[idx].engineerScript !== undefined && (<><dt className={ROW_LABEL}>Dev พูด</dt><dd>{prose(marked.scripts[idx].engineerScript)}</dd></>)}
           </dl>
         ))}
       </div>
 
-      {dilemma && (
+      {dilemma && markedDilemma && (
         <div className="mt-6 border-t border-base-border pt-5" data-playbook-dilemma>
           <h4 className="font-semibold text-base-content">ลองตอบดู</h4>
-          <p className="mt-2"><span className="font-semibold text-base-content">สถานการณ์</span> {dilemma.scenario}</p>
-          <p className="mt-2 font-medium text-base-content">&ldquo;{dilemma.counterpartQuote}&rdquo;</p>
+          <p className="mt-2"><span className="font-semibold text-base-content">สถานการณ์</span> {prose(markedDilemma.scenario)}</p>
+          <p className="mt-2 font-medium text-base-content">&ldquo;{prose(markedDilemma.counterpartQuote)}&rdquo;</p>
           <p className="mt-4 text-sm text-base-content-muted">ถ้าเป็นคุณ จะตอบยังไง</p>
           <ul className="mt-1 divide-y divide-base-border border-y border-base-border">
             {dilemma.options.map((option, index) => {
@@ -84,9 +91,9 @@ export const FrictionPlaybookCard: React.FC<FrictionPlaybookCardProps> = ({ play
                         <span className={`font-semibold ${option.isOptimal ? 'text-success' : 'text-error'}`}>
                           {option.isOptimal ? 'ข้อนี้ดีที่สุด' : 'ยังไม่ใช่ข้อที่ดีที่สุด'}
                         </span>{' '}
-                        {option.result}
+                        {prose(markedDilemma.options[index].result)}
                       </p>
-                      <p><span className="text-base-content-muted">เทคนิค</span> {option.tip}</p>
+                      <p><span className="text-base-content-muted">เทคนิค</span> {prose(markedDilemma.options[index].tip)}</p>
                     </div>
                   )}
                 </li>

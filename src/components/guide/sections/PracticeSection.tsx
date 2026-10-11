@@ -1,12 +1,15 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import type { SectionProps } from './registry';
 import { SectionShell } from './SectionShell';
 import { WorkflowSteps } from './WorkflowSteps';
 import { ChecklistItems } from './ChecklistItems';
+import { practiceTerms } from '../../../lib/sectionTerms';
 
 /** Hands-on practice: the workflow steps, then the pre-handoff checklist (spec A2). */
 export const PracticeSection: React.FC<SectionProps> = props => {
   const { chapter, ctx } = props;
+  // One first-occurrence walk for steps and checklist, computed purely from the chapter.
+  const marked = useMemo(() => practiceTerms(chapter), [chapter]);
   const steps = chapter.realWorldWorkflow?.length ?? 0;
   const items = chapter.checklist?.length ?? 0;
   if (steps === 0 && items === 0) return null;
@@ -16,14 +19,14 @@ export const PracticeSection: React.FC<SectionProps> = props => {
     <SectionShell {...props} sectionKey="practice" note={counts}>
       {steps > 0 && (
         <div data-practice-steps>
-          <WorkflowSteps chapter={chapter} />
+          <WorkflowSteps chapter={chapter} descriptions={marked.steps} ctx={ctx} />
         </div>
       )}
       {items > 0 && (
         <div data-practice-checklist className={steps > 0 ? 'mt-7 border-t border-base-border pt-5' : ''}>
           <h3 className="font-semibold text-base-content">เช็กลิสต์ก่อนส่งต่องาน</h3>
           <div className="mt-1">
-            <ChecklistItems chapter={chapter} ctx={ctx} />
+            <ChecklistItems chapter={chapter} items={marked.checklist} ctx={ctx} />
           </div>
         </div>
       )}

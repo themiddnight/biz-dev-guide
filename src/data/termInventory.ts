@@ -5,9 +5,10 @@ import { placementOf } from './sectionLayers';
 /**
  * What a beginner actually sees, as data, so the term-coverage guard and (later) the inline-term
  * marker can walk the same fields. The field list is the beginner Core render order that
- * `sectionLayers.ts` establishes: hero -> primer -> jargon -> otherSide -> coreConcepts -> diagram.
- * Sections a beginner only reaches in Apply or Deep (dialogue, examples, friction, reference,
- * mindset) are deliberately out of scope.
+ * `sectionLayers.ts` establishes: hero (with both seat lines) -> primer -> jargon -> otherSide ->
+ * coreConcepts -> diagram. Sections a beginner only reaches folded, in Apply or Deep (examples,
+ * practice, pitfalls, friction, reference), are deliberately out of scope: they are marked too
+ * (`src/lib/sectionTerms.ts`), but a folded section is neither a first use nor a definition here.
  */
 export interface TermField {
   /** Dotted path, used verbatim in failure messages: `perspectives.biz.measuredBy`. */
@@ -44,14 +45,15 @@ const TERM_FIELDS: readonly TermField[] = [
   { field: 'enTerm', get: c => texts(c.enTerm) },
   { field: 'subtitle', get: c => [c.subtitle] },
   { field: 'chapterOpening', get: c => [c.chapterOpening] },
+  { field: 'heroFigure.seats', get: c => (c.heroFigure ? [c.heroFigure.seats.biz, c.heroFigure.seats.eng] : []) },
   { field: 'plainAnalogy', get: c => [c.plainAnalogy] },
   { field: 'keyTakeaway', get: c => [c.keyTakeaway] },
   { field: 'beginnerPrimer.whatIsIt', get: c => texts(c.beginnerPrimer?.whatIsIt) },
   { field: 'beginnerPrimer.whyItMatters', get: c => texts(c.beginnerPrimer?.whyItMatters) },
   { field: 'beginnerPrimer.realWorldScenario', get: c => texts(c.beginnerPrimer?.realWorldScenario) },
   { field: 'jargonList.term', get: c => (c.jargonList ?? []).map(j => j.term) },
-  { field: 'jargonList.formalDefinition', get: c => (c.jargonList ?? []).flatMap(j => texts(j.formalDefinition)) },
   { field: 'jargonList.humanTranslation', get: c => (c.jargonList ?? []).map(j => j.humanTranslation) },
+  { field: 'jargonList.formalDefinition', get: c => (c.jargonList ?? []).flatMap(j => texts(j.formalDefinition)) },
   { field: 'jargonList.meetingExample', get: c => (c.jargonList ?? []).flatMap(j => texts(j.meetingExample)) },
   { field: 'businessNote', get: c => [c.businessNote] },
   { field: 'engineerNote', get: c => [c.engineerNote] },
@@ -102,7 +104,7 @@ const COMPOUND_TERMS: readonly string[] = [
 /**
  * ALL-CAPS tokens that the glossary does not own: English words the copy writes in caps,
  * role and team names, vendor and product names, and notation the copy spells out where it
- * uses it (`P0-P3`, `L4`, the `#A1024` order number). An explicit reviewed list, not a
+ * uses it (`P0-P3`, `L4`, the `#A1024` order number, the `REF-112` ticket number). An explicit reviewed list, not a
  * heuristic — an entry here is a claim that no reader has to look this up in the glossary.
  */
 const KNOWN_NON_TERMS: ReadonlySet<string> = new Set([
@@ -117,7 +119,7 @@ const KNOWN_NON_TERMS: ReadonlySet<string> = new Set([
   // `CTO` and `PO` are job titles, not concepts to look up; `AI` and `CPU` are general computing
   // literacy the chapters use only as background; `PDPA` is Thai law the copy explains where it
   // cites it. Adding an entry for any of them would be glossary padding (review issue 4).
-  'A1024', 'CPU', 'PDPA', 'AI', 'CTO', 'PO', 'P0', 'P1', 'P2', 'P3', 'L4',
+  'A1024', 'REF', 'CPU', 'PDPA', 'AI', 'CTO', 'PO', 'P0', 'P1', 'P2', 'P3', 'L4',
   // Ordinary English words or fragments that appear in caps inside copy
   'AND', 'OR', 'NOT', 'YES', 'NO', 'THE', 'FOR', 'ALL', 'NEW', 'OLD', 'WHY', 'HOW', 'WHAT',
   'WHO', 'WHEN', 'IF', 'IS', 'IT', 'TO', 'DO', 'BE', 'ON', 'IN', 'AT', 'BY', 'OK', 'VS',

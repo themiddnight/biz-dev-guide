@@ -53,7 +53,7 @@ const FrictionSection: React.FC<SectionProps> = props => {
   if (!playbook) return null;
   return (
     <SectionShell {...props} sectionKey="friction" note="เมื่อสองฝั่งเถียงกันเรื่องนี้">
-      <FrictionPlaybookCard playbook={playbook} />
+      <FrictionPlaybookCard playbook={playbook} ctx={props.ctx} />
     </SectionShell>
   );
 };

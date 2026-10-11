@@ -46,6 +46,7 @@ describe('automatic term markers on real chapters (beginner Core)', () => {
       'intro: api (API)',
       'jargon: sprint (Sprint)',
       'jargon: wireframe (Wireframe)',
+      'jargon: qa (QA)',
     ]);
   });
 

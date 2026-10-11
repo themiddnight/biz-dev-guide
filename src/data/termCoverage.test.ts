@@ -170,24 +170,27 @@ describe('beginner-visible abbreviation coverage', () => {
  * v2 (term-definitions spec D11, Phase 3): the at-or-before form. The markers come from the same
  * pure section walks the components render (`src/lib/sectionTerms.ts`), not from a hand-kept
  * mirror, so a rewired component cannot drift from this guard. The model is a beginner's default
- * view with every Core section open: the other-side box in `both` mode, and core-concept bullets
+ * view with every Core section open and no role chosen: both seat lines under the hero figure, the
+ * other-side box in `both` mode, and core-concept bullets
  * folded — a beginner does not see them until they tap `ดูรายละเอียด`, so they are neither a first
  * use nor a definition here. A field with no entry below is never marked (headings, unwired fields).
  */
 function markedByField(chapter: Chapter): Map<string, string[]> {
-  const hero = heroTerms(chapter);
+  const hero = heroTerms(chapter, ROLES);
   const primer = primerTerms(chapter);
   const jargon = jargonTerms(chapter);
   const cards = otherSideTerms(chapter, ROLES);
   const concepts = coreConceptTerms(chapter);
   return new Map([
     ['chapterOpening', [hero.chapterOpening]],
+    ['heroFigure.seats', ROLES.flatMap(side => hero.seats[side] ?? [])],
     ['plainAnalogy', [hero.plainAnalogy]],
     ['keyTakeaway', [hero.keyTakeaway]],
     ['beginnerPrimer.whatIsIt', primer ? [primer.whatIsIt] : []],
     ['beginnerPrimer.whyItMatters', primer ? [primer.whyItMatters] : []],
     ['beginnerPrimer.realWorldScenario', primer ? [primer.realWorldScenario] : []],
     ['jargonList.humanTranslation', jargon.map(card => card.humanTranslation)],
+    ['jargonList.formalDefinition', jargon.flatMap(card => card.formalDefinition ?? [])],
     ['jargonList.meetingExample', jargon.flatMap(card => (card.meetingExample === undefined ? [] : [card.meetingExample]))],
     // Each card carries its reader's note: the biz card is read by eng (`engineerNote`), and back.
     ['businessNote', cards.filter(card => card.side === 'eng').map(card => card.note)],
@@ -247,7 +250,7 @@ const openingExpands = (chapter: Chapter, term: string) => {
   const after = chapter.chapterOpening.match(new RegExp(`(?<![A-Za-z0-9])${t}\\s*\\(([^)]*)\\)`));
   if (after && ids.some(id => expansionsOf(id, term).some(exp => after[1].toLowerCase().includes(exp)))) return true;
   if (new RegExp(`[^\\s(]\\s*\\(\\s*${t}\\s*\\)`).test(chapter.chapterOpening)) return true;
-  const marked = markerIdsOf(heroTerms(chapter).chapterOpening);
+  const marked = markerIdsOf(heroTerms(chapter, ROLES).chapterOpening);
   return ids.some(id => marked.has(id));
 };
 
@@ -319,8 +322,11 @@ function trackGaps(track: TrackKey): { term: string; line: string }[] {
  *   the chapter opening under them (Phase 4, `HEADING_FIELDS`), which closed 16 / 13 / 19 / 12 down
  *   to 2 / 1 / 5 / 2 — the s1 opening also names BA, UX and QA, s11's FAQ, s18's KR.
  * - `missingFromGlossary`: no glossary entry resolves the term, so nothing could ever mark it. A
- *   cheap content fix: add the entry. Empty since D20/D21 — every earlier "never defined" line
- *   (SA, SMS, OTP, QR, Refactor, ...) resolves, and is now marked in a dialogue line or arrow chain.
+ *   cheap content fix: add the entry. D20/D21 emptied it — every earlier "never defined" line
+ *   (SA, SMS, OTP, QR, Refactor, ...) resolves, and is marked in a dialogue line or arrow chain.
+ *   `FR` came in when the walk learned the seat lines under the hero figure (quiet-reader spec):
+ *   s4's Engineering seat line says `FR` above the jargon row that defines it, and no glossary
+ *   entry answers to `FR`, so the seat line cannot be marked.
  */
 const KNOWN_GAPS_V2: Record<TrackKey, { guardrailLimited: readonly string[]; missingFromGlossary: readonly string[] }> = {
   beginner: {
@@ -328,7 +334,9 @@ const KNOWN_GAPS_V2: Record<TrackKey, { guardrailLimited: readonly string[]; mis
       'track beginner: "FURPS+" first seen at s4/coreConcepts.heading, never defined',
       'track beginner: "Gate" first seen at s6/diagramDescription, never defined',
     ],
-    missingFromGlossary: [],
+    missingFromGlossary: [
+      'track beginner: "FR" first seen at s4/heroFigure.seats, defined only later at s4/jargonList.term',
+    ],
   },
   experienced: {
     guardrailLimited: [
@@ -342,14 +350,18 @@ const KNOWN_GAPS_V2: Record<TrackKey, { guardrailLimited: readonly string[]; mis
       'track biz: "Gate" first seen at s6/diagramDescription, never defined',
       'track biz: "DORA" first seen at s8/coreConcepts.heading, defined only later at s8/coreConcepts.detail',
     ],
-    missingFromGlossary: [],
+    missingFromGlossary: [
+      'track biz: "FR" first seen at s4/heroFigure.seats, defined only later at s4/jargonList.term',
+    ],
   },
   eng: {
     guardrailLimited: [
       'track eng: "FURPS+" first seen at s4/coreConcepts.heading, never defined',
       'track eng: "SLO" first seen at s19/coreConcepts.heading, defined only later at s19/coreConcepts.detail',
     ],
-    missingFromGlossary: [],
+    missingFromGlossary: [
+      'track eng: "FR" first seen at s4/heroFigure.seats, defined only later at s4/jargonList.term',
+    ],
   },
 };
 
