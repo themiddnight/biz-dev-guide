@@ -521,31 +521,22 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
   // =========================================================================
   if (chapterId === 's6') {
     return (
-      <div className="space-y-3">
-        <div className="p-4 rounded-box border border-base-border bg-base-100 space-y-3">
-          <span className="text-xs font-bold text-engineer uppercase tracking-wider">
-            The Two Gates: Definition of Ready (DoR) vs Definition of Done (DoD)
-          </span>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-            <div className="p-3 rounded-xl bg-warning/10 border border-warning/25 space-y-1.5">
-              <div className="flex items-center gap-1.5 font-bold text-warning">
-                <CheckCircle2 className="w-4 h-4" />
-                <span>Gate 1: Definition of Ready (DoR)</span>
-              </div>
-              <p className="text-[11px] text-base-content-secondary">
-                <b>"พร้อมหยิบเข้าทำ":</b> สเปกนิ่ง มี Acceptance Criteria ครบ มีดีไซน์พร้อม และทีม Dev เข้าใจตรงกัน ไม่มีบล็อกเกอร์ค้าง
-              </p>
-            </div>
-
-            <div className="p-3 rounded-xl bg-success/10 border border-success/25 space-y-1.5">
-              <div className="flex items-center gap-1.5 font-bold text-success">
-                <CheckCircle2 className="w-4 h-4" />
-                <span>Gate 2: Definition of Done (DoD)</span>
-              </div>
-              <p className="text-[11px] text-base-content-secondary">
-                <b>"เสร็จจริงไม่ใช่แค่โค้ดเสร็จ":</b> ผ่าน Code Review, เทสต์ผ่านทั้งหมด + Coverage ตามเกณฑ์ทีม, Deploy บน Staging ตรวจแล้ว, และเอกสารถูกอัปเดต
-              </p>
-            </div>
+      <div className={FRAME}>
+        <h3 className={TITLE}>สองด่านคุมคุณภาพ</h3>
+        <div className="grid grid-cols-1 gap-y-5 sm:grid-cols-2 sm:gap-y-0 sm:divide-x sm:divide-base-border">
+          <div className="space-y-1 sm:pr-6">
+            <p className={LABEL}>Gate 1</p>
+            <h4 className={TITLE}>Definition of Ready (DoR)</h4>
+            <p>
+              <b className="text-base-content">พร้อมหยิบเข้าทำ</b> สเปกนิ่ง มี Acceptance Criteria ครบ มีดีไซน์พร้อม และทีม Dev เข้าใจตรงกัน ไม่มีบล็อกเกอร์ค้าง
+            </p>
+          </div>
+          <div className="space-y-1 border-t border-base-border pt-5 sm:border-t-0 sm:pl-6 sm:pt-0">
+            <p className={LABEL}>Gate 2</p>
+            <h4 className={TITLE}>Definition of Done (DoD)</h4>
+            <p>
+              <b className="text-base-content">เสร็จจริงไม่ใช่แค่โค้ดเสร็จ</b> ผ่าน Code Review, เทสต์ผ่านทั้งหมดและ Coverage ตามเกณฑ์ทีม, Deploy บน Staging ตรวจแล้ว และอัปเดตเอกสารแล้ว
+            </p>
           </div>
         </div>
       </div>
@@ -556,52 +547,36 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
   // CHAPTER 7: Testing Pyramid
   // =========================================================================
   if (chapterId === 's7') {
+    const layers = [
+      { id: 'e2e' as const, name: 'E2E / UI Tests (10%)', tag: 'ช้าและแพง', tagTone: 'text-error', text: 'จำลองเปิดเบราว์เซอร์คลิกเหมือนคนจริง เปราะ พังง่ายเมื่อ UI เปลี่ยน', width: 'sm:w-3/5' },
+      { id: 'integration' as const, name: 'Integration Tests (20%)', tag: 'ปานกลาง', tagTone: 'text-warning', text: 'ทดสอบการเชื่อมต่อระหว่าง API กับ Database หรือ Service ภายนอก', width: 'sm:w-4/5' },
+      { id: 'unit' as const, name: 'Unit Tests (70%)', tag: 'เร็วและถูก', tagTone: 'text-success', text: 'ทดสอบฟังก์ชันคำนวณย่อยๆ ในโค้ด รันหลักพันข้อเสร็จในไม่กี่วินาที', width: 'sm:w-full' },
+    ];
     return (
-      <div className="space-y-4">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <button
-            onClick={() => setPyramidLevel('e2e')}
-            className={`${TAP} p-3.5 rounded-box border text-left transition-all cursor-pointer ${
-              pyramidLevel === 'e2e' ? 'border-error bg-error/10 shadow-xs' : 'border-base-border'
-            }`}
-          >
-            <div className="flex justify-between items-center mb-1">
-              <span className="font-bold text-xs text-error">E2E / UI Tests (10%)</span>
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-error/15 text-error">ช้า &amp; แพง</span>
-            </div>
-            <p className="text-[11px] text-base-content-muted">จำลองเปิดเบราว์เซอร์คลิกเหมือนคนจริง เปราะ พังง่ายเมื่อ UI เปลี่ยน</p>
-          </button>
-
-          <button
-            onClick={() => setPyramidLevel('integration')}
-            className={`${TAP} p-3.5 rounded-box border text-left transition-all cursor-pointer ${
-              pyramidLevel === 'integration' ? 'border-engineer bg-engineer/10 shadow-xs' : 'border-base-border'
-            }`}
-          >
-            <div className="flex justify-between items-center mb-1">
-              <span className="font-bold text-xs text-engineer">Integration Tests (20%)</span>
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-engineer/15 text-engineer">ปานกลาง</span>
-            </div>
-            <p className="text-[11px] text-base-content-muted">ทดสอบการเชื่อมต่อระหว่าง API กับ Database หรือ Service ภายนอก</p>
-          </button>
-
-          <button
-            onClick={() => setPyramidLevel('unit')}
-            className={`${TAP} p-3.5 rounded-box border text-left transition-all cursor-pointer ${
-              pyramidLevel === 'unit' ? 'border-success bg-success/10 shadow-xs' : 'border-base-border'
-            }`}
-          >
-            <div className="flex justify-between items-center mb-1">
-              <span className="font-bold text-xs text-success">Unit Tests (70%)</span>
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-success/15 text-success">เร็ว &amp; ถูก</span>
-            </div>
-            <p className="text-[11px] text-base-content-muted">ทดสอบฟังก์ชันคำนวณย่อยๆ ในโค้ด รันหลักพันข้อเสร็จในไม่กี่วินาที</p>
-          </button>
+      <div className={FRAME}>
+        <div className="flex flex-col items-center gap-2">
+          {layers.map(l => (
+            <button
+              key={l.id}
+              type="button"
+              onClick={() => setPyramidLevel(l.id)}
+              aria-pressed={pyramidLevel === l.id}
+              className={`${TAP} w-full ${l.width} cursor-pointer rounded-field border p-3 text-left transition-colors ${FOCUS} ${
+                pyramidLevel === l.id ? 'border-base-content bg-base-300' : 'border-base-border hover:bg-base-300'
+              }`}
+            >
+              <span className="flex flex-wrap items-baseline justify-between gap-x-3">
+                <span className="font-semibold text-base-content">{l.name}</span>
+                <span className={`text-sm font-semibold ${l.tagTone}`}>{l.tag}</span>
+              </span>
+              <span className="block text-sm text-base-content-secondary">{l.text}</span>
+            </button>
+          ))}
         </div>
 
-        <div className="p-3 bg-base-300 rounded-xl text-xs text-base-content-secondary flex items-center justify-between">
-          <span>⚠️ <b>Ice-Cream Cone Anti-pattern:</b> ถ้าทีมมีแต่ E2E test แต่ไม่มี Unit test บิลด์จะช้าเป็นชั่วโมงและไม่มีใครกล้าปล่อยของ</span>
-        </div>
+        <p className={RULE}>
+          <span className="font-semibold text-warning">Ice-Cream Cone Anti-pattern</span> ถ้าทีมมีแต่ E2E Test แต่ไม่มี Unit Test บิลด์จะช้าเป็นชั่วโมงและไม่มีใครกล้าปล่อยของ
+        </p>
       </div>
     );
   }
@@ -676,35 +651,37 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
     const boehmData = [
       { phase: 'Requirement', cost: 'ถูกสุด', desc: 'แก้คำในเอกสาร ลบข้อความแล้วพิมพ์ใหม่' },
       { phase: 'Design/Prototype', cost: 'ยังถูก', desc: 'แก้ Flow ใน Figma และแจ้งทีมปรับความเข้าใจ' },
-      { phase: 'Coding', cost: 'เริ่มแพง', desc: 'แก้โครงสร้าง Logic และแก้ Unit Tests ที่เขียนไปแล้ว' },
+      { phase: 'Coding', cost: 'เริ่มแพง', desc: 'แก้โครงสร้าง Logic และแก้ Unit Test ที่เขียนไปแล้ว' },
       { phase: 'QA Testing', cost: 'แพง', desc: 'ต้อง Re-test ทั้งระบบ ตก Sprint และเลื่อนวันส่งมอบ' },
       { phase: 'Live Production', cost: 'แพงสุด', desc: 'ข้อมูลลูกค้าพัง ระบบล่ม เสียชื่อเสียง และต้องออก Hotfix เร่งด่วน' },
     ];
 
     return (
-      <div className="space-y-4">
-        <div className="text-xs text-base-content-muted">
+      <div className={FRAME}>
+        <p>
           ยิ่งเจอบั๊กหรือเปลี่ยนใจช้า ต้นทุนการแก้ยิ่งสูง ตัวคูณที่อ้างกันบ่อย (เช่น 100 เท่า) มาจากงานวิจัยยุคเก่าและเชื่อได้แค่ทิศทาง ไม่ใช่ตัวเลข
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+        </p>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
           {boehmData.map((b, idx) => (
             <button
               key={idx}
+              type="button"
               onClick={() => setBoehmPhase(idx)}
-              className={`${TAP} p-3 rounded-xl border text-left transition-all cursor-pointer ${
-                boehmPhase === idx
-                  ? 'border-error bg-error/10 shadow-xs'
-                  : 'border-base-border bg-base-300'
+              aria-pressed={boehmPhase === idx}
+              className={`${TAP} cursor-pointer rounded-field border p-3 text-left transition-colors ${FOCUS} ${
+                boehmPhase === idx ? 'border-base-content bg-base-300' : 'border-base-border hover:bg-base-300'
               }`}
             >
-              <span className="text-[10px] text-base-content-muted block">{idx + 1}. {b.phase}</span>
-              <span className="font-bold text-xs text-error">{b.cost}</span>
+              <span className="block text-sm text-base-content-muted">{idx + 1}. {b.phase}</span>
+              <span className="block text-sm font-semibold text-base-content">{b.cost}</span>
             </button>
           ))}
         </div>
-        <div className="p-3 bg-neutral text-neutral-content rounded-xl text-xs space-y-1">
-          <div className="text-error font-bold">เจอตอน: {boehmData[boehmPhase].phase} ({boehmData[boehmPhase].cost})</div>
-          <p className="text-base-content-subtle">{boehmData[boehmPhase].desc}</p>
+        <div className="space-y-1" aria-live="polite">
+          <p>
+            <span className={LABEL}>เจอตอน</span> <b className="text-base-content">{boehmData[boehmPhase].phase}</b> ({boehmData[boehmPhase].cost})
+          </p>
+          <p>{boehmData[boehmPhase].desc}</p>
         </div>
       </div>
     );
@@ -714,31 +691,37 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
   // CHAPTER 10: Feedback Loop
   // =========================================================================
   if (chapterId === 's10') {
+    const tiers = [
+      { tier: 'Tier 1', name: 'ทีมซัพพอร์ตลูกค้า', text: 'ตอบคำถามทั่วไป แก้ปัญหาเบื้องต้นตามคู่มือ ถ้าแก้ไม่ได้ส่งต่อ Tier 2' },
+      { tier: 'Tier 2', name: 'Tech Support และ Ops', text: 'ตรวจสอบ Log, สิทธิ์ผู้ใช้งาน, ข้อมูลใน Database และยืนยันบั๊ก' },
+      { tier: 'Tier 3', name: 'ทีม Engineering', text: 'ไล่ดู Code, ออกแบบ Hotfix และใส่บั๊กเข้า Product Backlog' },
+    ];
     return (
-      <div className="p-4 rounded-box border border-base-border bg-base-100 space-y-3">
-        <span className="text-xs font-bold text-engineer uppercase tracking-wider">
-          Closed-Loop Support &amp; Incident Escalation (Tier 1 ➔ Tier 2 ➔ Tier 3)
-        </span>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
-          <div className="p-3 rounded-xl bg-base-300 border border-base-border">
-            <b className="text-base-content block mb-1">Tier 1: Customer Support</b>
-            <p className="text-[11px] text-base-content-muted">ตอบคำถามทั่วไป แก้ปัญหาเบื้องต้นตามคู่มือ ถ้าแก้ไม่ได้ส่งต่อ Tier 2</p>
-          </div>
-          <div className="p-3 rounded-xl bg-base-300 border border-base-border">
-            <b className="text-base-content block mb-1">Tier 2: Tech Support / Ops</b>
-            <p className="text-[11px] text-base-content-muted">ตรวจสอบ Log, สิทธิ์ผู้ใช้งาน, ข้อมูลใน Database และยืนยันบั๊ก</p>
-          </div>
-          <div className="p-3 rounded-xl bg-engineer/10 border border-engineer/25">
-            <b className="text-engineer block mb-1">Tier 3: Engineering Team</b>
-            <p className="text-[11px] text-base-content-secondary">ไล่ดู Code, ออกแบบ Hotfix และใส่บั๊กเข้า Product Backlog</p>
-          </div>
+      <div className={FRAME}>
+        <h3 className={TITLE}>ส่งต่อปัญหาจาก Tier 1 ถึง 3 แล้วปิดวงจร</h3>
+        <div className="flex flex-col items-stretch gap-2 sm:flex-row">
+          {tiers.map((t, idx) => (
+            <React.Fragment key={t.tier}>
+              <div className="flex-1 rounded-field border border-base-border p-3">
+                <p className={LABEL}>{t.tier}</p>
+                <h4 className={TITLE}>{t.name}</h4>
+                <p className="text-sm text-base-content-secondary">{t.text}</p>
+              </div>
+              {idx < tiers.length - 1 && (
+                <>
+                  <ArrowRight className="hidden h-4 w-4 shrink-0 self-center text-base-content-subtle sm:block" aria-hidden="true" />
+                  <ArrowDown className="h-4 w-4 shrink-0 self-center text-base-content-subtle sm:hidden" aria-hidden="true" />
+                </>
+              )}
+            </React.Fragment>
+          ))}
         </div>
         {/* Return leg: without it the "loop" is just a one-way escalation */}
-        <div className="p-3 rounded-xl bg-success/10 border border-success/25 text-xs flex items-start gap-2">
-          <RotateCcw className="w-4 h-4 shrink-0 mt-0.5 text-success" />
+        <div className="flex items-start gap-2">
+          <RotateCcw className="mt-1.5 h-4 w-4 shrink-0 text-base-content-muted" aria-hidden="true" />
           <div>
-            <b className="text-success block mb-0.5">ปิดวงจร: แก้เสร็จ → Tier 1 แจ้งลูกค้า → อัปเดต FAQ/Runbook</b>
-            <p className="text-[11px] text-base-content-secondary">ครั้งหน้าที่เจอเรื่องเดิม Tier 1 ตอบได้เองโดยไม่ต้องส่งต่อ</p>
+            <p className="font-semibold text-base-content">ปิดวงจร เมื่อแก้เสร็จ Tier 1 แจ้งลูกค้า แล้วอัปเดต FAQ และ Runbook</p>
+            <p>ครั้งหน้าที่เจอเรื่องเดิม Tier 1 ตอบได้เองโดยไม่ต้องส่งต่อ</p>
           </div>
         </div>
       </div>
