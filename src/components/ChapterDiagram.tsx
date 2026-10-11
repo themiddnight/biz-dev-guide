@@ -231,60 +231,49 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
   // CHAPTER 2: MoSCoW & RICE Matrix
   // =========================================================================
   if (chapterId === 's2') {
+    const moscow = [
+      { letter: 'M', name: 'Must Have', text: 'ขาดแล้วระบบใช้งานไม่ได้เลย หรือผิดกฎหมาย เช่น ชำระเงิน' },
+      { letter: 'S', name: 'Should Have', text: 'สำคัญมาก แต่ยังมีทางเลี่ยงชั่วคราวได้ เช่น ใบเสร็จ PDF' },
+      { letter: 'C', name: 'Could Have', text: 'ถ้ามีเวลาเหลือจะทำ ช่วยเพิ่มความประทับใจ เช่น Dark mode' },
+      { letter: 'W', name: "Won't Have", text: 'ตัดทิ้งชัดเจนในรอบนี้ ไม่นำมาเปลืองสมาธิทีม' },
+    ];
+    const rice = [
+      { term: 'Reach', text: 'ผู้ใช้ที่โดนผลกระทบต่อเดือน (เช่น 5,000 คน)' },
+      { term: 'Impact', text: 'น้ำหนักผลลัพธ์ (3=สูงสุด, 2=สูง, 1=ปานกลาง, 0.5=ต่ำ)' },
+      { term: 'Confidence', text: 'ความมั่นใจในข้อมูล (100%, 80%, 50%)' },
+      { term: 'Effort', text: 'แรงทีม Dev วัดเป็น Person-Months เช่น 2 คน-เดือน' },
+    ];
     return (
-      <div className="space-y-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {/* MoSCoW Grid */}
-          <div className="p-4 rounded-box border border-base-border bg-base-100 space-y-3">
-            <span className="text-xs font-bold text-engineer uppercase tracking-wider">
-              MoSCoW Framework (จัดกลุ่มตามความจำเป็น)
-            </span>
-            <p className="text-[11px] text-base-content-muted">
-              ไม่มีโควตาตายตัว แต่ Must ไม่ควรเกิน ~60% ของงานรอบนี้ ที่เหลือคือกันชนไว้ตัดเมื่องานบานปลาย
-            </p>
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <div className="p-2.5 rounded-xl bg-error/10 border border-error/25">
-                <span className="font-bold text-error block mb-1">M - Must Have</span>
-                <p className="text-[11px] text-base-content-secondary">ขาดแล้วระบบใช้งานไม่ได้เลย หรือผิดกฎหมาย เช่น ชำระเงิน</p>
+      <div className={FRAME}>
+        <div className="space-y-3">
+          <WidgetHead
+            title="MoSCoW จัดกลุ่มตามความจำเป็น"
+            hint="ไม่มีโควตาตายตัว แต่ Must ไม่ควรเกิน ~60% ของงานรอบนี้ ที่เหลือคือกันชนไว้ตัดเมื่องานบานปลาย"
+          />
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            {moscow.map(m => (
+              <div key={m.letter} className="rounded-field border border-base-border p-3">
+                <p className="font-semibold text-base-content">
+                  <span className="mr-1.5 text-base-content-muted">{m.letter}</span>
+                  {m.name}
+                </p>
+                <p className="text-sm text-base-content-secondary">{m.text}</p>
               </div>
-              <div className="p-2.5 rounded-xl bg-warning/10 border border-warning/25">
-                <span className="font-bold text-warning block mb-1">S - Should Have</span>
-                <p className="text-[11px] text-base-content-secondary">สำคัญมาก แต่ยังมีทางเลี่ยงชั่วคราวได้ เช่น ใบเสร็จ PDF</p>
-              </div>
-              <div className="p-2.5 rounded-xl bg-data-1/10 border border-data-1/25">
-                <span className="font-bold text-data-1 block mb-1">C - Could Have</span>
-                <p className="text-[11px] text-base-content-secondary">ถ้ามีเวลาเหลือจะทำ ช่วยเพิ่มความประทับใจ เช่น Dark mode</p>
-              </div>
-              <div className="p-2.5 rounded-xl bg-base-300 border border-base-border">
-                <span className="font-bold text-base-content-secondary block mb-1">W - Won't Have</span>
-                <p className="text-[11px] text-base-content-muted">ตัดทิ้งชัดเจนในรอบนี้ ไม่นำมาเปลืองสมาธิทีม</p>
-              </div>
-            </div>
+            ))}
           </div>
+        </div>
 
-          {/* RICE Scoring Formula */}
-          <div className="p-4 rounded-box border border-base-border bg-base-100 space-y-3">
-            <span className="text-xs font-bold text-data-2 uppercase tracking-wider">
-              RICE Scoring (ให้คะแนนตามสูตร)
-            </span>
-            <div className="p-3 bg-base-300 rounded-xl text-center text-xs font-bold text-base-content">
-              Score = (Reach × Impact × Confidence) ÷ Effort
-            </div>
-            <div className="space-y-1.5 text-xs text-base-content-secondary">
-              <div className="flex justify-between">
-                <b className="text-engineer">Reach:</b> <span>ผู้ใช้ที่ได้รับผลกระทบต่อเดือน (เช่น 5,000 คน)</span>
-              </div>
-              <div className="flex justify-between">
-                <b className="text-data-2">Impact:</b> <span>น้ำหนักผลลัพธ์ (3=สูงสุด, 2=สูง, 1=ปานกลาง, 0.5=ต่ำ)</span>
-              </div>
-              <div className="flex justify-between">
-                <b className="text-success">Confidence:</b> <span>ความมั่นใจในข้อมูล (100%, 80%, 50%)</span>
-              </div>
-              <div className="flex justify-between">
-                <b className="text-data-5">Effort:</b> <span>แรงทีม Dev (Person-Months เช่น 2 คน-เดือน)</span>
-              </div>
-            </div>
-          </div>
+        <div className={`${RULE} space-y-3`}>
+          <h3 className={TITLE}>RICE ให้คะแนนตามสูตร</h3>
+          <p className="text-center font-semibold text-base-content">Score = (Reach × Impact × Confidence) ÷ Effort</p>
+          <dl className="grid gap-x-4 gap-y-1 sm:grid-cols-[7rem_1fr]">
+            {rice.map(r => (
+              <React.Fragment key={r.term}>
+                <dt className="font-semibold text-base-content">{r.term}</dt>
+                <dd className="mb-2 sm:mb-0">{r.text}</dd>
+              </React.Fragment>
+            ))}
+          </dl>
         </div>
       </div>
     );
@@ -294,25 +283,29 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
   // CHAPTER 3: Design Fidelity Spectrum
   // =========================================================================
   if (chapterId === 's3') {
+    const steps = [
+      { step: '1. Sketch', speed: 'ทำเสร็จใน 1 ชั่วโมง', cost: 'ถูกสุด', change: 'ลบขีดใหม่ใน 3 นาที' },
+      { step: '2. Low-Fi Wireframe', speed: 'ทำเสร็จใน 1 วัน', cost: 'ยังถูก', change: 'จัด Layout ใหม่ใน 20 นาที' },
+      { step: '3. Hi-Fi Interactive Prototype', speed: 'ทำเสร็จใน 3-5 วัน', cost: 'เริ่มแพง', change: 'แก้สี ฟอนต์ แอนิเมชัน 2 ชม.' },
+      { step: '4. Production Live Code', speed: 'ทำเสร็จใน 2-4 สัปดาห์', cost: 'แพงสุด', change: 'รื้อ Database/API/Test เป็นสัปดาห์' },
+    ];
     return (
-      <div className="space-y-4">
-        <div className="text-xs text-base-content-muted">
-          บันได 4 ขั้นของงานออกแบบ ยิ่งทดสอบในขั้นแรกๆ <b>ต้นทุนการรื้อทิ้งยิ่งถูกลง</b>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
-          {[
-            { step: '1. Sketch', speed: 'ทำเสร็จใน 1 ชั่วโมง', cost: 'ถูกสุด', change: 'ลบขีดใหม่ใน 3 นาที', color: 'border-data-1/40' },
-            { step: '2. Low-Fi Wireframe', speed: 'ทำเสร็จใน 1 วัน', cost: 'ยังถูก', change: 'จัด Layout ใหม่ใน 20 นาที', color: 'border-engineer/40' },
-            { step: '3. Hi-Fi Interactive Prototype', speed: 'ทำเสร็จใน 3-5 วัน', cost: 'เริ่มแพง', change: 'แก้สี ฟอนต์ แอนิเมชัน 2 ชม.', color: 'border-data-2/40' },
-            { step: '4. Production Live Code', speed: 'ทำเสร็จใน 2-4 สัปดาห์', cost: 'แพงสุด', change: 'รื้อ Database/API/Test เป็นสัปดาห์', color: 'border-data-5/40' },
-          ].map((item, idx) => (
-            <div key={idx} className={`p-4 rounded-box bg-base-100 border ${item.color} space-y-2`}>
-              <span className="text-xs font-bold text-base-content block">{item.step}</span>
-              <div className="text-[11px] text-base-content-muted space-y-1">
-                <div>⏱️ {item.speed}</div>
-                <div>💰 ต้นทุนการแก้: <b className="text-error">{item.cost}</b></div>
-                <div>🔄 ความยืดหยุ่น: {item.change}</div>
-              </div>
+      <div className={FRAME}>
+        <p>
+          บันไดสี่ขั้นของงานออกแบบ ยิ่งทดสอบในขั้นแรกๆ <b className="text-base-content">ต้นทุนการรื้อทิ้งยิ่งถูกลง</b>
+        </p>
+        <div className="grid grid-cols-1 gap-y-5 sm:grid-cols-4 sm:gap-y-0 sm:divide-x sm:divide-base-border">
+          {steps.map((item, idx) => (
+            <div
+              key={idx}
+              className={`space-y-2 ${idx > 0 ? 'border-t border-base-border pt-5 sm:border-t-0 sm:pt-0' : ''} ${idx > 0 ? 'sm:pl-4' : ''} ${idx < steps.length - 1 ? 'sm:pr-4' : ''}`}
+            >
+              <h3 className={TITLE}>{item.step}</h3>
+              <dl className="space-y-1 text-sm">
+                <div><dt className={LABEL}>เวลาทำ</dt><dd>{item.speed}</dd></div>
+                <div><dt className={LABEL}>ต้นทุนการแก้</dt><dd className="font-semibold text-base-content">{item.cost}</dd></div>
+                <div><dt className={LABEL}>ความยืดหยุ่น</dt><dd>{item.change}</dd></div>
+              </dl>
             </div>
           ))}
         </div>
@@ -324,55 +317,46 @@ export const ChapterDiagram: React.FC<ChapterDiagramProps> = ({ chapterId }) => 
   // CHAPTER 4: The Iceberg Requirement
   // =========================================================================
   if (chapterId === 's4') {
+    const nfr = [
+      { name: 'Performance', text: 'ตอบสนอง <200ms แม้มี 10,000 req/sec' },
+      { name: 'Security', text: 'เข้ารหัสข้อมูล, ป้องกัน SQL Injection, PDPA' },
+      { name: 'Availability', text: 'Uptime 99.95% มีระบบ Auto-failover' },
+      { name: 'Audit Log', text: 'บันทึกทุกการโอนเงินเพื่อตรวจสอบย้อนหลัง' },
+    ];
     return (
-      <div className="space-y-3">
-        <div className="p-4 rounded-box bg-gradient-to-b from-data-4/10 via-data-1/10 to-engineer/10 border border-data-1/25 space-y-3">
-          {/* Tip of Iceberg */}
-          <div className="p-3.5 rounded-xl bg-base-100/90 border border-data-1/25 shadow-xs space-y-1">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-data-4 flex items-center gap-1.5">
-                <Eye className="w-4 h-4" />
-                <span>ส่วนที่มองเห็น: Functional Requirements (FR)</span>
-              </span>
-              <span className="text-[10px] px-2 py-0.5 rounded bg-data-4/10 text-data-4 font-bold">สิ่งที่ตาเห็น</span>
-            </div>
-            <p className="text-xs text-base-content-secondary">
-              สิ่งที่ระบบต้อง <b>"ทำได้"</b>: กดปุ่มสมัครสมาชิกได้, มีตะกร้าสินค้า, ค้นหาตามชื่อสินค้าได้, มีใบเสร็จรับเงิน
-            </p>
+      <div className={FRAME}>
+        {/* Tip of the iceberg */}
+        <div className="space-y-1">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-4">
+            <h3 className={TITLE}>ส่วนที่มองเห็นคือ Functional Requirements (FR)</h3>
+            <span className={LABEL}>สิ่งที่ตาเห็น</span>
           </div>
+          <p>
+            สิ่งที่ระบบต้อง <b className="text-base-content">&ldquo;ทำได้&rdquo;</b> เช่น กดปุ่มสมัครสมาชิกได้, มีตะกร้าสินค้า, ค้นหาตามชื่อสินค้าได้, มีใบเสร็จรับเงิน
+          </p>
+        </div>
 
-          <div className="text-center font-bold text-[11px] text-data-1 tracking-wider">
-            〰〰〰〰〰〰〰〰 ผิวน้ำ (จุดที่ Business มักมองเห็นแค่นี้) 〰〰〰〰〰〰〰〰
-          </div>
+        {/* Waterline */}
+        <div className="flex items-center gap-3" role="separator">
+          <span className="h-px flex-1 border-t border-dashed border-base-border-strong" aria-hidden="true" />
+          <span className={`${LABEL} text-center`}>ผิวน้ำ (จุดที่ฝั่ง Business มักมองเห็นแค่นี้)</span>
+          <span className="h-px flex-1 border-t border-dashed border-base-border-strong" aria-hidden="true" />
+        </div>
 
-          {/* Under water */}
-          <div className="p-3.5 rounded-xl bg-engineer/10 border border-engineer/25 space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-engineer flex items-center gap-1.5">
-                <Shield className="w-4 h-4" />
-                <span>ส่วนใต้น้ำ: Non-Functional Requirements (NFR)</span>
-              </span>
-              <span className="text-[10px] px-2 py-0.5 rounded bg-error/10 text-error font-bold">สิ่งที่ทำให้ระบบไม่ล่ม</span>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-              <div className="p-2 bg-base-100/90 rounded-lg">
-                <b className="text-engineer block">Performance</b>
-                <span className="text-[11px] text-base-content-muted">ตอบสนอง &lt;200ms แม้มี 10,000 req/sec</span>
-              </div>
-              <div className="p-2 bg-base-100/90 rounded-lg">
-                <b className="text-engineer block">Security</b>
-                <span className="text-[11px] text-base-content-muted">เข้ารหัสข้อมูล, ป้องกัน SQL Injection, PDPA</span>
-              </div>
-              <div className="p-2 bg-base-100/90 rounded-lg">
-                <b className="text-engineer block">Availability</b>
-                <span className="text-[11px] text-base-content-muted">Uptime 99.95% มีระบบ Auto-failover</span>
-              </div>
-              <div className="p-2 bg-base-100/90 rounded-lg">
-                <b className="text-engineer block">Audit Log</b>
-                <span className="text-[11px] text-base-content-muted">บันทึกทุกการโอนเงินเพื่อตรวจสอบย้อนหลัง</span>
-              </div>
-            </div>
+        {/* Under water */}
+        <div className="space-y-3">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-4">
+            <h3 className={TITLE}>ส่วนใต้น้ำคือ Non-Functional Requirements (NFR)</h3>
+            <span className={LABEL}>สิ่งที่ทำให้ระบบไม่ล่ม</span>
           </div>
+          <dl className="grid grid-cols-1 gap-x-5 gap-y-3 sm:grid-cols-2">
+            {nfr.map(n => (
+              <div key={n.name}>
+                <dt className="font-semibold text-base-content">{n.name}</dt>
+                <dd className="text-sm text-base-content-secondary">{n.text}</dd>
+              </div>
+            ))}
+          </dl>
         </div>
       </div>
     );
