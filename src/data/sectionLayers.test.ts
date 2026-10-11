@@ -2,10 +2,9 @@ import { describe, it, expect } from 'vitest';
 import { CHAPTERS } from './chaptersData';
 import { FRICTION_PLAYBOOKS } from './frictionPlaybooks';
 import {
-  LAYERS, SECTION_KEYS, LAYER_CONFIG, SECTION_META, sectionMinutes,
+  LAYERS, SECTION_KEYS, LAYER_CONFIG, SECTION_LABEL,
   getLayerOf, getChapterLayout, deriveOpenState, expandAll, collapseAll,
-  openSection, toggleSection, toggleLayer, isSectionPresent, isSectionKey, sectionHasTool,
-  CHAPTER_CORE_COLLAPSED,
+  openSection, toggleSection, isSectionPresent, isSectionKey, sectionHasTool,
   type SectionKey,
 } from './sectionLayers';
 import type { ExperienceLevel } from '../types';
@@ -43,7 +42,6 @@ describe('LAYER_CONFIG', () => {
         deep: ['jargon', 'reference', 'glossary'],
       },
     });
-    expect(SECTION_META.otherSide).toEqual({ chip: 'อีกฝั่งมองยังไง', minutes: 2 });
   });
   it('beginner jargon precedes every section that uses terms bare (term-definitions D3)', () => {
     const at = (key: SectionKey) => LAYER_CONFIG.beginner.core.indexOf(key);
@@ -51,10 +49,6 @@ describe('LAYER_CONFIG', () => {
     expect(at('jargon')).toBeLessThan(at('otherSide'));
     expect(at('jargon')).toBeLessThan(at('diagram'));
     expect(LAYER_CONFIG.beginner.core[0]).toBe('jargon');
-  });
-  it('no chapter forces a Core section closed (term-definitions D4)', () => {
-    expect(CHAPTER_CORE_COLLAPSED.s3).toBeUndefined();
-    expect(Object.keys(CHAPTER_CORE_COLLAPSED)).toEqual([]);
   });
 });
 
@@ -116,17 +110,6 @@ describe('getChapterLayout', () => {
     }
     expect(core('beginner', 's11')).toEqual(['faq', 'jargon', 'otherSide', 'coreConcepts', 'diagram']);
   });
-  it('layer minutes = sum of sectionMinutes', () => {
-    for (const level of LEVELS) for (const g of getChapterLayout(level, ch('s1'))) {
-      expect(g.minutes).toBe(g.sections.reduce((s, k) => s + sectionMinutes(level, k), 0));
-    }
-    expect(getChapterLayout('beginner', ch('s1'))[0].minutes).toBe(5); // jargon + otherSide + coreConcepts (1); s1 has no Diagram section after Q4
-  });
-  it('sectionMinutes: compact core concepts count 1 minute for beginners only', () => {
-    expect(sectionMinutes('beginner', 'coreConcepts')).toBe(1);
-    expect(sectionMinutes('experienced', 'coreConcepts')).toBe(3);
-    expect(sectionMinutes('beginner', 'jargon')).toBe(SECTION_META.jargon.minutes);
-  });
   it('every chapter has coreConcepts in the beginner Core layer', () => {
     for (const c of CHAPTERS) expect(core('beginner', c.id)).toContain('coreConcepts');
   });
@@ -154,14 +137,12 @@ describe('isSectionPresent', () => {
     expect(idsWith('diagram')).not.toContain('s14');
   });
 
-  it('practice in every chapter; meta is ลงมือทำ, 3 minutes (spec A.3)', () => {
+  it('practice in every chapter (spec A.3)', () => {
     expect(idsWith('practice')).toHaveLength(CHAPTERS.length);
-    expect(SECTION_META.practice).toEqual({ chip: 'ลงมือทำ', minutes: 3 });
   });
 
-  it('examples in every chapter; meta is ตัวอย่างจริง, 5 minutes (spec A.3)', () => {
+  it('examples in every chapter (spec A.3)', () => {
     expect(idsWith('examples')).toHaveLength(CHAPTERS.length);
-    expect(SECTION_META.examples).toEqual({ chip: 'ตัวอย่างจริง', minutes: 5 });
   });
 });
 
@@ -176,48 +157,38 @@ describe('sectionHasTool', () => {
 describe('open state', () => {
   const layout = getChapterLayout('beginner', ch('s1'));
   const present = layout.flatMap(g => g.sections);
-  it('deriveOpenState opens core layer + core sections only', () => {
-    const s = deriveOpenState(layout);
-    expect(s.layers).toEqual({ core: true, apply: false, deep: false });
-    for (const k of present) expect(!!s.sections[k]).toBe(layout[0].sections.includes(k));
+  const openKeys = (s: { sections: Partial<Record<SectionKey, boolean>> }) => present.filter(k => s.sections[k]);
+
+  it('deriveOpenState opens the Core sections only', () => {
+    expect(openKeys(deriveOpenState(layout))).toEqual(['jargon', 'otherSide', 'coreConcepts']);
+    expect(openKeys(deriveOpenState(getChapterLayout('experienced', ch('s1'))))).toEqual(['otherSide', 'coreConcepts', 'pitfalls']);
   });
   it('deriveOpenState opens s3\'s jargon block, whose title needs it (term-definitions D4)', () => {
-    const s3 = getChapterLayout('beginner', ch('s3'));
-    const s = deriveOpenState(s3, 's3');
-    expect(s.layers.core).toBe(true);
+    const s = deriveOpenState(getChapterLayout('beginner', ch('s3')));
     expect(s.sections.jargon).toBe(true);
     expect(s.sections.diagram).toBe(true);
-    expect(s).toEqual(deriveOpenState(s3));
-    expect(deriveOpenState(layout, 's1')).toEqual(deriveOpenState(layout));
-    const exp = getChapterLayout('experienced', ch('s3'));
-    expect(deriveOpenState(exp, 's3')).toEqual(deriveOpenState(exp));
   });
-  it('collapseAll expands all layers, closes all sections', () => {
+  it('collapseAll folds every section outside Core and keeps Core open', () => {
     const s = collapseAll(layout);
-    expect(s.layers).toEqual({ core: true, apply: true, deep: true });
-    for (const k of present) expect(!!s.sections[k]).toBe(false);
+    expect(openKeys(s)).toEqual(['jargon', 'otherSide', 'coreConcepts']);
+    expect(s.sections.examples).toBe(false);
   });
   it('expandAll opens everything present', () => {
-    const s = expandAll(layout);
-    expect(s.layers).toEqual({ core: true, apply: true, deep: true });
-    for (const k of present) expect(s.sections[k]).toBe(true);
+    expect(openKeys(expandAll(layout))).toEqual(present);
+    expect(present).toHaveLength(8);
   });
-  it('openSection on a deep key expands deep and opens only that key', () => {
-    const base = deriveOpenState(layout);
-    const s = openSection(base, layout, 'reference');
-    expect(s.layers.deep).toBe(true);
-    expect(s.sections.reference).toBe(true);
-    const deepOthers = layout[2].sections.filter(k => k !== 'reference');
-    for (const k of deepOthers) expect(!!s.sections[k]).toBe(false);
+  it('openSection on a deep key opens only that key', () => {
+    const s = openSection(deriveOpenState(layout), layout, 'reference');
+    expect(openKeys(s)).toEqual(['jargon', 'otherSide', 'coreConcepts', 'reference']);
   });
   it('openSection for an absent key returns the same state', () => {
     const base = deriveOpenState(layout);
     expect(openSection(base, layout, 'faq')).toBe(base);
   });
-  it('toggleSection and toggleLayer flip one flag', () => {
+  it('toggleSection flips one section and leaves the rest', () => {
     const base = deriveOpenState(layout);
-    expect(toggleSection(base, 'jargon').sections.jargon).toBe(false);
-    expect(toggleLayer(base, 'apply').layers.apply).toBe(true);
+    expect(openKeys(toggleSection(base, 'examples'))).toEqual(['jargon', 'otherSide', 'coreConcepts', 'examples']);
+    expect(openKeys(toggleSection(toggleSection(base, 'examples'), 'examples'))).toEqual(['jargon', 'otherSide', 'coreConcepts']);
   });
 });
 
@@ -246,7 +217,7 @@ describe('consolidated sections (spec A.3, A.6 new 1 and 3, A.7 #1)', () => {
   });
 
   it('no chip reads a retired label', () => {
-    const chips = Object.values(SECTION_META).map(m => m.chip);
+    const chips = Object.values(SECTION_LABEL);
     for (const label of ['จุดเริ่มต้น', 'บทสนทนา', 'ขั้นตอนงาน', 'เช็กลิสต์', 'วิธีคิดแต่ละบทบาท']) expect(chips).not.toContain(label);
   });
 

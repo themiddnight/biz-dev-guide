@@ -32,38 +32,30 @@ const CHAPTER_CORE_OVERRIDES: Readonly<Record<string, readonly SectionKey[]>> = 
   s15: ['glossary'],
 };
 
-export const SECTION_META: Record<SectionKey, { chip: string; minutes: number }> = {
-  jargon: { chip: 'ศัพท์จำเป็น', minutes: 2 },
-  diagram: { chip: 'แผนภาพ', minutes: 3 },
-  examples: { chip: 'ตัวอย่างจริง', minutes: 5 },
-  practice: { chip: 'ลงมือทำ', minutes: 3 },
-  faq: { chip: 'คำถามที่เจอบ่อย', minutes: 6 },
-  friction: { chip: 'รับมือ Friction', minutes: 4 },
-  coreConcepts: { chip: 'แนวคิดหลัก', minutes: 3 },
-  pitfalls: { chip: 'กับดัก', minutes: 2 },
-  reference: { chip: 'อ้างอิง', minutes: 3 },
-  glossary: { chip: 'รวมคำศัพท์', minutes: 5 },
-  otherSide: { chip: 'อีกฝั่งมองยังไง', minutes: 2 },
+/** Short section name: the control-row link and the default section heading. */
+export const SECTION_LABEL: Record<SectionKey, string> = {
+  jargon: 'ศัพท์จำเป็น',
+  diagram: 'แผนภาพ',
+  examples: 'ตัวอย่างจริง',
+  practice: 'ลงมือทำ',
+  faq: 'คำถามที่เจอบ่อย',
+  friction: 'รับมือ Friction',
+  coreConcepts: 'แนวคิดหลัก',
+  pitfalls: 'กับดัก',
+  reference: 'อ้างอิง',
+  glossary: 'รวมคำศัพท์',
+  otherSide: 'อีกฝั่งมองยังไง',
 };
 
-/**
- * Reading minutes of one section at a level. Beginners see core concepts compact
- * (heading + detail only), so they count 1 minute instead of 3 (role UX fixes D3).
- */
-export function sectionMinutes(level: ExperienceLevel, key: SectionKey): number {
-  if (level === 'beginner' && key === 'coreConcepts') return 1;
-  return SECTION_META[key].minutes;
-}
-
-/** Layer header name (spec §2.3) and short outline label (spec §2.1). */
-export const LAYER_META: Record<Layer, { name: string; short: string }> = {
-  core: { name: 'ต้องรู้ (Core)', short: 'ต้องรู้' },
-  apply: { name: 'นำไปใช้ (Apply)', short: 'นำไปใช้' },
-  deep: { name: 'เจาะลึก (Deep)', short: 'เจาะลึก' },
+export const LAYER_LABEL: Record<Layer, string> = {
+  core: 'ต้องรู้',
+  apply: 'นำไปใช้',
+  deep: 'เจาะลึก',
 };
 
-export interface LayerGroup { layer: Layer; sections: SectionKey[]; minutes: number }
-export interface OpenState { layers: Record<Layer, boolean>; sections: Partial<Record<SectionKey, boolean>> }
+export interface LayerGroup { layer: Layer; sections: SectionKey[] }
+/** Which sections are open. Core sections are always open; the others fold. */
+export interface OpenState { sections: Partial<Record<SectionKey, boolean>> }
 
 export function isSectionKey(value: string): value is SectionKey {
   return (SECTION_KEYS as readonly string[]).includes(value);
@@ -141,52 +133,37 @@ export function getLayerOf(level: ExperienceLevel, key: SectionKey, chapterId: s
 }
 
 export function getChapterLayout(level: ExperienceLevel, chapter: Chapter): LayerGroup[] {
-  return LAYERS.map(layer => {
-    const sections = layerKeys(level, layer, chapter.id).filter(k => isSectionPresent(chapter, k));
-    return { layer, sections, minutes: sections.reduce((sum, k) => sum + sectionMinutes(level, k), 0) };
-  });
+  return LAYERS.map(layer => ({
+    layer,
+    sections: layerKeys(level, layer, chapter.id).filter(k => isSectionPresent(chapter, k)),
+  }));
 }
 
-const allLayers = (value: boolean): Record<Layer, boolean> => ({ core: value, apply: value, deep: value });
 const sectionsWhere = (layout: LayerGroup[], pick: (g: LayerGroup) => boolean) => {
   const sections: Partial<Record<SectionKey, boolean>> = {};
   for (const g of layout) for (const k of g.sections) sections[k] = pick(g);
   return sections;
 };
 
-/**
- * Core sections that start closed for a chapter (visual-first pilot). Layer stays expanded.
- * Empty since the jargon block leads beginner Core (term-definitions spec D4, section consolidation A.3):
- * s3's title uses `UX/UI`, so the block that resolves it must be open. The mechanism stays.
- */
-export const CHAPTER_CORE_COLLAPSED: Readonly<Record<string, readonly SectionKey[]>> = {};
-
-export function deriveOpenState(layout: LayerGroup[], chapterId?: string): OpenState {
-  const sections = sectionsWhere(layout, g => g.layer === 'core');
-  for (const k of (chapterId && CHAPTER_CORE_COLLAPSED[chapterId]) || []) {
-    if (sections[k]) sections[k] = false;
-  }
-  return { layers: { core: true, apply: false, deep: false }, sections };
+/** A chapter's starting state: Core open, everything else folded. */
+export function deriveOpenState(layout: LayerGroup[]): OpenState {
+  return { sections: sectionsWhere(layout, g => g.layer === 'core') };
 }
 
 export function expandAll(layout: LayerGroup[]): OpenState {
-  return { layers: allLayers(true), sections: sectionsWhere(layout, () => true) };
+  return { sections: sectionsWhere(layout, () => true) };
 }
 
+/** Core has no fold control, so folding everything is the starting state. */
 export function collapseAll(layout: LayerGroup[]): OpenState {
-  return { layers: allLayers(true), sections: sectionsWhere(layout, () => false) };
+  return deriveOpenState(layout);
 }
 
 export function openSection(state: OpenState, layout: LayerGroup[], key: SectionKey): OpenState {
-  const group = layout.find(g => g.sections.includes(key));
-  if (!group) return state;
-  return { layers: { ...state.layers, [group.layer]: true }, sections: { ...state.sections, [key]: true } };
+  if (!layout.some(g => g.sections.includes(key))) return state;
+  return { sections: { ...state.sections, [key]: true } };
 }
 
 export function toggleSection(state: OpenState, key: SectionKey): OpenState {
-  return { ...state, sections: { ...state.sections, [key]: !state.sections[key] } };
-}
-
-export function toggleLayer(state: OpenState, layer: Layer): OpenState {
-  return { ...state, layers: { ...state.layers, [layer]: !state.layers[layer] } };
+  return { sections: { ...state.sections, [key]: !state.sections[key] } };
 }

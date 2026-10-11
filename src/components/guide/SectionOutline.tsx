@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import type { Chapter } from '../../types';
-import { LAYER_META, SECTION_META, sectionHasTool, type LayerGroup, type OpenState, type SectionKey } from '../../data/sectionLayers';
+import { LAYER_LABEL, SECTION_LABEL, sectionHasTool, type LayerGroup, type OpenState, type SectionKey } from '../../data/sectionLayers';
 import { SCROLL_ROOM, TAP } from '../ui/tapTarget';
 import { ToggleChip } from '../ui/ToggleChip';
 import { ScrollFade } from '../ui/ScrollFade';
@@ -43,10 +43,10 @@ export const SectionOutline: React.FC<SectionOutlineProps> = ({ chapter, layout,
         {layout.filter(g => g.sections.length > 0).map(group => (
           <React.Fragment key={group.layer}>
             <span data-outline-layer={group.layer} className="shrink-0 text-[10px] font-bold uppercase tracking-wider text-base-content-muted">
-              {LAYER_META[group.layer].short}
+              {LAYER_LABEL[group.layer]}
             </span>
             {group.sections.map(key => {
-              const open = !!openState.sections[key] && openState.layers[group.layer];
+              const open = !!openState.sections[key];
               return (
                 <ToggleChip
                   key={key}
@@ -58,7 +58,7 @@ export const SectionOutline: React.FC<SectionOutlineProps> = ({ chapter, layout,
                   onClick={() => onSelectSection(key)}
                   className="shrink-0"
                 >
-                  {SECTION_META[key].chip}
+                  {SECTION_LABEL[key]}
                   {sectionHasTool(chapter, key) && (
                     <span data-tool-tag className="ml-1.5 px-1.5 py-px rounded-full bg-success/10 text-success text-[10px]">
                       ลองเล่น

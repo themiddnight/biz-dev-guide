@@ -15,18 +15,15 @@ import {
   collapseAll,
   openSection,
   toggleSection,
-  toggleLayer,
   getInlineSectionsAt,
   type OpenState,
   type SectionKey,
 } from '../data/sectionLayers';
 import { planRequest, type RequestedSection } from '../lib/chapterRoute';
-import { LayerGroupView } from './guide/LayerGroup';
 import { InlineSections } from './guide/InlineSections';
 import { ChapterHero } from './guide/ChapterHero';
 import { ChapterIntro } from './guide/ChapterIntro';
 import { SectionOutline } from './guide/SectionOutline';
-import { lensHint } from './guide/lensHint';
 import { TrackPanel } from './guide/TrackPanel';
 import { chapterLevelResetLabel, chapterLevelScopeLabel } from './guide/rolePerspectiveUi';
 import { TrackNextCard, TrackEndCard } from './guide/TrackFooter';
@@ -212,7 +209,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   const { level: chapterLevel, source: levelSource } = resolveChapterLevel(levelInputs, activeChapter);
   const trackKey = getActiveTrackKey(role, levelInputs.baseLevel);
   const layout = useMemo(() => getChapterLayout(chapterLevel, activeChapter), [chapterLevel, activeChapter]);
-  const [openState, setOpenState] = useState<OpenState>(() => deriveOpenState(layout, activeChapter.id));
+  const [openState, setOpenState] = useState<OpenState>(() => deriveOpenState(layout));
 
   // Other-side box: defaults to the other side (both when no role); resets on role change, not persisted (spec P2.2).
   const defaultOtherSideView: OtherSideView = role ? otherRole(role) : 'both';
@@ -238,7 +235,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
 
   // Each chapter (and each level) opens at its Core (spec §1.4, D3).
   useEffect(() => {
-    setOpenState(deriveOpenState(layout, activeChapter.id));
+    setOpenState(deriveOpenState(layout));
   }, [layout]);
 
   // A requested section opens on top of the re-derived defaults. Declared after the
@@ -261,7 +258,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
       scrollToChapterStart('smooth');
       return;
     }
-    setOpenState(openSection(deriveOpenState(layout, activeChapter.id), layout, action.key));
+    setOpenState(openSection(deriveOpenState(layout), layout, action.key));
     setPendingScrollId(`sec-${action.key}`);
   }, [requestedSection?.nonce]);
 
@@ -715,10 +712,6 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                   </div>
                 </div>
               )}
-
-              <p className="text-[11px] sm:text-xs text-base-content-muted leading-relaxed">
-                {lensHint(chapterLevel, layout)}
-              </p>
             </div>
 
             <SectionOutline
@@ -730,35 +723,26 @@ export const GuideTab: React.FC<GuideTabProps> = ({
               onCollapseAll={() => setOpenState(collapseAll(layout))}
             />
 
-            {layout.filter(group => group.sections.length > 0).map(group => (
-              <LayerGroupView
-                key={group.layer}
-                group={group}
-                isExpanded={openState.layers[group.layer]}
-                onToggle={() => setOpenState(prev => toggleLayer(prev, group.layer))}
-              >
-                {group.sections.map(key => {
-                  const Section = SECTION_COMPONENTS[key];
-                  return (
-                    <section key={key} id={`sec-${key}`} className="anchor-target" data-layer={group.layer}>
-                      <Section
-                        chapter={activeChapter}
-                        isOpen={!!openState.sections[key]}
-                        onToggle={() => setOpenState(prev => toggleSection(prev, key))}
-                        ctx={sectionCtx}
-                      />
-                      {openState.sections[key] && (
-                        <InlineSections
-                          className="mt-3.5"
-                          sections={getInlineSectionsAt(activeChapter, key)}
-                          onNavigateChapter={sectionCtx.onNavigateChapter}
-                        />
-                      )}
-                    </section>
-                  );
-                })}
-              </LayerGroupView>
-            ))}
+            {layout.flatMap(group => group.sections).map(key => {
+              const Section = SECTION_COMPONENTS[key];
+              return (
+                <section key={key} id={`sec-${key}`} className="anchor-target">
+                  <Section
+                    chapter={activeChapter}
+                    isOpen={!!openState.sections[key]}
+                    onToggle={() => setOpenState(prev => toggleSection(prev, key))}
+                    ctx={sectionCtx}
+                  />
+                  {openState.sections[key] && (
+                    <InlineSections
+                      className="mt-3.5"
+                      sections={getInlineSectionsAt(activeChapter, key)}
+                      onNavigateChapter={sectionCtx.onNavigateChapter}
+                    />
+                  )}
+                </section>
+              );
+            })}
 
             {/* Chapter Footer Actions */}
             <div className="pt-5 border-t border-base-border space-y-3.5">
