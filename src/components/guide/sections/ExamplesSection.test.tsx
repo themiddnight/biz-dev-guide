@@ -14,7 +14,7 @@ describe('ExamplesSection (spec A3)', () => {
   it('heading: the section name and what it holds; folded shows no body', () => {
     const html = render(s1, false);
     expect(html).toContain('>ตัวอย่างจริง</span>');
-    expect(html).toContain('>บทสนทนา · 2 เคส</span>');
+    expect(html).toContain('>บทสนทนา และ 2 เคส</span>');
     expect(html).not.toContain('data-examples-dialogue');
   });
 
@@ -24,8 +24,9 @@ describe('ExamplesSection (spec A3)', () => {
     const cases = html.indexOf('data-examples-cases');
     expect(dialogue).toBeGreaterThan(0);
     expect(cases).toBeGreaterThan(dialogue);
-    expect(html.indexOf('บทสนทนาในที่ทำงาน</h4>')).toBeLessThan(html.indexOf('เคสจริงจากบริษัท</h4>'));
-    expect(html.indexOf('สถานการณ์: ')).toBeLessThan(cases);
+    expect(html.indexOf('>สถานการณ์</span>')).toBeGreaterThan(dialogue);
+    expect(html.indexOf('>สถานการณ์</span>')).toBeLessThan(cases);
+    expect(html.indexOf(s1.realWorldExamples![0].title)).toBeGreaterThan(cases);
   });
 
   it('a dialogue without cases: dialogue only, no count', () => {

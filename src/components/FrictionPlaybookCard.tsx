@@ -1,250 +1,100 @@
 import React, { useState } from 'react';
-import { FrictionPlaybook } from '../types';
-import { 
-  Flame, 
-  Scale, 
-  MessageSquareQuote, 
-  CheckCircle, 
-  XCircle, 
-  Sparkles,
-  Briefcase,
-  Code2
-} from 'lucide-react';
+import { CheckCircle, XCircle } from 'lucide-react';
+import type { FrictionPlaybook } from '../types';
 import { TAP } from './ui/tapTarget';
 
 interface FrictionPlaybookCardProps {
   playbook: FrictionPlaybook;
 }
 
-export const FrictionPlaybookCard: React.FC<FrictionPlaybookCardProps> = ({
-  playbook,
-}) => {
-  const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
+const LABEL = 'block font-semibold text-base-content';
+const ROW_LABEL = 'text-sm text-base-content-muted';
+const OPTION_LETTERS = ['ก', 'ข', 'ค', 'ง', 'จ'];
 
-  const handleSelectDilemma = (optionId: string) => {
-    setSelectedOptionId(optionId);
-  };
+/**
+ * The friction playbook: one of the few framed blocks in the reader, because it is a worked tool
+ * and not chapter prose. Inside the frame everything is rows on hairlines.
+ */
+export const FrictionPlaybookCard: React.FC<FrictionPlaybookCardProps> = ({ playbook }) => {
+  const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
+  const { dilemma } = playbook;
 
   return (
-        <div className="space-y-3 sm:space-y-3.5 text-xs sm:text-sm">
-          <h3 className="text-base font-bold text-base-content">{playbook.battlegroundTitle}</h3>
-          {/* Section 1: The Iceberg - Frustrations and Root Cause */}
-          <div className="space-y-2.5">
-            <div className="flex items-center gap-1.5 text-xs font-bold text-base-content">
-              <Flame className="w-3.5 h-3.5 text-warning" />
-              <span>สิ่งที่ไม่ได้พูดออกมา (Under the Surface)</span>
-            </div>
+    <div data-friction-playbook className="rounded-box border border-base-border p-box-spacious">
+      <h3 className="text-base font-bold text-base-content">{playbook.battlegroundTitle}</h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-stack">
-              {/* Business Frustration */}
-              <div className="p-box-dense rounded-xl bg-warning/10 border border-warning/25">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-warning mb-1">
-                  <Briefcase className="w-3.5 h-3.5 text-warning" />
-                  <span>สิ่งที่ Business อึดอัดใจ</span>
-                </div>
-                <p className="text-xs text-base-content-body leading-relaxed">
-                  {playbook.businessFrustration}
-                </p>
-              </div>
+      <div className="mt-4 grid gap-5 sm:grid-cols-2">
+        <p><span className={LABEL}>ฝั่ง Business หงุดหงิดเรื่อง</span>{playbook.businessFrustration}</p>
+        <p><span className={LABEL}>ฝั่ง Engineering หงุดหงิดเรื่อง</span>{playbook.engineerFrustration}</p>
+      </div>
+      <p className="mt-5"><span className={LABEL}>สาเหตุจริง</span>{playbook.underlyingRootCause}</p>
 
-              {/* Engineer Frustration */}
-              <div className="p-box-dense rounded-xl bg-engineer/10 border border-engineer/25">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-engineer mb-1">
-                  <Code2 className="w-3.5 h-3.5 text-engineer" />
-                  <span>สิ่งที่ Engineer อึดอัดใจ</span>
-                </div>
-                <p className="text-xs text-base-content-body leading-relaxed">
-                  {playbook.engineerFrustration}
-                </p>
-              </div>
-            </div>
+      <div className="mt-6" data-playbook-tradeoffs>
+        <h4 className="font-semibold text-base-content">อยากได้อย่างหนึ่ง ต้องยอมเสียอีกอย่าง</h4>
+        {playbook.tradeOffMatrix.map((item, idx) => (
+          <dl key={idx} className="mt-4 grid gap-x-4 gap-y-1 border-t border-base-border pt-4 sm:grid-cols-[9rem_1fr]">
+            <dt className={ROW_LABEL}>ถ้าต้องการ</dt><dd className="font-medium text-base-content">{item.ifYouNeed}</dd>
+            <dt className={ROW_LABEL}>ต้องยอมเสีย</dt><dd>{item.youMustSacrifice}</dd>
+            <dt className={ROW_LABEL}>วิธีคุย</dt><dd>{item.howToNegotiate}</dd>
+          </dl>
+        ))}
+      </div>
 
-            {/* Root Cause Card */}
-            <div className="p-box-dense rounded-xl bg-base-300 border border-base-border flex items-start gap-2 sm:gap-2.5">
-              <span className="text-base shrink-0 mt-0.5">🎯</span>
-              <div>
-                <span className="font-bold text-base-content text-xs">
-                  ต้นเหตุจริงของความขัดแย้ง:
-                </span>
-                <p className="text-xs text-base-content-secondary mt-0.5 leading-relaxed">
-                  {playbook.underlyingRootCause}
-                </p>
-              </div>
-            </div>
-          </div>
+      <div className="mt-6" data-playbook-scripts>
+        <h4 className="font-semibold text-base-content">ประโยคที่หยิบไปพูดได้เลย</h4>
+        {playbook.goldenScripts.map((script, idx) => (
+          <dl key={idx} className="mt-4 grid gap-x-4 gap-y-1 border-t border-base-border pt-4 sm:grid-cols-[9rem_1fr]">
+            <dt className={ROW_LABEL}>สถานการณ์</dt><dd className="font-medium text-base-content">{script.situation}</dd>
+            {script.businessScript && (<><dt className={ROW_LABEL}>Business พูด</dt><dd>{script.businessScript}</dd></>)}
+            {script.engineerScript && (<><dt className={ROW_LABEL}>Dev พูด</dt><dd>{script.engineerScript}</dd></>)}
+          </dl>
+        ))}
+      </div>
 
-          {/* Section 2: Trade-off Matrix */}
-          <div className="space-y-2.5">
-            <div className="flex items-center gap-1.5 text-xs font-bold text-base-content">
-              <Scale className="w-3.5 h-3.5 text-success" />
-              <span>ตารางการต่อรองแบบ Win-Win (Trade-off Matrix)</span>
-            </div>
-            <p className="text-[11px] sm:text-xs text-base-content-muted">
-              การพัฒนาซอฟต์แวร์ไม่มีคำว่า &ldquo;เอาทุกอย่างพร้อมกัน&rdquo; คุณต้องเลือกสิ่งที่แคร์และยอมแลกบางอย่างเสมอ
-            </p>
-
-            <div className="overflow-x-auto -mx-1 sm:mx-0">
-              <table className="w-full text-left border-collapse min-w-[500px]">
-                <thead>
-                  <tr className="border-b border-base-border bg-base-300 text-[10px] sm:text-[11px] font-bold text-base-content-secondary uppercase tracking-wider">
-                    <th className="py-2 px-2.5 sm:px-3">ถ้าคุณต้องการ (Need)</th>
-                    <th className="py-2 px-2.5 sm:px-3">คุณต้องยอมแลกด้วย (Sacrifice)</th>
-                    <th className="py-2 px-2.5 sm:px-3">ประโยคที่ใช้ต่อรอง (How to Negotiate)</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-base-border text-xs">
-                  {playbook.tradeOffMatrix.map((item, idx) => (
-                    <tr key={idx} className="hover:bg-base-300 transition-colors">
-                      <td className="py-2.5 px-2.5 sm:px-3 font-semibold text-base-content align-top">
-                        {item.ifYouNeed}
-                      </td>
-                      <td className="py-2.5 px-2.5 sm:px-3 text-warning align-top">
-                        {item.youMustSacrifice}
-                      </td>
-                      <td className="py-2.5 px-2.5 sm:px-3 text-base-content-body italic align-top bg-success/10">
-                        {item.howToNegotiate}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Section 3: Battle-tested Golden Scripts */}
-          <div className="space-y-2.5">
-            <div className="flex items-center gap-1.5 text-xs font-bold text-base-content">
-              <MessageSquareQuote className="w-3.5 h-3.5 text-engineer" />
-              <span>ประโยคต่อรองที่ใช้ได้จริง (Battle-tested Scripts)</span>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-stack">
-              {playbook.goldenScripts.map((script, idx) => (
-                <div 
-                  key={idx}
-                  className="p-box-dense rounded-xl border border-base-border bg-base-300 space-y-2"
-                >
-                  <div className="text-[11px] font-bold text-base-content-body pb-1 border-b border-base-border">
-                    สถานการณ์: {script.situation}
-                  </div>
-
-                  {script.businessScript && (
-                    <div className="space-y-1">
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-warning/10 text-warning border border-warning/25">
-                        💼 Business ควรพูด:
-                      </span>
-                      <div className="p-box-dense rounded-lg bg-base-100 border border-base-border text-xs italic text-base-content leading-relaxed">
-                        {script.businessScript}
-                      </div>
+      {dilemma && (
+        <div className="mt-6 border-t border-base-border pt-5" data-playbook-dilemma>
+          <h4 className="font-semibold text-base-content">ลองตอบดู</h4>
+          <p className="mt-2"><span className="font-semibold text-base-content">สถานการณ์</span> {dilemma.scenario}</p>
+          <p className="mt-2 font-medium text-base-content">&ldquo;{dilemma.counterpartQuote}&rdquo;</p>
+          <p className="mt-4 text-sm text-base-content-muted">ถ้าเป็นคุณ จะตอบยังไง</p>
+          <ul className="mt-1 divide-y divide-base-border border-y border-base-border">
+            {dilemma.options.map((option, index) => {
+              const isSelected = selectedOptionId === option.id;
+              const answered = selectedOptionId !== null;
+              return (
+                <li key={option.id} className="py-3">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedOptionId(option.id)}
+                    aria-pressed={isSelected}
+                    className={`${TAP} flex w-full cursor-pointer items-start gap-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary`}
+                  >
+                    <span className="shrink-0 text-base-content-muted">{OPTION_LETTERS[index] ?? index + 1}.</span>
+                    <span className={`flex-1 ${isSelected ? 'font-medium text-base-content' : ''}`}>{option.text}</span>
+                    {isSelected && (option.isOptimal
+                      ? <CheckCircle className="mt-1.5 h-4 w-4 shrink-0 text-success" aria-hidden="true" />
+                      : <XCircle className="mt-1.5 h-4 w-4 shrink-0 text-error" aria-hidden="true" />)}
+                    {answered && !isSelected && option.isOptimal && (
+                      <span className="shrink-0 text-sm font-semibold text-success">ข้อนี้ดีที่สุด</span>
+                    )}
+                  </button>
+                  {isSelected && (
+                    <div className="mt-2 space-y-1 pl-7" data-dilemma-result={option.isOptimal ? 'optimal' : 'other'}>
+                      <p>
+                        <span className={`font-semibold ${option.isOptimal ? 'text-success' : 'text-error'}`}>
+                          {option.isOptimal ? 'ข้อนี้ดีที่สุด' : 'ยังไม่ใช่ข้อที่ดีที่สุด'}
+                        </span>{' '}
+                        {option.result}
+                      </p>
+                      <p><span className="text-base-content-muted">เทคนิค</span> {option.tip}</p>
                     </div>
                   )}
-
-                  {script.engineerScript && (
-                    <div className="space-y-1">
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-engineer/10 text-engineer border border-engineer/25">
-                        💻 Engineer ควรพูด:
-                      </span>
-                      <div className="p-box-dense rounded-lg bg-base-100 border border-base-border text-xs italic text-base-content leading-relaxed">
-                        {script.engineerScript}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Section 4: Interactive Dilemma Simulator (if available) */}
-          {playbook.dilemma && (
-            <div className="p-box-dense rounded-box bg-base-300 border border-base-border space-y-3 sm:space-y-3.5">
-              <div className="flex items-center justify-between flex-wrap gap-1.5 sm:gap-2">
-                <div className="flex items-center gap-1.5 text-base-content font-bold text-xs sm:text-sm">
-                  <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-warning" />
-                  <span>จำลองสถานการณ์จริงในห้องประชุม (Meeting Dilemma)</span>
-                </div>
-              </div>
-
-              {/* Dilemma Dialogue Quote */}
-              <div className="p-box-dense rounded-field bg-base-100 border border-base-border space-y-0.5 sm:space-y-1">
-                <div className="text-[10px] sm:text-[11px] font-semibold text-base-content-muted">
-                  สถานการณ์: {playbook.dilemma.scenario}
-                </div>
-                <div className="text-xs sm:text-sm font-bold text-base-content italic">
-                  &ldquo;{playbook.dilemma.counterpartQuote}&rdquo;
-                </div>
-              </div>
-
-              {/* Interactive Options */}
-              <div className="space-y-2">
-                <div className="text-[11px] sm:text-xs font-semibold text-base-content-body">
-                  ถ้าคุณต้องตอบ คุณจะตอบยังไง?
-                </div>
-                <div className="space-y-1.5 sm:space-y-2">
-                  {playbook.dilemma.options.map((option, index) => {
-                    const isSelected = selectedOptionId === option.id;
-                    const showResult = selectedOptionId !== null;
-
-                    return (
-                      <div
-                        key={option.id}
-                        className={`p-box-dense rounded-field border text-xs transition-all ${
-                          isSelected
-                            ? option.isOptimal
-                              ? 'bg-success/10 border-success font-medium'
-                              : 'bg-error/10 border-error font-medium'
-                            : showResult && option.isOptimal
-                            ? 'bg-success/10 border-success/25'
-                            : 'bg-base-100 border-base-border hover:border-base-border-strong'
-                        }`}
-                      >
-                        <button
-                          type="button"
-                          onClick={() => handleSelectDilemma(option.id)}
-                          aria-pressed={isSelected}
-                          className={`${TAP} w-full flex items-start justify-between gap-2 text-left cursor-pointer rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-engineer`}
-                        >
-                          <span className="flex items-start gap-1.5 sm:gap-2">
-                            <span className="font-bold text-base-content-muted shrink-0">
-                              {['ก', 'ข', 'ค', 'ง', 'จ'][index] ?? index + 1}.
-                            </span>
-                            <span className="text-base-content leading-relaxed">
-                              {option.text}
-                            </span>
-                          </span>
-                          {isSelected && (
-                            <span className="shrink-0">
-                              {option.isOptimal ? (
-                                <CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-success" />
-                              ) : (
-                                <XCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-error" />
-                              )}
-                            </span>
-                          )}
-                        </button>
-
-                        {/* Explanation if selected */}
-                        {isSelected && (
-                          <div className={`mt-2 pt-2 border-t text-[11px] leading-relaxed ${
-                            option.isOptimal 
-                              ? 'border-success/25 text-success' 
-                              : 'border-error/25 text-error'
-                          }`}>
-                            <div className="font-semibold mb-0.5">
-                              {option.isOptimal ? '✓ คำตอบนี้ดีที่สุด (Optimal Negotiation)' : '✗ ยังไม่ใช่วิธีแก้ที่ดีที่สุด'}
-                            </div>
-                            <p>{option.result}</p>
-                            <p className="mt-1 text-[10px] text-base-content-muted">
-                              💡 เทคนิค: {option.tip}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          )}
+                </li>
+              );
+            })}
+          </ul>
         </div>
+      )}
+    </div>
   );
 };

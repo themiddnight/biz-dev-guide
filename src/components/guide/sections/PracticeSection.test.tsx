@@ -17,7 +17,7 @@ describe('PracticeSection (spec A2)', () => {
   it('heading: the section name and both counts; folded shows no body', () => {
     const html = render(s1, {}, false);
     expect(html).toContain('>ลงมือทำ</span>');
-    expect(html).toContain('>4 ขั้น · 5 ข้อ</span>');
+    expect(html).toContain('>4 ขั้นตอน และเช็กลิสต์ 5 ข้อ</span>');
     expect(html).not.toContain('data-practice-steps');
   });
 
@@ -27,7 +27,7 @@ describe('PracticeSection (spec A2)', () => {
     const list = html.indexOf('data-practice-checklist');
     expect(steps).toBeGreaterThan(0);
     expect(list).toBeGreaterThan(steps);
-    expect(html.indexOf('ขั้นตอนงาน</h4>')).toBeLessThan(html.indexOf('เช็กลิสต์ก่อนส่งต่องาน</h4>'));
+    expect(html.indexOf(s1.realWorldWorkflow![0].step)).toBeLessThan(html.indexOf('เช็กลิสต์ก่อนส่งต่องาน</h3>'));
   });
 
   it('a tick made before the change still shows: key s1_cl_0 is unchanged', () => {
@@ -39,17 +39,17 @@ describe('PracticeSection (spec A2)', () => {
     const tree = ChecklistItems({
       chapter: s1,
       ctx: { checkedChecklist: {}, onToggleChecklistItem: key => { toggled.push(key); } },
-    }) as ReactElement<{ children: ReactElement<{ onClick: () => void }>[] }>;
-    tree.props.children[0].props.onClick();
+    }) as ReactElement<{ children: ReactElement<{ children: ReactElement<{ children: ReactElement<{ onChange: () => void }>[] }> }>[] }>;
+    tree.props.children[0].props.children.props.children[0].props.onChange();
     expect(toggled).toEqual(['s1_cl_0']);
   });
 
   it('drops an empty half and its count', () => {
     const noList = render({ ...s1, checklist: [] });
-    expect(noList).toContain('>4 ขั้น</span>');
+    expect(noList).toContain('>4 ขั้นตอน</span>');
     expect(noList).not.toContain('data-practice-checklist');
     const noSteps = render({ ...s1, realWorldWorkflow: [] });
-    expect(noSteps).toContain('>5 ข้อ</span>');
+    expect(noSteps).toContain('>เช็กลิสต์ 5 ข้อ</span>');
     expect(noSteps).not.toContain('data-practice-steps');
   });
 
