@@ -16,7 +16,7 @@ export const chapters11_15: Chapter[] = [
     plainAnalogy: 'เหมือนคนขับกับช่างเครื่อง คนขับดูความเร็ว ช่างดูความร้อน แค่ดูหน้าปัดคนละตัว',
     readTime: '15 นาที',
     diagramTitle: 'Cross-Functional Friction Compass (เข็มทิศความขัดแย้ง)',
-    diagramDescription: 'ภาพแรงดึงระหว่างความเร็วฝั่งธุรกิจ (Business Velocity) กับความรอบคอบฝั่งวิศวกรรม (Technical Rigor)',
+    diagramDescription: 'ภาพแรงดึงระหว่างความเร็วฝั่ง Business (Business Velocity) กับความรอบคอบฝั่งวิศวกรรม (Technical Rigor)',
     beginnerPrimer: {
       whatIsIt: 'Friction Scenarios คือสถานการณ์กลืนไม่เข้าคายไม่ออกที่เกิดซ้ำในบริษัทเทคแทบทุกแห่ง ระหว่างฝั่งที่หาเงิน (Business) กับฝั่งที่สร้างระบบ (Engineering)',
       whyItMatters: 'ถ้าไม่เห็นต้นตอ สองฝ่ายจะมองกันเป็นศัตรู Business มองว่า Dev เรื่องมาก ส่วน Dev มองว่า Business ไร้เหตุผล สุดท้ายบรรยากาศทั้งทีมเป็นพิษ',
@@ -602,7 +602,7 @@ export const chapters11_15: Chapter[] = [
         title: '"User" ที่แต่ละฝ่ายเข้าใจต่างกัน',
         companyOrIndustry: 'Southeast Asian B2B Marketplace',
         situation: '(ตัวอย่างสมมติ) สตาร์ทอัปทำแพลตฟอร์มซื้อขายสินค้าเกษตร ผู้บริหารสั่งทำ "ระบบยืนยันตัวตน User แบบเข้มงวดด้วยการสแกนบัตรประชาชน"',
-        whatHappened: 'ทีม Engineering เข้าใจว่า User คือเกษตรกรผู้ขายเท่านั้น เลยทำระบบสแกนบัตรเฉพาะฝั่งผู้ขาย แต่ฝ่ายธุรกิจหมายถึงฝ่ายจัดซื้อของโรงงานด้วย พอเปิดตัว โรงงานใหญ่ซื้อของไม่ได้เพราะไม่มีขั้นตอนยืนยันนิติบุคคล (Corporate Verification) โครงการสะดุด 4 เดือน เสียเงินกว่า 20 ล้านบาท',
+        whatHappened: 'ทีม Engineering เข้าใจว่า User คือเกษตรกรผู้ขายเท่านั้น เลยทำระบบสแกนบัตรเฉพาะฝั่งผู้ขาย แต่ฝั่ง Businessหมายถึงฝ่ายจัดซื้อของโรงงานด้วย พอเปิดตัว โรงงานใหญ่ซื้อของไม่ได้เพราะไม่มีขั้นตอนยืนยันนิติบุคคล (Corporate Verification) โครงการสะดุด 4 เดือน เสียเงินกว่า 20 ล้านบาท',
         resolution: 'บริษัททำศัพท์กลางของทีม (Ubiquitous Language) แยกประเภทผู้ใช้ชัดเจน: Individual Farmer, Corporate Buyer, Logistics Partner และทุกฟีเจอร์ต้องระบุว่าทำให้ผู้ใช้ประเภทไหน',
         keyLesson: 'คำธรรมดาอย่าง "ผู้ใช้" หรือ "ลูกค้า" อันตรายที่สุด ถ้าไม่ได้ตกลงความหมายกันไว้'
       },

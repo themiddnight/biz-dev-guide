@@ -112,7 +112,7 @@ export const CHAPTER_CONTENT: Record<string, ChapterContentSection[]> = {
             { cells: { type: 'C4 container (L2)', family: 'โครงสร้าง', question: 'ระบบประกอบด้วยส่วนที่รันแยกกันอะไรบ้าง', reader: 'คนเทคนิค' } },
             { cells: { type: 'Component / module map', family: 'โครงสร้าง', question: 'ข้างในส่วนหนึ่งมีก้อนย่อยอะไร', reader: 'architect · tech lead' } },
             { cells: { type: 'ERD (Entity Relationship Diagram)', family: 'โครงสร้าง', question: 'ข้อมูลมีตารางอะไร เชื่อมกันด้วยอะไร', reader: 'dev · data analyst' } },
-            { cells: { type: 'Use case', family: 'พฤติกรรม', question: 'ใครทำอะไรกับระบบได้บ้าง', reader: 'BA · QA · business' } },
+            { cells: { type: 'Use case', family: 'พฤติกรรม', question: 'ใครทำอะไรกับระบบได้บ้าง', reader: 'BA · QA · Business' } },
             { cells: { type: 'Sequence', family: 'พฤติกรรม', question: 'ใน 1 สถานการณ์ ใครเรียกใครตามลำดับไหน', reader: 'dev · QA' } },
             { cells: { type: 'State machine', family: 'พฤติกรรม', question: 'สิ่งหนึ่งมีสถานะอะไรได้บ้าง เปลี่ยนเมื่อไหร่', reader: 'dev · BA' } },
             { cells: { type: 'User flow', family: 'พฤติกรรม', question: 'ผู้ใช้เดินผ่านหน้าจอไหนบ้างกว่าจะถึงเป้าหมาย', reader: 'designer · PM' } },
@@ -177,7 +177,7 @@ export const CHAPTER_CONTENT: Record<string, ChapterContentSection[]> = {
               kind: 'note',
               id: 's5-nfr-sequence-steps',
               tone: 'info',
-              body: 'สมมติมี NFR ว่า "ร้านต้องกดรับออเดอร์ภายใน 2 นาที ถ้าเกินต้องเสนอร้านอื่น" เราไม่ก๊อปตัวเลขนี้ไปแปะทุกที่ แต่ "โยง" กันไว้:\n1. เกิดตอน elicit → เก็บเป็น NFR แยกจาก feature list\n2. traceability โยง NFR ไปหา mechanism ที่รองรับ (เช่น timeout/re-route logic ใน order module)\n3. sequence diagram ปัก annotation สั้นๆ ตรง arrow ที่รอ เช่น "async wait — ref NFR ร้านรับออเดอร์" ไม่ก๊อปเนื้อหาเต็ม\n4. engineer ตามรอย reference กลับไปหาตัวเลขจริงมาใส่ config\n\nหลักการเดียวกับ DRY ในโค้ด แก้ตัวเลขที่เดียว ไม่ต้องไล่แก้ทุกไดอะแกรมที่อ้างถึง',
+              body: 'สมมติมี NFR ว่า "ร้านต้องกดรับออเดอร์ภายใน 2 นาที ถ้าเกินต้องเสนอร้านอื่น" เราไม่ก๊อปตัวเลขนี้ไปแปะทุกที่ แต่ "โยง" กันไว้:\n1. เกิดตอน elicit → เก็บเป็น NFR แยกจาก feature list\n2. traceability โยง NFR ไปหา mechanism ที่รองรับ (เช่น timeout/re-route logic ใน order module)\n3. sequence diagram ปัก annotation สั้นๆ ตรง arrow ที่รอ เช่น "async wait — ref NFR ร้านรับออเดอร์" ไม่ก๊อปเนื้อหาเต็ม\n4. Engineer ตามรอย reference กลับไปหาตัวเลขจริงมาใส่ config\n\nหลักการเดียวกับ DRY ในโค้ด แก้ตัวเลขที่เดียว ไม่ต้องไล่แก้ทุกไดอะแกรมที่อ้างถึง',
             },
           ],
         },
@@ -219,9 +219,9 @@ export const CHAPTER_CONTENT: Record<string, ChapterContentSection[]> = {
         {
           kind: 'cards',
           id: 's6-engineer-docs',
-          title: 'เอกสารที่ engineer เขียนก่อนลงมือ',
+          title: 'เอกสารที่ Engineer เขียนก่อนลงมือ',
           intro:
-            'SA ส่ง solution design ที่ตอบว่า "ระบบจะมีหน้าตาแบบไหน" แต่ยังไม่ได้ตอบทุกรายละเอียดว่า "จะ implement ยังไงให้รอดในโค้ดจริง" engineer จึงต้องมีขั้นตอนคิดต่อและ "เขียนลง" ก่อนลงมือ เพราะการตัดสินใจที่อยู่แค่ในหัวใครคนหนึ่งจะหายไปเมื่อเขาลืม และคนอื่นในทีม (รวมถึงตัวเขาเองในอีก 6 เดือนข้างหน้า) จะไม่มีทางรู้ว่าทำไมถึงเลือกทางนี้',
+            'SA ส่ง solution design ที่ตอบว่า "ระบบจะมีหน้าตาแบบไหน" แต่ยังไม่ได้ตอบทุกรายละเอียดว่า "จะ implement ยังไงให้รอดในโค้ดจริง" Engineer จึงต้องมีขั้นตอนคิดต่อและ "เขียนลง" ก่อนลงมือ เพราะการตัดสินใจที่อยู่แค่ในหัวใครคนหนึ่งจะหายไปเมื่อเขาลืม และคนอื่นในทีม (รวมถึงตัวเขาเองในอีก 6 เดือนข้างหน้า) จะไม่มีทางรู้ว่าทำไมถึงเลือกทางนี้',
           cards: [
             {
               term: 'Technical design doc',
@@ -264,7 +264,7 @@ export const CHAPTER_CONTENT: Record<string, ChapterContentSection[]> = {
           tone: 'info',
           title: 'Pair programming',
           body:
-            'บางทีมให้ engineer สองคนนั่งเขียนโค้ดชิ้นเดียวกันพร้อมกัน คนหนึ่งพิมพ์ อีกคนคอยดูและคิดภาพรวม สลับกันเป็นระยะ วิธีนี้แลกความเร็วระยะสั้นกับคุณภาพและการกระจายความรู้ที่ดีขึ้น มักใช้กับงานที่ซับซ้อนหรือเสี่ยงสูง มากกว่าใช้ทุกงาน',
+            'บางทีมให้ Engineer สองคนนั่งเขียนโค้ดชิ้นเดียวกันพร้อมกัน คนหนึ่งพิมพ์ อีกคนคอยดูและคิดภาพรวม สลับกันเป็นระยะ วิธีนี้แลกความเร็วระยะสั้นกับคุณภาพและการกระจายความรู้ที่ดีขึ้น มักใช้กับงานที่ซับซ้อนหรือเสี่ยงสูง มากกว่าใช้ทุกงาน',
         },
       ],
     },
@@ -321,7 +321,7 @@ export const CHAPTER_CONTENT: Record<string, ChapterContentSection[]> = {
               cells: {
                 role: '**UX/UI**',
                 focus: 'ทำให้ไอเดียของ PM จับต้องได้ ก่อนใครจะลงมือสร้างจริง',
-                done: 'user ทดสอบ prototype แล้วใช้งานได้ตามที่ตั้งใจ พร้อม handoff ให้ทีม dev',
+                done: 'user ทดสอบ prototype แล้วใช้งานได้ตามที่ตั้งใจ พร้อม handoff ให้ทีม Dev',
                 ifWrong: 'ทีมสร้างของตาม design ที่ user จริงใช้ไม่เป็น ต้องมาแก้หลังลงทุนพัฒนาไปแล้ว',
               },
             },
@@ -330,14 +330,14 @@ export const CHAPTER_CONTENT: Record<string, ChapterContentSection[]> = {
                 role: '**BA**',
                 focus: 'ทำ requirement ให้ชัดพอที่ทีมจะสร้างของถูกต้องตั้งแต่รอบแรก',
                 done: 'stakeholder เซ็นรับ requirement/spec ตรงกับสิ่งที่ต้องการจริง ไม่ใช่แค่ "เขียนครบ"',
-                ifWrong: 'ทีม dev สร้างของถูกต้องตาม spec เป๊ะ แต่ผิดจากความต้องการจริง ต้องทำใหม่ทั้งก้อน',
+                ifWrong: 'ทีม Dev สร้างของถูกต้องตาม spec เป๊ะ แต่ผิดจากความต้องการจริง ต้องทำใหม่ทั้งก้อน',
               },
             },
             {
               cells: {
                 role: '**SA**',
                 focus: 'วางโครงสร้างที่รองรับทั้งวันนี้และการเติบโตข้างหน้า โดยไม่ over-engineer',
-                done: 'ทีม dev เข้าใจตรงกันว่าจะสร้างยังไง ไม่มีจุดกำกวมที่ต้องเดาเอง',
+                done: 'ทีม Dev เข้าใจตรงกันว่าจะสร้างยังไง ไม่มีจุดกำกวมที่ต้องเดาเอง',
                 ifWrong: 'ปัญหาโผล่ตอนระบบโตแล้ว แก้ยากกว่าตอนเริ่มมาก เพราะเปลี่ยน foundation ทีหลังแพงกว่าตอนวางแผน',
               },
             },
@@ -432,7 +432,7 @@ export const CHAPTER_CONTENT: Record<string, ChapterContentSection[]> = {
               cells: {
                 role: '**Engineer**',
                 before: 'เขียนโค้ดเองทุกบรรทัด',
-                trend: 'ใช้เวลาไปกับการ orchestrate/review โค้ดที่ AI generate มากกว่าพิมพ์เอง โฟกัสย้ายไปที่ code quality และผลลัพธ์ทาง business แทน',
+                trend: 'ใช้เวลาไปกับการ orchestrate/review โค้ดที่ AI generate มากกว่าพิมพ์เอง โฟกัสย้ายไปที่ code quality และผลลัพธ์ทาง Business แทน',
               },
             },
             {
@@ -599,11 +599,11 @@ export const CHAPTER_CONTENT: Record<string, ChapterContentSection[]> = {
         {
           kind: 'cards',
           id: 's14-career-eng-to-biz',
-          title: 'เส้นทางข้ามฝั่ง — engineer อยากเข้าใจ business',
+          title: 'เส้นทางข้ามฝั่ง — Engineer อยากเข้าใจ Business',
           cards: [
             {
               term: 'Engineer → Solution Architect',
-              def: 'ทางที่ไปต่อง่ายที่สุด skill เทคนิคยกมาใช้ต่อตรงๆ สิ่งที่ต้องเพิ่มคือความกว้างแทนความลึก และการสื่อสาร trade-off ให้คนไม่ใช่ engineer เข้าใจได้',
+              def: 'ทางที่ไปต่อง่ายที่สุด skill เทคนิคยกมาใช้ต่อตรงๆ สิ่งที่ต้องเพิ่มคือความกว้างแทนความลึก และการสื่อสาร trade-off ให้คนไม่ใช่ Engineer เข้าใจได้',
             },
             {
               term: 'Engineer → Business Analyst',
@@ -618,9 +618,9 @@ export const CHAPTER_CONTENT: Record<string, ChapterContentSection[]> = {
         {
           kind: 'cards',
           id: 's14-career-biz-to-tech',
-          title: 'เส้นทางข้ามฝั่ง — business อยากเข้าใจ technical (ไม่ใช่การเรียน programming)',
+          title: 'เส้นทางข้ามฝั่ง — Business อยากเข้าใจ technical (ไม่ใช่การเรียน programming)',
           intro:
-            'สิ่งที่ช่วยจริงไม่ใช่การเขียนโค้ดเป็น แต่คือ "technical literacy" — รู้พอจะคุยกับ engineer ได้ตรงจุด:',
+            'สิ่งที่ช่วยจริงไม่ใช่การเขียนโค้ดเป็น แต่คือ "technical literacy" — รู้พอจะคุยกับ Engineer ได้ตรงจุด:',
           cards: [
             {
               term: 'อ่านไดอะแกรม level 1-2 ของ C4 ออก',
@@ -639,7 +639,7 @@ export const CHAPTER_CONTENT: Record<string, ChapterContentSection[]> = {
               def: 'ซึมศัพท์จากบริบทจริง เร็วกว่าอ่านทฤษฎีเปล่าๆ',
             },
             {
-              term: 'เขียน user story ร่วมกับ engineer สักครั้ง',
+              term: 'เขียน user story ร่วมกับ Engineer สักครั้ง',
               def: 'ฝึกแปล "อยากได้อะไร" ให้เป็น requirement ที่ไม่กำกวมด้วยตัวเอง จะเห็นจุดกำกวมที่ตัวเองมองไม่เห็นตอนพูดปากเปล่า',
             },
           ],
@@ -712,7 +712,7 @@ export const S5_SWIMLANE_SEQUENCE_BLOCKS: ChapterContentSection[] = [
         kind: 'note',
         id: 's5-swimlane-vs-sequence-tip',
         tone: 'ok',
-        body: '**วิธีเลือกแบบเร็วๆ** — ถ้าคำถามที่ต้องตอบขึ้นต้นด้วย "ใครเป็นคนทำขั้นนี้" ให้ใช้ swimlane ถ้าขึ้นต้นด้วย "แล้วเกิดอะไรต่อ" หรือ "ตรงนี้รออะไรอยู่" ให้ใช้ sequence และถ้าคุยกับฝั่ง business ที่ยังไม่คุ้นสัญลักษณ์ เริ่มด้วย swimlane มักปลอดภัยกว่า เพราะกล่องกับลูกศรอ่านเข้าใจง่ายกว่า',
+        body: '**วิธีเลือกแบบเร็วๆ** — ถ้าคำถามที่ต้องตอบขึ้นต้นด้วย "ใครเป็นคนทำขั้นนี้" ให้ใช้ swimlane ถ้าขึ้นต้นด้วย "แล้วเกิดอะไรต่อ" หรือ "ตรงนี้รออะไรอยู่" ให้ใช้ sequence และถ้าคุยกับฝั่ง Business ที่ยังไม่คุ้นสัญลักษณ์ เริ่มด้วย swimlane มักปลอดภัยกว่า เพราะกล่องกับลูกศรอ่านเข้าใจง่ายกว่า',
       },
     ],
   },

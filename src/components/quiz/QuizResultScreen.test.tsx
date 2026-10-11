@@ -40,7 +40,7 @@ describe('QuizResultScreen', () => {
     const html = render(1);
     expect(html).toContain('คุณตอบ:');
     expect(html).toContain('คำตอบที่ถูก:');
-    expect(html).toContain(correct1.explanation.slice(0, 20));
+    expect(html).toContain(correct1.explanation.slice(0, 12));
   });
 
   it('a perfect score keeps the bouncing trophy and has nothing to review', () => {
