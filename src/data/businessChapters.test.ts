@@ -12,6 +12,7 @@ const BUSINESS = [
 const HERO_FIGURES: Record<string, string> = {
   s16: 'refund-unit-economics',
   s17: 'refund-fixed-deadline',
+  s18: 'refund-opportunity-cost',
 };
 
 const chapter = (id: string) => {

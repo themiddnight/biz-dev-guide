@@ -51,7 +51,8 @@ export type FigureKey =
   | 'refund-deploy-log'
   | 'refund-dual-track-board'
   | 'refund-unit-economics'
-  | 'refund-fixed-deadline';
+  | 'refund-fixed-deadline'
+  | 'refund-opportunity-cost';
 
 /** One figure shown right under a chapter's subtitle (visual-first pilot). */
 export interface ChapterHeroFigure {

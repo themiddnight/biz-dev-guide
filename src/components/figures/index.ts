@@ -33,6 +33,7 @@ import { RefundSwimlane } from './RefundSwimlane';
 import { RefundTestReport } from './RefundTestReport';
 import { RefundUnitEconomics } from './RefundUnitEconomics';
 import { RefundFixedDeadline } from './RefundFixedDeadline';
+import { RefundOpportunityCost } from './RefundOpportunityCost';
 import { TechDebtQuadrant } from './TechDebtQuadrant';
 import { ThreeLenses } from './ThreeLenses';
 import { TranslationLayers } from './TranslationLayers';
@@ -100,6 +101,7 @@ export const FIGURES: Record<FigureKey, React.FC<FigureProps>> = {
   // s16 hero (chapter content gaps spec 2026-10-11, section C)
   'refund-unit-economics': RefundUnitEconomics,
   'refund-fixed-deadline': RefundFixedDeadline,
+  'refund-opportunity-cost': RefundOpportunityCost,
   // Appendix figures (spec §6)
   'translation-layers': TranslationLayers,
   'gate-timeline': GateTimeline,
