@@ -2,7 +2,7 @@ import type { Chapter } from '../../types';
 
 /**
  * Business-side chapters for engineers (spec 2026-09-22-role-perspective.md P4.1).
- * Appended as s16–s19 so existing deep links stay valid (D10). No hero figure, no diagram widget.
+ * Appended as s16–s19 so existing deep links stay valid (D10). Each has a hero figure (chapter content gaps spec 2026-10-11, section C, which reversed P4.1); no diagram widget.
  * Illustrative money uses ฿ and is labelled ตัวเลขสมมติ; real cases keep their attributable figures.
  */
 export const chapters16_19: Chapter[] = [
@@ -457,7 +457,7 @@ export const chapters16_19: Chapter[] = [
     businessNote: 'ให้ Dev ดูก่อนเซ็น ถ้าในสัญญามีข้อผูกมัดเรื่องฟีเจอร์ วันส่ง หรือ uptime',
     engineerNote: 'ถามว่าลูกค้ารายนี้เซ็นอะไรไว้ ทั้ง SLA ค่าปรับ และฟีเจอร์ที่ฝ่ายขายรับปาก',
     keyTakeaway: 'คำสัญญากับลูกค้าเกิดตั้งแต่ขั้นขาย Dev ที่ตามขั้นตอนขายจะรู้ล่วงหน้าว่างานไหนกำลังมา',
-    plainAnalogy: 'เหมือนเพื่อนรับปากเจ้าของบ้านว่าเราจะไปทาสีห้องให้เสร็จวันเสาร์ โดยไม่ถามเราสักคำ',
+    plainAnalogy: 'เหมือนเพื่อนรับปากเจ้าของบ้านว่าเราจะทาสีห้องเสร็จวันเสาร์ โดยไม่ถามเราสักคำ',
     readTime: '10 นาที',
     beginnerPrimer: {
       whatIsIt: 'วงจรการขายคือขั้นตอนตั้งแต่เจอลูกค้าที่สนใจจนเซ็นสัญญา SLA คือข้อตกลงระดับบริการในสัญญา เช่น uptime และเวลาตอบ ถ้าทำไม่ได้ต้องชดเชย',

@@ -52,7 +52,8 @@ export type FigureKey =
   | 'refund-dual-track-board'
   | 'refund-unit-economics'
   | 'refund-fixed-deadline'
-  | 'refund-opportunity-cost';
+  | 'refund-opportunity-cost'
+  | 'refund-sla-penalty';
 
 /** One figure shown right under a chapter's subtitle (visual-first pilot). */
 export interface ChapterHeroFigure {

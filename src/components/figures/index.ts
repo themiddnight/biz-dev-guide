@@ -21,19 +21,20 @@ import { RefundDebtDiff } from './RefundDebtDiff';
 import { RefundDeployLog } from './RefundDeployLog';
 import { RefundDualTrackBoard } from './RefundDualTrackBoard';
 import { RefundFidelity } from './RefundFidelity';
+import { RefundFixedDeadline } from './RefundFixedDeadline';
 import { RefundGlossaryFix } from './RefundGlossaryFix';
 import { RefundHandoffDrift } from './RefundHandoffDrift';
 import { RefundKpiSplit } from './RefundKpiSplit';
 import { RefundNfrSpec } from './RefundNfrSpec';
+import { RefundOpportunityCost } from './RefundOpportunityCost';
 import { RefundSequence } from './RefundSequence';
+import { RefundSlaPenalty } from './RefundSlaPenalty';
 import { RefundSloDashboard } from './RefundSloDashboard';
 import { RefundSpecStack } from './RefundSpecStack';
 import { RefundStoryGates } from './RefundStoryGates';
 import { RefundSwimlane } from './RefundSwimlane';
 import { RefundTestReport } from './RefundTestReport';
 import { RefundUnitEconomics } from './RefundUnitEconomics';
-import { RefundFixedDeadline } from './RefundFixedDeadline';
-import { RefundOpportunityCost } from './RefundOpportunityCost';
 import { TechDebtQuadrant } from './TechDebtQuadrant';
 import { ThreeLenses } from './ThreeLenses';
 import { TranslationLayers } from './TranslationLayers';
@@ -98,10 +99,11 @@ export const FIGURES: Record<FigureKey, React.FC<FigureProps>> = {
   'refund-handoff-drift': RefundHandoffDrift,
   'refund-deploy-log': RefundDeployLog,
   'refund-dual-track-board': RefundDualTrackBoard,
-  // s16 hero (chapter content gaps spec 2026-10-11, section C)
+  // s16-s19 heroes (chapter content gaps spec 2026-10-11, section C)
   'refund-unit-economics': RefundUnitEconomics,
   'refund-fixed-deadline': RefundFixedDeadline,
   'refund-opportunity-cost': RefundOpportunityCost,
+  'refund-sla-penalty': RefundSlaPenalty,
   // Appendix figures (spec §6)
   'translation-layers': TranslationLayers,
   'gate-timeline': GateTimeline,
