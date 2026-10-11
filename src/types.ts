@@ -49,7 +49,8 @@ export type FigureKey =
   | 'refund-glossary-fix'
   | 'refund-handoff-drift'
   | 'refund-deploy-log'
-  | 'refund-dual-track-board';
+  | 'refund-dual-track-board'
+  | 'refund-unit-economics';
 
 /** One figure shown right under a chapter's subtitle (visual-first pilot). */
 export interface ChapterHeroFigure {

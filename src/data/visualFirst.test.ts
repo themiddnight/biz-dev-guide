@@ -19,6 +19,7 @@ const HERO_FIGURES: Record<string, string> = {
   s13: 'refund-ai-review',
   s14: 'refund-spec-stack',
   s15: 'refund-glossary-fix',
+  s16: 'refund-unit-economics',
 };
 const MONEY = /\$\s?\d/;
 

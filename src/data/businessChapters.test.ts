@@ -9,6 +9,10 @@ const BUSINESS = [
   { id: 's19', num: 19, enTerm: 'Sales Cycle & SLA' },
 ];
 
+const HERO_FIGURES: Record<string, string> = {
+  s16: 'refund-unit-economics',
+};
+
 const chapter = (id: string) => {
   const c = CHAPTERS.find((x) => x.id === id);
   if (!c) throw new Error(`missing ${id}`);
@@ -48,8 +52,9 @@ describe('business chapters s16-s19', () => {
     expect(c.perspectives?.eng).toBeDefined();
   });
 
-  it.each(BUSINESS.map((b) => b.id))('%s has no hero figure (P4.1)', (id) => {
-    expect(chapter(id).heroFigure).toBeUndefined();
+  // Chapter content gaps spec section C reversed P4.1: every business chapter opens with a hero figure.
+  it.each(Object.entries(HERO_FIGURES))('%s has its %s hero figure', (id, key) => {
+    expect(chapter(id).heroFigure?.figureKey).toBe(key);
   });
 
   it.each(BUSINESS.map((b) => b.id))('%s uses ฿, never $', (id) => {
