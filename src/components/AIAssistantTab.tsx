@@ -165,8 +165,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
   // Set by handleSend; the effect scrolls the new question to the top once it has rendered (F-04).
   const [pendingScrollId, setPendingScrollId] = useState<string | null>(null);
 
-  // To the question, not the end of the answer: the answer then reads from its top. scrollIntoView
-  // scrolls every ancestor, so this works in the desktop box and on the mobile page (F-05).
+  // To the question, not the end of the answer: the answer then reads from its top.
   useEffect(() => {
     if (!pendingScrollId) return;
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -304,8 +303,8 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
       </div>
 
       {/* Chat Conversation Thread */}
-      {/* A scroll box from sm only: on a phone it left ~250px for the answer, so the page scrolls instead (F-05) */}
-      <div data-chat-thread className="bg-base-100 border border-base-border rounded-box p-box-spacious sm:min-h-[420px] sm:max-h-[600px] sm:overflow-y-auto space-y-4 shadow-2xs">
+      {/* Never a scroll box: it clipped long answers and tables, so the page scrolls instead (F-05) */}
+      <div data-chat-thread className="bg-base-100 border border-base-border rounded-box p-box-spacious space-y-4 shadow-2xs">
         {messages.map((msg) => {
           const isAi = msg.role === 'assistant';
           return (
@@ -372,12 +371,13 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({
         )}
       </div>
 
-      {/* Below sm the note sits here, out of the sticky input block, to keep that block short */}
+      {/* The input block sticks to the bottom at every width, so the place to type is on the first
+          screen (F-08). Below sm the note sits here, out of that block, to keep it short on a phone. */}
       <p data-quota-note="mobile" className="sm:hidden px-1 text-[11px] text-base-content-muted">{QUOTA_NOTE}</p>
 
       <div
         data-chat-input
-        className="space-y-2 max-sm:sticky max-sm:bottom-0 max-sm:z-20 max-sm:bg-base-200 max-sm:pt-2 max-sm:pb-[max(0.5rem,env(safe-area-inset-bottom))]"
+        className="space-y-2 sticky bottom-0 z-20 bg-base-200 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]"
       >
         {chapterContext && (
           <div className={cn(badgeClass({ size: 'md' }), 'max-w-full font-medium text-base-content-body')}>

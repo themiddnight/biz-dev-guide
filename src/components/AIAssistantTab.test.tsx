@@ -39,22 +39,20 @@ describe('fallbackNotice', () => {
   });
 });
 
-describe('mobile chat layout (F-05)', () => {
+describe('chat layout (F-05, F-08)', () => {
   const html = renderToStaticMarkup(<AIAssistantTab />);
   const classesOf = (marker: string) =>
     (html.match(new RegExp(`<div ${marker}[^>]*class="([^"]*)"`))?.[1] ?? '').split(' ');
 
-  it('the thread is a scroll box from sm only; below sm the page scrolls', () => {
+  it('the thread is never a scroll box: the page scrolls at every width', () => {
     const thread = classesOf('data-chat-thread="true"');
-    expect(thread).toEqual(expect.arrayContaining(['sm:min-h-[420px]', 'sm:max-h-[600px]', 'sm:overflow-y-auto']));
-    const sizing = thread.filter((c) => /(^|:)(min-h|max-h|overflow-y)-/.test(c));
-    expect(sizing.every((c) => c.startsWith('sm:'))).toBe(true);
+    expect(thread.filter((c) => /(^|:)(min-h|max-h|overflow-y)-/.test(c))).toEqual([]);
   });
 
-  it('the input block sticks to the bottom below sm', () => {
+  it('the input block sticks to the bottom at every width', () => {
     const input = classesOf('data-chat-input="true"');
-    expect(input).toEqual(expect.arrayContaining(['max-sm:sticky', 'max-sm:bottom-0', 'max-sm:z-20', 'max-sm:bg-base-200']));
-    expect(input).toContain('max-sm:pb-[max(0.5rem,env(safe-area-inset-bottom))]');
+    expect(input).toEqual(expect.arrayContaining(['sticky', 'bottom-0', 'z-20', 'bg-base-200']));
+    expect(input).toContain('pb-[max(0.5rem,env(safe-area-inset-bottom))]');
   });
 
   it('the free-tier note sits under the input from sm and under the thread below sm, outside the sticky block', () => {
