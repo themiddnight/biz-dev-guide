@@ -23,8 +23,8 @@ const BEGINNER_TITLE = 'สำหรับมือใหม่: เน้นเ
 const EXPERIENCED_TITLE = 'สำหรับคนทำงานจริง: เน้นคู่มือรับมือ Friction, ห้องเจรจา และสคริปต์คำพูดจริง';
 
 const EXPERIENCE_ITEMS = [
-  { value: 'beginner', label: 'Beginner', icon: <Sprout className="w-3.5 h-3.5" />, title: BEGINNER_TITLE },
-  { value: 'experienced', label: 'Experienced', icon: <Handshake className="w-3.5 h-3.5" />, title: EXPERIENCED_TITLE },
+  { value: 'beginner', label: 'มือใหม่', icon: <Sprout className="w-3.5 h-3.5" />, title: BEGINNER_TITLE },
+  { value: 'experienced', label: 'คุ้นงาน', icon: <Handshake className="w-3.5 h-3.5" />, title: EXPERIENCED_TITLE },
 ] as const;
 
 const LEVEL_MODE_ITEMS = [
@@ -40,7 +40,7 @@ const THEME_ITEMS = [
 
 const navItems = (chapterCount: number) => [
   { value: 'guide', label: <span className="uppercase tracking-wider">Guide [{chapterCount}]</span>, icon: <BookOpen className="max-sm:hidden w-3.5 h-3.5" /> },
-  { value: 'ai', label: <span className="uppercase tracking-wider">AI Bridge</span>, icon: <Bot className="max-sm:hidden w-3.5 h-3.5" /> },
+  { value: 'ai', label: <span className="tracking-wider">ถาม AI</span>, icon: <Bot className="max-sm:hidden w-3.5 h-3.5" /> },
   { value: 'quiz', label: <span className="uppercase tracking-wider">Quiz</span>, icon: <Sparkles className="max-sm:hidden w-3.5 h-3.5 text-warning" /> },
 ] as const;
 
@@ -74,8 +74,12 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   // Role + level controls. Rendered inside the sticky header from md up; below md they sit in a
   // non-sticky strip under it so the sticky header stays short on phones.
+  // Each group carries a visible name, in the first-visit card's words: the segments alone did
+  // not say what they change (F-06).
+  const groupLabel = 'text-[11px] font-semibold text-base-content-muted';
   const controls = (
     <>
+      <span aria-hidden="true" className={groupLabel}>สายงาน</span>
       <Tabs<'biz' | 'eng' | 'none'>
         variant="segmented"
         aria-label="สายงานของคุณ"
@@ -83,10 +87,11 @@ export const Header: React.FC<HeaderProps> = ({
         value={role ?? 'none'}
         onChange={v => onChooseRole(v === 'none' ? null : v)}
       />
+      <span aria-hidden="true" className={groupLabel}>ระดับเนื้อหา</span>
       {role === null ? (
         <Tabs<ExperienceLevel>
           variant="segmented"
-          aria-label="Experience Level Switcher"
+          aria-label="ระดับเนื้อหา"
           items={EXPERIENCE_ITEMS}
           value={experienceLevel}
           onChange={setExperienceLevel}
@@ -94,7 +99,7 @@ export const Header: React.FC<HeaderProps> = ({
       ) : (
         <Tabs<LevelMode>
           variant="segmented"
-          aria-label="Experience Level Switcher"
+          aria-label="ระดับเนื้อหา"
           items={LEVEL_MODE_ITEMS}
           value={levelMode}
           onChange={onLevelModeChange}
@@ -105,15 +110,16 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <>
       <header className="sticky top-0 z-40 bg-base-100/90 backdrop-blur-md border-b border-base-border transition-colors">
-        {/* Top Banner: Brand + Theme */}
-        <div className="max-w-[1600px] mx-auto px-page py-3 flex flex-wrap items-center justify-between gap-3">
+        {/* Top Banner: Brand + Theme. One row below sm too: a wrapped theme switcher made the
+            sticky header a quarter of a small phone screen (F-07). */}
+        <div className="max-w-[1600px] mx-auto px-page py-2 sm:py-3 flex sm:flex-wrap items-center justify-between gap-3">
           {/* Brand */}
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 border border-base-border-strong bg-base-300 text-base-content flex items-center justify-center font-bold text-sm tracking-tight rounded-selector shrink-0 shadow-2xs">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 border border-base-border-strong bg-base-300 text-base-content flex items-center justify-center font-bold text-sm tracking-tight rounded-selector shrink-0 shadow-2xs">
               B↔E
             </div>
-            <div>
-              <h1 className="text-base sm:text-lg font-semibold text-base-content tracking-tight leading-none">
+            <div className="min-w-0">
+              <h1 className="text-sm sm:text-lg font-semibold text-base-content tracking-tight leading-tight sm:leading-none">
                 จุดที่ Business กับ Engineering มาเจอกัน
               </h1>
               <div className="label hidden sm:block mt-1 text-[10px] tracking-widest text-base-content-muted uppercase font-bold">
@@ -122,7 +128,7 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center gap-stack">
+          <div className="flex items-center gap-stack shrink-0">
             {/* Theme Switcher Capsule */}
             {setTheme && (
               <Tabs<'light' | 'dark' | 'system'>

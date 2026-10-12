@@ -23,6 +23,10 @@ export const FirstVisitCard: React.FC<{
   onSkip: () => void;
 }> = ({ chapters, onChoose, onSkip }) => (
   <div data-first-visit className="bg-base-100 border border-base-border rounded-box p-box-spacious shadow-2xs space-y-4">
+    {/* What the guide is, before the reader is asked to choose anything (F-10) */}
+    <p data-first-visit-about className="text-xs sm:text-sm text-base-content-body leading-relaxed">
+      คู่มือ {chapters.length} บท อธิบายงานฝั่ง Business และ Engineering เป็นภาษาคน มีรวมคำศัพท์ ผู้ช่วย AI ให้ถาม และควิซทบทวน
+    </p>
     <div className="space-y-1">
       <h2 className="text-lg sm:text-xl font-extrabold text-base-content">เริ่มจากตรงไหนดี?</h2>
       <p className="text-xs sm:text-sm text-base-content-secondary">เลือกสายงานและระดับของคุณ กดครั้งเดียวก็เริ่มอ่าน</p>

@@ -9,6 +9,12 @@ const noop = () => {};
 
 describe('FirstVisitCard', () => {
   const html = renderToStaticMarkup(<FirstVisitCard chapters={CHAPTERS} onChoose={noop} onSkip={noop} />);
+  it('says what the guide is before asking for a choice (F-10)', () => {
+    const about = html.indexOf('data-first-visit-about');
+    expect(about).toBeGreaterThan(-1);
+    expect(about).toBeLessThan(html.indexOf('เริ่มจากตรงไหนดี?'));
+    expect(html).toContain(`คู่มือ ${CHAPTERS.length} บท`);
+  });
   it('shows two role panels with their tracks', () => {
     expect(html).toContain('data-first-visit-role="biz"');
     expect(html).toContain('data-first-visit-role="eng"');

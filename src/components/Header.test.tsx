@@ -34,6 +34,16 @@ describe('Header hierarchy (spec §10.2)', () => {
     expect(html).toContain('aria-label="Theme mode switcher"');
   });
 
+  it('names the ask tab by its action and labels both control groups in Thai (F-06, F-11)', () => {
+    const html = render(null);
+    expect(html).toContain('ถาม AI');
+    expect(html).not.toContain('AI Bridge');
+    expect(html.match(/>สายงาน</g)).toHaveLength(2);
+    expect(html.match(/>ระดับเนื้อหา</g)).toHaveLength(2);
+    expect(html).toContain('มือใหม่');
+    expect(html).not.toContain('Beginner');
+  });
+
   it('no role selects the "none" segment and shows the two-level switch', () => {
     const html = render(null);
     expect(html).toMatch(/aria-pressed="true"[^>]*data-value="none"/);
