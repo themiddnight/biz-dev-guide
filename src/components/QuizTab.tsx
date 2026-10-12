@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { QuizQuestion } from '../types';
 import type { Role } from '../data/rolePerspective';
 import {
@@ -8,6 +8,7 @@ import {
 import { resolveTrack, type ChapterRef } from '../data/readingTracks';
 import { readStorage, removeStorage, writeStorage } from '../lib/storage';
 import { missedItems, type QuizAnswer } from '../lib/quizResult';
+import { chapterStartTop } from '../lib/chapterScroll';
 import { QuizResultScreen } from './quiz/QuizResultScreen';
 import {
   CheckCircle2,
@@ -164,6 +165,20 @@ const QuizRun: React.FC<QuizRunProps> = ({
   const [isFinished, setIsFinished] = useState(false);
   const [shuffledOptions, setShuffledOptions] = useState(() => shuffleOptions(questions));
 
+  // A new question starts at its heading: the next button sits below the options, so on a phone
+  // the page would otherwise stay there and show the new question's last options only (F-02).
+  const topRef = useRef<HTMLDivElement>(null);
+  const shownIndexRef = useRef(currentIndex);
+  useEffect(() => {
+    if (shownIndexRef.current === currentIndex) return;
+    shownIndexRef.current = currentIndex;
+    const top = topRef.current;
+    if (!top) return;
+    const headerBottom = document.querySelector('header')?.getBoundingClientRect().bottom ?? 0;
+    if (top.getBoundingClientRect().top >= headerBottom) return;
+    window.scrollTo({ top: chapterStartTop(top.getBoundingClientRect().top + window.scrollY, headerBottom) });
+  }, [currentIndex]);
+
   const currentQ = questions[currentIndex];
   const currentOptions = shuffledOptions[currentIndex] ?? currentQ.options;
 
@@ -215,7 +230,7 @@ const QuizRun: React.FC<QuizRunProps> = ({
   return (
     <div className="max-w-3xl mx-auto space-y-section pb-16">
       {/* Quiz Top Progress */}
-      <div>
+      <div ref={topRef}>
         <span className="text-[11px] font-bold text-base-content-muted uppercase tracking-wider">
           คำถามข้อที่ {currentIndex + 1} จาก {questions.length}
         </span>
