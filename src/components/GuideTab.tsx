@@ -286,7 +286,7 @@ export const GuideTab: React.FC<GuideTabProps> = ({
   const isCurrentRead = readChapters.includes(activeChapter.id);
   const trackNext = getTrackNext(resolveTrack(trackKey, chapters), activeChapter.id);
 
-  // Start the new chapter at its title (page top on desktop, reader card on mobile)
+  // Start the new chapter at its title: the reader card, just below the sticky header
   const handleSelectChapter = (chapterId: string) => {
     onNavigateChapter(chapterId);
     setIsIndexOpen(false);
@@ -315,6 +315,12 @@ export const GuideTab: React.FC<GuideTabProps> = ({
     setGlossaryCategory(category);
     setOpenState(prev => openSection(prev, layout, 'glossary'));
     setPendingScrollId('sec-glossary');
+  };
+
+  // Banner button -> the s15 term list itself, not the chapter top three screens above it (F-09)
+  const handleOpenGlossary = () => {
+    onNavigateChapter('s15', 'glossary');
+    setIsIndexOpen(false);
   };
 
   // s11 FAQ concept chip -> open the s15 glossary with the search prefilled
@@ -406,9 +412,9 @@ export const GuideTab: React.FC<GuideTabProps> = ({
               <span>ทำควิซทบทวนความรู้</span>
             </button>
 
-            {/* Quick jump to the glossary (chapter 15) */}
+            {/* Quick jump to the glossary term list (chapter 15) */}
             <button
-              onClick={() => handleSelectChapter('s15')}
+              onClick={handleOpenGlossary}
               className={`${TAP_GAP[8]} inline-flex items-center gap-2 px-3 sm:px-3.5 py-2 sm:py-2.5 rounded-xl bg-base-300 border border-base-border text-base-content-body text-xs sm:text-sm font-medium hover:bg-base-border transition-all cursor-pointer`}
             >
               <span aria-hidden="true">📖</span>
