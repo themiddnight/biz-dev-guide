@@ -44,6 +44,11 @@ describe('Header hierarchy (spec §10.2)', () => {
     expect(html).not.toContain('Beginner');
   });
 
+  it('explains the "ตามสายงาน" level in visible text once a role is set (F-06)', () => {
+    expect(render('biz').match(/data-level-hint[^>]*>ตามสายงาน: บทฝั่งคุณเปิดแบบกระชับ/g)).toHaveLength(2);
+    expect(render(null)).not.toContain('data-level-hint');
+  });
+
   it('no role selects the "none" segment and shows the two-level switch', () => {
     const html = render(null);
     expect(html).toMatch(/aria-pressed="true"[^>]*data-value="none"/);

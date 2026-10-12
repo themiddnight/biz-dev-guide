@@ -27,8 +27,11 @@ const EXPERIENCE_ITEMS = [
   { value: 'experienced', label: 'คุ้นงาน', icon: <Handshake className="w-3.5 h-3.5" />, title: EXPERIENCED_TITLE },
 ] as const;
 
+// Shown as the hover title and as the visible caption under the controls (F-06).
+const AUTO_MODE_HINT = 'บทฝั่งคุณเปิดแบบกระชับ บทอีกฝั่งเปิดแบบละเอียด';
+
 const LEVEL_MODE_ITEMS = [
-  { value: 'auto', label: 'ตามสายงาน', title: 'บทฝั่งคุณเปิดแบบคุ้นงาน บทอื่นเปิดแบบมือใหม่' },
+  { value: 'auto', label: 'ตามสายงาน', title: AUTO_MODE_HINT },
   ...EXPERIENCE_ITEMS,
 ] as const;
 
@@ -107,6 +110,12 @@ export const Header: React.FC<HeaderProps> = ({
       )}
     </>
   );
+  // "ตามสายงาน" exists only once a role is set, and is the one level whose name does not explain it.
+  const levelHint = role !== null && (
+    <p data-level-hint className="basis-full text-[11px] text-base-content-muted">
+      ตามสายงาน: {AUTO_MODE_HINT}
+    </p>
+  );
   return (
     <>
       <header className="sticky top-0 z-40 bg-base-100/90 backdrop-blur-md border-b border-base-border transition-colors">
@@ -158,8 +167,9 @@ export const Header: React.FC<HeaderProps> = ({
           </nav>
 
           {/* Controls: Role + Experience Level (md and up; the mobile copy is below the header) */}
-          <div className="hidden md:flex flex-wrap items-center gap-2 shrink-0">
-            {controls}
+          <div className="hidden md:flex flex-col items-end gap-1 shrink-0">
+            <div className="flex flex-wrap items-center gap-2">{controls}</div>
+            {levelHint}
           </div>
         </div>
       </header>
@@ -168,6 +178,7 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="md:hidden border-b border-base-border bg-base-100">
         <div className="max-w-[1600px] mx-auto px-page py-2 flex flex-wrap items-center gap-2">
           {controls}
+          {levelHint}
         </div>
       </div>
     </>
